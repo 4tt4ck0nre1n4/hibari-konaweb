@@ -42,3 +42,6 @@ app/
 conf/
 logs/
 sql/
+
+# Local Netlify folder
+.netlify

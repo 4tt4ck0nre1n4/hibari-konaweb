@@ -10,7 +10,7 @@ import sitemap from "@astrojs/sitemap";
 import netlify from "@astrojs/netlify";
 
 export default defineConfig({
-  site: "https://your-site-name.netlify.app",
+  site: "https://hibari-konaweb.netlify.app",
   build: {
     format: "file",
   },

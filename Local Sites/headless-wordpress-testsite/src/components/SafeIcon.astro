@@ -10,12 +10,17 @@ interface SafeIconProps {
 }
 
 const { name, width = 24, height = 24, class: className, ariaHidden = true } = Astro.props as SafeIconProps;
-
-const isValidIcon = typeof name === "string" && name !== "" && name.trim().length > 0;
 ---
 
 {
-  isValidIcon ? (
-    <Icon name={name} width={width} height={height} class={className} aria-hidden={ariaHidden} role="presentation" />
-  ) : null
+  name != null && typeof name === "string" && name.trim() !== "" && (
+    <Icon
+      name={name as never}
+      width={width}
+      height={height}
+      class={className}
+      aria-hidden={ariaHidden}
+      role="presentation"
+    />
+  )
 }
