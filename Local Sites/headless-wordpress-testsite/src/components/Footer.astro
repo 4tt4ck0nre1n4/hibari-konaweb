@@ -151,11 +151,17 @@ const typedContact = contact as ContactType;
   .footer__container {
     width: 100%;
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 2fr;
+    grid-template-columns: 2fr 2fr 2fr;
     gap: 1.5rem;
     padding-block: 2rem;
     padding-inline: 3rem;
-    align-items: start;
+    align-items: flex-start;
+  }
+
+  .footer__middleRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
   }
 
   .footer__textInner {
@@ -400,7 +406,7 @@ const typedContact = contact as ContactType;
     margin-inline: auto;
     padding-block: 1rem;
   }
-  @media screen and (max-width: 991px) {
+  @media screen and (max-width: 768px) {
     .footer__container {
       display: flex;
       flex-direction: column;
@@ -415,7 +421,7 @@ const typedContact = contact as ContactType;
     }
   }
 
-  @media screen and (max-width: 576px) {
+  @media screen and (max-width: 480px) {
     .footer__container {
       display: flex;
       flex-direction: column;
@@ -427,6 +433,12 @@ const typedContact = contact as ContactType;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
+    }
+    .footer__text_ja {
+      width: 100%;
+    }
+    .footer__text_en {
+      width: 100%;
     }
   }
 </style>

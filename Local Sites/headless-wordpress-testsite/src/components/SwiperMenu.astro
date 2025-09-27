@@ -1,6 +1,6 @@
 ---
-import { Image } from "astro:assets";
-import mouse from "/public/assets/mouse.png";
+// import { Image } from "astro:assets";
+// import mouse from "/public/assets/mouse.png";
 import { SLIDER_PATH_API } from "../api/headlessCms";
 
 interface Slider {
@@ -15,6 +15,7 @@ interface Slider {
 
 const resSlider = await fetch(SLIDER_PATH_API);
 const sliders: Slider[] = (await resSlider.json()) as unknown as Slider[];
+const mouse = "/assets/mouse.png";
 
 if (!Array.isArray(sliders)) {
   console.error("Expected an array of posts, but received:", sliders);
@@ -68,15 +69,7 @@ const mouseItem = {
       aria-label={mouseItem.ariaLabel}
       title={mouseItem.ariaTitle}
     >
-      <Image
-        id="js-mouse"
-        src={mouse}
-        alt={mouseItem.alt}
-        width={mouseItem.width}
-        height={mouseItem.height}
-        loading="lazy"
-        decoding="async"
-      />
+      <img id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" />
     </button>
   </div>
 </div>
@@ -204,16 +197,21 @@ const mouseItem = {
   }
 
   #js-mouseButton {
-    width: 40%;
+    width: 120px;
+    height: 90px;
     background: transparent;
     border: transparent 1px solid;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     border-radius: 1rem;
     margin-block-start: 0.5rem;
-    padding: 0.25rem;
+    padding: 0.5rem;
     transition:
       transform 0.1s ease,
       box-shadow 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
   }
   html.dark #js-mouseButton:is(:hover, :focus-visible) {
     box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
@@ -230,8 +228,8 @@ const mouseItem = {
     }
   } */
   #js-mouse {
-    width: 108px;
-    height: 80px;
+    width: 100px;
+    height: 70px;
     object-fit: contain;
     transform: rotate(0deg) translateX(0px);
     transition:
@@ -286,6 +284,17 @@ const mouseItem = {
       padding-block: 0.5rem;
     }
 
+    #js-mouseButton {
+      width: 100px;
+      height: 75px;
+      padding: 0.5rem;
+    }
+
+    #js-mouse {
+      width: 80px;
+      height: 55px;
+    }
+
     .confetti__wrapper {
       display: flex;
       align-items: center;
@@ -318,6 +327,17 @@ const mouseItem = {
       width: 100px;
       height: 80px;
       padding-block: 0.5rem;
+    }
+
+    #js-mouseButton {
+      width: 80px;
+      height: 60px;
+      padding: 0.25rem;
+    }
+
+    #js-mouse {
+      width: 65px;
+      height: 45px;
     }
   }
 </style>
