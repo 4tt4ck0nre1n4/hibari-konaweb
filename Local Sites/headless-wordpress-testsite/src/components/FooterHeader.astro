@@ -1,0 +1,25 @@
+---
+interface FooterProps {
+  footerHeader: string;
+}
+
+const { footerHeader } = Astro.props as FooterProps;
+---
+
+<h2 class="footer__header">
+  {footerHeader}
+</h2>
+
+<style>
+  .footer__header {
+    display: inline-block;
+    font-size: 1.25rem;
+    line-height: 1;
+    /* border: transparent 1px solid;
+    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    border-radius: 0.5rem; */
+    padding-block: 0.5rem;
+    padding-inline-start: 0.5rem;
+    padding-inline-end: 2rem;
+  }
+</style>

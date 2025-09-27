@@ -1,0 +1,62 @@
+---
+interface CrumbProps {
+  name: string;
+  path?: string;
+}
+
+const { crumbs } = Astro.props as { crumbs: CrumbProps[] };
+
+const isValidPath = (path: unknown): path is string => typeof path === "string" && path.trim() !== "";
+
+const hasMultipleCrumbs = crumbs.length > 1;
+
+let breadcrumbJsonLd: string | null = null;
+
+if (hasMultipleCrumbs) {
+  const jsonLdObject = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((crumb, index) => {
+      const base = {
+        "@type": "ListItem",
+        position: index + 1,
+        name: crumb.name,
+      };
+
+      return isValidPath(crumb.path)
+        ? {
+            ...base,
+            item: `http://headless-wordpress-testsite${crumb.path}`,
+          }
+        : base;
+    }),
+  };
+  breadcrumbJsonLd = JSON.stringify(jsonLdObject);
+}
+---
+
+{
+  hasMultipleCrumbs && (
+    <>
+      {typeof breadcrumbJsonLd === "string" && (
+        <script is:inline type="application/ld+json" set:html={breadcrumbJsonLd} />
+      )}
+
+      <div class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+          {crumbs.map((crumb) => (
+            <li>
+              {isValidPath(crumb.path) ? (
+                <a href={crumb.path} aria-label={`${crumb.name}ページへ`}>
+                  {crumb.name}
+                </a>
+              ) : (
+                <span aria-current="page">{crumb.name}</span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </>
+  )
+}

@@ -1,0 +1,415 @@
+---
+import RiveComponent from "./RiveComponent.tsx";
+
+interface CardProps {
+  href: string;
+  ariaLabel: string;
+  ariaTitle: string;
+  cardTitle: string;
+  cardBody: string;
+  cardDetails: string;
+  serviceMenu?: Array<{ item: string }>;
+  src: string;
+  stateMachines?: string | string[];
+}
+
+const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMenu, src, stateMachines } =
+  Astro.props as CardProps;
+---
+
+<li class="card__item">
+  <div class="card__flip-container">
+    <!-- 表面 -->
+    <div class="card__front">
+      <a class="card__item_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
+        <h2 class="card__item_header">
+          {cardTitle}
+          <span>&rarr;</span>
+        </h2>
+        <p class="card__item_body">
+          {cardBody}
+        </p>
+        <figure class="card__item_image">
+          <RiveComponent src={src} stateMachines={stateMachines} minWidth={300} minHeight={200} client:only="react" />
+        </figure>
+      </a>
+    </div>
+
+    <!-- 裏面 -->
+    <div class="card__back">
+      <div class="card__back_content">
+        <h2 class="card__back_header">
+          {cardTitle}
+        </h2>
+        <ul class="card__back_details">
+          {
+            Array.isArray(serviceMenu) ? (
+              serviceMenu.map((menuItem: { item: string }) => <li class="card__back_details_item">{menuItem.item}</li>)
+            ) : typeof cardDetails === "string" ? (
+              <li class="card__back_details_item">{cardDetails}</li>
+            ) : null
+          }
+        </ul>
+        <!-- <p class="card__back_body">
+          {cardDetails}
+        </p> -->
+        <!-- <div class="card__back_details">
+          <p>詳細情報がここに表示されます</p>
+          <p>カードの裏面です</p>
+        </div> -->
+        <button class="card__flip_back" type="button">&larr;</button>
+      </div>
+    </div>
+  </div>
+</li>
+
+<style>
+  .card__item {
+    display: flex;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 8px rgba(0 0 0 / 0.6);
+    background-image: none;
+    background-size: 500%;
+    background-position: 100%;
+    transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    padding: 1px;
+    perspective: 1000px;
+    min-height: 500px;
+    height: 100%;
+  }
+
+  .card__flip-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card__flip-container.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .card__front,
+  .card__back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    backface-visibility: hidden;
+    border-radius: 8px;
+  }
+
+  .card__back {
+    transform: rotateY(180deg);
+  }
+  .card__item_link {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.6;
+    color: inherit;
+    background-color: #232323;
+    background-color: transparent;
+    /* background-color: #23262d; */
+    text-decoration: none;
+    border-radius: 8px;
+    opacity: 0.8;
+    padding: calc(1.5rem - 1px);
+    overflow: hidden;
+  }
+  .card__item_header {
+    font-size: 1.125rem;
+    border-bottom: rebeccapurple 1px solid;
+    transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    margin: 0;
+  }
+  .card__item_body {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+    text-align: justify;
+    margin-block: 1rem;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+  }
+  .card__item:is(:hover, :focus-visible) {
+    background-color: transparent;
+    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    background-position: 0;
+    background-image: linear-gradient(
+      45deg,
+      rgba(238, 161, 255, 1),
+      #ffffff71,
+      rgba(147, 183, 255, 1),
+      #ffffff71,
+      rgba(170, 244, 254, 1)
+    );
+  }
+  html.dark .card__item {
+    box-shadow: 0 4px 8px rgba(255 255 255 / 0.6);
+  }
+  html.dark .card__item:is(:hover, :focus-visible) {
+    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    background-position: 0;
+    background-image: linear-gradient(45deg, #ffffff71, transparent, #ffffff71, transparent, #ffffff71);
+  }
+  .card__item:is(:hover, :focus-visible) .card__item_header {
+    color: rgb(var(--accent-light));
+    color: rebeccapurple;
+  }
+  .card__item_image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    max-height: 200px;
+    object-fit: contain;
+    margin-block-start: auto;
+    flex-shrink: 0;
+  }
+
+  .rive-container {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    max-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .rive-component {
+    width: 100%;
+    height: 100%;
+    max-height: 200px;
+  }
+
+  .rive-component canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 200px !important;
+    max-width: 300px !important;
+    object-fit: contain !important;
+    display: block;
+  }
+
+  .rive-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    max-height: 200px;
+    min-height: 150px;
+  }
+
+  .rive-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid rebeccapurple;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* 裏面のスタイリング */
+  .card__back_content {
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, rgba(102, 51, 153, 0.1) 0%, rgba(102, 51, 153, 0.05) 100%);
+    border: 1px solid rgba(102, 51, 153, 0.2);
+    border-radius: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    padding-block: 1rem;
+    padding-inline: 0.5rem;
+  }
+
+  .card__back_content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(102, 51, 153, 0.03) 50%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .card__back_header {
+    font-size: 1.125rem;
+    font-weight: bold;
+    /* color: rgb(102, 51, 153); */
+    text-align: center;
+    /* margin-bottom: 1.5rem; */
+    /* padding-bottom: 0.75rem; */
+    border-bottom: 2px solid rgba(102, 51, 153, 0.3);
+    position: relative;
+    z-index: 1;
+    padding-block-end: 0.5rem;
+  }
+
+  .card__back_body {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: rgba(102, 51, 153, 0.8);
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card__back_details {
+    width: 100%;
+    max-width: 288px;
+    /* margin-block-start: 1rem; */
+    padding-block-start: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card__back_details_item {
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    background: rgba(102, 51, 153, 0.08);
+    color: rgb(102, 51, 153);
+    margin-block-start: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border-left: 3px solid rgb(102, 51, 153);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(102, 51, 153, 0.1);
+  }
+
+  .card__back_details_item:hover {
+    background: rgba(102, 51, 153, 0.12);
+    transform: translateX(2px);
+    box-shadow: 0 4px 8px rgba(102, 51, 153, 0.15);
+  }
+
+  .card__back_details_item:last-child {
+    margin-bottom: 0;
+  }
+
+  html.dark .card__back_details_item {
+    color: #ffffff;
+  }
+
+  .card__back_details p {
+    margin: 0;
+    color: inherit;
+  }
+
+  .card__flip_back {
+    min-width: 120px;
+    background: linear-gradient(135deg, rgb(102, 51, 153) 0%, rgb(120, 70, 180) 100%);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    margin-block-start: 0.5rem;
+    padding: 0.25rem 2rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 51, 153, 0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .card__flip_back:hover {
+    background: linear-gradient(135deg, rgb(120, 70, 180) 0%, rgb(102, 51, 153) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 51, 153, 0.4);
+  }
+
+  .card__flip_back:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(102, 51, 153, 0.3);
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+
+  // カードのフリップアニメーションを初期化
+  function initCardFlip() {
+    const cards = document.querySelectorAll(".card__item");
+
+    cards.forEach((card) => {
+      const flipContainer = card.querySelector(".card__flip-container");
+      const frontLink = card.querySelector(".card__front .card__item_link");
+      const backButton = card.querySelector(".card__flip_back");
+
+      // 表面のリンククリック時の処理
+      frontLink?.addEventListener("click", (e) => {
+        e.preventDefault();
+        flipCard(flipContainer as HTMLElement, true);
+      });
+
+      // 裏面の戻るボタンクリック時の処理
+      backButton?.addEventListener("click", () => {
+        flipCard(flipContainer as HTMLElement, false);
+      });
+    });
+  }
+
+  // カードをフリップする関数
+  function flipCard(container: HTMLElement | null, isFlipping: boolean) {
+    if (!container) return;
+
+    if (isFlipping) {
+      // 表面から裏面へ
+      gsap.to(container, {
+        rotationY: 180,
+        duration: 0.4,
+        ease: "power2.inOut",
+        onComplete: () => {
+          container.classList.add("flipped");
+        },
+      });
+    } else {
+      // 裏面から表面へ
+      gsap.to(container, {
+        rotationY: 0,
+        duration: 0.4,
+        ease: "power2.inOut",
+        onComplete: () => {
+          container.classList.remove("flipped");
+        },
+      });
+    }
+  }
+
+  // DOMが読み込まれた後に初期化
+  document.addEventListener("DOMContentLoaded", initCardFlip);
+
+  // Astroの場合は、コンポーネントがマウントされた後に初期化
+  if (typeof window !== "undefined") {
+    initCardFlip();
+  }
+</script>

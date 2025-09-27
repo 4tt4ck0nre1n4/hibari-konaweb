@@ -1,0 +1,152 @@
+---
+import { Icon } from "astro-icon/components";
+
+const offBackgroundIcon = "fluent-emoji-high-contrast:mobile-phone-with-arrow";
+const onBackgroundIcon = "fluent-emoji:mobile-phone";
+---
+
+<button
+  id="toggleBackgroundButton"
+  type="button"
+  aria-label="背景色を切り替える（背景色あり）"
+  title="背景色を切り替える（背景色あり）"
+>
+  <Icon
+    class="offBackgroundIcon background-visible"
+    name={offBackgroundIcon}
+    width="50"
+    height="50"
+    aria-hidden="true"
+    role="presentation"
+  />
+  <Icon
+    class="onBackgroundIcon background-hidden"
+    name={onBackgroundIcon}
+    width="50"
+    height="50"
+    aria-hidden="true"
+    role="presentation"
+  />
+</button>
+<p id="ariaLiveStatus" class="screenReader-only" role="status" aria-live="polite"></p>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const mainContainer = document.getElementById("main-container");
+    const backgroundButton = document.getElementById("toggleBackgroundButton");
+    const offIcon = document.querySelector(".offBackgroundIcon");
+    const onIcon = document.querySelector(".onBackgroundIcon");
+    const ariaLiveStatus = document.getElementById("ariaLiveStatus");
+
+    if (!mainContainer || !backgroundButton || !offIcon || !onIcon || !ariaLiveStatus) {
+      return;
+    }
+
+    let isImageOff = false;
+    let ariaLabel = "背景画像を切り替える（背景画像あり）";
+    let title = "背景画像を切り替える（背景画像あり）";
+
+    const updateAccessibility = () => {
+      backgroundButton.setAttribute("aria-label", ariaLabel);
+      backgroundButton.setAttribute("title", title);
+    };
+
+    const updateIcons = () => {
+      if (isImageOff) {
+        offIcon.classList.replace("background-visible", "background-hidden");
+        onIcon.classList.replace("background-hidden", "background-visible");
+      } else {
+        onIcon.classList.replace("background-visible", "background-hidden");
+        offIcon.classList.replace("background-hidden", "background-visible");
+      }
+    };
+
+    updateIcons();
+
+    backgroundButton.addEventListener("click", () => {
+      isImageOff = mainContainer.classList.toggle("is-notImage");
+
+      if (isImageOff) {
+        ariaLabel = "背景画像を切り替える（背景画像なし）";
+        title = "背景画像を切り替える（背景画像なし）";
+        ariaLiveStatus.textContent = "背景画像なしに切り替えました";
+      } else {
+        ariaLabel = "背景画像を切り替える（背景画像あり）";
+        title = "背景画像を切り替える（背景画像あり）";
+        ariaLiveStatus.textContent = "背景画像ありに切り替えました";
+      }
+
+      updateAccessibility();
+      updateIcons();
+    });
+  });
+</script>
+
+<style>
+  #toggleBackgroundButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    border: transparent 1px solid;
+    border-radius: 1rem;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.4s ease;
+  }
+  #toggleBackgroundButton:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+  }
+  #toggleBackgroundButton:active {
+    transform: scale(0.8);
+    box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+  }
+  #toggleBackgroundButton svg {
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    filter: drop-shadow(10px 20px 20px rgba(160 160 160 / 0.7));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition:
+      opacity 1.8s ease,
+      transform 0.35s ease;
+  }
+  .offBackgroundIcon {
+    color: slategray;
+    opacity: 1;
+    z-index: 2;
+    transition:
+      opacity 1.8s ease,
+      transform 0.35s ease;
+  }
+  .onBackgroundIcon {
+    filter: drop-shadow(10px 20px 20px rgba(160 160 160 / 0.7));
+    opacity: 0;
+    z-index: 1;
+    transition:
+      transform 0.35s ease,
+      box-shadow 0.4s ease,
+      opacity 1.8s ease;
+  }
+  .offBackgroundIcon:is(:hover, :focus-visible) {
+    transform: scale(1.1);
+  }
+
+  .onBackgroundIcon:is(:hover, :focus-visible) {
+    transform: scale(1.1);
+  }
+  .background-visible {
+    opacity: 1;
+  }
+  .background-hidden {
+    opacity: 0;
+  }
+</style>

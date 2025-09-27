@@ -1,0 +1,734 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import worksText from "../../data/worksText.json";
+import globalText from "../../data/globalText.json";
+import { WORKS_SLUG_API, WORKS_PATH_API } from "../../api/headlessCms";
+
+interface Works {
+  id: number;
+  date: number;
+  title: {
+    rendered: string;
+  };
+  slug: string;
+  acf?: {
+    screenshot_pc?: string;
+    left_link?: string;
+    span_access?: string;
+    span_user?: string;
+    span_password?: string;
+    left_text?: string;
+    pc_image?: string;
+    right_header?: string;
+    right_title?: string;
+    icon_image?: string;
+    right_access?: string;
+    sp_image?: string;
+    right_link?: string;
+    description?: string;
+    icon_vscode?: string;
+    icon_html?: string;
+    icon_css?: string;
+    icon_sass?: string;
+    icon_javascript?: string;
+    icon_jquery?: string;
+    icon_typescript?: string;
+    icon_gsap?: string;
+    icon_swiper?: string;
+    icon_three?: string;
+    icon_react?: string;
+    icon_wordpress?: string;
+    icon_vite?: string;
+    icon_gulp?: string;
+    icon_webpack?: string;
+    icon_astro?: string;
+    icon_canva?: string;
+    icon_adobexd?: string;
+    icon_photoshop?: string;
+    icon_illustrator?: string;
+    icon_figma?: string;
+  };
+}
+
+interface WorksTextData {
+  worksTitle: string;
+  worksText: string;
+  [key: string]:
+    | {
+        left_leadMenu: {
+          header: string;
+          body: string;
+        }[];
+      }
+    | string;
+}
+
+const typedWorksText: WorksTextData = worksText as unknown as WorksTextData;
+
+const { slug } = Astro.params as { slug: string };
+let work: Works | null = null;
+
+const workTextData =
+  slug in typedWorksText && typedWorksText[slug] !== null && typeof typedWorksText[slug] === "object"
+    ? typedWorksText[slug]
+    : null;
+
+try {
+  const resWorks = await fetch(
+    // `${import.meta.env.PUBLIC_API_URL}works?_fields=acf,slug,title&acf_format=standard&slug=${slug}`,
+    `${WORKS_SLUG_API}${slug}`
+  );
+
+  console.log("Fetching data WORKS_SLUG_API:", WORKS_SLUG_API);
+
+  if (!resWorks.ok) {
+    console.error("Failed to fetch work data. Status:", resWorks.status);
+    throw new Error("Failed to fetch work data");
+  }
+
+  const data = (await resWorks.json()) as Works[];
+
+  console.log("API Response:", data);
+
+  if (Array.isArray(data) && data.length > 0 && data[0] !== undefined) {
+    work = data[0];
+  } else {
+    console.warn(`No data found for slug: ${slug}`);
+    work = null;
+  }
+} catch (error) {
+  console.error("Error fetching work data:", error);
+  work = null;
+}
+
+export async function getStaticPaths() {
+  try {
+    const res = await fetch(
+      WORKS_PATH_API
+      // `${import.meta.env.PUBLIC_API_URL}works?_fields=id,title,slug&acf_format=standard`,
+    );
+
+    console.log("Fetching data WORKS_PATH_API:", WORKS_PATH_API);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch works data");
+    }
+
+    const dataWorks = (await res.json()) as Works[];
+
+    console.log("API Response:", dataWorks);
+
+    const paths = dataWorks.map((work) => ({
+      params: { slug: work.slug },
+      props: { work },
+    }));
+
+    return paths;
+  } catch (error) {
+    console.error("Error in getStaticPaths:", error);
+
+    return [];
+  }
+}
+
+if (!work) {
+  console.error(`No matching data found for slug: ${slug}`);
+  throw new Error("404: Not Found");
+}
+
+const icons = work?.acf
+  ? Object.entries(work.acf)
+      .filter(([key, value]) => key.startsWith("icon_") && typeof value === "string" && value.trim() !== "")
+      .map(([key, value]) => ({
+        name: key.replace("icon_", ""),
+        url: value.trim(),
+      }))
+  : [];
+
+const worksSlugTitle = work?.title?.rendered;
+const worksSlugDescription = work?.acf?.description ?? "";
+const worksScreenshotPc = work?.acf?.screenshot_pc ?? "";
+const worksPcImage = work?.acf?.pc_image;
+const worksSpImage = work?.acf?.sp_image;
+const worksIconImage = work?.acf?.icon_image;
+const worksSlugLeftLink = work?.acf?.left_link;
+const worksSlugRightLink = work?.acf?.right_link;
+const worksRightHeader = work?.acf?.right_header;
+const worksRightAccess = work?.acf?.right_access;
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: worksSlugTitle,
+  description: work?.acf?.description?.replace(/(<([^>]+)>)/gi, "").trim(),
+  url: `${globalText.url}/works/${work.slug}`,
+  dataPublished: work.date,
+  author: {
+    "@type": "Person",
+    name: "hibari-konaweb.com",
+  },
+  image: worksScreenshotPc,
+});
+
+const worksSlugLinks = {
+  slug: { rendered: work?.slug },
+  ariaLabel: "のページへ",
+  ariaTitle: "のページへ",
+};
+
+const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, { name: worksSlugTitle }];
+---
+
+<Layout
+  title={worksSlugTitle ?? "Work PageTitle Not Found"}
+  description={worksSlugDescription}
+  ogType={globalText.local.type}
+  ogTitle={worksSlugTitle ?? "Work PageTitle Not Found"}
+  ogDescription={worksSlugDescription}
+  twitterTitle={worksSlugTitle ?? "Work PageTitle Not Found"}
+  twitterDescription={worksSlugDescription}
+  jsonLd={jsonLd}
+>
+  <div id="outer-container">
+    <Header />
+    <main id="page-wrap">
+      <div class="breadcrumbs__wrapper">
+        <Breadcrumbs {crumbs} />
+      </div>
+      <div>
+        {
+          work !== null ? (
+            <article class="work">
+              <div class="split__container">
+                <div class="split left left1">
+                  <div class="left__imageInner">
+                    <img
+                      class="left__image"
+                      src={worksScreenshotPc}
+                      alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+                  <div class="left__inner">
+                    <h1 class="left__title" set:html={worksSlugTitle ?? "No title available"} />
+                    <a
+                      class="left__link"
+                      href={worksSlugLeftLink}
+                      aria-label={`${worksSlugTitle}${worksSlugLinks.ariaLabel}`}
+                      title={`${worksSlugTitle}${worksSlugLinks.ariaTitle}`}
+                    >
+                      <span set:html={work?.acf?.span_access ?? ""} />
+                      <span set:html={work?.acf?.span_user ?? ""} />
+                      <span set:html={work?.acf?.span_password ?? ""} />
+                      <span set:html={worksSlugLeftLink ?? ""} />
+                    </a>
+                    <ul class="left__leadMenu">
+                      {workTextData?.left_leadMenu && workTextData.left_leadMenu.length > 0 ? (
+                        workTextData.left_leadMenu.map(({ header, body }) => (
+                          <li class="left__leadMenu_item">
+                            <h2 class="left__leadMenu_header">{header}</h2>
+                            <p class="left__leadMenu_body">{body}</p>
+                          </li>
+                        ))
+                      ) : (
+                        <li>
+                          <p style="display:none;" />
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="split right site1">
+                  <img
+                    class="right__pcImage"
+                    src={worksPcImage ?? ""}
+                    alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <p class="right__header" set:html={worksRightHeader ?? "No title available"} />
+                  <img
+                    class="right__logoIcon"
+                    src={worksIconImage ?? ""}
+                    alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <p class="right__text" set:html={worksRightAccess ?? ""} />
+                  <img
+                    class="right__spImage"
+                    src={worksSpImage ?? ""}
+                    alt={worksSlugTitle ?? "No image"}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <a
+                    class="right__link"
+                    href={worksSlugRightLink}
+                    aria-label={`${worksSlugRightLink}${worksSlugLinks.ariaLabel}`}
+                    title={`${worksSlugRightLink}${worksSlugLinks.ariaTitle}`}
+                    set:html={worksSlugRightLink}
+                  />
+                  <ul class="right__iconMenu">
+                    {icons.length > 0 ? (
+                      icons.map(({ name, url }) => (
+                        <li class="right__iconMenu_item">
+                          <img
+                            class="right__iconMenu_image"
+                            src={url}
+                            alt={`${name} icon`}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <span class="right__iconMenu_text">{name}</span>
+                          <div class="right__iconMenu_cover" />
+                        </li>
+                      ))
+                    ) : (
+                      <li class="right__iconMenu_item">
+                        <span>{worksText.error.noIcon}</span>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </article>
+          ) : (
+            <div>
+              <h1>{worksText.error.title}</h1>
+              <p>{worksText.error.text}</p>
+            </div>
+          )
+        }
+      </div><!-- #page-wrap -->
+    </main>
+  </div><!-- #outer-container -->
+  <Footer />
+</Layout>
+
+<script src="../../scripts/splitWorks.ts"></script>
+
+<style is:global>
+  :root {
+    --container-bg-color: #333;
+    --left-bg-color: rgba(223, 39, 39, 0.7);
+    --left-button-hover-color: rgba(161, 11, 11, 0.3);
+    --right-bg-color: rgba(43, 43, 43, 0.8);
+    --right-button-hover-color: rgba(92, 92, 92, 0.3);
+    --hover-width: 75%;
+    --other-width: 25%;
+    /* --speed: 1000ms; */
+    --speed: 800ms;
+    --gradient: linear-gradient(150deg, rgba(0, 19, 172, 1) 0%, rgba(100, 255, 209, 1) 55%, rgba(43, 255, 152, 1) 100%);
+  }
+  .work {
+    color: white;
+    position: relative;
+    z-index: 1;
+    margin-block-start: 5rem;
+    padding-block-start: 3rem;
+  }
+  .split__container {
+    width: 100%;
+    height: 100vh;
+    background: var(--container-bg-color);
+    position: relative;
+  }
+  .split.left::before,
+  .split.right::before {
+    position: absolute;
+    content: "";
+    width: 100%;
+    height: 100%;
+  }
+  .split.left::before {
+    background: var(--left-bg-color);
+  }
+  .split.right::before {
+    background: var(--right-bg-color);
+  }
+  .split.left,
+  .split.right,
+  .split.left::before,
+  .split.right::before {
+    transition: var(--speed) all ease-in-out;
+  }
+  .hover-left .left,
+  .hover-right .right {
+    width: var(--hover-width);
+  }
+  .hover-left .split.left::before,
+  .hover-right .split.right::before {
+    background: transparent;
+  }
+  .hover-left .right,
+  .hover-right .left {
+    width: var(--other-width);
+  }
+  .hover-right .left::before,
+  .hover-left .right::before {
+    z-index: 2;
+  }
+  .split {
+    width: 50%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+  }
+  .split.right {
+    display: grid;
+    place-items: end;
+  }
+  /* 左サイド サイト画像 */
+  .split.left {
+    top: 0;
+    left: 0;
+    background-position: top center;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .left__imageInner {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+  .left__image {
+    width: 100%;
+    object-fit: cover;
+  }
+  /* 左サイド モーダル風 */
+  .split.left::before.left1 .left__inner {
+    opacity: 0;
+    transition: all 0.85s ease;
+    display: none;
+  }
+  .split.left.left1 .left__inner {
+    width: 95%;
+    height: 100%;
+    max-height: 100vh;
+    background-color: transparent;
+    -webkit-backdrop-filter: blur(50px);
+    backdrop-filter: blur(50px);
+    background-image: linear-gradient(90deg, rgba(255 255 255 / 0.6), rgba(0 0 0 / 0.1));
+    background-size: 100vw 100vh;
+    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    box-shadow: 0px 4px 60px 0 rgba(56, 74, 244, 0.75);
+    border-radius: 1rem;
+    position: absolute;
+    top: 0%;
+    left: 10%;
+    left: 3%;
+    z-index: 10;
+    opacity: 0;
+    overflow-y: auto;
+    /* scrollbar-gutter: stable; */
+    margin-inline: auto;
+    padding-block: 3rem;
+    padding-inline: 2rem;
+  }
+  /* 左サイド サイトタイトル */
+  .left__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #010101;
+    white-space: nowrap;
+  }
+  /* 左サイド サイトテキスト */
+  .left__text {
+    font-size: 1rem;
+    color: #010101;
+  }
+  .left__leadMenu {
+    list-style: none;
+  }
+  .left__leadMenu_item {
+    /* border: 1px solid pink; */
+  }
+  .left__leadMenu_header {
+    font-size: 1rem;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    color: #010101;
+    color: rebeccapurple;
+    text-align: justify;
+    margin-block-start: 2rem;
+  }
+  .left__leadMenu_body {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    letter-spacing: 0.16em;
+    color: #010101;
+    text-align: justify;
+    margin-block-start: 0.5rem;
+  }
+  /* 左サイド サイトリンク URL */
+  .left__link {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #010101;
+    text-decoration: none;
+    margin-block-start: 1rem;
+  }
+  .left__link span {
+    line-height: 2;
+  }
+  .left__link span:nth-child(4) {
+    color: rebeccapurple;
+    text-decoration: underline;
+  }
+  /* 右サイド ロゴアイコン */
+  .right__logoIcon {
+    width: 2.5rem;
+    height: 2.5rem;
+    width: 3rem;
+    height: 3rem;
+    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    border-radius: 50%;
+    position: absolute;
+    top: 8%;
+    left: 4%;
+    z-index: 1;
+    animation: transLogo 2s ease-in infinite alternate;
+  }
+  @keyframes transLogo {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(20px);
+    }
+  }
+  /* 右サイド ヘッダー Portforlio */
+  .right__header {
+    font-size: 1.5rem;
+    color: inherit;
+    white-space: nowrap;
+    position: absolute;
+    top: 2%;
+    left: 4%;
+  }
+  .right__header span {
+    opacity: 0;
+    transform: translateX(24px);
+    transition:
+      opacity 0.3s ease-in,
+      transform 0.3s ease-in;
+  }
+  .right__header span + span {
+    padding: 0.1em;
+  }
+  .right__header span.is-active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  /* 右サイド Basic認証テキスト */
+  .right__text {
+    width: 34rem;
+    font-size: 1rem;
+    color: inherit;
+    background-color: transparent;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    background-image: linear-gradient(120deg, rgba(255 255 255 / 0.3), rgba(0 0 0 / 0.2));
+    background-size: 100px 0px;
+    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    box-shadow: 0px 4px 60px 0 rgba(56, 74, 244, 0.75);
+    white-space: nowrap;
+    border: rgba(43, 255, 152, 1) 0.2em solid;
+    border-radius: 0.5rem;
+    position: absolute;
+    top: 70%;
+    left: 20%;
+    opacity: 1;
+    padding-block: 0.25rem;
+    padding-inline: 1rem;
+  }
+  .right__text span {
+    display: inline-block;
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  .right__text span + span {
+    padding: 2px;
+  }
+  .right__text span.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.6s ease;
+  }
+  /* 右サイド サイト pc画像 */
+  .split.right {
+    top: 0;
+    right: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .right__pcImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* 右サイド サイト sp画像 */
+  .split.right .right__spImage {
+    width: 40%;
+    height: 40%;
+    position: absolute;
+    top: 12%;
+    right: 2%;
+    animation: rotateCircle 10s linear infinite alternate;
+  }
+  @keyframes rotateCircle {
+    0% {
+      transform: translateY(-24px);
+    }
+    100% {
+      transform: translateY(24px);
+    }
+  }
+  .right__link {
+    width: 26rem;
+    max-width: 100%;
+    font-family: "Poppins", sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    background-color: transparent;
+    text-decoration: none;
+    text-shadow: 0 0 80px aqua;
+    background: var(--gradient);
+    background-size: 48px;
+    border: rgba(43, 255, 152, 1) 2px solid;
+    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    border-radius: 0.5rem;
+    -webkit-backdrop-filter: blur(1px);
+    backdrop-filter: blur(1px);
+    white-space: nowrap;
+    overflow: hidden;
+    position: absolute;
+    top: 60%;
+    right: 30%;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    cursor: pointer;
+    padding-block: 0.5rem;
+    padding-inline: 1rem;
+  }
+
+  .split.right .right__link:after {
+    content: "";
+    display: block;
+    height: 0;
+    opacity: 0;
+    transform: translateY(-50%) scale(0.1);
+    transition:
+      opacity 0.5s,
+      transform 0s;
+    transition-delay: 0s, 0.4s;
+  }
+  .split.right .right__link:is(:hover, :focus-visible) {
+    background: transparent;
+  }
+  .hover-right .right__link {
+    opacity: 1;
+  }
+
+  .split.right .right__link:is(:hover, :focus-visible)::after {
+    opacity: 1;
+    content: "";
+    width: 32rem;
+    height: 2.5rem;
+    position: absolute;
+    top: 4%;
+    left: 0.5%;
+    z-index: -1;
+    background: var(--gradient);
+    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    opacity: 1;
+    transform: scale(1.1);
+    transition-delay: 0s;
+    transition:
+      opacity 0.8s,
+      transform 0.6s ease-in-out;
+    border-radius: 0.5rem;
+  }
+  .right__link span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(-24px);
+    transition:
+      opacity 0.3s ease-in,
+      transform 0.3s ease-in;
+  }
+  .right__link span + span {
+    padding: 4px;
+  }
+  .right__link span.is-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.6s ease;
+  }
+  /* 右サイド スキルアイコン */
+  .right__iconMenu {
+    width: 100%;
+    height: 12%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: transparent;
+    box-shadow: 0px 4px 60px 0 rgba(56 74 244 / 0.75);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    background-image: linear-gradient(120deg, rgba(255 255 255 / 0.3), rgba(0 0 0 / 0.2));
+    background-position: 200%;
+    background-size: 40px 80px;
+    position: absolute;
+    bottom: 10%;
+    right: 0%;
+  }
+
+  .split__container.right.right__iconMenu {
+    opacity: 1;
+  }
+  .right__iconMenu_item {
+    width: 10%;
+    height: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    position: relative;
+  }
+  .right__iconMenu_image {
+    width: 50%;
+    height: 100%;
+    height: auto;
+    box-shadow: 0 4px 15px 0 rgba(49 196 190 / 0.75);
+    object-fit: contain;
+    position: relative;
+    transition: transform 0.3s ease-in-out;
+  }
+  .right__iconMenu_text {
+    font-family: "Poppins", san-serif;
+    font-size: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    margin-top: -18px;
+  }
+  .right__iconMenu_item.is-active .right__iconMenu_image {
+    transform: translateY(-24px);
+  }
+  .right__iconMenu_item.is-active .right__iconMenu_text {
+    opacity: 1;
+  }
+  .right__iconMenu_item .right__iconMenu_cover {
+    display: none;
+  }
+</style>

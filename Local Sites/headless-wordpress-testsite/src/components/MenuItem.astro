@@ -1,0 +1,24 @@
+---
+interface MenuItemProps {
+  className?: string;
+  href?: string;
+  ariaLabel?: string;
+  ariaTitle?: string;
+  menuItem?: string;
+}
+
+const props = Astro.props as MenuItemProps;
+const href = props.href ?? "#";
+const ariaLabel = props.ariaLabel ?? "";
+const ariaTitle = props.ariaTitle ?? "";
+const menuItem = props.menuItem ?? "";
+---
+
+<a
+  {...typeof props.className === "string" && props.className.trim() !== "" ? { class: props.className } : {}}
+  href={href}
+  aria-label={ariaLabel}
+  title={ariaTitle}
+>
+  {menuItem}
+</a>

@@ -1,0 +1,6 @@
+.spinner {
+  width: 5px;
+  height: 5px;
+  margin-inline: auto;
+  /* animation: animate-spin; */
+}

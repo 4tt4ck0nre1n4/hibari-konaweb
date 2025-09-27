@@ -1,0 +1,349 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+import type { GetStaticPaths } from "astro";
+import { Icon } from "astro-icon/components";
+import { generateBreadcrumbs } from "../../../util/generateBreadcrumbs";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import globalText from "../../../data/globalText.json";
+
+interface CategoryPosts {
+  id: number;
+  name: string;
+  slug: string;
+  link: string;
+  title: string;
+  date: number;
+  acf?: {
+    description?: string;
+  };
+}
+
+interface Post {
+  id: number;
+  title: {
+    rendered: string;
+  };
+  slug: string;
+  date: string;
+  categories: number[];
+  acf?: {
+    blog_title: string;
+    blog_image: string;
+  };
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  try {
+    console.log("Fetching Categories from API...");
+
+    const response = await fetch(`http://headless-wordpress-testsite.local/wp-json/wp/v2/categories?per_page=100`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch posts for category slugs: ${response.status}`);
+    }
+
+    const categories = (await response.json()) as CategoryPosts[];
+    console.log("Fetched categories:", categories);
+
+    if (!Array.isArray(categories) || categories.length === 0) {
+      console.warn("No category found.");
+      return [];
+    }
+
+    const paths = categories
+      .filter((category) => typeof category.slug === "string" && category.slug.trim() !== "")
+      .map((category) => ({
+        params: { slug: decodeURIComponent(category.slug) },
+      }));
+
+    console.log("Generated category paths:", paths);
+
+    return paths;
+  } catch (error) {
+    console.error("Error in getStaticPaths:", error);
+    return [];
+  }
+};
+
+const { slug } = Astro.params as { slug: string };
+
+let category: CategoryPosts | null = null;
+let posts: Post[] = [];
+
+try {
+  console.log(`Fetching category details for slug: ${slug}`);
+
+  const categoryRes = await fetch(
+    `http://headless-wordpress-testsite.local/wp-json/wp/v2/categories?slug=${slug}&per_page=100`
+  );
+
+  if (!categoryRes.ok) {
+    throw new Error(`Failed to fetch category datails: ${categoryRes.status}`);
+  }
+
+  const categoryData = (await categoryRes.json()) as CategoryPosts[];
+
+  category = categoryData.length > 0 ? (categoryData[0] ?? null) : null;
+
+  if (!category) {
+    throw new Error("404: Not Found");
+  }
+
+  console.log(`Fetching posts for category ID: ${category.id}`);
+
+  const postsRes = await fetch(
+    `http://headless-wordpress-testsite.local/wp-json/wp/v2/posts?_embed&acf_format=standard&categories=${category.id}&per_page=100`
+  );
+
+  if (!postsRes.ok) {
+    throw new Error(`Failed to fetch posts for category: ${postsRes.status}`);
+  }
+
+  posts = (await postsRes.json()) as Post[];
+} catch (error) {
+  console.error("Error fetching category data:", error);
+
+  category = null;
+}
+
+const categoryTitle = "カテゴリー：";
+const categoryText = "同じカテゴリーの記事の一覧です。";
+const categoryError = "このカテゴリーには記事がありません。";
+const categoryLink = "カテゴリー記事一覧のページへ";
+const title = category?.name ?? "カテゴリー記事が見つかりません";
+const description = category?.acf?.description ?? "No description";
+
+const crumbs = generateBreadcrumbs(Astro.url.pathname);
+const dateIcon = "emojione-v1:alarm-clock";
+---
+
+<Layout
+  title={title}
+  description={description ?? ""}
+  ogType={globalText.local.type}
+  ogTitle={title}
+  ogDescription={description ?? ""}
+  twitterTitle={title}
+  twitterDescription={description ?? ""}
+>
+  <div id="outer-container">
+    <Header />
+    <main id="page-wrap">
+      <div class="breadcrumbs__wrapper">
+        <Breadcrumbs {crumbs} />
+      </div>
+      <div class="category__wrapper">
+        <div class="flowingLines">
+          <h1 class="category__title">
+            {`${categoryTitle}${title}`}
+          </h1>
+          <p class="category__text">
+            {categoryText}
+          </p>
+        </div>
+        <ul class="category__menu">
+          {
+            posts.length > 0 ? (
+              posts.map((post) => (
+                <li class="category__menu_item">
+                  <a class="category__menu_link" href={`/blog/${post.slug}`}>
+                    <div class="category__thumbnail">
+                      <figure class="category__figure">
+                        <img
+                          class="category__image"
+                          src={post.acf?.blog_image ?? undefined}
+                          alt={post.title.rendered}
+                          decoding="async"
+                          loading="lazy"
+                        />
+                      </figure>
+                    </div>
+                    <div class="category__contents">
+                      <h2 class="category__header" set:html={post.acf?.blog_title ?? post.title.rendered} />
+                      <div class="category__footer">
+                        <div class="category__times">
+                          <Icon name={dateIcon} />
+                          <time
+                            class="category__dateTime"
+                            datetime={new Date(post.date)
+                              .toLocaleDateString("ja-JP", {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                              })
+                              .replaceAll("/", "-")}
+                            set:html={new Date(post.date)
+                              .toLocaleDateString("ja-JP", {
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                              })
+                              .replaceAll("/", "-")}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </li>
+              ))
+            ) : (
+              <p class="category__error">{categoryError}</p>
+            )
+          }
+        </ul>
+        <p class="category__footerText">
+          <a class="category__footer_link" href="/blog/category">
+            {categoryLink}
+          </a>
+        </p>
+      </div>
+    </main>
+    <Footer />
+  </div>
+</Layout>
+
+<style>
+  .category__wrapper {
+    width: 700px;
+    max-width: 100%;
+    max-width: calc(100% - 2rem);
+    margin-inline: auto;
+    padding: 1rem;
+  }
+  .category__title {
+    font-size: 2rem;
+    text-align: center;
+  }
+  .category__text {
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.1em;
+    color: inherit;
+    text-align: center;
+    margin-block-start: 1rem;
+  }
+  .category__menu {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(32ch, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+    color: white;
+    list-style: none;
+    margin-block-start: 3rem;
+    padding-inline-start: 0;
+  }
+  .category__menu_item {
+    flex-basis: 33.3%;
+    flex-basis: 48%;
+    height: 100%;
+    color: rebeccapurple;
+    background-color: whitesmoke;
+    border: none;
+    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+    padding-block: 1rem;
+    padding-inline: 1rem;
+    transition: all 0.5s ease;
+  }
+  .category__menu_item:is(:hover, :focus-visible) {
+    border: transparent 1px solid;
+    box-shadow: 0 20px 20px rgba(0 0 0 / 0.6);
+    /* border: rebeccapurple 1px solid; */
+  }
+  .category__menu_link {
+    border: none;
+    text-decoration: none;
+  }
+  .category__menu_link:is(:hover, :focus-visible) {
+  }
+  .category__thumbnail {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  .category__figure {
+    width: 100%;
+    display: flex;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+    align-items: flex-start;
+    position: relative;
+    margin-block-start: 1rem;
+  }
+  .category__image {
+    display: block;
+    max-width: 100%;
+    flex-shrink: 0;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-inline: auto;
+  }
+  .category__image:is(:hover, :focus-visible) {
+    transform: scale(1.2);
+  }
+  .category__contents {
+    color: rebeccapurple;
+    transition: all 0.25s ease;
+  }
+  .category__contents:is(:hover, :focus-visible) {
+    color: blue;
+    opacity: 0.5;
+  }
+  .category__header {
+    font-size: 1.125rem;
+    /* color: inherit; */
+    /* color: rebeccapurple; */
+    /* color: white; */
+    overflow: hidden;
+    margin-block-start: 1rem;
+  }
+  .category__footer {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    margin-block-start: 1rem;
+  }
+  .category__times {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-block-start: auto;
+  }
+  .category__dateTime {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    /* color: inherit;
+    color: white;
+    color: rebeccapurple; */
+    align-self: flex-end;
+    margin-block-start: auto;
+    margin-inline-start: 0.25rem;
+  }
+  .category__footerText {
+    margin-block-start: 3rem;
+    text-align: center;
+  }
+  .category__footer_link {
+    letter-spacing: 0.04em;
+    color: rebeccapurple;
+    border: none;
+    padding-block: 0.5rem;
+    padding-inline: 1rem;
+    transition: all 0.5s ease;
+  }
+  .category__footer_link:is(:hover, :focus-visible) {
+    color: rebeccapurple;
+    border: transparent 1px solid;
+    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    border-radius: 0.5rem;
+    text-decoration: none;
+  }
+</style>

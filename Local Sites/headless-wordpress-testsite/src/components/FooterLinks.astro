@@ -1,0 +1,50 @@
+---
+import MenuItem from "./MenuItem.astro";
+
+const footerMenuLinks = [
+  {
+    className: "footer__menu_link",
+    href: "/blog",
+    ariaLabel: "ブログページへ",
+    ariaTitle: "ブログページへ",
+    menuItem: "Blog",
+  },
+  {
+    className: "footer__menu_link",
+    href: "/about",
+    ariaLabel: "アバウトページへ",
+    ariaTitle: "アバウトページへ",
+    menuItem: "About",
+  },
+  {
+    className: "footer__menu_link",
+    href: "/works",
+    ariaLabel: "ワークスページへ",
+    ariaTitle: "ワークスページへ",
+    menuItem: "Works",
+  },
+  {
+    className: "footer__menu_link",
+    href: "/",
+    ariaLabel: "トップページへ戻る",
+    ariaTitle: "トップページへ戻る",
+    menuItem: "Home",
+  },
+];
+---
+
+<ul class="footer__menu">
+  {
+    footerMenuLinks.map((link) => (
+      <li class="footer__menu_item">
+        <MenuItem
+          className={link.className}
+          href={link.href}
+          ariaLabel={link.ariaLabel}
+          ariaTitle={link.ariaTitle}
+          menuItem={link.menuItem}
+        />
+      </li>
+    ))
+  }
+</ul>

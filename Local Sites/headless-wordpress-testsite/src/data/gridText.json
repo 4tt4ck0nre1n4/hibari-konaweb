@@ -1,0 +1,90 @@
+{
+  "gridItem1": {
+    "Alt": "aboutページを案内する猫",
+    "ariaLabel": "アバウトページへ",
+    "ariaTitle": "アバウトページへ",
+    "tooltipText": "About Me?",
+    "tooltipPosition": "right"
+  },
+  "gridItem2": {
+    "Alt": "blogページを案内する猫",
+    "ariaLabel": "ブログページへ",
+    "ariaTitle": "ブログページへ",
+    "tooltipText": "blogを書きたい...",
+    "tooltipPosition": "left"
+  },
+  "gridItem3": {
+    "Alt": "お問い合わせページへ案内する猫",
+    "ariaLabel": "お問い合わせページへ",
+    "ariaTitle": "お問い合わせページへ",
+    "tooltipText": "お問い合わせはこちらです。",
+    "tooltipPosition": "left"
+  },
+  "gridItem4": {
+    "Alt": "",
+    "ariaLabel": "ワークスページへ",
+    "ariaTitle": "ワークスページへ",
+    "tooltipText": "Works Pageはこちらからどうぞ",
+    "tooltipPosition": "right"
+  },
+  "gridItem5": {
+    "Alt": "",
+    "ariaLabel": "",
+    "ariaTitle": "",
+    "tooltipText": "私のポートフォリオサイトへようこそ！",
+    "tooltipPosition": "left"
+  },
+  "gridItem6": {
+    "Alt": "",
+    "ariaLabel": "",
+    "ariaTitle": "",
+    "tooltipText": "Enjoy my portfolio!!",
+    "tooltipPosition": "left"
+  },
+  "gridItem7": {
+    "Alt": "袖ノ浦市港夏祭りのロゴ画像",
+    "ariaLabel": "袖ノ浦市港夏祭りのページへ",
+    "ariaTitle": "袖ノ浦市港夏祭りのページへ",
+    "tooltipText": "袖ノ浦市港夏祭り!!",
+    "tooltipPosition": "right"
+  },
+  "gridItem8": {
+    "Alt": "GAURA_STUDIOのロゴ画像",
+    "ariaLabel": "GAURA_STUDIOのページへ",
+    "ariaTitle": "GAURA_STUDIOのページへ",
+    "tooltipText": "gaura_studio!!",
+    "tooltipPosition": "left"
+  },
+  "gridItem9": {
+    "Alt": "ぴくちゃ公式運営サイトのロゴ画像",
+    "ariaLabel": "ぴくちゃ公式運営サイトのページへ",
+    "ariaTitle": "ぴくちゃ公式運営サイトのページへ",
+    "tooltipText": "ぴくちゃ!!",
+    "tooltipPosition": "left"
+  },
+  "gridItem10": {
+    "Alt": "袖ノ浦市港夏祭りのイメージ画像",
+    "ariaLabel": "袖ノ浦市港夏祭りのページへ",
+    "ariaTitle": "袖ノ浦市港夏祭りのページへ",
+    "tooltipText": "袖ノ浦市港夏祭り!!",
+    "tooltipPosition": "right"
+  },
+  "gridItem11": {
+    "Alt": "GAURA_STUDIOのイメージ画像",
+    "ariaLabel": "GAURA_STUDIOのページへ",
+    "ariaTitle": "GAURA_STUDIOのページへ",
+    "tooltipText": "GAURA_STUDIO!!",
+    "tooltipPosition": "left"
+  },
+  "gridItem12": {
+    "Alt": "ぴくちゃ公式運営サイトのイメージ画像",
+    "ariaLabel": "ぴくちゃ公式運営サイトのページへ",
+    "ariaTitle": "ぴくちゃ公式運営サイトのページへ",
+    "tooltipText": "ぴくちゃ!!",
+    "tooltipPosition": "left"
+  },
+  "play": "アニメーションを再生",
+  "pause": "アニメーションを一時停止",
+  "reverse": "アニメーションを逆再生",
+  "restart": "アニメーションをもう一度再生"
+}

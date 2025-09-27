@@ -1,0 +1,137 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import globalText from "../../data/globalText.json";
+import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import AboutHeading from "../../components/AboutHeading.astro";
+// import ServiceCard from "../../components/ServiceCard.astro";
+import serviceText from "../../data/serviceText.json";
+import { Image } from "astro:assets";
+import sorryImage from "/public/assets/sorry.svg";
+
+// const crumbs= [
+//   { name: "Home", path: "/" },
+//   { name: "Service" }
+// ];
+const crumbs = generateBreadcrumbs(Astro.url.pathname);
+
+// const cardSrc1 = "/riv/web-developer.riv";
+// const cardSrc2 = "/riv/coding-assets.riv";
+// const cardSrc3 = "/riv/wordpress.riv";
+// const cardSrc4 = "/riv/fixing-site.riv";
+---
+
+<Layout
+  title={globalText.service.title}
+  description={globalText.service.description}
+  ogType={globalText.local.type}
+  ogTitle={globalText.service.title}
+  ogDescription={globalText.service.description}
+  twitterTitle={globalText.service.title}
+  twitterDescription={globalText.service.description}
+>
+  <div id="outer-container">
+    <Header />
+    <main id="page-wrap">
+      <div class="breadcrumbs__wrapper">
+        <Breadcrumbs {crumbs} />
+      </div>
+      <section class="pricePage">
+        <AboutHeading aboutTitle="Price" aboutSubTitle="料金について。" />
+        {serviceText.price.body.map(({ text }) => <p class="price__body">{text}</p>)}
+        <Image
+          class="price__image"
+          src={sorryImage}
+          alt={serviceText.price.imageAlt}
+          width="200"
+          height="200"
+          loading="lazy"
+          decoding="async"
+        />
+        {serviceText.price.footer.map(({ text }) => <p class="price__body" set:html={text} />)}
+      </section>
+    </main>
+    <Footer />
+  </div>
+</Layout>
+
+<style is:global>
+  .pricePage {
+    /* border: rebeccapurple 1px solid; */
+    margin-block-start: 3rem;
+    padding-block: 3rem;
+  }
+  .price__body {
+    font-size: 1rem;
+    line-height: 2;
+    letter-spacing: 0.1em;
+    color: inherit;
+    text-align: center;
+    margin-block-start: 1rem;
+  }
+  .price__image {
+    display: block;
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    margin-inline: auto;
+  }
+  .price__link {
+    letter-spacing: 0.1em;
+    color: rebeccapurple;
+    text-align: center;
+    margin-block-start: 1rem;
+  }
+  .price__link_secondary {
+    /* display: block; */
+    letter-spacing: 0.1em;
+    color: rebeccapurple;
+    text-align: center;
+    margin-block-start: 1rem;
+    padding-block: 1rem;
+  }
+</style>
+
+<script>
+  import Swiper from "swiper";
+  import { Navigation, Autoplay } from "swiper/modules";
+  import "swiper/css/bundle";
+
+  const initSwiper2 = () => {
+    new Swiper("#swiper2", {
+      direction: "horizontal",
+      modules: [Navigation, Autoplay],
+      loop: true,
+      effect: "fade",
+      speed: 0,
+      allowTouchMove: false,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      navigation: {
+        nextEl: "#js-mouse",
+      },
+      on: {
+        slideChangeTransitionStart: function () {
+          document.querySelectorAll(".swiper-slide img").forEach((img) => {
+            img.classList.remove("active");
+          });
+        },
+        slideChangeTransitionEnd: function () {
+          const activeSlide = document.querySelector(".swiper-slide-active img");
+
+          if (activeSlide) {
+            activeSlide.classList.add("active");
+          }
+        },
+      },
+    });
+  };
+
+  if (typeof window !== "undefined") {
+    initSwiper2();
+  }
+</script>

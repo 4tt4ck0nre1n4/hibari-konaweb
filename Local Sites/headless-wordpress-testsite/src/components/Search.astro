@@ -1,0 +1,38 @@
+---
+import "@pagefind/default-ui/css/ui.css";
+---
+
+<div id="search"></div>
+
+<script>
+  import { PagefindUI } from "@pagefind/default-ui";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    new PagefindUI({
+      element: "#search",
+      showImages: true,
+    });
+  });
+</script>
+
+<style>
+  #search {
+    height: auto;
+    background: white;
+    border-radius: 0.5rem;
+    border: 1px solid gray;
+    transition-duration: 300ms;
+  }
+
+  #search:not(:has(.pagefind-ui__hidden)) {
+    width: 100%;
+    border-radius: 1rem;
+    padding: 1rem;
+  }
+  @media screen and (max-width: 480px) {
+    #search {
+      padding-block: 1.25rem;
+      padding-inline: 0.5rem;
+    }
+  }
+</style>

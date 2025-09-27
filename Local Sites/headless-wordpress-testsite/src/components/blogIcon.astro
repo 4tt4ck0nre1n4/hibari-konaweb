@@ -1,0 +1,21 @@
+---
+import SafeIcon from "./SafeIcon.astro";
+
+export interface Props {
+  iconSvg: string;
+}
+
+const { iconSvg } = Astro.props;
+---
+
+<span class="blog-icon">
+  <SafeIcon name={iconSvg} aria-hidden="true" role="presentation" />
+</span>
+
+<style>
+  .blog-icon {
+    display: inline-block;
+    font-size: 1rem;
+    color: inherit;
+  }
+</style>

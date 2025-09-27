@@ -1,0 +1,432 @@
+---
+import FooterHeader from "./FooterHeader.astro";
+import FooterSns from "../components/Sns.astro";
+import FooterIcon from "./FooterIcon.astro";
+import FooterSupport from "./FooterSupport.astro";
+import FooterLinks from "./FooterLinks.astro";
+import FooterCopyright from "./FooterCopyright.astro";
+import footerText from "../data/footerText.json";
+import { twitter, github_sns, instagram, about, contact, mail } from "../scripts/constSns";
+
+interface ContactType {
+  className: {
+    about: string;
+    footer: string;
+  };
+  href: string;
+  icon: string;
+  item: {
+    about: string;
+    footer: string;
+  };
+  ariaLabel: string;
+  ariaTitle: string;
+}
+
+const typedContact = contact as ContactType;
+---
+
+<footer class="footer">
+  <div class="footer__wrapper">
+    <div class="footer__container">
+      <div class="footer__menuInner">
+        <FooterHeader footerHeader="About Me" />
+        <div class="footer__textInner">
+          <p class="footer__text_ja">
+            {footerText.aboutMe.ja}
+          </p>
+          <p class="footer__text_en">
+            {footerText.aboutMe.en1}
+          </p>
+          <p class="footer__text_en">
+            {footerText.aboutMe.en2}
+          </p>
+        </div>
+        <ul class="footer__snsMenu">
+          <FooterSns
+            className={twitter.className}
+            href={twitter.href}
+            snsIconSvg={twitter.icon}
+            ariaLabel={twitter.ariaLabel}
+            ariaTitle={twitter.ariaTitle}
+            targetBlank={twitter.targetBlank}
+            source="Sns Components"
+          />
+          <FooterSns
+            className={github_sns.className}
+            href={github_sns.href}
+            snsIconSvg={github_sns.icon}
+            ariaLabel={github_sns.ariaLabel}
+            ariaTitle={github_sns.ariaTitle}
+            targetBlank={github_sns.targetBlank}
+            source="Sns Components"
+          />
+          <FooterSns
+            className={instagram.className}
+            href={instagram.href}
+            snsIconSvg={instagram.icon}
+            ariaLabel={instagram.ariaLabel}
+            ariaTitle={instagram.ariaTitle}
+            targetBlank={instagram.targetBlank}
+            source="Sns Components"
+          />
+          <FooterSns
+            className={about.className}
+            href={about.href}
+            snsIconSvg={about.icon}
+            ariaLabel={about.ariaLabel}
+            ariaTitle={about.ariaTitle}
+            source="Sns Components"
+          />
+        </ul>
+      </div>
+      <div class="footer__middleRow">
+        <div class="footer__menuInner footer__menuInner--middle">
+          <FooterHeader footerHeader="Support" />
+          <FooterSupport />
+        </div>
+        <div class="footer__menuInner footer__menuInner--middle">
+          <FooterHeader footerHeader="Links" />
+          <FooterLinks />
+        </div>
+      </div>
+      <div class="footer__menuInner">
+        <FooterHeader footerHeader="Contact Me" />
+        <p class="footer__text_ja">
+          {footerText.contactMe.ja1}
+        </p>
+        <p class="footer__text_ja">
+          {footerText.contactMe.ja2}
+        </p>
+        <p class="footer__text_en">
+          {footerText.contactMe.en}
+        </p>
+        <ul class="footer__contactMenu">
+          <FooterIcon
+            className={typedContact.className.footer}
+            href={typedContact.href}
+            footerIcon={typedContact.icon}
+            footerIconName={typedContact.item.footer}
+            ariaLabel={typedContact.ariaLabel}
+            ariaTitle={typedContact.ariaTitle}
+          />
+          <FooterIcon
+            className={mail.className.footer}
+            href={mail.href}
+            footerIcon={mail.icon}
+            footerIconName={mail.item.footer}
+            ariaLabel={mail.ariaLabel}
+            ariaTitle={mail.ariaTitle}
+            targetBlank={mail.targetBlank}
+          />
+        </ul>
+      </div>
+    </div>
+  </div>
+  <FooterCopyright />
+</footer>
+
+<style is:global>
+  .footer {
+    width: 94%;
+    height: auto;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.75rem;
+    /* background-color: #e8e8e8; */
+    background-color: transparent;
+    box-shadow:
+      inset 0.4em 0.4em 0.4em rgba(0, 0, 0, 0.4),
+      inset -0.4em -0.4em 0.4em rgba(0, 0, 0, 0.4);
+    border-radius: 0.75rem;
+    position: relative;
+    z-index: 1;
+    margin-block-start: 3rem;
+    margin-inline: auto;
+  }
+  .footer__wrapper {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+  }
+  .footer__container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    gap: 1.5rem;
+    padding-block: 2rem;
+    padding-inline: 3rem;
+    align-items: start;
+  }
+
+  .footer__textInner {
+    /* border: 1px solid transparent;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6); */
+    padding-block: 0.5rem;
+    padding-inline-start: 0.5rem;
+  }
+  .footer ul {
+    list-style: none;
+    padding: 0;
+  }
+  .footer__header {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  .footer__text_ja {
+    width: 88%;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    margin-block-start: 0.5rem;
+  }
+  .footer__text_ja:nth-of-type(2) {
+    margin-block-start: 0;
+  }
+  .footer__text_en {
+    width: 88%;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+  [data-icon] {
+    font-size: 1.5rem;
+  }
+  .footer__snsMenu .sns-icon__item {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    border: transparent 1px solid;
+    border-radius: 50%;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    /* perspective: 100px; */
+    margin-inline: 0.5rem;
+    /* padding-block: 0.25rem;
+    padding-inline: 0.25rem; */
+    /* padding-block: 0.25rem;
+    padding-inline: 0.25rem; */
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.3s ease;
+  }
+  .footer__snsMenu .sns-icon__item:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+  }
+  .footer__snsMenu .sns-icon__item:active {
+    transform: scale(0.8);
+    box-shadow: 0 8px 8px rgba(0 0 0 / 0.6);
+  }
+  html.dark .footer__snsMenu .sns-icon__item {
+    box-shadow: 0 4px 8px rgba(255 255 255 / 0.6);
+  }
+  html.dark .footer__snsMenu .sns-icon__item:is(:hover, :focus-visible) {
+    box-shadow: 0 8px 4px rgba(255 255 255 / 0.6);
+  }
+  html.dark .footer__snsMenu .sns-icon__item:active {
+    transform: scale(0.8);
+    box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
+  }
+  .footer__snsMenu .sns-icon__item:nth-of-type(2):is(:hover, :focus-visible) {
+    /* border: rebeccapurple 1px solid; */
+  }
+  .footer__snsMenu .sns-icon__link {
+    /* display: flex;
+    flex-direction: column;
+    align-items: center; */
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    text-align: center;
+    padding-block-start: 0.5rem;
+    padding-inline: 0.5rem;
+    aspect-ratio: 1 / 1;
+
+    transition: all 0.3s ease;
+  }
+  .footer__snsMenu .sns-icon__link:is(:hover, :focus-visible) {
+    color: rebeccapurple;
+    stroke: rebeccapurple;
+    fill: rebeccapurple;
+
+    /* transform: translateY(-8px); */
+  }
+  .footer__snsMenu .sns-icon__link:nth-of-type(2):is(:hover, :focus-visible) {
+    /* border: rebeccapurple 1px solid; */
+  }
+  .footer__snsMenu .sns-icon__link[data-icon]:nth-of-type(2) {
+    /* color: rebeccapurple; */
+    /* border: rebeccapurple 1px solid; */
+    /* transform: translateY(-8px); */
+  }
+  .footer__snsMenu.sns-icon__link svg {
+    width: 40px;
+    height: 40px;
+    margin-block-start: 0;
+    /* padding-block: 0.125rem; */
+    /* padding-inline: 0.125rem; */
+    transition: all 0.4s ease;
+  }
+  .footer__snsMenu.sns-icon__link svg:is(:hover, :focus-visible) {
+    color: rebeccapurple;
+    /* transform: scale(1.1); */
+  }
+  .footer__snsMenu.sns-icon__link svg:nth-child(3):is(:hover, :focus-visible) {
+    border: rebeccapurple 1px solid;
+    fill: rebeccapurple;
+    fill: red;
+    stroke: rebeccapurple;
+    stroke: red;
+    color: rebeccapurple;
+    color: red;
+    background: rebeccapurple;
+  }
+  .footer__snsMenu.sns-icon__lin svg:nth-of-type(2):is(:hover, :focus-visible) {
+    border: rebeccapurple 1px solid;
+    fill: rebeccapurple;
+    stroke: rebeccapurple;
+    color: rebeccapurple;
+    background: rebeccapurple;
+  }
+  html.dark .footer__snsMenu .sns-icon__link svg {
+    stroke: #f1f5f9;
+  }
+  .footer .footer__menu {
+    padding-block: 0.5rem;
+    padding-inline-start: 0.5rem;
+  }
+  .footer__menu_item {
+    margin-block-start: 0.5rem;
+  }
+  .footer__menu_link {
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.7s ease;
+  }
+  .footer__menu_link:is(:hover, :focus-visible) {
+    color: rebeccapurple;
+    text-decoration: underline;
+  }
+  .footer .footer__snsMenu {
+    display: grid;
+    grid-template-columns: repeat(4, 48px);
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+  }
+  .footer__contactMenu {
+    width: fit-content;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    /* align-items: center; */
+    flex-shrink: 0;
+  }
+  .footer-icon__item {
+    /* display: grid; */
+    /* grid-template-rows: subgrid; */
+    /* justify-content: flex-start; */
+    /* align-items: center; */
+    /* border: red 1px solid; */
+    margin-block-start: 0.5rem;
+  }
+  .footer-icon__item:nth-child(1) {
+    white-space: nowrap;
+  }
+  .footer-icon__item:nth-child(2) {
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  .footer__contactMenu svg {
+    transition: all 0.7s ease;
+  }
+  .footer__contactMenu svg:is(:hover, :focus-visible) {
+    color: rebeccapurple;
+  }
+  .footer .footer-icon__link {
+    transition: all 0.7s ease;
+  }
+  .footer .footer-icon__link:is(:hover, :focus-visible) {
+    color: rebeccapurple;
+    text-decoration: underline;
+  }
+  .footer-icon__link {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    grid-template-columns: 2.125rem 1fr;
+    grid-template-columns: repeat(48px, 1fr);
+    color: #010101;
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    border-radius: 50%;
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.3s ease;
+  }
+  .footer-icon__item .footer-icon__link svg {
+    width: 100%;
+    height: 100%;
+    margin-block-start: 0.0675rem;
+    margin-inline-start: 0.375rem;
+  }
+  .footer-icon__item .footer-icon__link:is(:hover, :focus-visible) {
+    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+  }
+  .footer-icon__item .footer-icon__link:active {
+    transform: scale(0.8);
+    box-shadow: 0 8px 8px rgba(0, 0, 0, 0.4);
+  }
+  html.dark .footer-icon__item .footer-icon__link {
+    box-shadow: 0 4px 8px rgba(255 255 255 / 0.6);
+  }
+  html.dark .footer-icon__item .footer-icon__link:is(:hover, :focus-visible) {
+    box-shadow: 0 8px 4px rgba(255 255 255 / 0.6);
+  }
+  html.dark .footer-icon__item .footer-icon__link:active {
+    transform: scale(0.8);
+    box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
+  }
+  .footer-icon__name {
+    background-color: transparent;
+    margin-inline-start: 1.25rem;
+    align-self: center;
+  }
+  .footer__copyright {
+    width: 94%;
+    display: block;
+    font-size: 0.75rem;
+    color: rebeccapurple;
+    text-align: center;
+    border-top: 1px solid gray;
+    margin-inline: auto;
+    padding-block: 1rem;
+  }
+  @media screen and (max-width: 991px) {
+    .footer__container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding-inline: 1rem;
+    }
+
+    .footer__middleRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .footer__container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding-inline: 1rem;
+    }
+
+    .footer__middleRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+  }
+</style>

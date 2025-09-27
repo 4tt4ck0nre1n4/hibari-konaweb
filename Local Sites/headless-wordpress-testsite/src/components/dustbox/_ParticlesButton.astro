@@ -1,0 +1,188 @@
+---
+import { Icon } from "astro-icon/components";
+
+const playIcon = "fluent-emoji:party-popper";
+const stopIcon = "fluent-emoji-high-contrast:party-popper";
+const resetIcon = "fluent-emoji:magic-wand";
+
+const iconName = {
+  play: "Play",
+  stop: "Stop",
+  reset: "Reset",
+};
+---
+
+<div class="particles__inner">
+  <button
+    id="js-play"
+    class="particles__button"
+    type="button"
+    aria-label="tsParticlesを切り替える（再生）"
+    title="tsParticlesを切り替える（再生）"
+  >
+    <Icon
+      name={playIcon}
+      class="particles__icon play__icon"
+      width="56"
+      height="56"
+      aria-hidden="true"
+      role="presentation"
+    />
+    <span class="particles__icon_name">
+      {iconName.play}
+    </span>
+  </button>
+  <button
+    id="js-stop"
+    class="particles__button"
+    type="button"
+    aria-label="tsParticlesを切り替える（停止）"
+    title="tsParticlesを切り替える（停止）"
+  >
+    <Icon
+      name={stopIcon}
+      class="particles__icon stop__icon"
+      width="56"
+      height="56"
+      aria-hidden="true"
+      role="presentation"
+    />
+    <span class="particles__icon_name">
+      {iconName.stop}
+    </span>
+  </button>
+  <button
+    id="js-reset"
+    class="particles__button"
+    type="button"
+    aria-label="tsParticlesを切り替える（リセット）"
+    title="tsParticlesを切り替える（リセット）"
+  >
+    <Icon
+      name={resetIcon}
+      class="particles__icon reset__icon"
+      width="56"
+      height="56"
+      aria-hidden="true"
+      role="presentation"
+    />
+    <span class="particles__icon_name">
+      {iconName.reset}
+    </span>
+  </button>
+</div>
+
+<style>
+  .particles__inner {
+    display: grid;
+    grid-template-columns: repeat(56px, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.5rem;
+  }
+  .particles__button {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: transparent 1px solid;
+    border-radius: 1rem;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    position: relative;
+  }
+  .particles__button:is(:hover, :focus-within) {
+    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+  }
+  html.dark .particles__button {
+    /* background-color: #f1f5f9;; */
+    box-shadow: 0 8px 16px rgba(255 255 255 / 0.6);
+    transition: box-shadow 0.4s ease;
+  }
+  html.dark .particles__button:is(:hover, :focus-within) {
+    box-shadow: 0 8px 4px rgba(255 255 255 / 0.6);
+  }
+  .particles__button svg {
+    transition: all 0.4s ease;
+  }
+  .particles__button svg:is(:hover, :focus-within) {
+    /* box-shadow: 0 16px 8px rgba(0 0 0 / 0.1); */
+    transform: perspective(100px) translateZ(16px) rotate(720deg);
+  }
+  .particles__icon {
+    width: 56px;
+    height: 56px;
+    filter: drop-shadow(4px 4px 4px rgba(160 160 160 / 0.5));
+    position: relative;
+  }
+  html.dark .particles__icon:is(:hover, :focus-within) {
+    filter: drop-shadow(4px 16px 8px rgba(160 160 160 / 0.5));
+  }
+  .play__icon.js-rotateIcon {
+    transform: scale(1.5) rotate(720deg);
+  }
+  .stop__icon {
+    width: 56px;
+    height: 56px;
+    /* display: inline-flex; */
+    color: slategray;
+    color: #808080;
+    color: #85939c;
+    color: #788288;
+    /* color: #98a9b4; */
+    position: relative;
+  }
+  .particles__icon_name {
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: rebeccapurple;
+    /* color: red; */
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+  }
+  html.dark .particles__icon_name {
+    color: #f1f5f9;
+  }
+  .particles__button:is(:hover, :focus-within) .particles__icon_name {
+    opacity: 1;
+    visibility: visible;
+  }
+</style>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const rotatePlayIcon = () => {
+      const playIcon = document.querySelector<HTMLElement>(".play__icon");
+
+      if (!playIcon) {
+        return;
+      }
+
+      playIcon.classList.remove("js-rotateIcon");
+      void playIcon.offsetWidth;
+      playIcon.classList.add("js-rotateIcon");
+
+      setTimeout(() => {
+        playIcon.classList.remove("js-rotateIcon");
+      }, 1000);
+    };
+
+    const rotatePlayIconTimeInterval = () => {
+      setInterval(() => {
+        const now = new Date();
+        const seconds = now.getSeconds();
+
+        if (seconds === 15 || seconds === 45) {
+          rotatePlayIcon();
+        }
+      }, 1000);
+    };
+
+    rotatePlayIconTimeInterval();
+  });
+</script>

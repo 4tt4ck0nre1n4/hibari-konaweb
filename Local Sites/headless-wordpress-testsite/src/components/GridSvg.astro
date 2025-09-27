@@ -1,0 +1,29 @@
+---
+// import { Icon } from "astro-icon/components";
+import { Image } from "astro:assets";
+
+interface GridSvgProps {
+  className: string;
+  href: string;
+  ariaLabel: string;
+  ariaTitle: string;
+  imageSrc: ImageMetadata;
+  imageMeta: string;
+  tooltipText: string;
+  tooltipPosition: string;
+}
+
+const { className, href, ariaLabel, ariaTitle, imageSrc, imageMeta, tooltipText, tooltipPosition } =
+  Astro.props as GridSvgProps;
+---
+
+<li class={`grid__menu_item ${className}`}>
+  <a class="grid__menu_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
+    <div class="grid__menu_svg">
+      <Image src={imageSrc} alt={imageMeta} width="100" height="100" loading="lazy" decoding="async" />
+    </div>
+    <span class={`item__tooltip_${tooltipPosition}`}>
+      {tooltipText}
+    </span>
+  </a>
+</li>
