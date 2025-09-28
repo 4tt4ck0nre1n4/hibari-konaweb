@@ -1,0 +1,309 @@
+---
+import { Image } from "astro:assets";
+import LogoSvg from "/public/black-outline_favicon.svg";
+const title = "Welcome to";
+const gradientTitle = "My Portfolio";
+---
+
+<div class="logo__wrapper" id="loading-screen">
+  <div class="loading-content">
+    <div class="logo-container">
+      <Image
+        class="logo-image"
+        src={LogoSvg}
+        alt="ロゴ画像"
+        width="495"
+        height="623"
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+    <h2 class="title">
+      <div class="title-row">
+        <span class="text-stroke">
+          {title}
+        </span>
+      </div>
+      <div class="title-row">
+        <span class="text-gradient">
+          {gradientTitle}
+        </span>
+      </div>
+    </h2>
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { gsap } from "gsap";
+
+  // ローディングアニメーションの設定
+  const LOADING_DURATION = 3000; // 3秒間のローディング表示
+
+  // DOM要素の取得とアニメーション初期化
+  function initLoadingAnimation() {
+    const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
+    const logoImage = document.querySelector(".logo-image") as HTMLElement;
+    const title = document.querySelector(".title") as HTMLElement;
+    const spinner = document.querySelector(".spinner") as HTMLElement;
+
+    if (!loadingScreen || !logoImage || !title || !spinner) {
+      console.warn("Loading animation elements not found");
+      return;
+    }
+
+    // ページ読み込み中はスクロールを無効化
+    document.body.style.overflow = "hidden";
+
+    // 初期状態の設定
+    gsap.set(loadingScreen, {
+      opacity: 1,
+      display: "flex",
+      visibility: "visible",
+    });
+
+    gsap.set([logoImage, title], {
+      opacity: 0,
+      scale: 0.8,
+    });
+
+    gsap.set(spinner, {
+      opacity: 0,
+      scale: 0.8,
+    });
+
+    // ローディングアニメーションの実行
+    const tl = gsap.timeline({
+      onComplete: () => {
+        // スピナーの回転アニメーションを開始
+        gsap.to(spinner, {
+          rotation: 360,
+          duration: 1.2,
+          ease: "none",
+          repeat: -1,
+        });
+      },
+    });
+
+    // ロゴとタイトルのフェードイン
+    tl.to([logoImage, title], {
+      opacity: 1,
+      scale: 1,
+      duration: 0.8,
+      ease: "back.out(1.7)",
+      stagger: 0.2,
+    })
+      // スピナーの表示
+      .to(
+        spinner,
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          ease: "power2.out",
+        },
+        "-=0.3"
+      );
+
+    // 指定時間後にフェードアウト
+    setTimeout(() => {
+      gsap.to(loadingScreen, {
+        opacity: 0,
+        duration: 0.8,
+        ease: "power2.inOut",
+        onComplete: () => {
+          loadingScreen.style.display = "none";
+          loadingScreen.style.visibility = "hidden";
+          // メインコンテンツの表示を許可
+          document.body.style.overflow = "auto";
+        },
+      });
+    }, LOADING_DURATION);
+  }
+
+  // DOM読み込み完了後にアニメーションを初期化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initLoadingAnimation);
+  } else {
+    initLoadingAnimation();
+  }
+</script>
+
+<style>
+  .logo__wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 0.8s ease-in-out,
+      visibility 0.8s ease-in-out;
+  }
+
+  .logo__wrapper.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  html.dark .logo__wrapper {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  }
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    padding: 2rem;
+  }
+
+  .logo-container {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .logo-image {
+    width: 120px;
+    height: auto;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    will-change: transform;
+  }
+
+  .title {
+    margin-bottom: 2rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .text-stroke {
+    font-family: "Poppins", sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: transparent;
+    text-align: center;
+    position: relative;
+    -webkit-text-stroke: 2px #ffffff;
+    text-stroke: 2px #ffffff;
+    paint-order: stroke;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    display: inline-block;
+  }
+
+  html.dark .text-stroke {
+    color: #f1f5f9;
+    background-image: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 180%;
+    background-position: 0%;
+    animation: flowingGradation 6s ease-in infinite;
+  }
+
+  .text-gradient {
+    display: inline-block;
+    font-size: 3rem;
+    font-weight: 700;
+    text-align: center;
+    background-image: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 180%;
+    background-position: 0%;
+    z-index: 3;
+    animation: flowingGradation 6s ease-in infinite;
+  }
+
+  .loading-spinner {
+    margin-top: 1rem;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #ffffff;
+    border-radius: 50%;
+    /* CSS animation disabled - using GSAP instead */
+  }
+
+  html.dark .spinner {
+    border: 3px solid rgba(241, 245, 249, 0.3);
+    border-top: 3px solid #f1f5f9;
+  }
+
+  @keyframes flowingGradation {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* レスポンシブデザイン */
+  @media (max-width: 768px) {
+    .text-stroke,
+    .text-gradient {
+      font-size: 2.5rem;
+    }
+
+    .logo-image {
+      width: 100px;
+    }
+
+    .title {
+      gap: 0.3rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .text-stroke,
+    .text-gradient {
+      font-size: 2rem;
+    }
+
+    .logo-image {
+      width: 80px;
+    }
+
+    .title {
+      gap: 0.2rem;
+    }
+  }
+</style>

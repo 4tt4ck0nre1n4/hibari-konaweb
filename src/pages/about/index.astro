@@ -1,0 +1,463 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import AboutHeading from "../../components/AboutHeading.astro";
+import AboutMe from "../../components/AboutMe.astro";
+import Sns from "../../components/Sns.astro";
+import { Image } from "astro:assets";
+import blackLady from "/public/assets/girl.jpg";
+import SkillsIcon from "../../components/SkillsIcon.astro";
+import Card from "../../components/Card.astro";
+import aboutText from "../../data/aboutText.json";
+import serviceText from "../../data/serviceText.json";
+import globalText from "../../data/globalText.json";
+
+interface AboutText {
+  aboutHeader: string;
+  aboutText: string;
+  aboutText2: string;
+  aboutText3: string;
+  aboutText4: string;
+  aboutText5: string;
+  aboutLikeHeader: string;
+  aboutLikeText: string;
+}
+import FlowingLinesWrapper from "../../components/FlowingLinesWrapper.astro";
+import { twitter, github_sns, mail, contact } from "../../scripts/constSns";
+import {
+  html,
+  css,
+  sass,
+  javascript,
+  typescript,
+  jquery,
+  wordpress,
+  swiper,
+  gsap,
+  react,
+  canva,
+  adobexd,
+  gulp,
+  vite,
+  astro,
+  vscode,
+  netlify,
+  github,
+  cursor,
+} from "../../scripts/constSkills";
+
+// const twitter = "/sorry"; //https://twitter.com"
+// const github = "/sorry"; //"https://github.com"
+// const notion = "/sorry"; //"https://notion.so"
+// const instagram = "/sorry"; //"https://instagram.com"
+// const mail = "mailto:webengineer@hibari-konaweb.com";
+
+const crumbs = generateBreadcrumbs(Astro.url.pathname);
+const href = "/service";
+
+const typedAboutText = aboutText as AboutText;
+
+interface ContactType {
+  className: {
+    about: string;
+    footer: string;
+  };
+  href: string;
+  icon: string;
+  item: {
+    about: string;
+    footer: string;
+  };
+  ariaLabel: string;
+  ariaTitle: string;
+}
+
+const typedContact = contact as ContactType;
+
+const aboutMeTitle = "About Me";
+const aboutMeSubTitle = "私について。";
+const skillsTitle = "Skills";
+const skillsSubTitle = "私のスキルをご紹介します。";
+const serviceTitle = "Service";
+const serviceSubTitle = "私の提供するサービスについてご紹介します。";
+
+const aboutImage = {
+  alt: "About Meのイメージ画像",
+  width: 300,
+  height: 400,
+};
+
+const cardSrc1 = "/riv/web-developer.riv";
+const cardSrc2 = "/riv/coding-assets.riv";
+const cardSrc3 = "/riv/wordpress.riv";
+const cardSrc4 = "/riv/fixing-site.riv";
+const stateMachine = "State Machine 1";
+---
+
+<Layout
+  title={globalText.about.title}
+  description={globalText.about.description}
+  ogType={globalText.local.type}
+  ogTitle={globalText.about.title}
+  ogDescription={globalText.about.description}
+  twitterTitle={globalText.about.title}
+  twitterDescription={globalText.about.description}
+>
+  <div id="outer-container">
+    <Header />
+    <main id="page-wrap">
+      <div class="breadcrumbs__wrapper">
+        <Breadcrumbs {crumbs} />
+      </div>
+      <section class="about">
+        <div class="about__wrapper">
+          <FlowingLinesWrapper>
+            <AboutHeading aboutTitle={aboutMeTitle} aboutSubTitle={aboutMeSubTitle} />
+          </FlowingLinesWrapper>
+          <div class="about__inner">
+            <div class="about__textInner">
+              <AboutMe
+                aboutHeader={typedAboutText.aboutHeader}
+                aboutText={typedAboutText.aboutText}
+                aboutText2={typedAboutText.aboutText2}
+                aboutText3={typedAboutText.aboutText3}
+                aboutLikeHeader={typedAboutText.aboutLikeHeader}
+                aboutLikeText={typedAboutText.aboutLikeText}
+              />
+              <div class="about__sns">
+                <ul class="about__snsMenu">
+                  <Sns
+                    className={twitter.className}
+                    href={twitter.href}
+                    ariaLabel={twitter.ariaLabel}
+                    ariaTitle={twitter.ariaTitle}
+                    target={twitter.targetBlank}
+                    snsIconSvg={twitter.icon}
+                    snsIconName={twitter.item}
+                  />
+                  <Sns
+                    className={github_sns.className}
+                    href={github_sns.href}
+                    ariaLabel={github_sns.ariaLabel}
+                    ariaTitle={github_sns.ariaTitle}
+                    target={github_sns.targetBlank}
+                    snsIconSvg={github_sns.icon}
+                    snsIconName={github_sns.item}
+                  />
+                  <Sns
+                    className={typedContact.className.about}
+                    href={typedContact.href}
+                    ariaLabel={typedContact.ariaLabel}
+                    ariaTitle={typedContact.ariaTitle}
+                    target=""
+                    snsIconSvg={typedContact.icon}
+                    snsIconName={typedContact.item.about}
+                  />
+                  <Sns
+                    className={mail.className.about}
+                    href={mail.href}
+                    snsIconSvg={mail.icon}
+                    ariaLabel={mail.ariaLabel}
+                    ariaTitle={mail.ariaTitle}
+                    target={mail.targetBlank}
+                    snsIconName={mail.item.about}
+                  />
+                </ul>
+              </div>
+            </div>
+            <div class="about__imageInner">
+              <figure>
+                <Image
+                  class="about__image"
+                  src={blackLady}
+                  alt={aboutImage.alt}
+                  width={aboutImage.width}
+                  height={aboutImage.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="skills">
+        <div class="skills__wrapper">
+          <FlowingLinesWrapper>
+            <AboutHeading aboutTitle={skillsTitle} aboutSubTitle={skillsSubTitle} />
+          </FlowingLinesWrapper>
+          <ul class="skills__menu">
+            <SkillsIcon className={html.className} iconSvg={html.icon} iconName={html.item} />
+            <SkillsIcon className={css.className} iconSvg={css.icon} iconName={css.item} />
+            <SkillsIcon className={sass.className} iconSvg={sass.icon} iconName={sass.item} />
+            <SkillsIcon className={javascript.className} iconSvg={javascript.icon} iconName={javascript.item} />
+            <SkillsIcon className={typescript.className} iconSvg={typescript.icon} iconName={typescript.item} />
+            <SkillsIcon className={jquery.className} iconSvg={jquery.icon} iconName={jquery.item} />
+            <SkillsIcon className={wordpress.className} iconSvg={wordpress.icon} iconName={wordpress.item} />
+            <SkillsIcon className={swiper.className} iconSvg={swiper.icon} iconName={swiper.item} />
+            <SkillsIcon className={gsap.className} iconSvg={gsap.icon} iconName={gsap.item} />
+            <SkillsIcon className={react.className} iconSvg={react.icon} iconName={react.item} />
+            <SkillsIcon className={canva.className} iconSvg={canva.icon} iconName={canva.item} />
+            <SkillsIcon className={adobexd.className} iconSvg={adobexd.icon} iconName={adobexd.item} />
+            <SkillsIcon className={gulp.className} iconSvg={gulp.icon} iconName={gulp.item} />
+            <SkillsIcon className={vite.className} iconSvg={vite.icon} iconName={vite.item} />
+            <SkillsIcon className={astro.className} iconSvg={astro.icon} iconName={astro.item} />
+            <SkillsIcon className={vscode.className} iconSvg={vscode.icon} iconName={vscode.item} />
+            <SkillsIcon className={cursor.className} iconSvg={cursor.icon} iconName={cursor.item} />
+            <SkillsIcon className={netlify.className} iconSvg={netlify.icon} iconName={netlify.item} />
+            <SkillsIcon className={github.className} iconSvg={github.icon} iconName={github.item} />
+          </ul>
+        </div>
+      </section>
+      <section class="service">
+        <div class="service__wrapper">
+          <FlowingLinesWrapper>
+            <AboutHeading aboutTitle={serviceTitle} aboutSubTitle={serviceSubTitle} />
+          </FlowingLinesWrapper>
+          <div class="service__inner">
+            <ul class="service__menu">
+              <Card
+                href={href}
+                cardTitle={serviceText.service.card1.serviceHeader}
+                cardBody={serviceText.service.card1.serviceBody}
+                cardDetails=""
+                serviceMenu={serviceText.service.card1.serviceMenu}
+                src={cardSrc1}
+                stateMachines={stateMachine}
+              />
+              <Card
+                href={href}
+                cardTitle={serviceText.service.card2.serviceHeader}
+                cardBody={serviceText.service.card2.serviceBody}
+                cardDetails=""
+                serviceMenu={serviceText.service.card2.serviceMenu}
+                src={cardSrc2}
+                stateMachines={stateMachine}
+              />
+              <Card
+                href={href}
+                cardTitle={serviceText.service.card3.serviceHeader}
+                cardBody={serviceText.service.card3.serviceBody}
+                cardDetails=""
+                serviceMenu={serviceText.service.card3.serviceMenu}
+                src={cardSrc3}
+                stateMachines={stateMachine}
+              />
+              <Card
+                href={href}
+                cardTitle={serviceText.service.card4.serviceHeader}
+                cardBody={serviceText.service.card4.serviceBody}
+                cardDetails=""
+                serviceMenu={serviceText.service.card4.serviceMenu}
+                src={cardSrc4}
+                stateMachines={stateMachine}
+              />
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+</Layout>
+
+<style is:global>
+  .about {
+  }
+  .about__wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin-block-start: 4rem;
+    margin-inline: auto;
+  }
+  .about__inner {
+    display: grid;
+    grid-template-columns: 320px 2fr;
+    gap: 2rem;
+    background-color: #e8e8e8;
+    border-radius: 1rem;
+    background-image: url(/assets/background3.png);
+    background-image: url(/assets/background1.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin-block-start: 2rem;
+    padding-block: 2rem;
+    padding-inline: 1rem;
+  }
+  .about__textInner {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-shrink: 0;
+    color: #020202;
+    background: transparent;
+
+    /* border: 1px solid pink; */
+    margin-block-start: 0rem;
+    padding-inline: 2.5rem;
+  }
+  .about__sns {
+    margin-block-start: auto;
+  }
+  .about__snsMenu {
+    display: grid;
+    grid-template-columns: repeat(4, 48px);
+    list-style: none;
+    margin-block-start: 1rem;
+  }
+  .about__snsMenu .sns-icon__link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+    aspect-ratio: 1 / 1;
+  }
+  .about__snsMenu .sns-icon__link {
+    transition: all 0.3s ease;
+  }
+  .about__snsMenu .sns-icon__link:is(:hover, :focus-visible) {
+    transform: translateY(-8px);
+  }
+  .about__snsMenu .sns-icon__link[data-icon]:is(:hover, :focus-visible) {
+    transform: translateY(-8px);
+  }
+  .about__snsMenu .sns-icon__link svg {
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  .about__snsMenu .sns-icon__name {
+    color: rebeccapurple;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease,
+      transform 0.3s ease;
+  }
+  .about__snsMenu .sns-icon__link:is(:hover, :focus-visible) .sns-icon__name {
+    display: inline-block;
+    width: 72px;
+    height: 20px;
+    font-size: 0.75rem;
+    color: rebeccapurple;
+    /* background-color: transparent; */
+    border: transparent 1px solid;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    text-align: center;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(8px);
+    z-index: 1;
+  }
+  /* @media (prefers-color-scheme: dark) {
+    html .about__snsMenu .sns-icon__link svg {
+      stroke: #020202;
+      fill: #020202;
+      color: #020202;
+    }
+  } */
+  .skills__wrapper {
+    width: 700px;
+    max-width: calc(100% - 2rem);
+    margin-block-start: 4rem;
+    margin-inline: auto;
+    /* padding: 1rem; */
+  }
+  .skills__menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8ch, 1fr));
+    /* grid-template-columns: repeat(5, 12ch); */
+    gap: 2rem;
+    list-style: none;
+    background-color: #e8e8e8;
+    border-radius: 1rem;
+    perspective: 1000px;
+    margin-block-start: 2rem;
+    margin-inline: auto;
+    padding-block: 2.5rem;
+    padding-inline: 2rem;
+    /* padding-inline-start: 1rem; */
+  }
+  .skills-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: inherit;
+    /* text-decoration: none; */
+  }
+  .skills-icon__image[data-icon] {
+    font-size: 2rem;
+    transition: all 0.4s ease-out;
+  }
+  .skills-icon .skills-icon__image:is(:hover, :focus-visible) {
+    transform: translateZ(20px) scale(1.6) rotate(180deg);
+  }
+  .skills-icon.sass [data-icon]:is(:hover, :focus-visible),
+  .skills-icon.jquery [data-icon]:is(:hover, :focus-visible),
+  .skills-icon.wordpress [data-icon]:is(:hover, :focus-visible),
+  .skills-icon.swiper [data-icon]:is(:hover, :focus-visible),
+  .skills-icon.gsap [data-icon]:is(:hover, :focus-visible),
+  .skills-icon.react [data-icon]:is(:hover, :focus-visible),
+  .skills-icon.canva [data-icon]:is(:hover, :focus-visible),
+  .skills-icon.gulp [data-icon]:is(:hover, :focus-visible),
+  .skills-icon.netlify [data-icon]:is(:hover, :focus-visible),
+  .skills-icon.github [data-icon]:is(:hover, :focus-visible) {
+    transform: scale(1.6) rotate(720deg);
+  }
+  .skills-icon__name {
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease;
+    margin-block-start: 0.25rem;
+  }
+  .skills-icon:is(:hover, :focus-visible) .skills-icon__name {
+    opacity: 1;
+    visibility: visible;
+  }
+  @media (prefers-color-scheme: dark) {
+    .skills-icon.swiper svg,
+    .skills-icon.gsap svg {
+      color: initial;
+      fill: initial;
+    }
+    .skills-icon__name {
+      color: #020202;
+    }
+  }
+  .service__wrapper {
+    width: 700px;
+    max-width: calc(100% - 2rem);
+    margin-block-start: 4rem;
+    margin-inline: auto;
+    /* padding: 1rem; */
+  }
+  .service__menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(32ch, 1fr));
+    gap: 1.5rem;
+    margin-block-start: 2rem;
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .service__menu .card__item {
+    height: 100%;
+    display: flex;
+  }
+</style>
+
+<script>
+  import { setupFlowingLinesAnimation } from "../../scripts/flowingLines";
+  setupFlowingLinesAnimation();
+</script>

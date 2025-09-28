@@ -1,0 +1,90 @@
+{
+  "url": "https://headless-wordpress-testsite",
+  "global": {
+    "themeColor": "",
+    "colorScheme": "light dark",
+    "keywords": "Web制作,ウェブサイト制作,ホームページ制作,千葉",
+    "referrer": "origin",
+    "generator": "Astro v5.2.5",
+    "applicationName": "hibari-konaweb.com My Portfolio Site",
+    "author": "hibari-konaweb.com",
+    "creator": "hibari-konaweb.com",
+    "publisher": "hibari-konaweb.com",
+    "robots": "index follow",
+    "formatDetection": "telephone=no, address=no, email=no",
+    "mobileWebAppCapable": "yes",
+    "appleMobileWebAppTitle": "hibari-konaweb.com My Portfolio Site"
+  },
+  "link": {
+    "sitemap": "/sitemap-index.xml",
+    "author": "https://hibari-konaweb.com",
+    "canonical": "https://hibari-konaweb.com"
+  },
+  "og": {
+    "local": "ja_JP",
+    "title": "hibari-konaweb.com My Portfolio Site",
+    "description": "ポートフォリオサイトをご覧いただきありがとうございます。私は千葉県袖ケ浦市を拠点に活動している個人事業主の開発者です。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
+    "type": "website",
+    "url": "https://hibari-konaweb.com",
+    "image": "",
+    "site_name": "My Portfolio Site"
+  },
+  "twitter": {
+    "card": "summary_large_image",
+    "title": "hibari-konaweb.com My Portfolio Site",
+    "description": "ポートフォリオサイトをご覧いただきありがとうございます。私は千葉県袖ケ浦市を拠点に活動している個人事業主の開発者です。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
+    "site": "hibari-konaweb",
+    "image": ""
+  },
+  "local": {
+    "type": "article"
+  },
+  "top": {
+    "title": "My Portfolio Site",
+    "description": "ポートフォリオサイトをご覧いただきありがとうございます。私は千葉県袖ケ浦市を拠点に活動している個人事業主の開発者です。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。"
+  },
+  "about": {
+    "title": "About | My Portfolio Site",
+    "description": "私について、スキル、サービスを紹介しています。"
+  },
+  "works": {
+    "title": "Works | My Portfolio Site",
+    "description": "私の実績を紹介しています。"
+  },
+  "blog": {
+    "title": "Blog | My Portfolio Site",
+    "description": "ブログの記事一覧です。"
+  },
+  "categories": {
+    "title": "Categories | My Portfolio Site",
+    "description": "ブログのカテゴリー記事一覧です。"
+  },
+  "contact": {
+    "title": "Contact | My Portfolio Site",
+    "description": "Web制作などのお仕事に関するご相談、お見積りやポートフォリオの感想など、お問い合わせはこちらのフォームからお願いします。メール受付後、1～3営業日以内にメールで返答させていただきます。"
+  },
+  "service": {
+    "title": "Service | My Portfolio Site",
+    "description": "Web制作などのお仕事に関する私のサービス内容と料金表を紹介しています。"
+  },
+  "thanks": {
+    "title": "Thanks | My Portfolio Site",
+    "description": "お問い合わせありがとうございます。ご記入していただいた情報は無事に送信されました。確認のため、お客様に自動返信メールをお送りしております。"
+  },
+  "privacy": {
+    "title": "Privacy Policy | My Portfolio Site",
+    "description": "プライバシーポリシー（以下、「本ポリシー」といいます。）は、当サイトがどのような個人情報を取得し、どのように利用するか、どのように個人情報を管理するのかをユーザーにご説明するものです。当サイトは本ポリシーに従い、個人情報の安全管理のために必要かつ適切な取り扱いと保護に努めます。"
+  },
+  "sorry": {
+    "title": "Sorry... | My Portfolio Site",
+    "description": "申し訳ございません。このページは準備中です。当サイトをご覧いただきありがとうございます。各ページは随時更新しております。しばらくお待ちください。"
+  },
+  "notFound404": {
+    "title": "404 Not Found | My Portfolio Site",
+    "description": "お探しのページが見つかりませんでした。アクセスしようとしたページは削除、変更されたか、現在利用できない可能性があります。直接アドレスを入力された場合は、アドレスが正しく入力されているかもう一度ご確認ください。"
+  },
+  "serverError500": {
+    "title": "500 Server Error | My Portfolio Site",
+    "description": "サーバー側で何らかの予期しないエラーが発生しました。"
+  }
+}

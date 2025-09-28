@@ -1,0 +1,98 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { Image } from "astro:assets";
+import sorryImage from "/public/assets/sorry.svg";
+// import { Breadcrumbs } from "astro-breadcrumbs";
+// import "astro-breadcrumbs/breadcrumbs.css";
+// import "../styles/astro-breadcrumbs-config.scss";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import globalText from "../data/globalText.json";
+import errorText from "../data/errorText.json";
+
+export const prerender = false;
+
+const crumbs = [{ name: "Home", path: "/" }, { name: "Sorry..." }];
+
+const sorryImageMeta = {
+  alt: "開発中のため立ち入り禁止を案内する猫の画像",
+  width: 200,
+  height: 200,
+};
+---
+
+<Layout
+  title={globalText.sorry.title}
+  description={globalText.sorry.description}
+  ogType={globalText.local.type}
+  ogTitle={globalText.sorry.title}
+  ogDescription={globalText.sorry.description}
+  twitterTitle={globalText.sorry.title}
+  twitterDescription={globalText.sorry.description}
+>
+  <div id="outer-container">
+    <Header />
+    <main id="page-wrap">
+      <div class="breadcrumbs__wrapper">
+        <Breadcrumbs {crumbs} />
+      </div>
+      <div class="sorry__wrapper">
+        <h1 class="sorry__header">
+          {errorText.sorry.title}
+        </h1>
+        {errorText.sorry.body.map(({ text }) => <p class="sorry__body">{text}</p>)}
+        <Image
+          class="sorry__image"
+          src={sorryImage}
+          alt={sorryImageMeta.alt}
+          width={sorryImageMeta.width}
+          height={sorryImageMeta.height}
+          loading="lazy"
+          decoding="async"
+        />
+        <p class="sorry__body" set:html={errorText.sorry.link} />
+      </div>
+    </main>
+    <Footer />
+  </div>
+</Layout>
+
+<style>
+  .sorry__wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin-inline: auto;
+  }
+  .sorry__header {
+    font-size: 2rem;
+    color: inherit;
+    text-align: center;
+    margin-block-start: 3rem;
+  }
+
+  .sorry__body {
+    font-size: 1rem;
+    line-height: 2;
+    letter-spacing: 0.1em;
+    color: inherit;
+    text-align: center;
+    margin-block-start: 3rem;
+  }
+
+  .sorry__image {
+    display: block;
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    margin-inline: auto;
+  }
+
+  .sorry__link {
+    display: block;
+    color: rebeccapurple;
+    text-align: center;
+    margin-block-start: 3rem;
+    padding-block: 1rem;
+  }
+</style>

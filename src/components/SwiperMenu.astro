@@ -1,0 +1,439 @@
+---
+// import { Image } from "astro:assets";
+// import mouse from "/public/assets/mouse.png";
+import { SLIDER_PATH_API } from "../api/headlessCms";
+
+interface Slider {
+  id: number;
+  title: string;
+  slug: string;
+  acf: {
+    slider_image: string;
+    slider_title: string;
+  };
+}
+
+const resSlider = await fetch(SLIDER_PATH_API);
+const sliders: Slider[] = (await resSlider.json()) as unknown as Slider[];
+const mouse = "/assets/mouse.png";
+
+if (!Array.isArray(sliders)) {
+  console.error("Expected an array of posts, but received:", sliders);
+}
+
+const sliderItem = {
+  href: "/works",
+  ariaLabel: "ワークスページへ",
+  ariaTitle: "ワークスページへ",
+  width: 160,
+  height: 90,
+};
+
+const mouseItem = {
+  alt: "マウスの画像",
+  ariaLabel: "マウスでスライド画像を切り替える",
+  ariaTitle: "マウスでスライド画像を切り替える",
+  width: 100,
+  height: 80,
+};
+---
+
+<div class="swiper__wrapper">
+  <div id="swiper1" class="swiper">
+    <ul class="swiper-wrapper">
+      {
+        sliders.map((slider) => (
+          <li class="swiper-slide">
+            <a href={sliderItem.href} aria-label={sliderItem.ariaLabel} title={sliderItem.ariaTitle}>
+              <img
+                src={slider.acf?.slider_image ?? ""}
+                alt={slider.acf?.slider_title ?? ""}
+                class="swiper__image"
+                width={sliderItem.width}
+                height={sliderItem.height}
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="mousePad">
+    <button
+      id="js-mouseButton"
+      class="mouse"
+      type="button"
+      aria-label={mouseItem.ariaLabel}
+      title={mouseItem.ariaTitle}
+    >
+      <img id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" />
+    </button>
+  </div>
+</div>
+
+<canvas id="canvas" class="confetti__wrapper" width="210" height="100"></canvas>
+
+<style>
+  .swiper__wrapper {
+    background: transparent;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    border-radius: 1rem;
+    padding-block: 0.5rem;
+    transition: box-shadow 0.4s ease;
+  }
+  .swiper__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+  }
+  html.dark .swiper__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgba(255 255 255 / 0.6);
+  }
+  #swiper1.swiper {
+    width: 100%;
+    max-width: 320px;
+    height: 240px;
+    overflow: hidden;
+    border-radius: 1rem;
+    background-image: url("/assets/pc.svg");
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 0;
+    transition: all 0.3s ease-in;
+  }
+
+  .swiper::before {
+    content: "";
+    width: 70%;
+    max-width: 240px;
+    height: 100%;
+    max-height: 112px;
+    display: block;
+    background: linear-gradient(90deg, transparent, #ffffff71, transparent);
+    position: absolute;
+    top: 5%;
+    right: 0;
+    z-index: 1;
+    transform: translateX(-200px) skew(-16deg);
+    animation: shineDisplay 5s linear infinite;
+  }
+
+  @keyframes shineDisplay {
+    0% {
+      transform: translateX(-200px) skew(-16deg);
+      opacity: 0;
+    }
+    4% {
+      opacity: 1;
+    }
+    16% {
+      transform: translateX(300px) skew(-16deg);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(-200px) skew(-16deg);
+      opacity: 0;
+    }
+  }
+
+  .swiper:is(:hover, :focus-visible)::before {
+    animation: shineMoveHover 2.8s linear infinite;
+  }
+
+  @keyframes shineMoveHover {
+    0% {
+      transform: translateX(300px) skew(-16deg);
+      opacity: 0;
+    }
+    5% {
+      opacity: 1;
+    }
+    25% {
+      transform: translateX(-200px) skew(-16deg);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(300px) skew(-16deg);
+      opacity: 0;
+    }
+  }
+
+  .swiper-wrapper {
+  }
+
+  #swiper1 .swiper-slide {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    padding-block: 0.5rem;
+  }
+
+  #swiper1 .swiper-slide .swiper__image {
+    width: 180px;
+    height: 120px;
+    object-fit: contain;
+    padding-block: 1rem;
+    opacity: 0;
+    transition: opacity 0.35s ease-in-out;
+  }
+
+  #swiper1 .swiper-slide .swiper__image.active {
+    opacity: 1;
+  }
+
+  .mousePad {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding-inline-end: 1.5rem;
+  }
+
+  #js-mouseButton {
+    width: 120px;
+    height: 90px;
+    background: transparent;
+    border: transparent 1px solid;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    border-radius: 1rem;
+    margin-block-start: 0.5rem;
+    padding: 0.5rem;
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  html.dark #js-mouseButton:is(:hover, :focus-visible) {
+    box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
+  }
+  html.dark #js-mouseButton:active {
+    box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+  }
+  #js-mouseButton:active {
+    box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+  }
+  /* @media (prefers-color-scheme: dark) {
+    html.dark #js-mouseButton {
+      background: #f1f5f9;
+    }
+  } */
+  #js-mouse {
+    width: 100px;
+    height: 70px;
+    object-fit: contain;
+    transform: rotate(0deg) translateX(0px);
+    transition:
+      transform 0.5s ease,
+      box-shadow 0.4s ease;
+  }
+  #js-mouse.js-mouseMove {
+    transform: rotate(-8deg) translateX(-16px);
+  }
+  #js-mouse:is(:hover, :focus-visible) {
+    transform: rotate(4deg) translateX(8px);
+    /* transform: scale(1.05); */
+  }
+  .confetti__wrapper {
+    width: 100%;
+    height: 130px;
+    background: transparent;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    border-radius: 1rem;
+    position: relative;
+    margin-block-start: 1rem;
+    margin-inline: auto;
+    transition: box-shadow 0.4s ease;
+  }
+  .confetti__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+  }
+  html.dark .confetti__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgba(255 255 255 / 0.6);
+  }
+
+  /* スマホサイズでのレスポンシブ対応 */
+  @media screen and (max-width: 768px) {
+    .swiper__wrapper,
+    .confetti__wrapper {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    .swiper__wrapper {
+      height: 200px;
+    }
+
+    #swiper1.swiper {
+      max-width: 100%;
+      height: 180px;
+    }
+
+    #swiper1 .swiper-slide .swiper__image {
+      width: 140px;
+      height: 90px;
+      padding-block: 0.5rem;
+    }
+
+    #js-mouseButton {
+      width: 100px;
+      height: 75px;
+      padding: 0.5rem;
+    }
+
+    #js-mouse {
+      width: 80px;
+      height: 55px;
+    }
+
+    .confetti__wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  /* 480px以下での超小型スマホ最適化 */
+  @media screen and (max-width: 480px) {
+    .swiper__wrapper,
+    .confetti__wrapper {
+      height: 150px;
+    }
+
+    .swiper__wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #swiper1.swiper {
+      height: 130px;
+    }
+
+    #swiper1 .swiper-slide {
+      padding-block: 0;
+    }
+
+    #swiper1 .swiper-slide .swiper__image {
+      width: 100px;
+      height: 80px;
+      padding-block: 0.5rem;
+    }
+
+    #js-mouseButton {
+      width: 80px;
+      height: 60px;
+      padding: 0.25rem;
+    }
+
+    #js-mouse {
+      width: 65px;
+      height: 45px;
+    }
+  }
+</style>
+
+<script>
+  import Swiper from "swiper";
+  import { Navigation, Autoplay } from "swiper/modules";
+  import "swiper/css/bundle";
+
+  const initSwiper1 = () => {
+    new Swiper("#swiper1", {
+      direction: "vertical",
+      modules: [Navigation, Autoplay],
+      loop: true,
+      effect: "creative",
+      speed: 1500,
+      allowTouchMove: false,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      navigation: {
+        nextEl: "#js-mouse",
+      },
+      on: {
+        slideChangeTransitionStart: function () {
+          document.querySelectorAll(".swiper-slide img").forEach((img) => {
+            img.classList.remove("active");
+          });
+        },
+        slideChangeTransitionEnd: function () {
+          const activeSlide = document.querySelector(".swiper-slide-active img");
+
+          if (activeSlide) {
+            activeSlide.classList.add("active");
+          }
+        },
+      },
+    });
+  };
+
+  if (typeof window !== "undefined") {
+    initSwiper1();
+  }
+
+  let lastMouseMoveSecond: number | null = null;
+
+  const triggerMouseMove = () => {
+    const mouse = document.getElementById("js-mouse");
+    if (!mouse) {
+      return;
+    }
+
+    mouse.classList.remove("js-mouseMove");
+    void mouse.offsetWidth;
+    mouse.classList.add("js-mouseMove");
+
+    setTimeout(() => {
+      mouse.classList.remove("js-mouseMove");
+    }, 1000);
+  };
+
+  const mouseMoveTimeInterval = () => {
+    setInterval(() => {
+      const now = new Date();
+      const seconds = now.getSeconds();
+
+      if ([0, 15, 30, 45].includes(seconds) && seconds !== lastMouseMoveSecond) {
+        triggerMouseMove();
+        lastMouseMoveSecond = seconds;
+      }
+    }, 1000);
+  };
+
+  window.addEventListener("load", () => {
+    mouseMoveTimeInterval();
+  });
+</script>
+
+<script is:inline>
+  const mouseButton = document.getElementById("js-mouseButton");
+
+  if (mouseButton) {
+    const mouseSound = new Audio("/sounds/mouseSound.mp3");
+
+    mouseButton.addEventListener("click", () => {
+      const isSoundOn = localStorage.getItem("sound-enabled") === "true";
+
+      if (isSoundOn) {
+        try {
+          mouseSound.currentTime = 0;
+          void mouseSound.play();
+        } catch (error) {
+          console.error("Sound playback failed:", error);
+        }
+      }
+    });
+  }
+</script>

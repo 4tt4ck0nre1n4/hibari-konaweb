@@ -1,0 +1,246 @@
+/* リセットcss */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+* {
+  border-width: 0;
+  border-style: solid;
+  background-origin: border-box;
+  background-repeat: no-repeat;
+}
+
+:where(html) {
+  block-size: 100%;
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  color-scheme: dark light;
+  tab-size: 2;
+  scrollbar-gutter: stable;
+}
+
+:where(html:has(dialog:modal[open])) {
+  overflow: clip;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :where(html:focus-within) {
+    scroll-behavior: smooth;
+  }
+}
+
+:where(body) {
+  min-height: 100vh;
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeSpeed;
+  min-block-size: 100%;
+}
+
+:where(h1, h2, h3, h4, h5, h6, p) {
+  overflow-wrap: break-word;
+}
+
+/* :where(h1, h2, h3) {
+  text-wrap: balance;
+} */
+
+:where(ul, ol),
+[role="list"] {
+  list-style: none;
+}
+
+:where(a) {
+  color: inherit;
+  background-color: transparent;
+  text-decoration: none;
+  text-underline-offset: 0.2ex;
+}
+
+:where(a:not([class])) {
+  color: currentColor;
+  text-decoration-skip-ink: auto;
+}
+
+:where(a[href], button, input, textarea, select, label[for], summary, [tabindex]:not([tabindex*="-"])) {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+:where(button, input, textarea, select) {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.15;
+  letter-spacing: inherit;
+  color: inherit;
+  background: transparent;
+  border-radius: 0;
+  text-align: inherit;
+  word-spacing: inherit;
+  text-transform: inherit;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+:where(button, button[type], input[type="button"], input[type="submit"], input[type="reset"]) {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  text-align: center;
+}
+
+:where(button:disabled, button[type="button"]:disabled, button[type="reset"]:disabled, button[type="submit"]:disabled) {
+  cursor: not-allowed;
+}
+
+button::-moz-focus-inner,
+[type="button"]::-moz-focus-inner,
+[type="reset"]::-moz-focus-inner,
+[type="submit"]::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+button:-moz-focusring,
+[type="button"]:-moz-focusring,
+[type="reset"]:-moz-focusring,
+[type="submit"]:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+:where(
+  input:disabled,
+  input[type="button"]:disabled,
+  input[type="submit"]:disabled,
+  input[type="reset"]:disabled,
+  input[type="reset"]:disabled
+) {
+  cursor: not-allowed;
+}
+
+:where(input[type="checkbox"]) {
+  -webkit-appearance: checkbox;
+  appearance: checkbox;
+}
+
+:where(input[type="radio"]) {
+  -webkit-appearance: radio;
+  appearance: radio;
+}
+
+:where(input[type="file"]) {
+  cursor: auto;
+}
+
+:where(input[type="file"])::-webkit-file-upload-button {
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  word-spacing: inherit;
+}
+
+:where(input[type="file"])::-webkit-file-upload-button,
+:where(input[type="file"])::file-selector-button {
+  cursor: pointer;
+}
+
+:where(textarea) {
+  resize: vertical;
+}
+
+@supports (resize: block) {
+  :where(textarea) {
+    resize: block;
+  }
+}
+
+:where(label:has(> input:disabled), label:has(+ input:disabled)) {
+  cursor: not-allowed;
+}
+
+:where(img, svg, canvas, iframe, video, audio, embed, object) {
+  display: block;
+  vertical-align: middle;
+  max-width: 100%;
+}
+
+:where(img, svg, video) {
+  max-inline-size: 100%;
+  /* block-size: auto; */
+}
+
+:where(svg) {
+  stroke: none;
+  fill: currentColor;
+}
+
+:where(svg):where(:not([fill])) {
+  /* stroke: currentColor; */
+  /* fill: none; */
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:where(svg):where(:not([width])) {
+  inline-size: 5rem;
+}
+
+:where(small) {
+  font-size: 100%;
+}
+
+:where(dialog) {
+  max-width: unset;
+  max-height: unset;
+  background: none;
+  border: none;
+  inset: unset;
+}
+
+:where(dialog:not([open])) {
+  display: none !important;
+}
+
+:where(hr) {
+  color: inherit;
+  border: none;
+  border-block-start: 1px solid;
+  block-size: 0;
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* :focus-visible {
+    transition: outline-offset 145ms cubic-bezier(0.25, 0, 0.4, 1);
+  } */
+
+  :where(:not(:active)):focus-visible {
+    transition-duration: 0.25s;
+  }
+}
+
+:where(:not(:active)):focus-visible {
+  outline-offset: 5px;
+}
+
+[aria-busy="true"] {
+  cursor: progress;
+}
+
+[aria-controls] {
+  cursor: pointer;
+}
+
+[aria-disabled="true"] {
+  cursor: default;
+}

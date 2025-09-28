@@ -1,0 +1,72 @@
+.particles__inner {
+  width: 100%;
+  height: 130px;
+  position: relative;
+  overflow: hidden;
+}
+.particlesButton__inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  margin-block-start: 1.5rem;
+  margin-inline: 1rem;
+}
+.particlesButton {
+  background-color: transparent;
+  border: transparent 1px solid;
+  box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+  padding-block: 0.5rem;
+  padding-inline: 0.5rem;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.4s ease;
+}
+/* .particlesButton::after {
+  content: "";
+  background: rgba(255 255 255 / 0.4);
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+}
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+} */
+.particlesButton:is(:hover, :focus-visible) {
+  box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+}
+.particlesButton:active {
+  transform: scale(0.8);
+  box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+}
+.particlesButton svg {
+  width: 56px;
+  height: 56px;
+  filter: drop-shadow(4px 4px 4px rgba(160 160 160 / 0.5));
+  position: relative;
+}
+.pauseIcon {
+  color: #788288;
+}
+
+/* スマホサイズでのレスポンシブ対応 */
+@media screen and (max-width: 768px) {
+  .particles__inner {
+    height: 100px;
+  }
+  .particlesButton__inner {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    margin-block: 0;
+    margin-inline: 0;
+  }
+}

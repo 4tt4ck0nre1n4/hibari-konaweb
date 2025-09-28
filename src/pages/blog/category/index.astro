@@ -1,0 +1,235 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+// import { Breadcrumbs } from "astro-breadcrumbs";
+// import "astro-breadcrumbs/breadcrumbs.css";
+// import "../../../styles/astro-breadcrumbs-config.scss";
+import { generateBreadcrumbs } from "../../../util/generateBreadcrumbs";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import globalText from "../../../data/globalText.json";
+import { CATEGORY_PAGE_API } from "../../../api/headlessCms";
+import SafeIcon from "../../../components/SafeIcon.astro";
+// import { headlessCmsUrl, headlessCmsApiPrefix } from "../../../api/headlessCms";
+
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+// const CATEGORY_API = `${headlessCmsUrl}${headlessCmsApiPrefix}/categories?_fields=id,name,slug`;
+
+let categories: Category[] = [];
+
+try {
+  const response = await fetch(CATEGORY_PAGE_API);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch categories: ${response.status}`);
+  }
+  categories = (await response.json()) as Category[];
+} catch (error) {
+  console.error("Error fetching categories:", error);
+}
+
+const categoryTitle = "Category";
+const categoryText = "カテゴリー記事の一覧です。";
+const categoryErrorText = "カテゴリー記事が見つかりませんでした。";
+const categoryAriaLabel = "カテゴリー記事へ";
+const categoryAriaTitle = "カテゴリー記事へ";
+
+const crumbs = generateBreadcrumbs(Astro.url.pathname);
+
+const categoryIcon = {
+  icon: "emojione-v1:bookmark",
+  width: 24,
+  height: 24,
+};
+---
+
+<Layout
+  title={globalText.categories.title}
+  description={globalText.categories.description}
+  ogType={globalText.local.type}
+  ogTitle={globalText.categories.title}
+  ogDescription={globalText.categories.description}
+  twitterTitle={globalText.categories.title}
+  twitterDescription={globalText.categories.description}
+>
+  <div id="outer-container">
+    <Header />
+    <main id="page-wrap">
+      <div class="breadcrumbs__wrapper">
+        <Breadcrumbs {crumbs} />
+      </div>
+      <div class="category">
+        <div class="category__wrapper">
+          <div class="category__inner">
+            <div class="flowingLines">
+              <h1 class="category__title">
+                {categoryTitle}
+              </h1>
+              <p class="category__text">
+                {categoryText}
+              </p>
+            </div>
+            <ul class="category__menu">
+              {
+                categories.length > 0 ? (
+                  categories.map((category: Category) => (
+                    <li class="category__menu_item">
+                      <a
+                        class="category__menu_link"
+                        href={`/blog/category/${category?.slug}`}
+                        aria-label={categoryAriaLabel}
+                        title={categoryAriaTitle}
+                      >
+                        <SafeIcon name={categoryIcon.icon} width={categoryIcon.width} height={categoryIcon.height} />
+                        <span class="category__menu_name">{category.name}</span>
+                      </a>
+                    </li>
+                  ))
+                ) : (
+                  <p class="category__menu_error">{categoryErrorText}</p>
+                )
+              }
+            </ul>
+          </div>
+        </div>
+      </div>
+    </main>
+    <Footer />
+  </div>
+</Layout>
+
+<style>
+  .category {
+    margin-block-start: 6rem;
+  }
+  .category__wrapper {
+    width: 700px;
+    max-width: 100%;
+    /* margin-block: 2rem; */
+    margin-inline: auto;
+  }
+  .category__inner {
+    /* display: grid; */
+    /* place-items: center; */
+    /* border: 1px solid rebeccapurple; */
+
+    padding-block: 2rem;
+  }
+  .category__title {
+    font-size: 2rem;
+    text-align: center;
+    /* margin-block-start: 2rem; */
+  }
+  .category__text {
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.2em;
+    color: inherit;
+    text-align: center;
+    margin-block-start: 1rem;
+  }
+  .category__menu {
+    /* display: flex; */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    /* align-items: center; */
+    /* flex-wrap: wrap; */
+    /* flex-direction: column; */
+    /* justify-content: center; */
+    row-gap: 2rem;
+    column-gap: 0.5rem;
+    list-style: none;
+    margin-block-start: 2rem;
+  }
+  .category__menu_item {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 1;
+    background-color: whitesmoke;
+    border: transparent 1px solid;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0px 8px rgba(0 0 0 / 0.6);
+    overflow: hidden;
+    position: relative;
+    padding-block: 0.5rem;
+    padding-inline: 2rem;
+    transition: all 0.4s ease;
+  }
+  .category__menu_item::before {
+    content: "";
+    width: 360px;
+    height: 48px;
+    display: grid;
+    background: linear-gradient(
+      -90deg,
+      transparent,
+      rgba(236, 159, 255, 1),
+      #ffffff71,
+      rgba(147, 183, 255, 1),
+      #ffffff71,
+      rgba(170, 244, 254, 1),
+      transparent
+    );
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: -1;
+    transform: translateX(-360px) skew(-16deg);
+    opacity: 0;
+    animation: shineEffectCard 2s linear infinite;
+  }
+  @keyframes shineEffectCard {
+    0% {
+      transform: translateX(-360px) skew(-16deg);
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+    48% {
+      transform: translateX(360px) skew(-16deg);
+      opacity: 0.9;
+    }
+    50% {
+      opacity: 0.1;
+    }
+    100% {
+      transform: translateX(-360px) skew(-16deg);
+      opacity: 0;
+    }
+  }
+  .category__menu_item:is(:hover, :focus-visible) {
+    background-color: transparent;
+    border: transparent 1px solid;
+    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+  }
+  .category__menu_link {
+    display: flex;
+    /* justify-content: flex-start; */
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.1em;
+    color: inherit;
+    transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .category__menu_link:is(:hover, :focus-visible) {
+    color: rebeccapurple;
+    text-decoration: underline;
+  }
+  .category__menu_name {
+    padding-inline: 1rem;
+  }
+  .category__menu_error {
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.1em;
+    color: inherit;
+  }
+</style>

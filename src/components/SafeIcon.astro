@@ -1,0 +1,26 @@
+---
+import { Icon } from "astro-icon/components";
+
+interface SafeIconProps {
+  name?: string;
+  width?: number;
+  height?: number;
+  class?: string;
+  ariaHidden?: boolean;
+}
+
+const { name, width = 24, height = 24, class: className, ariaHidden = true } = Astro.props as SafeIconProps;
+---
+
+{
+  name != null && typeof name === "string" && name.trim() !== "" && (
+    <Icon
+      name={name as never}
+      width={width}
+      height={height}
+      class={className}
+      aria-hidden={ariaHidden}
+      role="presentation"
+    />
+  )
+}

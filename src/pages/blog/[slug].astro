@@ -1,0 +1,461 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import type { GetStaticPaths } from "astro";
+// import { Breadcrumbs } from "astro-breadcrumbs";
+// import "astro-breadcrumbs/breadcrumbs.css";
+// import "../../styles/astro-breadcrumbs-config.scss";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+// import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
+import globalText from "../../data/globalText.json";
+
+import "../../../app/public/wp-includes/css/dist/block-library/style.min.css";
+import "../../../app/public/wp-content/themes/arkhe/dist/css/main.css";
+import { BLOG_POST_API, BLOG_SLUG_API } from "../../api/headlessCms";
+
+interface Post {
+  id: number;
+  title: {
+    rendered: string;
+  };
+  slug: string;
+  date: string;
+  categories: number[];
+  cat_info?: {
+    id: number;
+    slug: string;
+    name: string;
+  }[];
+  content: {
+    rendered: string;
+  };
+  _embedded?: {
+    author?: {
+      name: string;
+      link: string;
+    }[];
+    "wp:term"?: Array<
+      Array<{
+        id: number;
+        name: string;
+      }>
+    >;
+  };
+  acf?: {
+    blog_image?: string;
+  };
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  try {
+    console.log("Fetching blog slugs from API:", BLOG_POST_API);
+
+    const response = await fetch(
+      // `${headlessCmsUrl}${headlessCmsApiPrefix}posts?context=embed&acf_format=standard`;
+      BLOG_POST_API
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch blog slugs: ${response.status}`);
+    }
+
+    const dataPosts = (await response.json()) as Post[];
+
+    if (!Array.isArray(dataPosts) || dataPosts.length === 0) {
+      console.warn("No posts found, returning empty paths.");
+      return [];
+    }
+
+    const paths = dataPosts.map((post: Post) => ({
+      params: {
+        slug: post.slug,
+      },
+    }));
+
+    console.log("Generated paths:", paths);
+
+    return paths;
+  } catch (error) {
+    console.error("Error fetching static paths:", error);
+    return [];
+  }
+};
+
+const { slug } = Astro.params;
+let post: Post | undefined;
+
+try {
+  console.log(`Fetching blog post data for slug: ${slug}`);
+
+  const resPosts = await fetch(
+    // `${headlessCmsUrl}${headlessCmsApiPrefix}posts?context=embed&acf_format=standard&slug=${slug}`;
+    `${BLOG_SLUG_API}${slug}`
+  );
+
+  if (!resPosts.ok) {
+    throw new Error(`Failed to fetch post data: ${resPosts.status}`);
+  }
+
+  const dataPosts = (await resPosts.json()) as Post[];
+
+  if (!Array.isArray(dataPosts) || dataPosts.length === 0) {
+    console.error("No Post data found for slug:", slug);
+    throw new Error("Post not found");
+  }
+
+  post = dataPosts[0];
+} catch (error) {
+  console.error("Error fetching post data:", error);
+  throw new Error("Post not found");
+}
+
+const postId = post?.id ?? 0;
+const postSlugTitle = post?.title?.rendered;
+const title = post?.title?.rendered ?? "記事が見つかりません";
+const publishedDate = typeof post?.date === "string" && post.date !== "" ? new Date(post.date).toISOString() : "";
+const content = post?.content?.rendered ?? "この記事の内容は表示できません";
+const author = post?._embedded?.author?.[0]?.name ?? "不明な著者";
+const authorLink = post?._embedded?.author?.[0]?.link ?? "#";
+const postUrl = `/blog`;
+const category = post?.cat_info?.[0] ?? { id: 0, slug: "", name: "未分類" };
+const categoryId = category.id ?? null;
+const categoryName = category.name ?? "Uncategorized";
+const categoryUrl = `/blog/category/${category.slug}`;
+
+export const prerender = true;
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description: post?.content?.rendered.replace(/(<([^>]+)>)/gi, "").trim() ?? "",
+  dataPublished: publishedDate,
+  url: `${globalText.url}/blog/${post?.slug}`,
+  author: {
+    "@type": "Person",
+    name: `${globalText.global.author}`,
+  },
+  image: post?.acf?.blog_image ?? "",
+});
+
+const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { name: postSlugTitle }];
+---
+
+<Layout
+  title={title ?? "Blog Title Not Found"}
+  description={globalText.blog.description}
+  ogType={globalText.local.type}
+  ogTitle={title ?? "Blog Title Not Found"}
+  ogDescription={globalText.blog.description}
+  twitterTitle={title ?? "Blog Title Not Found"}
+  twitterDescription={globalText.blog.description}
+  jsonLd={jsonLd}
+>
+  <div id="outer-container">
+    <Header />
+    <main id="page-wrap">
+      <div class="breadcrumbs__wrapper">
+        <Breadcrumbs {crumbs} />
+      </div>
+      <div id="content" class="l-content">
+        <div class="l-content__body l-container">
+          <div id="main_content" class="l-main l-article">
+            <article class="l-main__body p-entry" id={postId.toString()}>
+              <header class="p-entry__head">
+                <div class="p-entry__title c-pageTitle">
+                  <h1 class="c-pageTitle__main" set:html={title} />
+                </div>
+                <div class="c-postMetas u-flex--aicw">
+                  <div class="c-postTimes u-flex--aicw">
+                    <time class="c-postTimes__item u-flex--aic -posted" datetime={publishedDate}>
+                      <svg class="c-postMetas__icon"></svg>
+                      {new Date(publishedDate).toLocaleDateString()}
+                    </time>
+                  </div>
+                  <div class="c-postTerms u-flex--aicw">
+                    <div class="c-postTerms__item -category u-flex--aicw">
+                      <svg class="c-postMetas__icon"></svg>
+                      <a
+                        class="c-postTerms__link"
+                        href={categoryUrl}
+                        id={categoryId?.toString()}
+                        set:html={categoryName}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </header>
+              <div class="c-postContent p-entry__content">
+                <p set:html={content} />
+              </div>
+              <div class="p-entry__foot">
+                <div class="c-postMetas u-flex--aicw">
+                  <div class="c-postTerms u-flex--aic">
+                    <div class="c-postTerms__item -category u-flex--aicw">
+                      <svg class="c-postMetas__icon"></svg>
+                      <a
+                        class="c-postTerms__link"
+                        href={categoryUrl}
+                        id={categoryId?.toString()}
+                        set:html={categoryName}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <ul class="c-pnNav">
+                  <li class="c-pnNav__item -prev">
+                    <a class="c-pnNav__link u-flex--aic" href="/">
+                      <svg class="c-pnNav__svg"></svg>
+                      <span class="c-pnNav__title"></span>
+                    </a>
+                  </li>
+                  <li class="c-pnNav__item -next"></li>
+                </ul>
+                <section class="p-entry__author c-bottomSection">
+                  <h2 class="c-bottomSection__title">この記事を書いた人</h2>
+                  <div class="p-authorBox">
+                    <figure class="p-authorBox_avator">
+                      <img class="avator" src="" alt="" />
+                    </figure>
+                    <div class="p-authorBox__body">
+                      <span class="p-authorBox__name" set:html={author} />
+                      <div class="p-authorBox__footer">
+                        <div class="p-auhtorBox__links">
+                          <div class="p-authorBox__weblink u-flex--aic">
+                            <svg class="arkhe-svg-link"></svg>
+                            <a href={authorLink} target="_blank" set:html={authorLink} />
+                          </div>
+                        </div>
+                        <div class="p-authorBox__archivelink">
+                          <a href={postUrl} target="_blank"> 記事一覧へ </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <section class="p-entry__related c-bottomSection">
+                  <h2>関連記事</h2>
+                  <ul class="p-postList -type-card -related">
+                    <li class="p-postList__item">
+                      <a href="/">
+                        <div class="p-postList__thumb c-postThumb">
+                          ::before
+                          <figure class="c-postThumb__figure">
+                            <img class="c-postThumb__img" src="" alt="" loading="lazy" />
+                          </figure>
+                        </div>
+                        <div class="p-postList__body">
+                          <div class="p-postList__title"></div>
+                          <div class="p-postList__meta c-postMetas u-flex--aicw">
+                            <div class="p-postList__times c-postTimes u-color-thin u-flex--aic">
+                              <time class="c-postTimes__item u-flex--aic -posted" datetime="">
+                                <svg></svg>
+                              </time>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                    </li>
+                  </ul>
+                </section>
+              </div>
+              <div id="comments" class="p-comments c-bottomSection">
+                <h2 class="p-comments__title c-bottomSection__title">コメント</h2>
+                <div class="p-comments__body">
+                  <p class="p-comments__none"></p>
+                  <div id="respond" class="comment-respond">
+                    <h3 id="reply-title" class="comment-reply-title">
+                      "コメントを残す"
+                      <small>
+                        <a id="cancel-comment-reply-link" href="/" rel="nofollow" style="display: none;">
+                          コメントをキャンセル
+                        </a>
+                      </small>
+                    </h3>
+                    <form
+                      id="commentform"
+                      class="comment-form"
+                      action="http://headless-wordpress-testsite.local/wp-comment-post.php"
+                      method="post"
+                      novalidate
+                    >
+                      <p class="logged-in-as">
+                        〇〇としてログインしています。
+                        <a href="http://headless-wordpress-testsite.local/wp-admin/profile.php">
+                          プロフィールを編集します
+                        </a>
+                        。
+                        <a href="/"> ログアウトしますか </a>
+                        ？
+                        <span class="required-field-message">
+                          <span class="required">※</span>
+                          が付いている欄は必須項目です
+                        </span>
+                      </p>
+                      <p class="comment-form-comment">
+                        <label for="comment">
+                          コメント
+                          <span class="required"> ※ </span>
+                        </label>
+                        <textarea name="comment" id="comment" cols="45" rows="8" maxlength="65525" required></textarea>
+                      </p>
+                      <p class="form-submit">
+                        <input type="submit" name="submit" id="submit" class="submit" value="コメントを送信" />
+                        <input type="hidden" name="comment_post_ID" id="comment_post_ID" value="" />
+                        <input type="hidden" name="comment_parent" id="comment_parent" value="0" />
+                      </p>
+                      <input
+                        type="hidden"
+                        name="_wp_unfiltered_html_comment"
+                        id="_wp_unfiltered_html_comment_disabled"
+                        value=""
+                      />
+                      <script is:inline type="text/javascript">
+                        (function () {
+                          if (window === window.parent) {
+                            document.getElementById("_wp_unfiltered_html_comment_disabled").name =
+                              "_wp_unfiltered_html_comment";
+                          }
+                        })();
+                      </script>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+          <aside id="sidebar" class="l-sidebar">
+            <div id="block-2" class="c-widget widget_block widget_search">
+              <form
+                class="wp-block-search__button-outside wp-block-search_text-button wp-block-search"
+                role="search"
+                method="get"
+                action="http://headless-wordpress-testsite.local/"
+              >
+                <label class="wp-block-search__label" for="wp-block-search__input-1"> 検索 </label>
+                <div class="wp-block-search__inside-wrapper">
+                  <input class="wp-block-search__input" type="search" name="s" required />
+                  <button class="wp-block-search__button wp-element-button" type="submit" aria-label="検索"></button>
+                </div>
+              </form>
+            </div>
+            <div id="block-3" class="c-widget widget_block">
+              <div class="wp-block-group">
+                <div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+                  <h2 class="wp-block-heading">Recent Posts</h2>
+                  <ul class="wp-block-latest-posts__list wp-block-latest-posts">
+                    <li>
+                      <a class="wp-block-latest-posts__post-title" href="/"> ::after </a>
+                    </li>
+                    <li>
+                      <a class="wp-block-latest-posts__post-title" href="/"> ::after </a>
+                    </li>
+                    <li>
+                      <a class="wp-block-latest-posts__post-title" href="/"> ::after </a>
+                    </li>
+                    <li>
+                      <a class="wp-block-latest-posts__post-title" href="/"> ::after </a>
+                    </li>
+                    <li>
+                      <a class="wp-block-latest-posts__post-title" href="/"> ::after </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div id="block-4" class="c-widget widget_block">
+              <div class="wp-block-group">
+                <div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+                  <h2 class="wp-block-heading">Recent Comments</h2>
+                  <ol class="wp-block-latest-comments">
+                    <li class="wp-block-latest-comments__comment">
+                      <article>
+                        <div class="wp-block-latest-comments__comment-meta">
+                          <a class="wp-block-latest-comments__comment-link" href="/">...</a>
+                          <a class="wp-block-latest-comments__comment-author" href="/">...</a>
+                        </div>
+                      </article>
+                    </li>
+                    <li class="wp-block-latest-comments__comment">
+                      <article>
+                        <div class="wp-block-latest-comments__comment-meta">
+                          <a class="wp-block-latest-comments__comment-link" href="/">...</a>
+                          <a class="wp-block-latest-comments__comment-author" href="/">...</a>
+                        </div>
+                      </article>
+                    </li>
+                    <li class="wp-block-latest-comments__comment">
+                      <article>
+                        <div class="wp-block-latest-comments__comment-meta">
+                          <a class="wp-block-latest-comments__comment-link" href="/">...</a>
+                          <a class="wp-block-latest-comments__comment-author" href="/">...</a>
+                        </div>
+                      </article>
+                    </li>
+                    <li class="wp-block-latest-comments__comment">
+                      <article>
+                        <div class="wp-block-latest-comments__comment-meta">
+                          <a class="wp-block-latest-comments__comment-link" href="/">aaa</a>
+                          <a class="wp-block-latest-comments__comment-author" href="/">aaa</a>
+                        </div>
+                      </article>
+                    </li>
+                    <li class="wp-block-latest-comments__comment">
+                      <article>
+                        <div class="wp-block-latest-comments__comment-meta">
+                          <a class="wp-block-latest-comments__comment-link" href="/">aaa</a>
+                          <a class="wp-block-latest-comments__comment-author" href="/">aaa</a>
+                        </div>
+                      </article>
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+            <div id="block-5" class="c-widget widget_block">
+              <div class="wp-block-group">
+                <div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+                  <h2 class="wp-block-heading">Archives</h2>
+                  <ul class="wp-block-archives-list wp-block-archives">
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                    <li><a href="/">list</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div id="block-6" class="c-widget widget_block">
+              <div class="wp-block-group">
+                <div class="wp-block-group__inner-container is-layout-flow wp-block-group-is-layout-flow">
+                  <h2 class="wp-block-heading">title</h2>
+                  <ul class="wp-blick-categories-list wp-block-categories">
+                    <li class="cat-item cat-item-1"><a href="/">list</a></li>
+                    <li class="cat-item cat-item-2"><a href="/">list</a></li>
+                    <li class="cat-item cat-item-17"><a href="/">list</a></li>
+                    <li class="cat-item cat-item-18"><a href="/">list</a></li>
+                    <li class="cat-item cat-item-3"><a href="/">list</a></li>
+                    <li class="cat-item cat-item-4"><a href="/">list</a></li>
+                    <li class="cat-item cat-item-19"><a href="/">list</a></li>
+                    <li class="cat-item cat-item-5"><a href="/">list</a></li>
+                    <li class="cat-item cat-item-20"><a href="/">list</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+    <Footer />
+  </div>
+</Layout>

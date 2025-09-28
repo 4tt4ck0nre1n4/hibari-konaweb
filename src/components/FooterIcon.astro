@@ -1,0 +1,35 @@
+---
+import SafeIcon from "./SafeIcon.astro";
+
+interface FooterIconProps {
+  className: string;
+  href: string;
+  ariaLabel: string;
+  ariaTitle: string;
+  ariaHidden?: boolean;
+  targetBlank?: string;
+  footerIcon?: string;
+  footerIconName: string;
+  footerIconWidth: number;
+  footerIconHeight: number;
+}
+
+const { className, href, ariaLabel, ariaTitle, ariaHidden, targetBlank, footerIcon, footerIconName } =
+  Astro.props as FooterIconProps;
+
+const footerIconWidth = 40;
+const footerIconHeight = 40;
+---
+
+<li class="footer-icon__item">
+  <a class={className} href={href} aria-label={ariaLabel} title={ariaTitle} target={targetBlank}>
+    {
+      typeof footerIcon === "string" && footerIcon.trim().length > 0 ? (
+        <SafeIcon name={footerIcon} width={footerIconWidth} height={footerIconHeight} aria-hidden={ariaHidden} />
+      ) : null
+    }
+    <span class="footer-icon__name">
+      {footerIconName}
+    </span>
+  </a>
+</li>

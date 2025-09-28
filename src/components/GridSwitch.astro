@@ -1,0 +1,153 @@
+---
+import { Icon } from "astro-icon/components";
+
+const onIcon = "fluent-emoji-flat:woman-technologist-medium-light";
+const offIcon = "fluent-emoji-flat:man-technologist-medium-light";
+---
+
+<button
+  id="toggleLogoSvgButton"
+  type="button"
+  aria-label="ポートフォリオサイトの画像を切り替える（ロゴ画像）"
+  title="ポートフォリオサイトの画像を切り替える（ロゴ画像）"
+>
+  <Icon class="onWomanIcon" name={onIcon} width="50" height="50" aria-hidden="true" role="presentation" />
+  <Icon class="offManIcon" name={offIcon} width="50" height="50" aria-hidden="true" role="presentation" />
+</button>
+<p id="ariaLiveStatus__logoSvg" class="screenReader-only" role="status" aria-live="polite"></p>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const logoSvgButton = document.getElementById("toggleLogoSvgButton") as HTMLButtonElement;
+    const onWomanIcon = document.querySelector(".onWomanIcon") as HTMLElement | null;
+    const offManIcon = document.querySelector(".offManIcon") as HTMLElement | null;
+    const gridSvg = document.querySelectorAll<HTMLElement>(".item-7, .item-8, .item-9");
+    const gridSvg2 = document.querySelectorAll<HTMLElement>(".item-10, .item-11, .item-12");
+    const ariaLiveStatusLogoSvg = document.getElementById("ariaLiveStatus__logoSvg") as HTMLElement;
+
+    if (!logoSvgButton || !onWomanIcon || !offManIcon || !ariaLiveStatusLogoSvg) return;
+
+    const initializeDisplay = () => {
+      gridSvg.forEach((element) => ((element as HTMLElement).style.display = "block"));
+      gridSvg2.forEach((element) => ((element as HTMLElement).style.display = "none"));
+      onWomanIcon.style.opacity = "1";
+      offManIcon.style.opacity = "0";
+    };
+
+    const toggleDisplay = (isShowingFirstLogoSvg: boolean) => {
+      if (isShowingFirstLogoSvg) {
+        gridSvg.forEach((element) => ((element as HTMLElement).style.display = "none"));
+        gridSvg2.forEach((element) => ((element as HTMLElement).style.display = "block"));
+        onWomanIcon.style.opacity = "0";
+        offManIcon.style.opacity = "1";
+        logoSvgButton.setAttribute("aria-label", "ポートフォリオサイトの画像を切り替える（イメージ画像）");
+        logoSvgButton.setAttribute("title", "ポートフォリオサイトの画像を切り替える（イメージ画像）");
+        ariaLiveStatusLogoSvg.textContent = "イメージ画像に切り替えました";
+      } else {
+        gridSvg2.forEach((element) => ((element as HTMLElement).style.display = "none"));
+        gridSvg.forEach((element) => ((element as HTMLElement).style.display = "block"));
+        onWomanIcon.style.opacity = "1";
+        offManIcon.style.opacity = "0";
+        logoSvgButton.setAttribute("aria-label", "ポートフォリオサイトの画像を切り替える（ロゴ画像）");
+        logoSvgButton.setAttribute("title", "ポートフォリオサイトの画像を切り替える（ロゴ画像）");
+        ariaLiveStatusLogoSvg.textContent = "ロゴ画像に切り替えました";
+      }
+    };
+
+    initializeDisplay();
+
+    logoSvgButton.addEventListener("click", () => {
+      const isShowingFirstLogoSvg = (gridSvg[0] as HTMLElement)?.style.display !== "none";
+      toggleDisplay(isShowingFirstLogoSvg);
+    });
+
+    const checkTimeAndFlashIcon = () => {
+      setInterval(() => {
+        const now = new Date();
+        const seconds = now.getSeconds();
+        const isWomanVisible = onWomanIcon.style.opacity === "1";
+
+        if ((seconds === 0 || seconds === 15 || seconds === 30 || seconds === 45) && isWomanVisible) {
+          onWomanIcon.style.opacity = "0";
+          offManIcon.style.opacity = "1";
+
+          setTimeout(() => {
+            onWomanIcon.style.opacity = "1";
+            offManIcon.style.opacity = "0";
+          }, 1000);
+        }
+      }, 1000);
+    };
+
+    checkTimeAndFlashIcon();
+  });
+</script>
+
+<style>
+  #toggleLogoSvgButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: transparent 1px solid;
+    border-radius: 1rem;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.4s ease;
+  }
+  #toggleLogoSvgButton:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+  }
+  #toggleLogoSvgButton:active {
+    transform: scale(0.8);
+    box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+  }
+  #toggleLogoSvgButton svg {
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    filter: drop-shadow(10px 20px 20px rgba(160 160 160 / 0.7));
+
+    transition:
+      opacity 1.8s ease,
+      transform 0.35s ease;
+  }
+  #toggleLogoSvgButton svg:is(:hover, :focus-visible) {
+    transform: scale(1.1);
+  }
+  .onWomanIcon {
+    filter: drop-shadow(10px 20px 20px rgba(160 160 160 / 0.7));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: inline-flex;
+    z-index: 1;
+    opacity: 1;
+    transition:
+      opacity 1.8s ease,
+      transform 0.35s ease;
+  }
+  .offManIcon {
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    filter: drop-shadow(10px 20px 20px rgba(160 160 160 / 0.7));
+    opacity: 0;
+    transition:
+      opacity 1.8s ease,
+      transform 0.35s ease;
+  }
+  .onWomanIcon:is(:hover, :focus-visible) {
+    transform: scale(1.1);
+  }
+  .offManIcon:is(:hover, :focus-visible) {
+    transform: scale(1.1);
+  }
+</style>

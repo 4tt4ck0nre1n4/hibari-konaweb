@@ -1,0 +1,173 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import type { GetStaticPaths } from "astro";
+// import { Breadcrumbs } from "astro-breadcrumbs";
+// import "astro-breadcrumbs/breadcrumbs.css";
+// import "../styles/astro-breadcrumbs-config.scss";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import globalText from "../data/globalText.json";
+import errorText from "../data/errorText.json";
+import { Image } from "astro:assets";
+import serverErrorImage from "../assets/500Cat.png";
+
+interface Props {
+  error: unknown;
+}
+
+const { error } = Astro.props;
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return [];
+};
+
+export const prerender = true;
+
+const crumbs = [{ name: "Home", path: "/" }, { name: "500 Server Error" }];
+
+const serverErrorImageMeta = {
+  alt: "500 Server Error エラーを案内する猫の画像",
+  width: 200,
+  height: 200,
+};
+---
+
+<Layout
+  title={globalText.serverError500.title}
+  description={globalText.serverError500.description}
+  ogType={globalText.local.type}
+  ogTitle={globalText.serverError500.title}
+  ogDescription={globalText.serverError500.description}
+  twitterTitle={globalText.serverError500.title}
+  twitterDescription={globalText.serverError500.description}
+>
+  <div id="outer-container">
+    <Header />
+    <main id="page-wrap">
+      <div class="breadcrumbs__wrapper">
+        <Breadcrumbs {crumbs} />
+      </div>
+      <div class="serverError__wrapper">
+        <h1 class="serverError__header">
+          {errorText.serverError.title}
+        </h1>
+        <p class="serverError__text">
+          {
+            import.meta.env.MODE === "development"
+              ? error instanceof Error
+                ? error.message
+                : "Unknown error"
+              : "An unexpected error occurred. Please try again later."
+          }
+        </p>
+        <div class="serverError__imageInner">
+          <Image
+            class="serverError__image"
+            src={serverErrorImage}
+            alt={serverErrorImageMeta.alt}
+            width={serverErrorImageMeta.width}
+            height={serverErrorImageMeta.height}
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="serverError__inner">
+          <p class="serverError__body">
+            {errorText.serverError.body.text1}
+          </p>
+          <p class="serverError__body">
+            {errorText.serverError.body.text2}
+          </p>
+          <ul class="serverError__menu">
+            {
+              errorText.serverError.menu.map(({ href, ariaLabel, ariaTitle, text, textAfter }) => (
+                <li class="serverError__menu_item">
+                  <a class="serverError__menu_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
+                    {text}
+                  </a>
+                  {textAfter}
+                </li>
+              ))
+            }
+          </ul>
+          <p class="serverError__body" set:html={errorText.serverError.body.text3} />
+        </div>
+      </div>
+    </main>
+    <Footer />
+  </div>
+</Layout>
+
+<style>
+  .serverErrors__wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin-inline: auto;
+    /* display: flex;
+    flex-direction: column;
+    align-items: center; */
+
+    /* padding-inline-start: 6rem; */
+  }
+  .serverErrors_wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin-inline: auto;
+    color: green;
+  }
+  .serverError__header {
+    font-size: 2rem;
+    color: red;
+    text-align: center;
+    margin-block-start: 3rem;
+  }
+  .serverError__text {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    letter-spacing: 0.1em;
+    color: inherit;
+    text-align: center;
+    margin-block-start: 1rem;
+    /* border: 1px solid red; */
+  }
+  .serverError__image {
+    display: block;
+    width: 200px;
+    height: 200px;
+    /* border: 1px solid red; */
+    object-fit: contain;
+    margin-block-start: 1rem;
+    margin-inline: auto;
+  }
+  .serverError__inner {
+    /* text-align: center; */
+
+    padding-inline-start: 4rem;
+  }
+  .serverError__body {
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.1em;
+    color: inherit;
+    /* text-align: center; */
+    margin-block-start: 0.5rem;
+  }
+  .serverError__menu {
+    /* justify-content: flex-end; */
+    /* list-style: none; */
+    letter-spacing: 0.1em;
+    margin-block-start: 1rem;
+
+    padding-inline-start: 3rem;
+  }
+  .serverError__menu_item {
+    /* letter-spacing: 0.1em; */
+    text-align: left;
+    padding-block: 0.25rem;
+  }
+  .serverError__menu_link {
+    font-size: inherit;
+    /* letter-spacing: 0.1em; */
+  }
+</style>
