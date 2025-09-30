@@ -3,15 +3,10 @@ import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import type { GetStaticPaths } from "astro";
-// import { Breadcrumbs } from "astro-breadcrumbs";
-// import "astro-breadcrumbs/breadcrumbs.css";
-// import "../../styles/astro-breadcrumbs-config.scss";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
-// import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import globalText from "../../data/globalText.json";
-
-import "../../../app/public/wp-includes/css/dist/block-library/style.min.css";
-import "../../../app/public/wp-content/themes/arkhe/dist/css/main.css";
+// import "../../../app/public/wp-includes/css/dist/block-library/style.min.css";
+// import "../../../app/public/wp-content/themes/arkhe/dist/css/main.css";
 import { BLOG_POST_API, BLOG_SLUG_API } from "../../api/headlessCms";
 
 interface Post {
