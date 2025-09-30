@@ -120,33 +120,37 @@
 
 <script>
   const clock = () => {
-    const d = new Date();
+    try {
+      const d = new Date();
 
-    let year: number | string = d.getFullYear();
-    let month: number | string = (d.getMonth() + 1).toString().padStart(2, "0");
-    let date: number | string = d.getDate().toString().padStart(2, "0");
-    const weekday = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-    let day: string | undefined = weekday[d.getDay()];
+      let year: number | string = d.getFullYear();
+      let month: number | string = (d.getMonth() + 1).toString().padStart(2, "0");
+      let date: number | string = d.getDate().toString().padStart(2, "0");
+      const weekday = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+      let day: string | undefined = weekday[d.getDay()];
 
-    let hour: number | string = d.getHours().toString().padStart(2, "0");
-    let minutes: number | string = d.getMinutes().toString().padStart(2, "0");
-    let seconds: number | string = d.getSeconds().toString().padStart(2, "0");
+      let hour: number | string = d.getHours().toString().padStart(2, "0");
+      let minutes: number | string = d.getMinutes().toString().padStart(2, "0");
+      let seconds: number | string = d.getSeconds().toString().padStart(2, "0");
 
-    let today = `${year}/${month}/${date}/${day}`;
-    let time = `${hour}:${minutes}:${seconds}`;
-    let datetime = `${year}-${month}-${date}T${hour}:${minutes}:${seconds}Z`;
+      let today = `${year}/${month}/${date}/${day}`;
+      let time = `${hour}:${minutes}:${seconds}`;
+      let datetime = `${year}-${month}-${date}T${hour}:${minutes}:${seconds}Z`;
 
-    const dateElement = document.querySelector(".clock__date");
-    const timeElement = document.querySelector(".clock__time");
+      const dateElement = document.querySelector(".clock__date");
+      const timeElement = document.querySelector(".clock__time");
 
-    if (dateElement) {
-      dateElement.textContent = today;
-      dateElement.setAttribute("datetime", `${year}-${month}-${date}`);
-    }
+      if (dateElement) {
+        dateElement.textContent = today;
+        dateElement.setAttribute("datetime", `${year}-${month}-${date}`);
+      }
 
-    if (timeElement) {
-      timeElement.textContent = time;
-      timeElement.setAttribute("datetime", datetime);
+      if (timeElement) {
+        timeElement.textContent = time;
+        timeElement.setAttribute("datetime", datetime);
+      }
+    } catch (error) {
+      console.error("Clock error:", error);
     }
   };
 
@@ -167,8 +171,16 @@
     }, 3000);
   };
 
-  const startTimeInterval = () => {
-    setInterval(() => {
+  let clockInterval: number | null = null;
+  let shineInterval: number | null = null;
+  let colorInterval: number | null = null;
+
+  window.addEventListener("load", () => {
+    clock();
+    clockInterval = setInterval(clock, 1000);
+    
+    // シャイン効果のインターバル
+    shineInterval = setInterval(() => {
       const now = new Date();
       const seconds = now.getSeconds();
 
@@ -177,16 +189,8 @@
         lastShineSecond = seconds;
       }
     }, 1000);
-  };
 
-  let clockInterval: number | null = null;
-  let colorInterval: number | null = null;
-
-  window.addEventListener("load", () => {
-    clock();
-    clockInterval = setInterval(clock, 1000);
-    startTimeInterval();
-
+    // カラー効果のインターバル
     colorInterval = setInterval(() => {
       const now = new Date();
       const seconds = now.getSeconds();
@@ -206,6 +210,9 @@
   window.addEventListener("beforeunload", () => {
     if (clockInterval) {
       clearInterval(clockInterval);
+    }
+    if (shineInterval) {
+      clearInterval(shineInterval);
     }
     if (colorInterval) {
       clearInterval(colorInterval);

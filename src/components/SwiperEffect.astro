@@ -59,7 +59,13 @@ try {
 
 <div class="mousePad">
   <button id="js-mouse" class="mouse" type="button" aria-label="マウス">
-    <img src="/assets/mouse.png" alt="mouse" loading="lazy" decoding="async" />
+    <img 
+      src="/assets/mouse.png" 
+      alt="mouse" 
+      loading="lazy" 
+      decoding="async"
+      onerror="this.style.display='none'"
+    />
   </button>
 </div>
 
