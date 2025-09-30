@@ -84,7 +84,7 @@ const mouseItem = {
       aria-label={mouseItem.ariaLabel}
       title={mouseItem.ariaTitle}
     >
-      <img id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" />
+      <img id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" style="display: none;" />
     </button>
   </div>
 </div>
@@ -425,8 +425,30 @@ const mouseItem = {
     }, 1000);
   };
 
+  // マウス画像の読み込み処理
+  const handleMouseImageLoad = () => {
+    const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
+    if (mouseImage) {
+      mouseImage.style.display = "block";
+    }
+  };
+
+  const handleMouseImageError = () => {
+    const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
+    if (mouseImage) {
+      mouseImage.style.display = "none";
+    }
+  };
+
   window.addEventListener("load", () => {
     mouseMoveTimeInterval();
+    
+    // マウス画像のイベントリスナーを追加
+    const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
+    if (mouseImage) {
+      mouseImage.addEventListener("load", handleMouseImageLoad);
+      mouseImage.addEventListener("error", handleMouseImageError);
+    }
   });
 </script>
 
