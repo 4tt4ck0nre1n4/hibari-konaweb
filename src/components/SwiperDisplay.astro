@@ -11,16 +11,25 @@ interface Swiper {
   };
 }
 
-const resSwiper = await fetch(`${SWIPER_PATH_API}${Date.now()}`);
+let swipers: Swiper[] = [];
 
-if (!resSwiper.ok) {
-  console.error("Failed to fetch swiper data:", resSwiper.status);
-}
+try {
+  const resSwiper = await fetch(`${SWIPER_PATH_API}${Date.now()}`);
 
-const swipers: Swiper[] = (await resSwiper.json()) as unknown as Swiper[];
+  if (!resSwiper.ok) {
+    console.error("Failed to fetch swiper data:", resSwiper.status);
+  } else {
+    const data = (await resSwiper.json()) as unknown as Swiper[];
 
-if (!Array.isArray(swipers)) {
-  console.error("Expected an array of posts, but received:", swipers);
+    if (!Array.isArray(data)) {
+      console.error("Expected an array of posts, but received:", data);
+    } else {
+      swipers = data;
+    }
+  }
+} catch (error) {
+  console.error("Error fetching swiper data:", error);
+  // Continue with empty array
 }
 
 const swiperHeader = "Works Menu";

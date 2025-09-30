@@ -13,13 +13,28 @@ interface Slider {
   };
 }
 
-const resSlider = await fetch(SLIDER_PATH_API);
-const sliders: Slider[] = (await resSlider.json()) as unknown as Slider[];
-const mouse = "/assets/mouse.png";
+let sliders: Slider[] = [];
 
-if (!Array.isArray(sliders)) {
-  console.error("Expected an array of posts, but received:", sliders);
+try {
+  const resSlider = await fetch(SLIDER_PATH_API);
+
+  if (resSlider.ok) {
+    const data = (await resSlider.json()) as unknown as Slider[];
+
+    if (!Array.isArray(data)) {
+      console.error("Expected an array of posts, but received:", data);
+    } else {
+      sliders = data;
+    }
+  } else {
+    console.error("Failed to fetch slider data:", resSlider.status);
+  }
+} catch (error) {
+  console.error("Error fetching slider data:", error);
+  // Continue with empty array
 }
+
+const mouse = "/assets/mouse.png";
 
 const sliderItem = {
   href: "/works",
