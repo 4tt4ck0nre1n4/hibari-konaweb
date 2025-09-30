@@ -63,10 +63,10 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
   }
   @keyframes spin {
     0% {
-      transform: translate(-50%, -50%) rotateY(0turn);
+      transform: translate(-50%, -50%) rotateY(0deg);
     }
     100% {
-      transform: translate(-50%, -50%) rotateY(3turn);
+      transform: translate(-50%, -50%) rotateY(1080deg);
     }
   }
   .onConfettiIcon:is(:hover, :focus-visible) {
@@ -74,7 +74,7 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
   }
   /* アニメーション中はホバー効果を無効化 */
   .onConfettiIcon.js-turnIcon:is(:hover, :focus-visible) {
-    transform: translate(-50%, -50%) rotateY(3turn);
+    transform: translate(-50%, -50%) rotateY(1080deg);
   }
   @media screen and (max-width: 480px) {
     .onConfettiIcon {
@@ -87,17 +87,17 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     }
     /* アニメーション中はホバー効果を無効化 */
     .onConfettiIcon.js-turnIcon:is(:hover, :focus-visible) {
-      transform: translate(-50%, -50%) rotateY(3turn);
+      transform: translate(-50%, -50%) rotateY(1080deg);
     }
     .onConfettiIcon.js-turnIcon {
       animation: spinMobile 3s ease;
     }
     @keyframes spinMobile {
       0% {
-        transform: translate(-50%, -50%) rotateY(0turn);
+        transform: translate(-50%, -50%) rotateY(0deg);
       }
       100% {
-        transform: translate(-50%, -50%) rotateY(3turn);
+        transform: translate(-50%, -50%) rotateY(1080deg);
       }
     }
   }
@@ -117,13 +117,23 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     
     confettiIcon.classList.add("js-turnIcon");
 
-    setTimeout(() => {
+    // アニメーション終了を監視
+    const handleAnimationEnd = () => {
       confettiIcon.classList.remove("js-turnIcon");
-      // アニメーション終了後に確実に基本位置に戻す
       confettiIcon.style.transform = "translate(-50%, -50%)";
-      // スタイルを強制的に適用
-      void confettiIcon.offsetWidth;
-    }, 3000);
+      confettiIcon.removeEventListener("animationend", handleAnimationEnd);
+    };
+    
+    confettiIcon.addEventListener("animationend", handleAnimationEnd);
+    
+    // フォールバック用のタイマー
+    setTimeout(() => {
+      if (confettiIcon.classList.contains("js-turnIcon")) {
+        confettiIcon.classList.remove("js-turnIcon");
+        confettiIcon.style.transform = "translate(-50%, -50%)";
+        confettiIcon.removeEventListener("animationend", handleAnimationEnd);
+      }
+    }, 3100);
   };
 
   let lastTurnedSecond: number | null = null;
