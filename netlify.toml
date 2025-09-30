@@ -1,5 +1,5 @@
 [build]
-  command = "npm run copy && astro check && astro build && pagefind --site dist"
+  command = "astro check && astro build && pagefind --site dist"
   publish = "dist"
 
 [build.environment]
