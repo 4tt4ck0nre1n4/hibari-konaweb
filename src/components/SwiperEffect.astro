@@ -1,6 +1,6 @@
 ---
-// import { Image } from "astro:assets";
-// import mouse from "/public/assets/mouse.png"; // ファイルが存在しないためコメントアウト
+import { Image } from "astro:assets";
+import mouse from "/public/assets/mouse.png";
 
 interface Slider {
   id: number;
@@ -18,12 +18,12 @@ try {
   const resSlider = await fetch(
     `${import.meta.env.PUBLIC_API_URL}sliders?acf_format=standard&_fields=id,title,slug,acf`,
     {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
       // タイムアウトを設定
-      signal: AbortSignal.timeout(5000)
+      signal: AbortSignal.timeout(5000),
     }
   );
 
@@ -40,7 +40,7 @@ try {
   }
 } catch (error) {
   if (error instanceof Error) {
-    if (error.name === 'AbortError') {
+    if (error.name === "AbortError") {
       console.warn("Slider data fetch timed out");
     } else {
       console.warn("Error fetching slider data:", error.message);
@@ -73,7 +73,7 @@ try {
 
 <div class="mousePad">
   <button id="js-mouse" class="mouse" type="button" aria-label="マウス">
-    <img id="mouse-image" src="/assets/mouse.png" alt="mouse" loading="lazy" decoding="async" />
+    <Image id="mouse-image" src={mouse} alt="mouse" loading="lazy" decoding="async" />
   </button>
 </div>
 
@@ -103,22 +103,8 @@ try {
     });
   };
 
-  // マウス画像のエラーハンドリング
-  const handleMouseImageError = () => {
-    const mouseImage = document.getElementById("mouse-image") as HTMLImageElement;
-    if (mouseImage) {
-      mouseImage.style.display = "none";
-    }
-  };
-
   if (typeof window !== "undefined") {
     initSwiper();
-
-    // マウス画像のエラーイベントリスナーを追加
-    const mouseImage = document.getElementById("mouse-image") as HTMLImageElement;
-    if (mouseImage) {
-      mouseImage.addEventListener("error", handleMouseImageError);
-    }
   }
 </script>
 
