@@ -72,6 +72,10 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
   .onConfettiIcon:is(:hover, :focus-visible) {
     transform: translate(-50%, -50%) scale(1.1);
   }
+  /* アニメーション中はホバー効果を無効化 */
+  .onConfettiIcon.js-turnIcon:is(:hover, :focus-visible) {
+    transform: translate(-50%, -50%) rotateY(3turn);
+  }
   @media screen and (max-width: 480px) {
     .onConfettiIcon {
       transform: translate(-50%, -50%);
@@ -80,6 +84,10 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     }
     .onConfettiIcon:is(:hover, :focus-visible) {
       transform: translate(-50%, -50%) scale(1.1);
+    }
+    /* アニメーション中はホバー効果を無効化 */
+    .onConfettiIcon.js-turnIcon:is(:hover, :focus-visible) {
+      transform: translate(-50%, -50%) rotateY(3turn);
     }
     .onConfettiIcon.js-turnIcon {
       animation: spinMobile 3s ease;
@@ -103,13 +111,18 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     // アニメーション開始前に基本位置を確実に設定
     confettiIcon.style.transform = "translate(-50%, -50%)";
     confettiIcon.classList.remove("js-turnIcon");
+    
+    // 強制的にリフローを発生させてスタイルを適用
     void confettiIcon.offsetWidth;
+    
     confettiIcon.classList.add("js-turnIcon");
 
     setTimeout(() => {
       confettiIcon.classList.remove("js-turnIcon");
       // アニメーション終了後に確実に基本位置に戻す
       confettiIcon.style.transform = "translate(-50%, -50%)";
+      // スタイルを強制的に適用
+      void confettiIcon.offsetWidth;
     }, 3000);
   };
 
