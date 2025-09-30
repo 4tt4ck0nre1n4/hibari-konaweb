@@ -10,7 +10,7 @@ import sitemap from "@astrojs/sitemap";
 import netlify from "@astrojs/netlify";
 
 export default defineConfig({
-  // site: "https://hibari-konaweb.netlify.app",
+  site: "https://hibari-konaweb.netlify.app",
   build: {
     format: "file",
   },
@@ -128,7 +128,7 @@ export default defineConfig({
   image: {
     domains: [
       "astro.build",
-      "http://headless-wordpress-testsite.local"
+      // "http://headless-wordpress-testsite.local"
     ],
     remotePatterns: [{
       protocol: "http"

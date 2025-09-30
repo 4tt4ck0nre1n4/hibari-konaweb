@@ -1,0 +1,23 @@
+[build]
+  command = "npm run copy && astro check && astro build && pagefind --site dist"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@astrojs/netlify"
+
+# WordPress uploads フォルダをコピーするためのディレクトリ設定
+[build.processing]
+  skip_processing = false
+
+# リダイレクト設定（必要に応じて）
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# 環境変数の設定（必要に応じてNetlify UIで設定）
+# [context.production.environment]
+#   WORDPRESS_API_URL = "your-wordpress-url"
