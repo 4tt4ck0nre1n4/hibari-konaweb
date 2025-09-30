@@ -54,19 +54,31 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    margin-block-start: -1.5rem;
+    margin-inline-start: -1.5rem;
     transition: all 0.35s ease;
   }
   .onConfettiIcon.js-turnIcon {
     animation: spin 3s ease;
+    transition: none;
   }
   @keyframes spin {
-    to {
+    0% {
+      transform: rotateY(0turn);
+    }
+    100% {
       transform: rotateY(3turn);
     }
   }
   .onConfettiIcon:is(:hover, :focus-visible) {
     transform: scale(1.1);
+  }
+  @media screen and (max-width: 480px) {
+    .onConfettiIcon {
+      transform: translate(-50%, -50%);
+      margin-block-start: 0;
+      margin-inline-start: 0;
+    }
   }
 </style>
 
@@ -81,7 +93,7 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
 
     setTimeout(() => {
       confettiIcon.classList.remove("js-turnIcon");
-    }, 1000);
+    }, 3000);
   };
 
   let lastTurnedSecond: number | null = null;
