@@ -64,10 +64,10 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
   }
   @keyframes spin {
     0% {
-      transform: rotateY(0deg);
+      transform: rotateY(0turn);
     }
     100% {
-      transform: rotateY(1080deg);
+      transform: rotateY(3turn);
     }
   }
   .onConfettiIcon:is(:hover, :focus-visible) {
@@ -75,7 +75,7 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
   }
   /* アニメーション中はホバー効果を無効化 */
   .onConfettiIcon.js-turnIcon:is(:hover, :focus-visible) {
-    transform: rotateY(1080deg);
+    transform: rotateY(3turn);
   }
   @media screen and (max-width: 480px) {
     .onConfettiIcon {
@@ -88,17 +88,17 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     }
     /* アニメーション中はホバー効果を無効化 */
     .onConfettiIcon.js-turnIcon:is(:hover, :focus-visible) {
-      transform: rotateY(1080deg);
+      transform: rotateY(3turn);
     }
     .onConfettiIcon.js-turnIcon {
       animation: spinMobile 3s ease;
     }
     @keyframes spinMobile {
       0% {
-        transform: rotateY(0deg);
+        transform: rotateY(0turn);
       }
       100% {
-        transform: rotateY(1080deg);
+        transform: rotateY(3turn);
       }
     }
   }
