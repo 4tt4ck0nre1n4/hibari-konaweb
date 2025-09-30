@@ -22,17 +22,45 @@ import "@pagefind/default-ui/css/ui.css";
     border-radius: 0.5rem;
     border: 1px solid gray;
     transition-duration: 300ms;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   #search:not(:has(.pagefind-ui__hidden)) {
     width: 100%;
     border-radius: 1rem;
     padding: 1rem;
+    min-height: 14vh; /* Clock.astroと同じ高さ基準 */
   }
+  
   @media screen and (max-width: 480px) {
-    #search {
-      padding-block: 1.25rem;
+    #search:not(:has(.pagefind-ui__hidden)) {
+      min-height: 12vh; /* モバイル版のClock.astroと同じ高さ */
+      padding-block: 0.75rem; /* パディングを調整 */
       padding-inline: 0.5rem;
+    }
+  }
+  
+  /* iPhone特有の調整 */
+  @media screen and (max-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+    #search:not(:has(.pagefind-ui__hidden)) {
+      min-height: 14vh; /* iPhone版のClock.astroと同じ高さ */
+      padding-block: 0.5rem;
+    }
+  }
+  
+  /* Pagefind UIの検索ボックスのスタイル調整 */
+  #search .pagefind-ui__search-input {
+    font-size: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
+  
+  @media screen and (max-width: 480px) {
+    #search .pagefind-ui__search-input {
+      font-size: 0.9rem; /* モバイルでは少し小さく */
+      padding: 0.6rem;
     }
   }
 </style>
