@@ -140,12 +140,12 @@
     const timeElement = document.querySelector(".clock__time");
 
     if (dateElement) {
-      dateElement.innerHTML = today;
+      dateElement.textContent = today;
       dateElement.setAttribute("datetime", `${year}-${month}-${date}`);
     }
 
     if (timeElement) {
-      timeElement.innerHTML = time;
+      timeElement.textContent = time;
       timeElement.setAttribute("datetime", datetime);
     }
   };
