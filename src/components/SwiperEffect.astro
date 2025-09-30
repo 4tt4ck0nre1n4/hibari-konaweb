@@ -1,5 +1,5 @@
 ---
-import { Image } from "astro:assets";
+// import { Image } from "astro:assets";
 // import mouse from "/public/assets/mouse.png"; // ファイルが存在しないためコメントアウト
 
 interface Slider {
@@ -59,13 +59,7 @@ try {
 
 <div class="mousePad">
   <button id="js-mouse" class="mouse" type="button" aria-label="マウス">
-    <img 
-      src="/assets/mouse.png" 
-      alt="mouse" 
-      loading="lazy" 
-      decoding="async"
-      onerror="this.style.display='none'"
-    />
+    <img id="mouse-image" src="/assets/mouse.png" alt="mouse" loading="lazy" decoding="async" />
   </button>
 </div>
 
@@ -95,8 +89,22 @@ try {
     });
   };
 
+  // マウス画像のエラーハンドリング
+  const handleMouseImageError = () => {
+    const mouseImage = document.getElementById("mouse-image") as HTMLImageElement;
+    if (mouseImage) {
+      mouseImage.style.display = "none";
+    }
+  };
+
   if (typeof window !== "undefined") {
     initSwiper();
+
+    // マウス画像のエラーイベントリスナーを追加
+    const mouseImage = document.getElementById("mouse-image") as HTMLImageElement;
+    if (mouseImage) {
+      mouseImage.addEventListener("error", handleMouseImageError);
+    }
   }
 </script>
 

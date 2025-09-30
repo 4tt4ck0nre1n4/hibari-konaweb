@@ -171,14 +171,14 @@
     }, 3000);
   };
 
-  let clockInterval: number | null = null;
-  let shineInterval: number | null = null;
-  let colorInterval: number | null = null;
+  let clockInterval: ReturnType<typeof setInterval> | null = null;
+  let shineInterval: ReturnType<typeof setInterval> | null = null;
+  let colorInterval: ReturnType<typeof setInterval> | null = null;
 
   window.addEventListener("load", () => {
     clock();
     clockInterval = setInterval(clock, 1000);
-    
+
     // シャイン効果のインターバル
     shineInterval = setInterval(() => {
       const now = new Date();
