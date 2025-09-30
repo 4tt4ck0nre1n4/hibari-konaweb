@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import mouse from "/public/assets/mouse.png";
+// import mouse from "/public/assets/mouse.png"; // ファイルが存在しないためコメントアウト
 
 interface Slider {
   id: number;
@@ -15,11 +15,13 @@ interface Slider {
 let sliders: Slider[] = [];
 
 try {
-  const resSlider = await fetch(`${import.meta.env.PUBLIC_API_URL}sliders?acf_format=standard&_fields=id,title,slug,acf`);
-  
+  const resSlider = await fetch(
+    `${import.meta.env.PUBLIC_API_URL}sliders?acf_format=standard&_fields=id,title,slug,acf`
+  );
+
   if (resSlider.ok) {
     const data = (await resSlider.json()) as unknown as Slider[];
-    
+
     if (!Array.isArray(data)) {
       console.error("Expected an array of posts, but received:", data);
     } else {
@@ -57,7 +59,7 @@ try {
 
 <div class="mousePad">
   <button id="js-mouse" class="mouse" type="button" aria-label="マウス">
-    <Image src={mouse} alt="mouse" loading="lazy" decoding="async" />
+    <img src="/assets/mouse.png" alt="mouse" loading="lazy" decoding="async" />
   </button>
 </div>
 

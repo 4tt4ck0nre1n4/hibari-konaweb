@@ -179,12 +179,15 @@
     }, 1000);
   };
 
+  let clockInterval: number | null = null;
+  let colorInterval: number | null = null;
+
   window.addEventListener("load", () => {
     clock();
-    setInterval(clock, 1000);
+    clockInterval = setInterval(clock, 1000);
     startTimeInterval();
 
-    setInterval(() => {
+    colorInterval = setInterval(() => {
       const now = new Date();
       const seconds = now.getSeconds();
       const colorTarget = document.querySelector(".clock") as HTMLElement;
@@ -197,5 +200,15 @@
         }, 1000);
       }
     }, 1000);
+  });
+
+  // ページがアンロードされる時にインターバルをクリア
+  window.addEventListener("beforeunload", () => {
+    if (clockInterval) {
+      clearInterval(clockInterval);
+    }
+    if (colorInterval) {
+      clearInterval(colorInterval);
+    }
   });
 </script>
