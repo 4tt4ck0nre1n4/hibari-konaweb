@@ -54,7 +54,8 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    margin-block-start: -1.5rem;
+    margin-inline-start: -1.5rem;
     transition: all 0.35s ease;
   }
   .onConfettiIcon.js-turnIcon {
@@ -63,18 +64,18 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
   }
   @keyframes spin {
     0% {
-      transform: translate(-50%, -50%) rotateY(0deg);
+      transform: rotateY(0deg);
     }
     100% {
-      transform: translate(-50%, -50%) rotateY(1080deg);
+      transform: rotateY(1080deg);
     }
   }
   .onConfettiIcon:is(:hover, :focus-visible) {
-    transform: translate(-50%, -50%) scale(1.1);
+    transform: scale(1.1);
   }
   /* アニメーション中はホバー効果を無効化 */
   .onConfettiIcon.js-turnIcon:is(:hover, :focus-visible) {
-    transform: translate(-50%, -50%) rotateY(1080deg);
+    transform: rotateY(1080deg);
   }
   @media screen and (max-width: 480px) {
     .onConfettiIcon {
@@ -87,17 +88,17 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     }
     /* アニメーション中はホバー効果を無効化 */
     .onConfettiIcon.js-turnIcon:is(:hover, :focus-visible) {
-      transform: translate(-50%, -50%) rotateY(1080deg);
+      transform: rotateY(1080deg);
     }
     .onConfettiIcon.js-turnIcon {
       animation: spinMobile 3s ease;
     }
     @keyframes spinMobile {
       0% {
-        transform: translate(-50%, -50%) rotateY(0deg);
+        transform: rotateY(0deg);
       }
       100% {
-        transform: translate(-50%, -50%) rotateY(1080deg);
+        transform: rotateY(1080deg);
       }
     }
   }
@@ -108,32 +109,13 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     const confettiIcon = document.querySelector(".onConfettiIcon") as HTMLElement | null;
     if (!confettiIcon) return;
 
-    // アニメーション開始前に基本位置を確実に設定
-    confettiIcon.style.transform = "translate(-50%, -50%)";
     confettiIcon.classList.remove("js-turnIcon");
-    
-    // 強制的にリフローを発生させてスタイルを適用
     void confettiIcon.offsetWidth;
-    
     confettiIcon.classList.add("js-turnIcon");
 
-    // アニメーション終了を監視
-    const handleAnimationEnd = () => {
-      confettiIcon.classList.remove("js-turnIcon");
-      confettiIcon.style.transform = "translate(-50%, -50%)";
-      confettiIcon.removeEventListener("animationend", handleAnimationEnd);
-    };
-    
-    confettiIcon.addEventListener("animationend", handleAnimationEnd);
-    
-    // フォールバック用のタイマー
     setTimeout(() => {
-      if (confettiIcon.classList.contains("js-turnIcon")) {
-        confettiIcon.classList.remove("js-turnIcon");
-        confettiIcon.style.transform = "translate(-50%, -50%)";
-        confettiIcon.removeEventListener("animationend", handleAnimationEnd);
-      }
-    }, 3100);
+      confettiIcon.classList.remove("js-turnIcon");
+    }, 3000);
   };
 
   let lastTurnedSecond: number | null = null;
