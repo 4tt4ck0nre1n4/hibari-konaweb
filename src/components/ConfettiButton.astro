@@ -58,7 +58,7 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     transition: all 0.35s ease;
   }
   .onConfettiIcon.js-turnIcon {
-    animation: spin 3s ease;
+    animation: spin 3s ease forwards;
     transition: none;
   }
   @keyframes spin {
@@ -82,7 +82,7 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
       transform: translate(-50%, -50%) scale(1.1);
     }
     .onConfettiIcon.js-turnIcon {
-      animation: spinMobile 3s ease;
+      animation: spinMobile 3s ease forwards;
     }
     @keyframes spinMobile {
       0% {
@@ -106,6 +106,8 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
 
     setTimeout(() => {
       confettiIcon.classList.remove("js-turnIcon");
+      // アニメーション終了後に確実に基本位置に戻す
+      confettiIcon.style.transform = "translate(-50%, -50%)";
     }, 3000);
   };
 
