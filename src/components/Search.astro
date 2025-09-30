@@ -22,23 +22,24 @@ import "@pagefind/default-ui/css/ui.css";
     border-radius: 0.5rem;
     border: 1px solid gray;
     transition-duration: 300ms;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative; /* Clock.astroと同じposition設定 */
   }
 
   #search:not(:has(.pagefind-ui__hidden)) {
     width: 100%;
     border-radius: 1rem;
-    padding: 1rem;
     min-height: 14vh; /* Clock.astroと同じ高さ基準 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem; /* Clock.astroと同じパディング */
+    box-sizing: border-box; /* Clock.astroと同じボックスサイズ */
   }
   
   @media screen and (max-width: 480px) {
     #search:not(:has(.pagefind-ui__hidden)) {
       min-height: 12vh; /* モバイル版のClock.astroと同じ高さ */
-      padding-block: 0.75rem; /* パディングを調整 */
-      padding-inline: 0.5rem;
+      padding: 0.25rem; /* Clock.astroと同じパディング */
     }
   }
   
@@ -46,7 +47,7 @@ import "@pagefind/default-ui/css/ui.css";
   @media screen and (max-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
     #search:not(:has(.pagefind-ui__hidden)) {
       min-height: 14vh; /* iPhone版のClock.astroと同じ高さ */
-      padding-block: 0.5rem;
+      padding: 0.25rem;
     }
   }
   
@@ -55,12 +56,15 @@ import "@pagefind/default-ui/css/ui.css";
     font-size: 1rem;
     padding: 0.75rem;
     border-radius: 0.5rem;
+    width: 100%;
+    max-width: 400px; /* 最大幅を制限 */
   }
   
   @media screen and (max-width: 480px) {
     #search .pagefind-ui__search-input {
       font-size: 0.9rem; /* モバイルでは少し小さく */
       padding: 0.6rem;
+      max-width: 100%; /* モバイルでは全幅使用 */
     }
   }
 </style>
