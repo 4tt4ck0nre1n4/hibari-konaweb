@@ -125,6 +125,16 @@ const swiperText2 = "Thank you for viewing my site.";
 
   /* スマホサイズでのテキスト中央配置 */
   @media (max-width: 768px) {
+    .swipers__header {
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      width: 90%;
+      z-index: 5;
+    }
+
     .swipers__text {
       position: absolute;
       top: 50%;
@@ -133,6 +143,15 @@ const swiperText2 = "Thank you for viewing my site.";
       text-align: center;
       width: 90%;
       margin-block-start: 0;
+      line-height: 1.8;
+    }
+
+    .swipers__text:first-of-type {
+      margin-bottom: 1.5rem;
+    }
+
+    .swipers__text:last-of-type {
+      margin-top: 1.5rem;
     }
   }
   .swipers {
