@@ -49,18 +49,18 @@ if (canvasElement instanceof HTMLCanvasElement) {
       if (screenWidth <= 480) {
         // スマホサイズ: デバイスに応じたフォントサイズ
         if (isIOS) {
-          fontSize = 28; // iOS用に少し小さめ
+          fontSize = 36; // iOS用により大きく
         } else if (isAndroid) {
-          fontSize = 36; // Android用により大きく
+          fontSize = 44; // Android用により大きく
         } else {
-          fontSize = 32;
+          fontSize = 40;
         }
       } else if (screenWidth <= 768) {
         // タブレットサイズ
-        fontSize = 40;
+        fontSize = 48;
       } else {
         // デスクトップサイズ
-        fontSize = 44;
+        fontSize = 52;
       }
 
       // より安全なフォント設定
@@ -84,7 +84,7 @@ if (canvasElement instanceof HTMLCanvasElement) {
       if (textMetrics.width > maxWidth && screenWidth <= 480) {
         // スマホでテキストが長すぎる場合はフォントサイズを調整
         const ratio = maxWidth / textMetrics.width;
-        fontSize = Math.max(20, fontSize * ratio);
+        fontSize = Math.max(28, fontSize * ratio);
         context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       }
 
