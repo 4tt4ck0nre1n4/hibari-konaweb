@@ -21,13 +21,13 @@ if (canvasElement instanceof HTMLCanvasElement) {
 
       if (screenWidth <= 480) {
         // スマホサイズ: より大きなフォントサイズ
-        fontSize = 18;
+        fontSize = 24;
       } else if (screenWidth <= 768) {
         // タブレットサイズ
-        fontSize = 20;
+        fontSize = 26;
       } else {
         // デスクトップサイズ
-        fontSize = 22;
+        fontSize = 28;
       }
 
       context.font = `${fontSize}px system-ui`;
@@ -43,7 +43,7 @@ if (canvasElement instanceof HTMLCanvasElement) {
       const textMetrics = context.measureText(text);
       if (textMetrics.width > maxWidth && screenWidth <= 480) {
         // スマホでテキストが長すぎる場合はフォントサイズをさらに調整
-        fontSize = Math.max(14, fontSize * (maxWidth / textMetrics.width));
+        fontSize = Math.max(18, fontSize * (maxWidth / textMetrics.width));
         context.font = `${fontSize}px system-ui`;
       }
 
