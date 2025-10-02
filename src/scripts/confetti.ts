@@ -64,7 +64,7 @@ if (canvasElement instanceof HTMLCanvasElement) {
       }
 
       // より安全なフォント設定
-      context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       context.fillStyle = "#000000"; // 明確な黒色
       context.textAlign = "center";
       context.textBaseline = "middle";
@@ -85,7 +85,7 @@ if (canvasElement instanceof HTMLCanvasElement) {
         // スマホでテキストが長すぎる場合はフォントサイズを調整
         const ratio = maxWidth / textMetrics.width;
         fontSize = Math.max(28, fontSize * ratio);
-        context.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+        context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       }
 
       context.fillText(text, canvasElement.width / 2, canvasElement.height / 2);

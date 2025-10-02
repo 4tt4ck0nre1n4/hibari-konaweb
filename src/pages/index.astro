@@ -843,22 +843,41 @@ const webDesignerRiv = "/riv/designer-life.riv";
     });
   });
 
-  const animationSettings: [string, gsap.TweenVars][] = [
-    [".item-1", { y: 230, rotation: 720, duration: 1.2 }],
-    [".item-2", { y: 230, rotation: 360, duration: 1.6 }],
-    [".item-3", { y: 230, rotation: 720, duration: 2 }],
-    [".item-4", { x: 440, rotation: 360, duration: 2.3 }],
-    [".item-5", { x: 0, rotation: 1080, duration: 2.6 }],
-    [".item-6", { x: -440, rotation: 360, duration: 2.3 }],
-    [".item-7", { y: -230, rotation: 720, duration: 1.4 }],
-    [".item-8", { y: -230, rotation: 360, duration: 1.8 }],
-    [".item-9", { y: -230, rotation: 720, duration: 2.2 }],
-    [".item-10", { y: -230, rotation: 720, duration: 1.4 }],
-    [".item-11", { y: -230, rotation: 360, duration: 1.8 }],
-    [".item-12", { y: -230, rotation: 720, duration: 2.2 }],
-  ];
+  // 画面サイズに応じたアニメーション設定
+  const getAnimationSettings = (): [string, gsap.TweenVars][] => {
+    const isMobile = window.innerWidth <= 768;
 
+    return [
+      [".item-1", { y: 230, rotation: 720, duration: 1.2 }],
+      [".item-2", { y: 230, rotation: 360, duration: 1.6 }],
+      [".item-3", { y: 230, rotation: 720, duration: 2 }],
+      [".item-4", { x: isMobile ? 120 : 440, rotation: 360, duration: 2.3 }],
+      [".item-5", { x: 0, rotation: 1080, duration: 2.6 }],
+      [".item-6", { x: isMobile ? -120 : -440, rotation: 360, duration: 2.3 }],
+      [".item-7", { y: -230, rotation: 720, duration: 1.4 }],
+      [".item-8", { y: -230, rotation: 360, duration: 1.8 }],
+      [".item-9", { y: -230, rotation: 720, duration: 2.2 }],
+      [".item-10", { y: -230, rotation: 720, duration: 1.4 }],
+      [".item-11", { y: -230, rotation: 360, duration: 1.8 }],
+      [".item-12", { y: -230, rotation: 720, duration: 2.2 }],
+    ];
+  };
+
+  const animationSettings = getAnimationSettings();
+
+  // アニメーション設定を適用
   animationSettings.forEach(([selector, props]) => createTween(selector, props));
+
+  // ウィンドウリサイズ時にアニメーション設定を再生成
+  window.addEventListener("resize", () => {
+    // 既存のtweenをクリア
+    tweens.forEach((tween) => tween.kill());
+    tweens.length = 0;
+
+    // 新しい設定でtweenを作成
+    const newAnimationSettings = getAnimationSettings();
+    newAnimationSettings.forEach(([selector, props]) => createTween(selector, props));
+  });
 
   function updateTooltipClassByPosition(): void {
     const item4 = document.querySelector(".item-4");
