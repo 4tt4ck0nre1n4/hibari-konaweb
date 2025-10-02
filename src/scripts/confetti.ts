@@ -49,9 +49,9 @@ if (canvasElement instanceof HTMLCanvasElement) {
       if (screenWidth <= 480) {
         // スマホサイズ: デバイスに応じたフォントサイズ
         if (isIOS) {
-          fontSize = 36; // iOS用により大きく
+          fontSize = 44; // iOS用により大きく
         } else if (isAndroid) {
-          fontSize = 44; // Android用により大きく
+          fontSize = 44; // Android用（適切なサイズ）
         } else {
           fontSize = 40;
         }
