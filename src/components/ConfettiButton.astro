@@ -82,23 +82,26 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
       transform: translate(-50%, -50%);
       margin-block-start: 0;
       margin-inline-start: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
     }
     .onConfettiIcon:is(:hover, :focus-visible) {
       transform: translate(-50%, -50%) scale(1.1);
     }
     /* アニメーション中はホバー効果を無効化 */
     .onConfettiIcon.js-turnIcon:is(:hover, :focus-visible) {
-      transform: rotateY(3turn);
+      transform: translate(-50%, -50%) rotateY(3turn);
     }
     .onConfettiIcon.js-turnIcon {
       animation: spinMobile 3s ease;
     }
     @keyframes spinMobile {
       0% {
-        transform: rotateY(0turn);
+        transform: translate(-50%, -50%) rotateY(0turn);
       }
       100% {
-        transform: rotateY(3turn);
+        transform: translate(-50%, -50%) rotateY(3turn);
       }
     }
   }

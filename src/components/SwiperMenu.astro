@@ -1,6 +1,6 @@
 ---
-// import { Image } from "astro:assets";
-// import mouse from "/public/assets/mouse.png";
+import { Image } from "astro:assets";
+import mouse from "/public/assets/mouse.png";
 import { SLIDER_PATH_API } from "../api/headlessCms";
 
 interface Slider {
@@ -17,12 +17,12 @@ let sliders: Slider[] = [];
 
 try {
   const resSlider = await fetch(SLIDER_PATH_API, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Accept': 'application/json',
+      Accept: "application/json",
     },
     // タイムアウトを設定
-    signal: AbortSignal.timeout(5000)
+    signal: AbortSignal.timeout(5000),
   });
 
   if (resSlider.ok) {
@@ -38,7 +38,7 @@ try {
   }
 } catch (error) {
   if (error instanceof Error) {
-    if (error.name === 'AbortError') {
+    if (error.name === "AbortError") {
       console.warn("Slider data fetch timed out");
     } else {
       console.warn("Error fetching slider data:", error.message);
@@ -47,7 +47,7 @@ try {
   // Continue with empty array
 }
 
-const mouse = "/assets/mouse.png";
+// const mouse = "/assets/mouse.png";
 
 const sliderItem = {
   href: "/works",
@@ -97,7 +97,8 @@ const mouseItem = {
       aria-label={mouseItem.ariaLabel}
       title={mouseItem.ariaTitle}
     >
-      <img id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" style="display: none;" />
+      <Image id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" />
+      <!-- <img id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" style="display: none;" /> -->
     </button>
   </div>
 </div>

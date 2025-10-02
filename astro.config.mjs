@@ -128,11 +128,7 @@ export default defineConfig({
   image: {
     domains: [
       "astro.build",
-      // "http://headless-wordpress-testsite.local"
     ],
-    remotePatterns: [{
-      protocol: "http"
-    }],
   },
   base: "/",
   trailingSlash: "ignore",

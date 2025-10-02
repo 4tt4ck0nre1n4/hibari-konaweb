@@ -15,12 +15,12 @@ let swipers: Swiper[] = [];
 
 try {
   const resSwiper = await fetch(`${SWIPER_PATH_API}${Date.now()}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Accept': 'application/json',
+      Accept: "application/json",
     },
     // タイムアウトを設定
-    signal: AbortSignal.timeout(5000)
+    signal: AbortSignal.timeout(5000),
   });
 
   if (!resSwiper.ok) {
@@ -36,7 +36,7 @@ try {
   }
 } catch (error) {
   if (error instanceof Error) {
-    if (error.name === 'AbortError') {
+    if (error.name === "AbortError") {
       console.warn("Swiper data fetch timed out");
     } else {
       console.warn("Error fetching swiper data:", error.message);
