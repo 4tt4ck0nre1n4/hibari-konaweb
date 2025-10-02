@@ -109,55 +109,51 @@ const swiperText2 = "Thank you for viewing my site.";
   .textArea {
     display: grid;
     place-items: center;
+    position: absolute;
+    top: 34%;
+    left: 42%;
+    z-index: 5;
   }
   .swipers__header {
     font-size: 2rem;
     color: inherit;
-    position: absolute;
+    /* position: absolute;
     top: 30%;
     left: 36%;
-    z-index: 5;
+    z-index: 5; */
   }
   .swipers__text {
     font-size: 1rem;
     color: inherit;
-    position: absolute;
+    /* position: absolute;
     top: 34%;
     left: 36%;
-    z-index: 5;
+    z-index: 5; */
     margin-block-start: 1rem;
   }
 
   /* スマホサイズでのテキスト中央配置 */
-  @media (max-width: 768px) {
+  @media (max-width: 480px) {
+    .textArea {
+      top: 30%;
+      left: 20%;
+    }
     .swipers__header {
-      position: absolute;
-      top: 42%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      width: 90%;
-      z-index: 5;
-      margin-bottom: 1rem;
+      width: 100%;
     }
 
     .swipers__text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      width: 90%;
+      width: 100%;
       margin-block-start: 0;
       line-height: 1.8;
     }
 
     .swipers__text:first-of-type {
-      margin-bottom: 1.5rem;
+      margin-block-start: 1rem;
     }
 
     .swipers__text:last-of-type {
-      margin-top: 1.5rem;
+      margin-block-start: 0.5rem;
     }
   }
   .swipers {
