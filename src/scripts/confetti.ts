@@ -15,15 +15,39 @@ if (canvasElement instanceof HTMLCanvasElement) {
       context.clearRect(0, 0, canvasElement.width, canvasElement.height);
       context.globalAlpha = opacity;
 
-      // スマホサイズかどうかをチェックしてフォントサイズを調整
-      const isMobile = window.innerWidth <= 480;
-      const fontSize = isMobile ? "16px" : "22px";
+      // レスポンシブなフォントサイズの計算
+      const screenWidth = window.innerWidth;
+      let fontSize: number;
 
-      context.font = `${fontSize} system-ui`;
+      if (screenWidth <= 480) {
+        // スマホサイズ: より大きなフォントサイズ
+        fontSize = 18;
+      } else if (screenWidth <= 768) {
+        // タブレットサイズ
+        fontSize = 20;
+      } else {
+        // デスクトップサイズ
+        fontSize = 22;
+      }
+
+      context.font = `${fontSize}px system-ui`;
       context.fillStyle = "black";
       context.textAlign = "center";
       context.textBaseline = "middle";
-      context.fillText("Thank you for viewing my portfolio site!", canvasElement.width / 2, canvasElement.height / 2);
+
+      // テキストが長い場合は改行を考慮
+      const text = "Thank you for viewing my portfolio site!";
+      const maxWidth = canvasElement.width * 0.9;
+
+      // テキストの幅を測定して、必要に応じて調整
+      const textMetrics = context.measureText(text);
+      if (textMetrics.width > maxWidth && screenWidth <= 480) {
+        // スマホでテキストが長すぎる場合はフォントサイズをさらに調整
+        fontSize = Math.max(14, fontSize * (maxWidth / textMetrics.width));
+        context.font = `${fontSize}px system-ui`;
+      }
+
+      context.fillText(text, canvasElement.width / 2, canvasElement.height / 2);
       context.globalAlpha = 1;
     };
 
