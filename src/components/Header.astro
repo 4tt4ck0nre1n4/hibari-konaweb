@@ -131,6 +131,14 @@ const logo = {
     .header__logo_whiteText {
       margin-inline: 0.25rem;
     }
+
+    /* スクロール時も並列配置を維持 */
+    .header__logo_link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
+    }
   }
   .header__inner {
     display: flex;
@@ -161,6 +169,13 @@ const logo = {
     transition:
       transform 0.3s ease,
       box-shadow 0.4s ease;
+  }
+
+  /* iPhone特有の調整 - スクロール時も並列配置を維持 */
+  @media screen and (max-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+    .header__logo_image.is-scroll {
+      margin-inline: 0.25rem;
+    }
   }
 
   .header__clock_animation {
