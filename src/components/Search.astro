@@ -12,6 +12,45 @@ import "@pagefind/default-ui/css/ui.css";
       element: "#search",
       showImages: true,
     });
+
+    // スマホサイズでのみ検索ボックスのborderを強制的に設定
+    const applyBorderStyle = () => {
+      const searchInput = document.querySelector("#search .pagefind-ui__search-input") as HTMLInputElement;
+      if (searchInput) {
+        // スマホサイズかどうかをチェック
+        if (window.innerWidth <= 480) {
+          searchInput.style.border = "1px solid aqua";
+          searchInput.style.borderColor = "aqua";
+          searchInput.style.setProperty("border", "1px solid aqua", "important");
+        } else {
+          // パソコンサイズではborderをリセット
+          searchInput.style.border = "";
+          searchInput.style.borderColor = "";
+          searchInput.style.removeProperty("border");
+        }
+      }
+    };
+
+    // 複数のタイミングでスタイルを適用
+    setTimeout(applyBorderStyle, 100);
+    setTimeout(applyBorderStyle, 500);
+    setTimeout(applyBorderStyle, 1000);
+
+    // ウィンドウリサイズ時にスタイルを再適用
+    window.addEventListener("resize", applyBorderStyle);
+
+    // MutationObserverでDOMの変更を監視
+    const searchContainer = document.querySelector("#search");
+    if (searchContainer) {
+      const observer = new MutationObserver(() => {
+        applyBorderStyle();
+      });
+
+      observer.observe(searchContainer, {
+        childList: true,
+        subtree: true,
+      });
+    }
   });
 </script>
 
@@ -27,12 +66,13 @@ import "@pagefind/default-ui/css/ui.css";
 
   #search:not(:has(.pagefind-ui__hidden)) {
     width: 100%;
-    border-radius: 1rem;
     min-height: 14vh; /* Clock.astroと同じ高さ基準 */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    border-radius: 1rem;
     padding: 0.5rem; /* Clock.astroと同じパディング */
     box-sizing: border-box; /* Clock.astroと同じボックスサイズ */
   }
@@ -44,6 +84,7 @@ import "@pagefind/default-ui/css/ui.css";
       align-items: center;
       justify-content: center;
       min-height: 12vh; /* モバイル版のClock.astroと同じ高さ */
+
       padding: 0.25rem; /* Clock.astroと同じパディング */
     }
   }
@@ -72,9 +113,10 @@ import "@pagefind/default-ui/css/ui.css";
   @media screen and (max-width: 480px) {
     #search .pagefind-ui__search-input {
       font-size: 0.9rem; /* モバイルでは少し小さく */
-      padding: 0.6rem;
       max-width: 100%; /* モバイルでは全幅使用 */
       margin: 0 auto; /* 中央配置 */
+      padding: 0.5rem;
+      border: 1px solid aqua !important;
     }
 
     /* スマホサイズでのPagefind UIのコンテナ全体を中央配置 */

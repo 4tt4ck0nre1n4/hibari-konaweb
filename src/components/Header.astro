@@ -116,6 +116,22 @@ const logo = {
       width: auto;
     }
   }
+
+  /* iPhone特有の調整 - ロゴのスペースをAndroidと同じに */
+  @media screen and (max-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+    .header__logo_container {
+      margin-inline: 0.25rem;
+    }
+
+    .header__logo_image {
+      margin-inline: 0.25rem;
+    }
+
+    .header__logo_text,
+    .header__logo_whiteText {
+      margin-inline: 0.25rem;
+    }
+  }
   .header__inner {
     display: flex;
     justify-content: space-between;
