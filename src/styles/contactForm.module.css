@@ -54,6 +54,10 @@
   font-size: 0.75rem;
   color: var(--color-red);
   margin-inline-start: 0.25rem;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-text-fill-color: var(--color-red);
+  -webkit-opacity: 1;
 }
 
 .input__name {
@@ -245,4 +249,12 @@
   margin: 0;
   margin-block-start: 0.25rem;
   padding: 0;
+}
+@media (max-width: 480px) {
+  .form__inner {
+    max-width: 320px;
+    min-height: 100%;
+    padding-block: 2rem;
+    padding-inline: 0.5rem;
+  }
 }

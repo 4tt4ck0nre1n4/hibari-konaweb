@@ -281,6 +281,12 @@ const googleAnalyticsTermsLinks = {
     margin-inline: auto;
     padding-block: 3rem;
   }
+  @media (max-width: 480px) {
+    .privacy__wrapper {
+      max-width: 320px;
+      padding-block: 2rem;
+    }
+  }
 
   .privacy__title {
     font-size: 1.5rem;
@@ -343,6 +349,7 @@ const googleAnalyticsTermsLinks = {
 
   .privacy__menu {
     width: fit-content;
+    list-style: disc;
     margin-block-start: 2rem;
     margin-inline: auto;
   }
@@ -365,6 +372,21 @@ const googleAnalyticsTermsLinks = {
   .privacy__body_link:is(:hover, :focus-visible) {
     color: rgba(0, 19, 172, 1);
     text-decoration: underline;
+  }
+  @media (max-width: 480px) {
+    .privacy__header {
+      text-align: left;
+    }
+    .privacy__menu {
+      padding-inline-start: 1.5rem;
+
+    }
+    .privacy__text {
+      font-size: 0.9375rem;
+    }
+    .privacy__body {
+      font-size: 0.9375rem;
+    }
   }
 </style>
 
