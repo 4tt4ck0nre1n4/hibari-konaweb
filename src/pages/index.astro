@@ -843,17 +843,43 @@ const webDesignerRiv = "/riv/designer-life.riv";
     });
   });
 
-  // 画面サイズに応じたアニメーション設定
+  // 画面サイズとデバイスに応じたアニメーション設定
   const getAnimationSettings = (): [string, gsap.TweenVars][] => {
-    const isMobile = window.innerWidth <= 768;
+    const screenWidth = window.innerWidth;
+    const isMobile = screenWidth <= 768;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+
+    let item4X: number;
+    let item6X: number;
+
+    if (isMobile) {
+      if (isIOS) {
+        // iPhone: はみ出しを防ぐため少し小さめに調整
+        item4X = 254;
+        item6X = -254;
+      } else if (isAndroid) {
+        // Android: 足りない分を補うため少し大きめに調整
+        item4X = 264;
+        item6X = -264;
+      } else {
+        // その他のデバイス
+        item4X = 254;
+        item6X = -254;
+      }
+    } else {
+      // デスクトップ
+      item4X = 440;
+      item6X = -440;
+    }
 
     return [
       [".item-1", { y: 230, rotation: 720, duration: 1.2 }],
       [".item-2", { y: 230, rotation: 360, duration: 1.6 }],
       [".item-3", { y: 230, rotation: 720, duration: 2 }],
-      [".item-4", { x: isMobile ? 254 : 440, rotation: 360, duration: 2.3 }],
+      [".item-4", { x: item4X, rotation: 360, duration: 2.3 }],
       [".item-5", { x: 0, rotation: 1080, duration: 2.6 }],
-      [".item-6", { x: isMobile ? -254 : -440, rotation: 360, duration: 2.3 }],
+      [".item-6", { x: item6X, rotation: 360, duration: 2.3 }],
       [".item-7", { y: -230, rotation: 720, duration: 1.4 }],
       [".item-8", { y: -230, rotation: 360, duration: 1.8 }],
       [".item-9", { y: -230, rotation: 720, duration: 2.2 }],
