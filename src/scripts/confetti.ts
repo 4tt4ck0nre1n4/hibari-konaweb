@@ -14,7 +14,12 @@ if (canvasElement instanceof HTMLCanvasElement) {
     const drawText = (opacity: number = 1) => {
       context.clearRect(0, 0, canvasElement.width, canvasElement.height);
       context.globalAlpha = opacity;
-      context.font = "22px system-ui";
+
+      // スマホサイズかどうかをチェックしてフォントサイズを調整
+      const isMobile = window.innerWidth <= 480;
+      const fontSize = isMobile ? "16px" : "22px";
+
+      context.font = `${fontSize} system-ui`;
       context.fillStyle = "black";
       context.textAlign = "center";
       context.textBaseline = "middle";
@@ -29,6 +34,11 @@ if (canvasElement instanceof HTMLCanvasElement) {
           drawText();
         }
       }, 50);
+    });
+
+    // ウィンドウリサイズ時にテキストサイズを再調整
+    window.addEventListener("resize", () => {
+      drawText();
     });
 
     if (confetti) {

@@ -119,6 +119,10 @@
       height: 12vh; /* 高さを少し増やす */
       min-height: 80px; /* 最小高さを設定 */
     }
+    .clock__inner::before {
+      width: 60%;
+      transform: translateX(-90px) skew(-16deg);
+    }
     .clock {
       padding: 0.25rem; /* モバイルではパディングを小さく */
       line-height: 1.1; /* 行間をさらに詰める */
@@ -139,6 +143,10 @@
     .clock__inner {
       height: 14vh; /* iPhoneではさらに高さを増やす */
       min-height: 90px;
+    }
+    .clock__inner::before {
+      width: 60%;
+      transform: translateX(-90px) skew(-16deg);
     }
     .clock__date {
       font-size: 0.85rem;

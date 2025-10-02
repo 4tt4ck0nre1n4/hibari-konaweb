@@ -306,9 +306,9 @@ const mouseItem = {
     }
 
     #swiper1 .swiper-slide .swiper__image {
-      width: 140px;
+      width: 144px;
       height: 90px;
-      padding-block: 0.5rem;
+      padding-block: 0;
     }
 
     #js-mouseButton {
@@ -320,6 +320,8 @@ const mouseItem = {
     #js-mouse {
       width: 80px;
       height: 55px;
+      display: block !important;
+      visibility: visible !important;
     }
 
     .confetti__wrapper {
@@ -341,9 +343,34 @@ const mouseItem = {
       align-items: center;
       justify-content: center;
     }
+    .swiper::before {
+      width: 50%;
+      max-width: 90px;
+      height: 24%;
+      min-height: 64px;
+      top: 3%;
+      transform: translateX(-120px) skew(-16deg);
+    }
+    @keyframes shineDisplay {
+      0% {
+        transform: translateX(-120px) skew(-16deg);
+        opacity: 0;
+      }
+      4% {
+        opacity: 1;
+      }
+      16% {
+        transform: translateX(90px) skew(-16deg);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(-120px) skew(-16deg);
+        opacity: 0;
+      }
+    }
 
     #swiper1.swiper {
-      height: 130px;
+      height: 136px;
     }
 
     #swiper1 .swiper-slide {
@@ -351,9 +378,8 @@ const mouseItem = {
     }
 
     #swiper1 .swiper-slide .swiper__image {
-      width: 100px;
-      height: 80px;
-      padding-block: 0.5rem;
+      width: 104px;
+      height: 72px;
     }
 
     #js-mouseButton {
@@ -365,6 +391,8 @@ const mouseItem = {
     #js-mouse {
       width: 65px;
       height: 45px;
+      display: block !important;
+      visibility: visible !important;
     }
   }
 </style>
@@ -444,6 +472,7 @@ const mouseItem = {
     const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
     if (mouseImage) {
       mouseImage.style.display = "block";
+      mouseImage.style.visibility = "visible";
     }
   };
 
