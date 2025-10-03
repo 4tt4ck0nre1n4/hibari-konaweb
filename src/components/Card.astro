@@ -18,49 +18,67 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
 ---
 
 <li class="card__item">
-  <div class="card__flip-container">
-    <!-- 表面 -->
-    <div class="card__front">
-      <a class="card__item_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
-        <h2 class="card__item_header">
-          {cardTitle}
-          <span>&rarr;</span>
-        </h2>
-        <p class="card__item_body">
-          {cardBody}
-        </p>
-        <figure class="card__item_image">
-          <RiveComponent src={src} stateMachines={stateMachines} minWidth={300} minHeight={200} client:only="react" />
-        </figure>
-      </a>
-    </div>
+  <article class="card__article">
+    <div class="card__flip-container">
+      <!-- 表面 -->
+      <div class="card__front">
+        <a class="card__item_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
+          <h2 class="card__item_header">
+            {cardTitle}
+            <span class="card__flip_arrow" aria-hidden="true" title="詳細を見る">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 12h14"></path>
+                <path d="M12 5l7 7-7 7"></path>
+              </svg>
+            </span>
+          </h2>
+          <p class="card__item_body">
+            {cardBody}
+          </p>
+          <figure class="card__item_image">
+            <RiveComponent src={src} stateMachines={stateMachines} minWidth={300} minHeight={200} client:only="react" />
+          </figure>
+        </a>
+      </div>
 
-    <!-- 裏面 -->
-    <div class="card__back">
-      <div class="card__back_content">
-        <h2 class="card__back_header">
-          {cardTitle}
-        </h2>
-        <ul class="card__back_details">
-          {
-            Array.isArray(serviceMenu) ? (
-              serviceMenu.map((menuItem: { item: string }) => <li class="card__back_details_item">{menuItem.item}</li>)
-            ) : typeof cardDetails === "string" ? (
-              <li class="card__back_details_item">{cardDetails}</li>
-            ) : null
-          }
-        </ul>
-        <!-- <p class="card__back_body">
+      <!-- 裏面 -->
+      <div class="card__back">
+        <div class="card__back_content">
+          <h2 class="card__back_header">
+            {cardTitle}
+          </h2>
+          <ul class="card__back_details">
+            {
+              Array.isArray(serviceMenu) ? (
+                serviceMenu.map((menuItem: { item: string }) => (
+                  <li class="card__back_details_item">{menuItem.item}</li>
+                ))
+              ) : typeof cardDetails === "string" ? (
+                <li class="card__back_details_item">{cardDetails}</li>
+              ) : null
+            }
+          </ul>
+          <!-- <p class="card__back_body">
           {cardDetails}
         </p> -->
-        <!-- <div class="card__back_details">
+          <!-- <div class="card__back_details">
           <p>詳細情報がここに表示されます</p>
           <p>カードの裏面です</p>
         </div> -->
-        <button class="card__flip_back" type="button">&larr;</button>
+          <button class="card__flip_back" type="button">&larr;</button>
+        </div>
       </div>
     </div>
-  </div>
+  </article>
 </li>
 
 <style>
@@ -86,6 +104,10 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     min-height: 500px;
     transform-style: preserve-3d;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    /* iOS Safari対応: ハードウェアアクセラレーション */
+    -webkit-transform-style: preserve-3d;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   .card__flip-container.flipped {
@@ -100,10 +122,48 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     min-height: 500px;
     backface-visibility: hidden;
     border-radius: 8px;
+    /* iOS Safari対応: 3D変換の最適化 */
+    -webkit-backface-visibility: hidden;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
   }
 
   .card__back {
     transform: rotateY(180deg);
+    /* iOS Safari対応: 裏面の表示を確実に隠す */
+    -webkit-transform: rotateY(180deg);
+  }
+
+  /* iOS Safari専用の修正 */
+  @supports (-webkit-touch-callout: none) {
+    .card__flip-container {
+      -webkit-transform-style: preserve-3d;
+      -webkit-perspective: 1000px;
+      perspective: 1000px;
+    }
+
+    .card__front,
+    .card__back {
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      -webkit-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+    }
+
+    .card__front {
+      -webkit-transform: rotateY(0deg);
+      transform: rotateY(0deg);
+    }
+
+    .card__back {
+      -webkit-transform: rotateY(180deg);
+      transform: rotateY(180deg);
+    }
+
+    .card__flip-container.flipped {
+      -webkit-transform: rotateY(180deg);
+      transform: rotateY(180deg);
+    }
   }
   .card__item_link {
     width: 100%;
@@ -122,11 +182,72 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     padding: calc(1.5rem - 1px);
     overflow: hidden;
   }
+  .card__article {
+    width: 100%;
+    height: 100%;
+  }
+
   .card__item_header {
     font-size: 1.125rem;
     border-bottom: rebeccapurple 1px solid;
     transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .card__flip_arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, rebeccapurple 0%, #8a2be2 100%);
+    border-radius: 50%;
+    color: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(102, 51, 153, 0.3);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card__flip_arrow::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .card__flip_arrow:hover::before {
+    left: 100%;
+  }
+
+  .card__flip_arrow svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card__flip_arrow:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(102, 51, 153, 0.4);
+    background: linear-gradient(135deg, #8a2be2 0%, rebeccapurple 100%);
+  }
+
+  .card__flip_arrow:hover svg {
+    transform: translateX(2px);
+  }
+
+  .card__item:is(:hover, :focus-visible) .card__flip_arrow {
+    background: linear-gradient(135deg, rgb(var(--accent-light)) 0%, #8a2be2 100%);
+    box-shadow: 0 4px 16px rgba(102, 51, 153, 0.5);
   }
   .card__item_body {
     font-size: 0.9375rem;
@@ -158,6 +279,21 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
     background-position: 0;
     background-image: linear-gradient(45deg, #ffffff71, transparent, #ffffff71, transparent, #ffffff71);
+  }
+
+  html.dark .card__flip_arrow {
+    background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.4);
+  }
+
+  html.dark .card__flip_arrow:hover {
+    background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.5);
+  }
+
+  html.dark .card__item:is(:hover, :focus-visible) .card__flip_arrow {
+    background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
+    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.6);
   }
   .card__item:is(:hover, :focus-visible) .card__item_header {
     color: rgb(var(--accent-light));
@@ -354,6 +490,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
 </style>
 
 <script>
+  // @ts-nocheck
   import { gsap } from "gsap";
 
   // カードのフリップアニメーションを初期化
@@ -365,16 +502,52 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       const frontLink = card.querySelector(".card__front .card__item_link");
       const backButton = card.querySelector(".card__flip_back");
 
-      // 表面のリンククリック時の処理
-      frontLink?.addEventListener("click", (e) => {
-        e.preventDefault();
-        flipCard(flipContainer as HTMLElement, true);
-      });
+      // 表面のリンククリック時の処理（モダンなイベントハンドリング）
+      frontLink?.addEventListener(
+        "click",
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          flipCard(flipContainer as HTMLElement, true);
+        },
+        { passive: false }
+      );
 
       // 裏面の戻るボタンクリック時の処理
-      backButton?.addEventListener("click", () => {
-        flipCard(flipContainer as HTMLElement, false);
-      });
+      backButton?.addEventListener(
+        "click",
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          flipCard(flipContainer as HTMLElement, false);
+        },
+        { passive: false }
+      );
+
+      // タッチデバイス対応（iOS Safari用）
+      if ("ontouchstart" in window) {
+        let touchStartTime = 0;
+        frontLink?.addEventListener(
+          "touchstart",
+          () => {
+            touchStartTime = Date.now();
+          },
+          { passive: true }
+        );
+
+        frontLink?.addEventListener(
+          "touchend",
+          (e) => {
+            const touchDuration = Date.now() - touchStartTime;
+            // 短いタップのみフリップを実行（スクロールと区別）
+            if (touchDuration < 300) {
+              e.preventDefault();
+              flipCard(flipContainer as HTMLElement, true);
+            }
+          },
+          { passive: false }
+        );
+      }
     });
   }
 
@@ -382,14 +555,37 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   function flipCard(container: HTMLElement | null, isFlipping: boolean) {
     if (!container) return;
 
+    // 現代的なiOS検出方法
+    const isIOS = (() => {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
+      const isMacTouch = navigator.maxTouchPoints > 1 && /macintosh/.test(userAgent);
+      return isIOSDevice || isMacTouch;
+    })();
+
+    // Safari検出（より確実な方法）
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    // パフォーマンス最適化のためのwill-change設定
+    container.style.willChange = "transform";
+
     if (isFlipping) {
       // 表面から裏面へ
       gsap.to(container, {
         rotationY: 180,
         duration: 0.4,
         ease: "power2.inOut",
+        force3D: true,
+        onStart: () => {
+          // iOS Safari対応: アニメーション開始時にクラスを追加
+          if (isIOS || isSafari) {
+            container.classList.add("flipped");
+          }
+        },
         onComplete: () => {
           container.classList.add("flipped");
+          // アニメーション完了後にwill-changeを削除してメモリを節約
+          container.style.willChange = "auto";
         },
       });
     } else {
@@ -398,18 +594,49 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
         rotationY: 0,
         duration: 0.4,
         ease: "power2.inOut",
+        force3D: true,
+        onStart: () => {
+          // iOS Safari対応: アニメーション開始時にクラスを削除
+          if (isIOS || isSafari) {
+            container.classList.remove("flipped");
+          }
+        },
         onComplete: () => {
           container.classList.remove("flipped");
+          // アニメーション完了後にwill-changeを削除してメモリを節約
+          container.style.willChange = "auto";
         },
       });
     }
   }
 
+  // モダンな初期化方法
+  function initializeCardFlip() {
+    // 既に初期化済みの場合はスキップ
+    if (document.querySelector(".card__item[data-initialized]")) {
+      return;
+    }
+
+    initCardFlip();
+
+    // 初期化済みマークを追加
+    const cards = document.querySelectorAll(".card__item");
+    cards.forEach((card) => {
+      card.setAttribute("data-initialized", "true");
+    });
+  }
+
   // DOMが読み込まれた後に初期化
-  document.addEventListener("DOMContentLoaded", initCardFlip);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeCardFlip);
+  } else {
+    // 既に読み込み完了している場合
+    initializeCardFlip();
+  }
 
   // Astroの場合は、コンポーネントがマウントされた後に初期化
   if (typeof window !== "undefined") {
-    initCardFlip();
+    // 少し遅延させて他のスクリプトとの競合を避ける
+    setTimeout(initializeCardFlip, 100);
   }
 </script>
