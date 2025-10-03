@@ -68,8 +68,9 @@
   border: 1px solid #cccccc;
   box-shadow: 0 0 8px rgba(0 255 255 / 0.6);
   border-radius: 0.5rem;
-  margin-block-start: 0.125rem;
-  padding: 0.5rem;
+  margin-block-start: 0.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.5rem;
 }
 
 .input__name:is(:hover, :focus-within),
@@ -93,12 +94,12 @@
   border: 1px solid #cccccc;
   box-shadow: 0 0 8px rgba(0 255 255 / 0.6);
   border-radius: 0.5rem;
-  margin-block-start: 0.125rem;
-  padding: 0.5rem;
+  margin-block-start: 0.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.5rem;
 }
 
 .label__message {
-  display: flex;
   width: 100%;
   line-height: 2;
   background: transparent;
@@ -113,9 +114,6 @@
 
 .label__text {
   width: 120px;
-  color: rebeccapurple;
-  color: transparent;
-  color: white;
   color: gray;
   border: 1px solid gray;
   border-radius: 0.5rem;
@@ -147,7 +145,7 @@
   box-shadow: 0 0 8px rgba(0 255 255 / 0.6);
   border-radius: 0.5rem;
   resize: vertical;
-  margin-block-start: 1rem;
+  margin-block-start: 0.5rem;
   padding-block: 0.5rem;
   padding-inline: 0.5rem;
 }
@@ -199,6 +197,7 @@
 }
 
 .checkbox__link {
+  font-size: 0.875rem;
   color: rebeccapurple;
 }
 .checkbox__link:is(:hover, :focus-within) {
@@ -252,9 +251,15 @@
 }
 @media (max-width: 480px) {
   .form__inner {
-    max-width: 320px;
+    width: 94%;
     min-height: 100%;
     padding-block: 2rem;
     padding-inline: 0.5rem;
+  }
+  .checkbox__link {
+    font-size: 0.9375rem;
+  }
+  .checkbox__text {
+    font-size: 0.9375rem;
   }
 }

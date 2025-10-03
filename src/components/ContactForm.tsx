@@ -6,6 +6,7 @@ import { validationSchema } from "../scripts/validationSchema.ts";
 import styles from "../styles/contactForm.module.css";
 import { CONTACT_WPCF7_API, wpcf7Id, wpcf7UnitTag, wpcf7PostId } from "../api/headlessCms.ts";
 
+const requiredMark = "【必須】";
 const THANKS_URL = "/contact/thanks";
 
 type FormValues = {
@@ -94,7 +95,7 @@ export default function ContactForm() {
                   お名前
                 </span>
               </span>
-              <span className={styles.required}>&#10035;</span>
+              <span className={styles.required}>{requiredMark}</span>
             </label>
             <input
               id="name"
@@ -123,7 +124,7 @@ export default function ContactForm() {
                   メール
                 </span>
               </span>
-              <span className={styles.required}>&#10035;</span>
+              <span className={styles.required}>{requiredMark}</span>
             </label>
             <input
               id="email"
@@ -152,7 +153,7 @@ export default function ContactForm() {
                   お問い合わせ
                 </span>
               </span>
-              <span className={styles.required}>&#10035;</span>
+              <span className={styles.required}>{requiredMark}</span>
             </label>
             <textarea
               id="message"
@@ -175,8 +176,6 @@ export default function ContactForm() {
             type="submit"
             value={`${hoveredSubmit ? "送信" : "Submit"}`}
             aria-label={hoveredSubmit ? "送信" : "Submit"}
-            // value={`${hoveredSubmit === "submit" ? "Submit" : "送信"}`}
-            // aria-label={hoveredSubmit === "submit" ? "Submit" : "送信"}
             onMouseEnter={() => setHoveredSubmit(true)}
             onMouseLeave={() => setHoveredSubmit(false)}
           />

@@ -84,6 +84,7 @@ html.dark footer {
   font-size: 0.75rem;
   list-style: none;
   gap: 0.5rem;
+  margin-inline-start: 1rem;
 }
 .breadcrumbs li::after {
   content: ">";
