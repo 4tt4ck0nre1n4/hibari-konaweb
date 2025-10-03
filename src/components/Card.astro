@@ -134,35 +134,86 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     -webkit-transform: rotateY(180deg);
   }
 
-  /* iOS Safari専用の修正 */
+  /* iOS Safari専用の修正 - より強力なアプローチ */
   @supports (-webkit-touch-callout: none) {
     .card__flip-container {
       -webkit-transform-style: preserve-3d;
       -webkit-perspective: 1000px;
       perspective: 1000px;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
     }
 
     .card__front,
     .card__back {
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden !important;
+      backface-visibility: hidden !important;
       -webkit-transform-style: preserve-3d;
       transform-style: preserve-3d;
+      -webkit-perspective: 1000px;
+      perspective: 1000px;
     }
 
     .card__front {
-      -webkit-transform: rotateY(0deg);
-      transform: rotateY(0deg);
+      -webkit-transform: rotateY(0deg) translateZ(0);
+      transform: rotateY(0deg) translateZ(0);
+      z-index: 2;
     }
 
     .card__back {
-      -webkit-transform: rotateY(180deg);
-      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg) translateZ(0);
+      transform: rotateY(180deg) translateZ(0);
+      z-index: 1;
+    }
+
+    .card__flip-container.flipped .card__front {
+      -webkit-transform: rotateY(180deg) translateZ(0);
+      transform: rotateY(180deg) translateZ(0);
+      z-index: 1;
+    }
+
+    .card__flip-container.flipped .card__back {
+      -webkit-transform: rotateY(0deg) translateZ(0);
+      transform: rotateY(0deg) translateZ(0);
+      z-index: 2;
     }
 
     .card__flip-container.flipped {
       -webkit-transform: rotateY(180deg);
       transform: rotateY(180deg);
+    }
+  }
+
+  /* iPhone Safari専用の追加修正 */
+  @media screen and (max-width: 768px) and (-webkit-touch-callout: none) {
+    .card__front,
+    .card__back {
+      -webkit-backface-visibility: hidden !important;
+      backface-visibility: hidden !important;
+      -webkit-transform-style: preserve-3d !important;
+      transform-style: preserve-3d !important;
+    }
+
+    .card__front {
+      -webkit-transform: rotateY(0deg) translateZ(1px);
+      transform: rotateY(0deg) translateZ(1px);
+    }
+
+    .card__back {
+      -webkit-transform: rotateY(180deg) translateZ(-1px);
+      transform: rotateY(180deg) translateZ(-1px);
+    }
+
+    .card__flip-container.flipped .card__front {
+      -webkit-transform: rotateY(180deg) translateZ(-1px);
+      transform: rotateY(180deg) translateZ(-1px);
+      opacity: 0;
+    }
+
+    .card__flip-container.flipped .card__back {
+      -webkit-transform: rotateY(0deg) translateZ(1px);
+      transform: rotateY(0deg) translateZ(1px);
+      opacity: 1;
     }
   }
   .card__item_link {
@@ -569,44 +620,72 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     // パフォーマンス最適化のためのwill-change設定
     container.style.willChange = "transform";
 
+    // iOS Safari用の追加設定
+    if (isIOS || isSafari) {
+      container.style.webkitBackfaceVisibility = "hidden";
+      container.style.backfaceVisibility = "hidden";
+      container.style.webkitTransformStyle = "preserve-3d";
+      container.style.transformStyle = "preserve-3d";
+    }
+
     if (isFlipping) {
       // 表面から裏面へ
-      gsap.to(container, {
-        rotationY: 180,
-        duration: 0.4,
-        ease: "power2.inOut",
-        force3D: true,
-        onStart: () => {
-          // iOS Safari対応: アニメーション開始時にクラスを追加
-          if (isIOS || isSafari) {
+      if (isIOS || isSafari) {
+        // iOS Safari用の即座にクラスを適用
+        container.classList.add("flipped");
+
+        // アニメーションは最小限に
+        gsap.to(container, {
+          rotationY: 180,
+          duration: 0.3,
+          ease: "power2.inOut",
+          force3D: true,
+          onComplete: () => {
+            container.style.willChange = "auto";
+          },
+        });
+      } else {
+        // 他のブラウザ用の通常アニメーション
+        gsap.to(container, {
+          rotationY: 180,
+          duration: 0.4,
+          ease: "power2.inOut",
+          force3D: true,
+          onComplete: () => {
             container.classList.add("flipped");
-          }
-        },
-        onComplete: () => {
-          container.classList.add("flipped");
-          // アニメーション完了後にwill-changeを削除してメモリを節約
-          container.style.willChange = "auto";
-        },
-      });
+            container.style.willChange = "auto";
+          },
+        });
+      }
     } else {
       // 裏面から表面へ
-      gsap.to(container, {
-        rotationY: 0,
-        duration: 0.4,
-        ease: "power2.inOut",
-        force3D: true,
-        onStart: () => {
-          // iOS Safari対応: アニメーション開始時にクラスを削除
-          if (isIOS || isSafari) {
+      if (isIOS || isSafari) {
+        // iOS Safari用の即座にクラスを削除
+        container.classList.remove("flipped");
+
+        // アニメーションは最小限に
+        gsap.to(container, {
+          rotationY: 0,
+          duration: 0.3,
+          ease: "power2.inOut",
+          force3D: true,
+          onComplete: () => {
+            container.style.willChange = "auto";
+          },
+        });
+      } else {
+        // 他のブラウザ用の通常アニメーション
+        gsap.to(container, {
+          rotationY: 0,
+          duration: 0.4,
+          ease: "power2.inOut",
+          force3D: true,
+          onComplete: () => {
             container.classList.remove("flipped");
-          }
-        },
-        onComplete: () => {
-          container.classList.remove("flipped");
-          // アニメーション完了後にwill-changeを削除してメモリを節約
-          container.style.willChange = "auto";
-        },
-      });
+            container.style.willChange = "auto";
+          },
+        });
+      }
     }
   }
 
