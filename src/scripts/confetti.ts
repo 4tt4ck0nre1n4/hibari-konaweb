@@ -3,11 +3,14 @@ import JSConfetti from "js-confetti";
 const confetti: HTMLElement | null = document.getElementById("confettiButton");
 const canvasElement = document.getElementById("canvas");
 
-if (canvasElement instanceof HTMLCanvasElement) {
-  // デバイス検出とキャンバスサイズの設定
-  const screenWidth = window.innerWidth;
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isAndroid = /Android/.test(navigator.userAgent);
+  if (canvasElement instanceof HTMLCanvasElement) {
+    // デバイス検出とキャンバスサイズの設定
+    const screenWidth = window.innerWidth;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+
+    // 高DPI対応のためのスケールファクター
+    const devicePixelRatio = window.devicePixelRatio ?? 1;
 
   if (screenWidth <= 480) {
     // スマホサイズ: デバイスに応じたキャンバスサイズ
@@ -30,6 +33,13 @@ if (canvasElement instanceof HTMLCanvasElement) {
     canvasElement.width = 400;
     canvasElement.height = 250;
   }
+
+  // 高DPI対応: キャンバスの実際のサイズを設定
+  const rect = canvasElement.getBoundingClientRect();
+  canvasElement.style.width = `${rect.width}px`;
+  canvasElement.style.height = `${rect.height}px`;
+  canvasElement.width = canvasElement.width * devicePixelRatio;
+  canvasElement.height = canvasElement.height * devicePixelRatio;
 
   const jsConfetti = new JSConfetti({ canvas: canvasElement });
   const context = canvasElement.getContext("2d");
@@ -58,10 +68,10 @@ if (canvasElement instanceof HTMLCanvasElement) {
       } else if (screenWidth <= 768) {
         // タブレットサイズ
         fontSize = 48;
-      } else {
-        // デスクトップサイズ
-        fontSize = 52;
-      }
+        } else {
+          // デスクトップサイズ
+          fontSize = 20;
+        }
 
       // より安全なフォント設定
       context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
@@ -81,10 +91,12 @@ if (canvasElement instanceof HTMLCanvasElement) {
       const maxWidth = canvasElement.width * 0.85;
       const textMetrics = context.measureText(text);
 
-      if (textMetrics.width > maxWidth && screenWidth <= 480) {
-        // スマホでテキストが長すぎる場合はフォントサイズを調整
+      if (textMetrics.width > maxWidth) {
+        // テキストが長すぎる場合はフォントサイズを調整
         const ratio = maxWidth / textMetrics.width;
-        fontSize = Math.max(28, fontSize * ratio);
+        // パソコンサイズでは最小フォントサイズを大きく設定
+        const minFontSize = screenWidth > 768 ? 28 : 28;
+        fontSize = Math.max(minFontSize, fontSize * ratio);
         context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       }
 
@@ -134,6 +146,18 @@ if (canvasElement instanceof HTMLCanvasElement) {
         canvasElement.width = 400;
         canvasElement.height = 250;
       }
+
+      // 高DPI対応: リサイズ時も適用
+      const newDevicePixelRatio = window.devicePixelRatio ?? 1;
+      const rect = canvasElement.getBoundingClientRect();
+      canvasElement.style.width = `${rect.width}px`;
+      canvasElement.style.height = `${rect.height}px`;
+      canvasElement.width = canvasElement.width * newDevicePixelRatio;
+      canvasElement.height = canvasElement.height * newDevicePixelRatio;
+
+      // コンテキストを再スケール
+      context.scale(newDevicePixelRatio, newDevicePixelRatio);
+
       drawText();
     });
 

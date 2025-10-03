@@ -956,18 +956,61 @@ const webDesignerRiv = "/riv/designer-life.riv";
   const controlMenu = document.querySelector(".control__menu");
   const buttons = document.querySelectorAll(".button");
 
+  // 各ボタンの回転タイムアウトを管理するMap
+  const buttonRotationTimeouts = new Map();
+
   buttons.forEach((button) => {
     button.addEventListener("mouseenter", () => {
+      // 既存のタイムアウトをクリア
+      const existingTimeout = buttonRotationTimeouts.get(button);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+        buttonRotationTimeouts.delete(button);
+      }
+
       button.classList.remove("reset-rotation");
       button.classList.add("is-rotating");
+
+      // 3秒後に自動的に回転を停止
+      const timeoutId = setTimeout(() => {
+        button.classList.remove("is-rotating");
+        button.classList.add("reset-rotation");
+        button.addEventListener(
+          "transitionend",
+          () => {
+            button.classList.remove("reset-rotation");
+          },
+          {
+            once: true,
+          }
+        );
+        buttonRotationTimeouts.delete(button);
+      }, 3000);
+
+      buttonRotationTimeouts.set(button, timeoutId);
     });
+
     button.addEventListener("mouseleave", () => {
+      // タイムアウトをクリア
+      const timeoutId = buttonRotationTimeouts.get(button);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        buttonRotationTimeouts.delete(button);
+      }
+
       button.classList.remove("is-rotating");
     });
   });
 
   controlMenu?.addEventListener("mouseleave", () => {
     buttons.forEach((button) => {
+      // タイムアウトをクリア
+      const timeoutId = buttonRotationTimeouts.get(button);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        buttonRotationTimeouts.delete(button);
+      }
+
       button.classList.remove("is-rotating");
       button.classList.add("reset-rotation");
       button.addEventListener(
