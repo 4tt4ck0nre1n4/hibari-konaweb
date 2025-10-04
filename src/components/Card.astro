@@ -536,13 +536,11 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
 
       // フリップ状態を更新する関数
       const updateFlipState = (flipped: boolean) => {
-        console.log("Updating flip state from", isFlipping, "to", flipped);
         isFlipping = flipped;
       };
 
       // フリップ状態をリセットする関数
       const resetFlipState = () => {
-        console.log("Resetting flip state");
         isFlipping = false;
       };
 
@@ -552,33 +550,38 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
         e.stopPropagation();
 
         // フリップ中は処理をスキップ
-        if (isFlipping) return;
+        if (isFlipping) {
+          return;
+        }
 
         // フリップ状態を一時的に設定
         isFlipping = true;
-        flipCard(flipContainer as HTMLElement, true);
+        flipCard(flipContainer as HTMLElement, true, resetFlipState);
       };
 
       // 裏面の戻るボタン処理
       const handleBackClick = (e: Event) => {
-        console.log("Back button clicked, isFlipping:", isFlipping);
         e.preventDefault();
         e.stopPropagation();
 
         // フリップ中は処理をスキップ
         if (isFlipping) {
-          console.log("Skipping flip - already flipping");
           return;
         }
 
-        console.log("Calling flipCard with false");
         // フリップ状態を一時的に設定
         isFlipping = true;
-        flipCard(flipContainer as HTMLElement, false);
+        flipCard(flipContainer as HTMLElement, false, resetFlipState);
       };
 
+      // デバイス検出の改善
+      const isTouchDevice =
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0 ||
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
       // タッチデバイス用の処理
-      if ("ontouchstart" in window) {
+      if (isTouchDevice) {
         // タッチスタート
         frontLink?.addEventListener(
           "touchstart",
@@ -606,13 +609,18 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
           },
           { passive: false }
         );
+
+        // クリックイベントも追加（タッチデバイスでもクリックが発生する場合がある）
+        frontLink?.addEventListener("click", (e) => {
+          handleFrontInteraction(e);
+        });
       } else {
         // 非タッチデバイス用のクリック処理
         frontLink?.addEventListener("click", handleFrontInteraction);
       }
 
       // 裏面のボタン処理（タッチ/クリック両対応）
-      if ("ontouchstart" in window) {
+      if (isTouchDevice) {
         // タッチデバイス用の裏面ボタン処理
         let backTouchStartTime = 0;
 
@@ -634,6 +642,11 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
           },
           { passive: false }
         );
+
+        // クリックイベントも追加
+        backButton?.addEventListener("click", (e) => {
+          handleBackClick(e);
+        });
       } else {
         // 非タッチデバイス用のクリック処理
         backButton?.addEventListener("click", handleBackClick);
@@ -643,11 +656,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (mutation.type === "attributes" && mutation.attributeName === "class") {
-            const target = mutation.target as HTMLElement;
-            const flipped = target.classList.contains("flipped");
-            console.log("MutationObserver detected class change, flipped:", flipped);
             // フリップ状態はアニメーション完了後にリセットされるため、ここでは更新しない
-            // updateFlipState(flipped);
           }
         });
       });
@@ -655,25 +664,20 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       if (flipContainer) {
         observer.observe(flipContainer, { attributes: true });
         // 初期状態を設定（フリップ中ではない）
-        console.log("Initial flip state: false (not flipping)");
         updateFlipState(false);
       }
     });
   }
 
   // カードをフリップする関数
-  function flipCard(container: HTMLElement | null, toFlipped: boolean) {
+  function flipCard(container: HTMLElement | null, toFlipped: boolean, resetCallback?: () => void) {
     if (!container) return;
-
-    console.log("flipCard called with toFlipped:", toFlipped);
 
     // フリップ状態を即座に設定
     const isCurrentlyFlipped = container.classList.contains("flipped");
-    console.log("Current flipped state:", isCurrentlyFlipped);
 
     // 既に目的の状態の場合は何もしない
     if ((toFlipped && isCurrentlyFlipped) || (!toFlipped && !isCurrentlyFlipped)) {
-      console.log("Already in target state, skipping flip");
       return;
     }
 
@@ -717,43 +721,44 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       ease: "power2.inOut",
       force3D: true,
       onStart: () => {
-        console.log("Animation started, toFlipped:", toFlipped);
         // アニメーション開始時にクラスを即座に適用
         if (toFlipped) {
           container.classList.add("flipped");
-          console.log("Added flipped class");
         } else {
           container.classList.remove("flipped");
-          console.log("Removed flipped class");
         }
+
+        // アニメーション開始時にもリセット処理を予約
+        setTimeout(() => {
+          if (resetCallback) {
+            resetCallback();
+          }
+        }, 300);
       },
       onComplete: () => {
-        console.log("Animation completed, toFlipped:", toFlipped);
         container.style.willChange = "auto";
         // アニメーション完了後に状態を確認
         if (toFlipped) {
           container.classList.add("flipped");
-          console.log("Ensured flipped class is present");
         } else {
           container.classList.remove("flipped");
-          console.log("Ensured flipped class is removed");
         }
         // フリップ状態をリセット（アニメーション完了後）
         setTimeout(() => {
-          resetFlipState();
-        }, 100);
+          if (resetCallback) {
+            resetCallback();
+          }
+        }, 50);
       },
     };
 
     // フリップアニメーション実行
     if (toFlipped) {
-      console.log("Starting flip to back (180 degrees)");
       gsap.to(container, {
         ...animationConfig,
         rotationY: 180,
       });
     } else {
-      console.log("Starting flip to front (0 degrees)");
       gsap.to(container, {
         ...animationConfig,
         rotationY: 0,
@@ -789,16 +794,12 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   function runInitialization() {
     if (typeof window === "undefined") return;
 
-    // 複数のタイミングで初期化を試行
-    const initTimings = [0, 100, 300, 500];
+    // 単一のタイミングで初期化を実行
+    setTimeout(() => {
+      initializeCardFlip();
+    }, 100);
 
-    initTimings.forEach((delay) => {
-      setTimeout(() => {
-        initializeCardFlip();
-      }, delay);
-    });
-
-    // リサイズイベントでも初期化を再実行
+    // リサイズイベントでも初期化を再実行（必要に応じて）
     let resizeTimeout: number;
     window.addEventListener("resize", () => {
       clearTimeout(resizeTimeout);
