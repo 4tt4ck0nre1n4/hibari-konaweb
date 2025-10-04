@@ -134,86 +134,29 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     -webkit-transform: rotateY(180deg);
   }
 
-  /* iOS Safari専用の修正 - より強力なアプローチ */
-  @supports (-webkit-touch-callout: none) {
+  /* モバイルデバイス用のシンプルなアプローチ */
+  @media screen and (max-width: 768px) {
     .card__flip-container {
+      transform-style: preserve-3d;
       -webkit-transform-style: preserve-3d;
-      -webkit-perspective: 1000px;
-      perspective: 1000px;
-      -webkit-backface-visibility: hidden;
-      backface-visibility: hidden;
     }
 
     .card__front,
     .card__back {
-      -webkit-backface-visibility: hidden !important;
-      backface-visibility: hidden !important;
-      -webkit-transform-style: preserve-3d;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
       transform-style: preserve-3d;
-      -webkit-perspective: 1000px;
-      perspective: 1000px;
-    }
-
-    .card__front {
-      -webkit-transform: rotateY(0deg) translateZ(0);
-      transform: rotateY(0deg) translateZ(0);
-      z-index: 2;
+      -webkit-transform-style: preserve-3d;
     }
 
     .card__back {
-      -webkit-transform: rotateY(180deg) translateZ(0);
-      transform: rotateY(180deg) translateZ(0);
-      z-index: 1;
-    }
-
-    .card__flip-container.flipped .card__front {
-      -webkit-transform: rotateY(180deg) translateZ(0);
-      transform: rotateY(180deg) translateZ(0);
-      z-index: 1;
-    }
-
-    .card__flip-container.flipped .card__back {
-      -webkit-transform: rotateY(0deg) translateZ(0);
-      transform: rotateY(0deg) translateZ(0);
-      z-index: 2;
+      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
     }
 
     .card__flip-container.flipped {
-      -webkit-transform: rotateY(180deg);
       transform: rotateY(180deg);
-    }
-  }
-
-  /* iPhone Safari専用の追加修正 */
-  @media screen and (max-width: 768px) and (-webkit-touch-callout: none) {
-    .card__front,
-    .card__back {
-      -webkit-backface-visibility: hidden !important;
-      backface-visibility: hidden !important;
-      -webkit-transform-style: preserve-3d !important;
-      transform-style: preserve-3d !important;
-    }
-
-    .card__front {
-      -webkit-transform: rotateY(0deg) translateZ(1px);
-      transform: rotateY(0deg) translateZ(1px);
-    }
-
-    .card__back {
-      -webkit-transform: rotateY(180deg) translateZ(-1px);
-      transform: rotateY(180deg) translateZ(-1px);
-    }
-
-    .card__flip-container.flipped .card__front {
-      -webkit-transform: rotateY(180deg) translateZ(-1px);
-      transform: rotateY(180deg) translateZ(-1px);
-      opacity: 0;
-    }
-
-    .card__flip-container.flipped .card__back {
-      -webkit-transform: rotateY(0deg) translateZ(1px);
-      transform: rotateY(0deg) translateZ(1px);
-      opacity: 1;
+      -webkit-transform: rotateY(180deg);
     }
   }
   .card__item_link {
@@ -553,169 +496,211 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       const frontLink = card.querySelector(".card__front .card__item_link");
       const backButton = card.querySelector(".card__flip_back");
 
-      // 表面のリンククリック時の処理（モダンなイベントハンドリング）
-      frontLink?.addEventListener(
-        "click",
-        (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          flipCard(flipContainer as HTMLElement, true);
-        },
-        { passive: false }
-      );
+      // フリップ状態を管理するフラグ
+      let isFlipping = false;
+      let touchStartTime = 0;
+      let touchStartY = 0;
 
-      // 裏面の戻るボタンクリック時の処理
-      backButton?.addEventListener(
-        "click",
-        (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          flipCard(flipContainer as HTMLElement, false);
-        },
-        { passive: false }
-      );
+      // 表面のクリック/タッチ処理（統一されたイベントハンドリング）
+      const handleFrontInteraction = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-      // タッチデバイス対応（iOS Safari用）
+        // フリップ中は処理をスキップ
+        if (isFlipping) return;
+
+        flipCard(flipContainer as HTMLElement, true);
+      };
+
+      // 裏面の戻るボタン処理
+      const handleBackClick = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // フリップ中は処理をスキップ
+        if (isFlipping) return;
+
+        flipCard(flipContainer as HTMLElement, false);
+      };
+
+      // タッチデバイス用の処理
       if ("ontouchstart" in window) {
-        let touchStartTime = 0;
+        // タッチスタート
         frontLink?.addEventListener(
           "touchstart",
-          () => {
+          (e) => {
+            const touch = e.touches[0];
             touchStartTime = Date.now();
+            touchStartY = touch.clientY;
           },
           { passive: true }
         );
 
+        // タッチエンド
         frontLink?.addEventListener(
           "touchend",
           (e) => {
             const touchDuration = Date.now() - touchStartTime;
-            // 短いタップのみフリップを実行（スクロールと区別）
-            if (touchDuration < 300) {
-              e.preventDefault();
-              flipCard(flipContainer as HTMLElement, true);
+            const touch = e.changedTouches[0];
+            const touchEndY = touch.clientY;
+            const touchDistance = Math.abs(touchEndY - touchStartY);
+
+            // 短いタップかつスクロールでない場合のみフリップ
+            if (touchDuration < 300 && touchDistance < 10) {
+              handleFrontInteraction(e);
             }
           },
           { passive: false }
         );
+      } else {
+        // 非タッチデバイス用のクリック処理
+        frontLink?.addEventListener("click", handleFrontInteraction);
+      }
+
+      // 裏面のボタン処理（タッチ/クリック両対応）
+      backButton?.addEventListener("click", handleBackClick);
+
+      // フリップ状態の更新を監視
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "attributes" && mutation.attributeName === "class") {
+            const target = mutation.target as HTMLElement;
+            isFlipping = target.classList.contains("flipped");
+          }
+        });
+      });
+
+      if (flipContainer) {
+        observer.observe(flipContainer, { attributes: true });
       }
     });
   }
 
   // カードをフリップする関数
-  function flipCard(container: HTMLElement | null, isFlipping: boolean) {
+  function flipCard(container: HTMLElement | null, toFlipped: boolean) {
     if (!container) return;
 
-    // 現代的なiOS検出方法
-    const isIOS = (() => {
-      const userAgent = navigator.userAgent.toLowerCase();
-      const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
-      const isMacTouch = navigator.maxTouchPoints > 1 && /macintosh/.test(userAgent);
-      return isIOSDevice || isMacTouch;
-    })();
+    // フリップ状態を即座に設定
+    const isCurrentlyFlipped = container.classList.contains("flipped");
 
-    // Safari検出（より確実な方法）
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    // 既に目的の状態の場合は何もしない
+    if ((toFlipped && isCurrentlyFlipped) || (!toFlipped && !isCurrentlyFlipped)) {
+      return;
+    }
 
     // パフォーマンス最適化のためのwill-change設定
     container.style.willChange = "transform";
 
-    // iOS Safari用の追加設定
-    if (isIOS || isSafari) {
+    // デバイス検出
+    const isMobile = window.innerWidth <= 768;
+    const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    // モバイルデバイス用の最適化設定
+    if (isMobile || isIOS || isSafari) {
       container.style.webkitBackfaceVisibility = "hidden";
       container.style.backfaceVisibility = "hidden";
       container.style.webkitTransformStyle = "preserve-3d";
       container.style.transformStyle = "preserve-3d";
     }
 
-    if (isFlipping) {
-      // 表面から裏面へ
-      if (isIOS || isSafari) {
-        // iOS Safari用の即座にクラスを適用
-        container.classList.add("flipped");
+    // アニメーション設定
+    const animationConfig = {
+      duration: isMobile ? 0.25 : 0.4,
+      ease: "power2.inOut",
+      force3D: true,
+      onStart: () => {
+        // アニメーション開始時にクラスを即座に適用
+        if (toFlipped) {
+          container.classList.add("flipped");
+        } else {
+          container.classList.remove("flipped");
+        }
+      },
+      onComplete: () => {
+        container.style.willChange = "auto";
+        // アニメーション完了後に状態を確認
+        if (toFlipped) {
+          container.classList.add("flipped");
+        } else {
+          container.classList.remove("flipped");
+        }
+      },
+    };
 
-        // アニメーションは最小限に
-        gsap.to(container, {
-          rotationY: 180,
-          duration: 0.3,
-          ease: "power2.inOut",
-          force3D: true,
-          onComplete: () => {
-            container.style.willChange = "auto";
-          },
-        });
-      } else {
-        // 他のブラウザ用の通常アニメーション
-        gsap.to(container, {
-          rotationY: 180,
-          duration: 0.4,
-          ease: "power2.inOut",
-          force3D: true,
-          onComplete: () => {
-            container.classList.add("flipped");
-            container.style.willChange = "auto";
-          },
-        });
-      }
+    // フリップアニメーション実行
+    if (toFlipped) {
+      gsap.to(container, {
+        ...animationConfig,
+        rotationY: 180,
+      });
     } else {
-      // 裏面から表面へ
-      if (isIOS || isSafari) {
-        // iOS Safari用の即座にクラスを削除
-        container.classList.remove("flipped");
-
-        // アニメーションは最小限に
-        gsap.to(container, {
-          rotationY: 0,
-          duration: 0.3,
-          ease: "power2.inOut",
-          force3D: true,
-          onComplete: () => {
-            container.style.willChange = "auto";
-          },
-        });
-      } else {
-        // 他のブラウザ用の通常アニメーション
-        gsap.to(container, {
-          rotationY: 0,
-          duration: 0.4,
-          ease: "power2.inOut",
-          force3D: true,
-          onComplete: () => {
-            container.classList.remove("flipped");
-            container.style.willChange = "auto";
-          },
-        });
-      }
+      gsap.to(container, {
+        ...animationConfig,
+        rotationY: 0,
+      });
     }
   }
 
   // モダンな初期化方法
   function initializeCardFlip() {
-    // 既に初期化済みの場合はスキップ
-    if (document.querySelector(".card__item[data-initialized]")) {
+    // カードが存在するかチェック
+    const cards = document.querySelectorAll(".card__item");
+    if (cards.length === 0) {
       return;
     }
 
+    // 既に初期化済みの場合はスキップ
+    const uninitializedCards = Array.from(cards).filter((card) => !card.hasAttribute("data-initialized"));
+
+    if (uninitializedCards.length === 0) {
+      return;
+    }
+
+    // 初期化を実行
     initCardFlip();
 
     // 初期化済みマークを追加
-    const cards = document.querySelectorAll(".card__item");
     cards.forEach((card) => {
       card.setAttribute("data-initialized", "true");
+    });
+
+    console.log(`Card flip initialized for ${cards.length} cards`);
+  }
+
+  // 初期化を実行する関数
+  function runInitialization() {
+    if (typeof window === "undefined") return;
+
+    // 複数のタイミングで初期化を試行
+    const initTimings = [0, 100, 300, 500];
+
+    initTimings.forEach((delay) => {
+      setTimeout(() => {
+        initializeCardFlip();
+      }, delay);
+    });
+
+    // リサイズイベントでも初期化を再実行
+    let resizeTimeout: number;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        initializeCardFlip();
+      }, 250);
     });
   }
 
   // DOMが読み込まれた後に初期化
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeCardFlip);
+    document.addEventListener("DOMContentLoaded", runInitialization);
   } else {
     // 既に読み込み完了している場合
-    initializeCardFlip();
+    runInitialization();
   }
 
   // Astroの場合は、コンポーネントがマウントされた後に初期化
   if (typeof window !== "undefined") {
-    // 少し遅延させて他のスクリプトとの競合を避ける
-    setTimeout(initializeCardFlip, 100);
+    runInitialization();
   }
 </script>
