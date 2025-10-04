@@ -386,6 +386,47 @@ const stateMachine = "State Machine 1";
     padding-inline: 2rem;
     /* padding-inline-start: 1rem; */
   }
+
+  /* スマホサイズでの3列表示を確実にする */
+  @media screen and (max-width: 768px) {
+    .skills__menu {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      padding-block: 2rem;
+      padding-inline: 1.5rem;
+    }
+  }
+
+  /* より小さい画面での調整 */
+  @media screen and (max-width: 480px) {
+    .skills__menu {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      padding-block: 1.5rem;
+      padding-inline: 1rem;
+    }
+  }
+
+  /* iPhone Safari専用の設定 - より具体的なセレクタで詳細度を上げる */
+  @supports (-webkit-touch-callout: none) {
+    @media screen and (max-width: 768px) {
+      .skills .skills__wrapper .skills__menu {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        padding-block: 2rem;
+        padding-inline: 1.5rem;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .skills .skills__wrapper .skills__menu {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        padding-block: 1.5rem;
+        padding-inline: 1rem;
+      }
+    }
+  }
   .skills-icon {
     display: flex;
     flex-direction: column;
