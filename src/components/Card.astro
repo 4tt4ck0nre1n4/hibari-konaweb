@@ -147,6 +147,9 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       -webkit-backface-visibility: hidden;
       transform-style: preserve-3d;
       -webkit-transform-style: preserve-3d;
+      /* iPhoneでの重複表示を防ぐため、より強力な設定 */
+      isolation: isolate;
+      -webkit-isolation: isolate;
     }
 
     .card__back {
@@ -157,6 +160,36 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     .card__flip-container.flipped {
       transform: rotateY(180deg);
       -webkit-transform: rotateY(180deg);
+    }
+
+    /* iPhone Safari専用の追加修正 */
+    @supports (-webkit-touch-callout: none) {
+      .card__front,
+      .card__back {
+        backface-visibility: hidden !important;
+        -webkit-backface-visibility: hidden !important;
+        transform-style: preserve-3d !important;
+        -webkit-transform-style: preserve-3d !important;
+        /* より強力な重複防止 */
+        contain: layout style paint;
+        -webkit-contain: layout style paint;
+      }
+
+      .card__front {
+        z-index: 2;
+      }
+
+      .card__back {
+        z-index: 1;
+      }
+
+      .card__flip-container.flipped .card__front {
+        z-index: 1;
+      }
+
+      .card__flip-container.flipped .card__back {
+        z-index: 2;
+      }
     }
   }
   .card__item_link {
@@ -501,6 +534,11 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       let touchStartTime = 0;
       let touchStartY = 0;
 
+      // フリップ状態を更新する関数
+      const updateFlipState = (flipped: boolean) => {
+        isFlipping = flipped;
+      };
+
       // 表面のクリック/タッチ処理（統一されたイベントハンドリング）
       const handleFrontInteraction = (e: Event) => {
         e.preventDefault();
@@ -558,20 +596,48 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       }
 
       // 裏面のボタン処理（タッチ/クリック両対応）
-      backButton?.addEventListener("click", handleBackClick);
+      if ("ontouchstart" in window) {
+        // タッチデバイス用の裏面ボタン処理
+        let backTouchStartTime = 0;
+
+        backButton?.addEventListener(
+          "touchstart",
+          () => {
+            backTouchStartTime = Date.now();
+          },
+          { passive: true }
+        );
+
+        backButton?.addEventListener(
+          "touchend",
+          (e) => {
+            const touchDuration = Date.now() - backTouchStartTime;
+            if (touchDuration < 300) {
+              handleBackClick(e);
+            }
+          },
+          { passive: false }
+        );
+      } else {
+        // 非タッチデバイス用のクリック処理
+        backButton?.addEventListener("click", handleBackClick);
+      }
 
       // フリップ状態の更新を監視
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (mutation.type === "attributes" && mutation.attributeName === "class") {
             const target = mutation.target as HTMLElement;
-            isFlipping = target.classList.contains("flipped");
+            const flipped = target.classList.contains("flipped");
+            updateFlipState(flipped);
           }
         });
       });
 
       if (flipContainer) {
         observer.observe(flipContainer, { attributes: true });
+        // 初期状態を設定
+        updateFlipState(flipContainer.classList.contains("flipped"));
       }
     });
   }
@@ -602,6 +668,24 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       container.style.backfaceVisibility = "hidden";
       container.style.webkitTransformStyle = "preserve-3d";
       container.style.transformStyle = "preserve-3d";
+
+      // 表面と裏面にも強制的に設定
+      const front = container.querySelector(".card__front") as HTMLElement;
+      const back = container.querySelector(".card__back") as HTMLElement;
+
+      if (front) {
+        front.style.webkitBackfaceVisibility = "hidden";
+        front.style.backfaceVisibility = "hidden";
+        front.style.webkitTransformStyle = "preserve-3d";
+        front.style.transformStyle = "preserve-3d";
+      }
+
+      if (back) {
+        back.style.webkitBackfaceVisibility = "hidden";
+        back.style.backfaceVisibility = "hidden";
+        back.style.webkitTransformStyle = "preserve-3d";
+        back.style.transformStyle = "preserve-3d";
+      }
     }
 
     // アニメーション設定
@@ -664,8 +748,6 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     cards.forEach((card) => {
       card.setAttribute("data-initialized", "true");
     });
-
-    console.log(`Card flip initialized for ${cards.length} cards`);
   }
 
   // 初期化を実行する関数
