@@ -251,7 +251,7 @@
 }
 @media (max-width: 480px) {
   .form__inner {
-    width: 94%;
+    width: 96%;
     min-height: 100%;
     padding-block: 2rem;
     padding-inline: 0.5rem;

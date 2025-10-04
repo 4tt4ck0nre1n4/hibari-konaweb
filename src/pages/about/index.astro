@@ -127,6 +127,10 @@ const stateMachine = "State Machine 1";
                 aboutLikeHeader={typedAboutText.aboutLikeHeader}
                 aboutLikeText={typedAboutText.aboutLikeText}
               />
+              <p class="about__text">
+                お仕事のご依頼などは、
+                <a class="about__text_link" href="/contact">お問い合わせフォーム</a>
+                からお願いします。</p>
               <div class="about__sns">
                 <ul class="about__snsMenu">
                   <Sns
@@ -169,17 +173,15 @@ const stateMachine = "State Machine 1";
               </div>
             </div>
             <div class="about__imageInner">
-              <figure>
-                <Image
-                  class="about__image"
-                  src={blackLady}
-                  alt={aboutImage.alt}
-                  width={aboutImage.width}
-                  height={aboutImage.height}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </figure>
+              <Image
+                class="about__image"
+                src={blackLady}
+                alt={aboutImage.alt}
+                width={aboutImage.width}
+                height={aboutImage.height}
+                loading="lazy"
+                decoding="async"
+              />
             </div>
           </div>
         </div>
@@ -288,6 +290,11 @@ const stateMachine = "State Machine 1";
     padding-block: 2rem;
     padding-inline: 1rem;
   }
+  @media screen and (max-width: 768px) {
+    .about__inner {
+      grid-template-columns: 1fr;
+    }
+  }
   .about__textInner {
     display: flex;
     flex-direction: column;
@@ -300,6 +307,20 @@ const stateMachine = "State Machine 1";
     /* border: 1px solid pink; */
     margin-block-start: 0rem;
     padding-inline: 2.5rem;
+  }
+  .about__text {
+    font-size: 0.875rem;
+    line-height: 1.8;
+    letter-spacing: 0.06em;
+    text-align: left;
+  }
+  .about__text_link {
+    color: rebeccapurple;
+    text-decoration: underline;
+  }
+  .about__text_link:is(:hover, :focus-visible) {
+    color: blue;
+    text-decoration: underline;
   }
   .about__sns {
     margin-block-start: auto;
@@ -357,13 +378,18 @@ const stateMachine = "State Machine 1";
     transform: translateY(8px);
     z-index: 1;
   }
-  /* @media (prefers-color-scheme: dark) {
-    html .about__snsMenu .sns-icon__link svg {
-      stroke: #020202;
-      fill: #020202;
-      color: #020202;
-    }
-  } */
+  .about__imageInner {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+  }
+  .about__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+  }
   .skills__wrapper {
     width: 700px;
     max-width: calc(100% - 2rem);
