@@ -536,7 +536,14 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
 
       // フリップ状態を更新する関数
       const updateFlipState = (flipped: boolean) => {
+        console.log("Updating flip state from", isFlipping, "to", flipped);
         isFlipping = flipped;
+      };
+
+      // フリップ状態をリセットする関数
+      const resetFlipState = () => {
+        console.log("Resetting flip state");
+        isFlipping = false;
       };
 
       // 表面のクリック/タッチ処理（統一されたイベントハンドリング）
@@ -547,17 +554,26 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
         // フリップ中は処理をスキップ
         if (isFlipping) return;
 
+        // フリップ状態を一時的に設定
+        isFlipping = true;
         flipCard(flipContainer as HTMLElement, true);
       };
 
       // 裏面の戻るボタン処理
       const handleBackClick = (e: Event) => {
+        console.log("Back button clicked, isFlipping:", isFlipping);
         e.preventDefault();
         e.stopPropagation();
 
         // フリップ中は処理をスキップ
-        if (isFlipping) return;
+        if (isFlipping) {
+          console.log("Skipping flip - already flipping");
+          return;
+        }
 
+        console.log("Calling flipCard with false");
+        // フリップ状態を一時的に設定
+        isFlipping = true;
         flipCard(flipContainer as HTMLElement, false);
       };
 
@@ -629,15 +645,18 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
           if (mutation.type === "attributes" && mutation.attributeName === "class") {
             const target = mutation.target as HTMLElement;
             const flipped = target.classList.contains("flipped");
-            updateFlipState(flipped);
+            console.log("MutationObserver detected class change, flipped:", flipped);
+            // フリップ状態はアニメーション完了後にリセットされるため、ここでは更新しない
+            // updateFlipState(flipped);
           }
         });
       });
 
       if (flipContainer) {
         observer.observe(flipContainer, { attributes: true });
-        // 初期状態を設定
-        updateFlipState(flipContainer.classList.contains("flipped"));
+        // 初期状態を設定（フリップ中ではない）
+        console.log("Initial flip state: false (not flipping)");
+        updateFlipState(false);
       }
     });
   }
@@ -646,11 +665,15 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   function flipCard(container: HTMLElement | null, toFlipped: boolean) {
     if (!container) return;
 
+    console.log("flipCard called with toFlipped:", toFlipped);
+
     // フリップ状態を即座に設定
     const isCurrentlyFlipped = container.classList.contains("flipped");
+    console.log("Current flipped state:", isCurrentlyFlipped);
 
     // 既に目的の状態の場合は何もしない
     if ((toFlipped && isCurrentlyFlipped) || (!toFlipped && !isCurrentlyFlipped)) {
+      console.log("Already in target state, skipping flip");
       return;
     }
 
@@ -694,31 +717,43 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       ease: "power2.inOut",
       force3D: true,
       onStart: () => {
+        console.log("Animation started, toFlipped:", toFlipped);
         // アニメーション開始時にクラスを即座に適用
         if (toFlipped) {
           container.classList.add("flipped");
+          console.log("Added flipped class");
         } else {
           container.classList.remove("flipped");
+          console.log("Removed flipped class");
         }
       },
       onComplete: () => {
+        console.log("Animation completed, toFlipped:", toFlipped);
         container.style.willChange = "auto";
         // アニメーション完了後に状態を確認
         if (toFlipped) {
           container.classList.add("flipped");
+          console.log("Ensured flipped class is present");
         } else {
           container.classList.remove("flipped");
+          console.log("Ensured flipped class is removed");
         }
+        // フリップ状態をリセット（アニメーション完了後）
+        setTimeout(() => {
+          resetFlipState();
+        }, 100);
       },
     };
 
     // フリップアニメーション実行
     if (toFlipped) {
+      console.log("Starting flip to back (180 degrees)");
       gsap.to(container, {
         ...animationConfig,
         rotationY: 180,
       });
     } else {
+      console.log("Starting flip to front (0 degrees)");
       gsap.to(container, {
         ...animationConfig,
         rotationY: 0,
