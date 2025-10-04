@@ -95,12 +95,17 @@ const notFoundLinks = {
 <style>
   .notFound__wrapper {
     width: 100%;
-    max-width: 700px;
+    max-width: 500px;
     margin-inline: auto;
+  }
+  @media (max-width: 480px) {
+    .notFound__wrapper {
+      width: 90%;
+    }
   }
   .notFound__header {
     font-size: 2rem;
-    color: red;
+    color: #ff4f48;
     text-align: center;
     text-transform: uppercase;
     margin-block-start: 3rem;
@@ -112,7 +117,7 @@ const notFoundLinks = {
     letter-spacing: 0.12em;
     color: inherit;
     /* text-align: center; */
-    margin-block-start: 0.5rem;
+    margin-block-start: 1rem;
   }
 
   .notFound__body:nth-of-type(1) {
@@ -120,6 +125,11 @@ const notFoundLinks = {
     letter-spacing: 0.2em;
     text-align: center;
     margin-block-start: 1rem;
+  }
+  @media (max-width: 480px) {
+    .notFound__body {
+      font-size: 0.9375rem;
+    }
   }
 
   .notFound__image {
@@ -134,5 +144,10 @@ const notFoundLinks = {
   .notFound__link {
     display: inline-block;
     color: rebeccapurple;
+    text-decoration: underline;
+  }
+  .notFound__link:is(:hover, :focus-visible) {
+    color: blue;
+    text-decoration: none;
   }
 </style>
