@@ -38,20 +38,22 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
       <div class="breadcrumbs__wrapper">
         <Breadcrumbs {crumbs} />
       </div>
-      <section class="pricePage">
-        <AboutHeading aboutTitle="Price" aboutSubTitle="料金について。" />
-        {serviceText.price.body.map(({ text }) => <p class="price__body">{text}</p>)}
-        <Image
-          class="price__image"
-          src={sorryImage}
-          alt={serviceText.price.imageAlt}
-          width="200"
-          height="200"
-          loading="lazy"
-          decoding="async"
-        />
-        {serviceText.price.footer.map(({ text }) => <p class="price__body" set:html={text} />)}
-      </section>
+      <div class="pricePage">
+        <div class="pricePage__wrapper">
+          <AboutHeading aboutTitle="Price" aboutSubTitle="料金について" />
+          {serviceText.price.body.map(({ text }) => <p class="price__body">{text}</p>)}
+          <Image
+            class="price__image"
+            src={sorryImage}
+            alt={serviceText.price.imageAlt}
+            width="200"
+            height="200"
+            loading="lazy"
+            decoding="async"
+          />
+          {serviceText.price.footer.map(({ text }) => <p class="price__body" set:html={text} />)}
+        </div>
+      </div>
     </main>
     <Footer />
   </div>
@@ -63,6 +65,21 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     margin-block-start: 3rem;
     padding-block: 3rem;
   }
+  .pricePage__wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin-inline: auto;
+  }
+  @media (max-width: 768px) {
+    .pricePage__wrapper {
+      width: 90%;
+    }
+  }
+  @media (max-width: 480px) {
+    .pricePage__wrapper {
+      width: 80%;
+    }
+  }
   .price__body {
     font-size: 1rem;
     line-height: 2;
@@ -70,6 +87,18 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     color: inherit;
     text-align: center;
     margin-block-start: 1rem;
+  }
+  @media (max-width: 768px) {
+    .price__body {
+      font-size: 0.9375rem;
+      line-height: 1.8;
+      letter-spacing: 0.04em;
+      text-align: left;
+    }
+  }
+  .price__body:last-child {
+    text-align: center;
+    margin-block-start: 2rem;
   }
   .price__image {
     display: block;

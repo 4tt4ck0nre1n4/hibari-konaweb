@@ -556,7 +556,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     bottom: 0;
     width: 100%;
     height: 100%;
-    z-index: 1;
+    z-index: 10;
     cursor: pointer;
     /* 透明だがタッチ可能 */
     background: transparent;
@@ -567,6 +567,11 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+    /* タッチ領域を拡大 */
+    min-width: 44px;
+    min-height: 44px;
+    /* デバッグ用：一時的に背景色を追加 */
+    background: rgba(0, 255, 0, 0.2);
   }
 
   /* モバイルデバイスでのオーバーレイ最適化 */
@@ -894,6 +899,81 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
         handleBackClick(e);
       });
 
+      // より直接的なアプローチ：裏面オーバーレイに直接的なタッチハンドラーを追加
+      if (backOverlay) {
+        console.log("iPhone Debug - Adding direct touch handler to back overlay");
+
+        // 直接的なタッチイベント
+        backOverlay.ontouchstart = (e) => {
+          console.log("iPhone Debug - Direct touchstart on back overlay");
+          e.preventDefault();
+          handleBackClick(e);
+        };
+
+        backOverlay.onclick = (e) => {
+          console.log("iPhone Debug - Direct click on back overlay");
+          e.preventDefault();
+          handleBackClick(e);
+        };
+
+        // より確実な方法：addEventListener で複数のイベントを同時に設定
+        backOverlay.addEventListener(
+          "touchstart",
+          (e) => {
+            console.log("iPhone Debug - addEventListener touchstart on back overlay");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        backOverlay.addEventListener(
+          "touchend",
+          (e) => {
+            console.log("iPhone Debug - addEventListener touchend on back overlay");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        backOverlay.addEventListener(
+          "click",
+          (e) => {
+            console.log("iPhone Debug - addEventListener click on back overlay");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        // さらに確実な方法：pointer events も追加
+        backOverlay.addEventListener(
+          "pointerdown",
+          (e) => {
+            console.log("iPhone Debug - addEventListener pointerdown on back overlay");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        backOverlay.addEventListener(
+          "pointerup",
+          (e) => {
+            console.log("iPhone Debug - addEventListener pointerup on back overlay");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+      }
+
       // 追加のイベントハンドラー（タッチイベントの代替）
       backOverlay?.addEventListener("mousedown", (e) => {
         console.log("iPhone Debug - Mouse down detected on back overlay");
@@ -997,6 +1077,81 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
         handleBackClick(e);
       });
 
+      // より直接的なアプローチ：裏面全体に直接的なタッチハンドラーを追加
+      if (backFace) {
+        console.log("iPhone Debug - Adding direct touch handler to back face");
+
+        // 直接的なタッチイベント
+        backFace.ontouchstart = (e) => {
+          console.log("iPhone Debug - Direct touchstart on back face");
+          e.preventDefault();
+          handleBackClick(e);
+        };
+
+        backFace.onclick = (e) => {
+          console.log("iPhone Debug - Direct click on back face");
+          e.preventDefault();
+          handleBackClick(e);
+        };
+
+        // より確実な方法：addEventListener で複数のイベントを同時に設定
+        backFace.addEventListener(
+          "touchstart",
+          (e) => {
+            console.log("iPhone Debug - addEventListener touchstart on back face");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        backFace.addEventListener(
+          "touchend",
+          (e) => {
+            console.log("iPhone Debug - addEventListener touchend on back face");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        backFace.addEventListener(
+          "click",
+          (e) => {
+            console.log("iPhone Debug - addEventListener click on back face");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        // さらに確実な方法：pointer events も追加
+        backFace.addEventListener(
+          "pointerdown",
+          (e) => {
+            console.log("iPhone Debug - addEventListener pointerdown on back face");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        backFace.addEventListener(
+          "pointerup",
+          (e) => {
+            console.log("iPhone Debug - addEventListener pointerup on back face");
+            e.preventDefault();
+            e.stopPropagation();
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+      }
+
       // 追加のイベントハンドラー（タッチイベントの代替）
       backFace?.addEventListener("mousedown", (e) => {
         console.log("iPhone Debug - Mouse down detected on back face");
@@ -1032,19 +1187,151 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
               // 裏面オーバーレイのイベントを再設定
               if (backOverlay) {
                 console.log("iPhone Debug - Re-setting up back overlay events");
-                backOverlay.addEventListener("click", (e) => {
-                  console.log("iPhone Debug - Re-setup click event detected on back overlay");
+
+                // 直接的なタッチハンドラーを再設定
+                backOverlay.ontouchstart = (e) => {
+                  console.log("iPhone Debug - Re-setup direct touchstart on back overlay");
+                  e.preventDefault();
                   handleBackClick(e);
-                });
+                };
+
+                backOverlay.onclick = (e) => {
+                  console.log("iPhone Debug - Re-setup direct click on back overlay");
+                  e.preventDefault();
+                  handleBackClick(e);
+                };
+
+                // より確実な方法：addEventListener で複数のイベントを同時に再設定
+                backOverlay.addEventListener(
+                  "touchstart",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener touchstart on back overlay");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
+
+                backOverlay.addEventListener(
+                  "touchend",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener touchend on back overlay");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
+
+                backOverlay.addEventListener(
+                  "click",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener click on back overlay");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
+
+                // さらに確実な方法：pointer events も再設定
+                backOverlay.addEventListener(
+                  "pointerdown",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener pointerdown on back overlay");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
+
+                backOverlay.addEventListener(
+                  "pointerup",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener pointerup on back overlay");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
               }
 
               // 裏面全体のイベントを再設定
               if (backFace) {
                 console.log("iPhone Debug - Re-setting up back face events");
-                backFace.addEventListener("click", (e) => {
-                  console.log("iPhone Debug - Re-setup click event detected on back face");
+
+                // 直接的なタッチハンドラーを再設定
+                backFace.ontouchstart = (e) => {
+                  console.log("iPhone Debug - Re-setup direct touchstart on back face");
+                  e.preventDefault();
                   handleBackClick(e);
-                });
+                };
+
+                backFace.onclick = (e) => {
+                  console.log("iPhone Debug - Re-setup direct click on back face");
+                  e.preventDefault();
+                  handleBackClick(e);
+                };
+
+                // より確実な方法：addEventListener で複数のイベントを同時に再設定
+                backFace.addEventListener(
+                  "touchstart",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener touchstart on back face");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
+
+                backFace.addEventListener(
+                  "touchend",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener touchend on back face");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
+
+                backFace.addEventListener(
+                  "click",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener click on back face");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
+
+                // さらに確実な方法：pointer events も再設定
+                backFace.addEventListener(
+                  "pointerdown",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener pointerdown on back face");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
+
+                backFace.addEventListener(
+                  "pointerup",
+                  (e) => {
+                    console.log("iPhone Debug - Re-setup addEventListener pointerup on back face");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleBackClick(e);
+                  },
+                  { passive: false, capture: true }
+                );
               }
             }
           }

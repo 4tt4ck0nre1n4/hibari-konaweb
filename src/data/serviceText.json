@@ -135,10 +135,7 @@
     "imageAlt": "開発中のため立ち入り禁止する猫の画像",
     "footer": [
       {
-        "text": "ご依頼やご相談につきましては、"
-      },
-      {
-        "text": "こちらの<a class='price__link' href='/contact'> お問い合わせフォーム</a>よりお気軽にご連絡ください。"
+        "text": "ご依頼やご相談につきましては、<br>こちらの<a class='price__link' href='/contact'> お問い合わせフォーム</a>よりお気軽にご連絡ください。"
       },
       {
         "text": "<a class='price__link_secondary' href='/'>トップページ</a>に戻る"
