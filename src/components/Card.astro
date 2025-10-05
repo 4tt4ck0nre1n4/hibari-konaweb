@@ -579,8 +579,8 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       -webkit-user-select: none;
       user-select: none;
       /* デバッグ用：一時的に背景色を追加（後で削除） */
-      background: rgba(255, 0, 0, 0.3);
-      border: 2px solid red;
+      /* background: rgba(255, 0, 0, 0.3); */
+      /* border: 2px solid red; */
     }
   }
 </style>
@@ -852,6 +852,8 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
 
             // 即座にフリップを実行（タッチ開始時）
             console.log("iPhone Debug - Immediate flip on touch start");
+            e.preventDefault();
+            e.stopPropagation();
             handleBackClick(e);
           },
           { passive: false, capture: true }
@@ -887,6 +889,8 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       backOverlay?.addEventListener("click", (e) => {
         console.log("iPhone Debug - Click event detected on back overlay");
         console.log("iPhone Debug - Click event details:", e);
+        e.preventDefault();
+        e.stopPropagation();
         handleBackClick(e);
       });
 
@@ -944,6 +948,8 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
 
             // 即座にフリップを実行（タッチ開始時）
             console.log("iPhone Debug - Immediate flip on back face touch start");
+            e.preventDefault();
+            e.stopPropagation();
             handleBackClick(e);
           },
           { passive: false, capture: true }

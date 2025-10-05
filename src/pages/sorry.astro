@@ -64,6 +64,11 @@ const sorryImageMeta = {
     max-width: 700px;
     margin-inline: auto;
   }
+  @media (max-width: 768px) {
+    .sorry__wrapper {
+      width: 90%;
+    }
+  }
   .sorry__header {
     font-size: 2rem;
     color: inherit;
@@ -78,6 +83,18 @@ const sorryImageMeta = {
     color: inherit;
     text-align: center;
     margin-block-start: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    .sorry__header {
+      font-size: 1.5rem;
+    }
+    .sorry__body {
+      font-size: 0.9375rem;
+      line-height: 1.8;
+      letter-spacing: 0.05em;
+      text-align: left;
+    }
   }
 
   .sorry__image {
