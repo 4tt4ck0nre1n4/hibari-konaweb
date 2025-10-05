@@ -76,6 +76,8 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
         </div> -->
           <button class="card__flip_back" type="button">&larr;</button>
         </div>
+        <!-- 裏面全体をクリック可能にするためのオーバーレイ -->
+        <div class="card__back_overlay"></div>
       </div>
     </div>
   </article>
@@ -128,10 +130,39 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     transform-style: preserve-3d;
   }
 
+  /* 表面のスタイル（常に前面に表示） */
+  .card__front {
+    z-index: 2;
+    /* タッチ操作を確実にする */
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* 裏面のスタイル */
   .card__back {
     transform: rotateY(180deg);
     /* iOS Safari対応: 裏面の表示を確実に隠す */
     -webkit-transform: rotateY(180deg);
+    z-index: 1;
+    /* タッチ操作を確実にする */
+    cursor: pointer;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* フリップ時のz-index調整 */
+  .card__flip-container.flipped .card__front {
+    z-index: 1;
+  }
+
+  .card__flip-container.flipped .card__back {
+    z-index: 2;
   }
 
   /* モバイルデバイス用のシンプルなアプローチ */
@@ -175,20 +206,21 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
         -webkit-contain: layout style paint;
       }
 
+      /* 表面と裏面のz-indexを確実に設定 */
       .card__front {
-        z-index: 2;
+        z-index: 2 !important;
       }
 
       .card__back {
-        z-index: 1;
+        z-index: 1 !important;
       }
 
       .card__flip-container.flipped .card__front {
-        z-index: 1;
+        z-index: 1 !important;
       }
 
       .card__flip-container.flipped .card__back {
-        z-index: 2;
+        z-index: 2 !important;
       }
     }
   }
@@ -514,6 +546,43 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     transform: translateY(0);
     box-shadow: 0 2px 8px rgba(102, 51, 153, 0.3);
   }
+
+  /* 裏面オーバーレイ（タッチ操作用） */
+  .card__back_overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    cursor: pointer;
+    /* 透明だがタッチ可能 */
+    background: transparent;
+    /* タッチイベントを確実に有効にする */
+    pointer-events: auto;
+    /* iOS Safariでのタッチ最適化 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* モバイルデバイスでのオーバーレイ最適化 */
+  @media screen and (max-width: 768px) {
+    .card__back_overlay {
+      /* タッチ操作を確実にする */
+      touch-action: manipulation;
+      pointer-events: auto;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      /* デバッグ用：一時的に背景色を追加（後で削除） */
+      background: rgba(255, 0, 0, 0.3);
+      border: 2px solid red;
+    }
+  }
 </style>
 
 <script>
@@ -528,98 +597,195 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       const flipContainer = card.querySelector(".card__flip-container");
       const frontLink = card.querySelector(".card__front .card__item_link");
       const backButton = card.querySelector(".card__flip_back");
+      const backOverlay = card.querySelector(".card__back_overlay");
+      const backFace = card.querySelector(".card__back");
 
       // フリップ状態を管理するフラグ
       let isFlipping = false;
+      let isCurrentlyShowingBack = false; // 現在裏面が表示されているかの状態
+      let flipState = false; // 追加のフリップ状態管理
       let touchStartTime = 0;
       let touchStartY = 0;
 
       // フリップ状態を更新する関数
       const updateFlipState = (flipped: boolean) => {
+        console.log("iPhone Debug - Updating flip state from", isFlipping, "to", flipped);
         isFlipping = flipped;
+      };
+
+      // 現在のフリップ状態を確認する関数（改良版）
+      const isCurrentlyFlipped = () => {
+        // 最もシンプルで確実な方法：内部状態を使用
+        console.log("iPhone Debug - Using internal state - isCurrentlyShowingBack:", isCurrentlyShowingBack);
+        return isCurrentlyShowingBack;
       };
 
       // フリップ状態をリセットする関数
       const resetFlipState = () => {
+        console.log("iPhone Debug - Resetting flip state");
         isFlipping = false;
       };
 
       // 表面のクリック/タッチ処理（統一されたイベントハンドリング）
       const handleFrontInteraction = (e: Event) => {
+        console.log(
+          "iPhone Debug - Front interaction detected, isFlipping:",
+          isFlipping,
+          "isCurrentlyFlipped:",
+          isCurrentlyFlipped()
+        );
         e.preventDefault();
         e.stopPropagation();
 
         // フリップ中は処理をスキップ
         if (isFlipping) {
+          console.log("iPhone Debug - Skipping front flip - already flipping");
           return;
         }
 
-        // フリップ状態を一時的に設定
-        isFlipping = true;
-        flipCard(flipContainer as HTMLElement, true, resetFlipState);
+        // 現在裏面が表示されている場合は表面に戻る
+        // DOMの状態を少し遅延させて確認（非同期更新の問題を回避）
+        setTimeout(() => {
+          const currentlyFlipped = isCurrentlyFlipped();
+          console.log("iPhone Debug - Final flip decision (delayed) - currentlyFlipped:", currentlyFlipped);
+
+          if (currentlyFlipped) {
+            console.log("iPhone Debug - Currently showing back, flipping to front");
+            isFlipping = true;
+            flipCard(flipContainer as HTMLElement, false, resetFlipState);
+          } else {
+            // 現在表面が表示されている場合は裏面にフリップ
+            console.log("iPhone Debug - Currently showing front, flipping to back");
+            isFlipping = true;
+            flipCard(flipContainer as HTMLElement, true, resetFlipState);
+          }
+        }, 10);
       };
 
       // 裏面の戻るボタン処理
       const handleBackClick = (e: Event) => {
+        console.log("iPhone Debug - Back button clicked, isFlipping:", isFlipping);
+        console.log("iPhone Debug - handleBackClick called from:", e.target);
         e.preventDefault();
         e.stopPropagation();
 
         // フリップ中は処理をスキップ
         if (isFlipping) {
+          console.log("iPhone Debug - Skipping back flip - already flipping");
           return;
         }
 
+        // 重複実行防止のためのタイムアウト
+        const now = Date.now();
+        if (typeof handleBackClick.lastExecutionTime === "undefined") {
+          handleBackClick.lastExecutionTime = 0;
+        }
+
+        if (now - handleBackClick.lastExecutionTime < 100) {
+          console.log("iPhone Debug - Skipping back flip - too soon after last execution");
+          return;
+        }
+
+        handleBackClick.lastExecutionTime = now;
+
         // フリップ状態を一時的に設定
         isFlipping = true;
+        console.log("iPhone Debug - Calling flipCard with false (to front)");
         flipCard(flipContainer as HTMLElement, false, resetFlipState);
       };
 
-      // デバイス検出の改善
+      // デバイス検出の改善（iPhone対応強化）
       const isTouchDevice =
         "ontouchstart" in window ||
         navigator.maxTouchPoints > 0 ||
-        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+        /Mobile|Tablet/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768 ||
+        // iPhone Safari特有の検出
+        (/Safari/i.test(navigator.userAgent) && /Mobile/i.test(navigator.userAgent)) ||
+        // iOS WebKit特有の検出
+        (/WebKit/i.test(navigator.userAgent) && /Mobile/i.test(navigator.userAgent)) ||
+        // その他のモバイルデバイス検出
+        typeof window.DeviceMotionEvent !== "undefined" ||
+        // タッチイベントサポートの詳細チェック
+        window.TouchEvent !== undefined ||
+        window.ontouchstart !== undefined;
 
-      // タッチデバイス用の処理
+      console.log("iPhone Debug - Device detection:", {
+        ontouchstart: "ontouchstart" in window,
+        maxTouchPoints: navigator.maxTouchPoints,
+        userAgent: navigator.userAgent,
+        isTouchDevice: isTouchDevice,
+        windowWidth: window.innerWidth,
+        // 追加の検出情報
+        isIOS: /iPhone|iPad|iPod/i.test(navigator.userAgent),
+        isSafari: /Safari/i.test(navigator.userAgent) && /Mobile/i.test(navigator.userAgent),
+        isWebKit: /WebKit/i.test(navigator.userAgent) && /Mobile/i.test(navigator.userAgent),
+        hasDeviceMotion: typeof window.DeviceMotionEvent !== "undefined",
+        hasTouchEvent: window.TouchEvent !== undefined,
+      });
+
+      // 表面のイベント設定（タッチとクリック両方）
+      console.log("iPhone Debug - Setting up events for front link, isTouchDevice:", isTouchDevice);
+      console.log("iPhone Debug - Front link element:", frontLink);
+
+      // タッチイベント（タッチデバイスの場合）
       if (isTouchDevice) {
-        // タッチスタート
+        // タッチスタート（簡素化版）
         frontLink?.addEventListener(
           "touchstart",
           (e) => {
-            const touch = e.touches[0];
+            console.log("iPhone Debug - Front link touch start detected (simplified)");
             touchStartTime = Date.now();
-            touchStartY = touch.clientY;
+            console.log("iPhone Debug - Touch start time:", touchStartTime);
           },
-          { passive: true }
+          { passive: true, capture: false }
         );
 
         // タッチエンド
         frontLink?.addEventListener(
           "touchend",
           (e) => {
-            const touchDuration = Date.now() - touchStartTime;
-            const touch = e.changedTouches[0];
-            const touchEndY = touch.clientY;
-            const touchDistance = Math.abs(touchEndY - touchStartY);
+            console.log("iPhone Debug - Front link touch end detected (simplified)");
 
-            // 短いタップかつスクロールでない場合のみフリップ
-            if (touchDuration < 300 && touchDistance < 10) {
+            // 基本的なタッチ検証のみ
+            const touchDuration = Date.now() - touchStartTime;
+            console.log("iPhone Debug - Touch duration:", touchDuration);
+
+            // 極端に長いタッチ（10秒以上）以外は全て有効とする
+            if (touchDuration < 10000) {
+              console.log("iPhone Debug - Valid touch, calling handleFrontInteraction");
               handleFrontInteraction(e);
+            } else {
+              console.log("iPhone Debug - Touch too long, ignoring");
             }
           },
-          { passive: false }
+          { passive: false, capture: false }
         );
 
-        // クリックイベントも追加（タッチデバイスでもクリックが発生する場合がある）
-        frontLink?.addEventListener("click", (e) => {
-          handleFrontInteraction(e);
-        });
-      } else {
-        // 非タッチデバイス用のクリック処理
-        frontLink?.addEventListener("click", handleFrontInteraction);
+        // タッチキャンセル（簡素化版）
+        frontLink?.addEventListener(
+          "touchcancel",
+          (e) => {
+            console.log("iPhone Debug - Front link touch cancelled (simplified)");
+          },
+          { passive: true, capture: false }
+        );
       }
 
-      // 裏面のボタン処理（タッチ/クリック両対応）
+      // クリックイベント（全てのデバイスで設定）
+      frontLink?.addEventListener("click", (e) => {
+        console.log("iPhone Debug - Click event detected on front link");
+        console.log("iPhone Debug - Click event - preventing default and stopping propagation");
+        e.preventDefault();
+        e.stopPropagation();
+        handleFrontInteraction(e);
+      });
+
+      // 裏面ボタンのイベント設定（タッチとクリック両方）
+      console.log("iPhone Debug - Setting up events for back button, isTouchDevice:", isTouchDevice);
+
+      // タッチイベント（タッチデバイスの場合）
       if (isTouchDevice) {
         // タッチデバイス用の裏面ボタン処理
         let backTouchStartTime = 0;
@@ -627,6 +793,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
         backButton?.addEventListener(
           "touchstart",
           () => {
+            console.log("iPhone Debug - Back button touch start");
             backTouchStartTime = Date.now();
           },
           { passive: true }
@@ -636,27 +803,244 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
           "touchend",
           (e) => {
             const touchDuration = Date.now() - backTouchStartTime;
+            console.log("iPhone Debug - Back button touch end, duration:", touchDuration);
+
             if (touchDuration < 300) {
+              console.log("iPhone Debug - Valid back button tap, calling handleBackClick");
               handleBackClick(e);
+            } else {
+              console.log("iPhone Debug - Invalid back button tap (too long), ignoring");
             }
           },
           { passive: false }
         );
-
-        // クリックイベントも追加
-        backButton?.addEventListener("click", (e) => {
-          handleBackClick(e);
-        });
-      } else {
-        // 非タッチデバイス用のクリック処理
-        backButton?.addEventListener("click", handleBackClick);
       }
+
+      // クリックイベント（全てのデバイスで設定）
+      backButton?.addEventListener("click", (e) => {
+        console.log("iPhone Debug - Click event detected on back button");
+        handleBackClick(e);
+      });
+
+      // 裏面オーバーレイのイベント設定（裏面全体をタッチ可能にする）
+      console.log("iPhone Debug - Setting up events for back overlay, isTouchDevice:", isTouchDevice);
+      console.log("iPhone Debug - Back overlay element:", backOverlay);
+
+      // 裏面オーバーレイの存在確認
+      if (!backOverlay) {
+        console.log("iPhone Debug - ERROR: backOverlay element not found!");
+      } else {
+        console.log("iPhone Debug - backOverlay found, setting up events...");
+      }
+
+      // タッチイベント（タッチデバイスの場合）
+      if (isTouchDevice) {
+        console.log("iPhone Debug - Setting up touch events for back overlay...");
+        // タッチデバイス用の裏面オーバーレイ処理
+        let overlayTouchStartTime = 0;
+        let overlayTouchStartY = 0;
+
+        // より確実なタッチイベント設定
+        backOverlay?.addEventListener(
+          "touchstart",
+          (e) => {
+            console.log("iPhone Debug - Back overlay touch start detected (simplified)");
+            console.log("iPhone Debug - Touch start event details:", e);
+            console.log("iPhone Debug - Touch target:", e.target);
+            console.log("iPhone Debug - Touch currentTarget:", e.currentTarget);
+            overlayTouchStartTime = Date.now();
+
+            // 即座にフリップを実行（タッチ開始時）
+            console.log("iPhone Debug - Immediate flip on touch start");
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        backOverlay?.addEventListener(
+          "touchend",
+          (e) => {
+            console.log("iPhone Debug - Back overlay touch end detected (simplified)");
+            const touchDuration = Date.now() - overlayTouchStartTime;
+            console.log("iPhone Debug - Back overlay touch duration:", touchDuration);
+
+            // 即座にフリップを実行（タッチ終了時）
+            console.log("iPhone Debug - Immediate flip on touch end");
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        // タッチキャンセル（追加）
+        backOverlay?.addEventListener(
+          "touchcancel",
+          (e) => {
+            console.log("iPhone Debug - Back overlay touch cancelled");
+            console.log("iPhone Debug - Immediate flip on touch cancel");
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+      }
+
+      // クリックイベント（全てのデバイスで設定）
+      backOverlay?.addEventListener("click", (e) => {
+        console.log("iPhone Debug - Click event detected on back overlay");
+        console.log("iPhone Debug - Click event details:", e);
+        handleBackClick(e);
+      });
+
+      // 追加のイベントハンドラー（タッチイベントの代替）
+      backOverlay?.addEventListener("mousedown", (e) => {
+        console.log("iPhone Debug - Mouse down detected on back overlay");
+        handleBackClick(e);
+      });
+
+      backOverlay?.addEventListener("mouseup", (e) => {
+        console.log("iPhone Debug - Mouse up detected on back overlay");
+        handleBackClick(e);
+      });
+
+      // より確実なイベントハンドラー（pointer events）
+      backOverlay?.addEventListener("pointerdown", (e) => {
+        console.log("iPhone Debug - Pointer down detected on back overlay");
+        handleBackClick(e);
+      });
+
+      backOverlay?.addEventListener("pointerup", (e) => {
+        console.log("iPhone Debug - Pointer up detected on back overlay");
+        handleBackClick(e);
+      });
+
+      // フォールバック: 裏面全体にもイベントを追加（より確実にするため）
+      console.log("iPhone Debug - Setting up fallback events for back face");
+      console.log("iPhone Debug - Back face element:", backFace);
+
+      // 裏面全体の存在確認
+      if (!backFace) {
+        console.log("iPhone Debug - ERROR: backFace element not found!");
+      } else {
+        console.log("iPhone Debug - backFace found, setting up fallback events...");
+      }
+
+      // タッチイベント（タッチデバイスの場合）
+      if (isTouchDevice) {
+        console.log("iPhone Debug - Setting up touch events for back face...");
+        // タッチデバイス用の裏面全体処理
+        let backFaceTouchStartTime = 0;
+        let backFaceTouchStartY = 0;
+
+        // より確実なタッチイベント設定
+        backFace?.addEventListener(
+          "touchstart",
+          (e) => {
+            console.log("iPhone Debug - Back face touch start detected");
+            console.log("iPhone Debug - Back face touch start event details:", e);
+            console.log("iPhone Debug - Back face touch target:", e.target);
+            console.log("iPhone Debug - Back face touch currentTarget:", e.currentTarget);
+            const touch = e.touches[0];
+            backFaceTouchStartTime = Date.now();
+            backFaceTouchStartY = touch.clientY;
+
+            // 即座にフリップを実行（タッチ開始時）
+            console.log("iPhone Debug - Immediate flip on back face touch start");
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        backFace?.addEventListener(
+          "touchend",
+          (e) => {
+            console.log("iPhone Debug - Back face touch end detected");
+            const touchDuration = Date.now() - backFaceTouchStartTime;
+            const touch = e.changedTouches[0];
+            const touchEndY = touch.clientY;
+            const touchDistance = Math.abs(touchEndY - backFaceTouchStartY);
+
+            console.log(
+              "iPhone Debug - Back face touch details - duration:",
+              touchDuration,
+              "distance:",
+              touchDistance
+            );
+
+            // 即座にフリップを実行（タッチ終了時）
+            console.log("iPhone Debug - Immediate flip on back face touch end");
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+
+        // タッチキャンセル（追加）
+        backFace?.addEventListener(
+          "touchcancel",
+          (e) => {
+            console.log("iPhone Debug - Back face touch cancelled");
+            console.log("iPhone Debug - Immediate flip on back face touch cancel");
+            handleBackClick(e);
+          },
+          { passive: false, capture: true }
+        );
+      }
+
+      // クリックイベント（全てのデバイスで設定）
+      backFace?.addEventListener("click", (e) => {
+        console.log("iPhone Debug - Click event detected on back face");
+        console.log("iPhone Debug - Back face click event details:", e);
+        handleBackClick(e);
+      });
+
+      // 追加のイベントハンドラー（タッチイベントの代替）
+      backFace?.addEventListener("mousedown", (e) => {
+        console.log("iPhone Debug - Mouse down detected on back face");
+        handleBackClick(e);
+      });
+
+      backFace?.addEventListener("mouseup", (e) => {
+        console.log("iPhone Debug - Mouse up detected on back face");
+        handleBackClick(e);
+      });
+
+      // より確実なイベントハンドラー（pointer events）
+      backFace?.addEventListener("pointerdown", (e) => {
+        console.log("iPhone Debug - Pointer down detected on back face");
+        handleBackClick(e);
+      });
+
+      backFace?.addEventListener("pointerup", (e) => {
+        console.log("iPhone Debug - Pointer up detected on back face");
+        handleBackClick(e);
+      });
 
       // フリップ状態の更新を監視
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (mutation.type === "attributes" && mutation.attributeName === "class") {
             // フリップ状態はアニメーション完了後にリセットされるため、ここでは更新しない
+
+            // 裏面が表示された時にイベントを再設定
+            if (flipContainer?.classList.contains("flipped")) {
+              console.log("iPhone Debug - Back face is now visible, re-setting up events...");
+
+              // 裏面オーバーレイのイベントを再設定
+              if (backOverlay) {
+                console.log("iPhone Debug - Re-setting up back overlay events");
+                backOverlay.addEventListener("click", (e) => {
+                  console.log("iPhone Debug - Re-setup click event detected on back overlay");
+                  handleBackClick(e);
+                });
+              }
+
+              // 裏面全体のイベントを再設定
+              if (backFace) {
+                console.log("iPhone Debug - Re-setting up back face events");
+                backFace.addEventListener("click", (e) => {
+                  console.log("iPhone Debug - Re-setup click event detected on back face");
+                  handleBackClick(e);
+                });
+              }
+            }
           }
         });
       });
@@ -666,104 +1050,129 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
         // 初期状態を設定（フリップ中ではない）
         updateFlipState(false);
       }
-    });
-  }
 
-  // カードをフリップする関数
-  function flipCard(container: HTMLElement | null, toFlipped: boolean, resetCallback?: () => void) {
-    if (!container) return;
-
-    // フリップ状態を即座に設定
-    const isCurrentlyFlipped = container.classList.contains("flipped");
-
-    // 既に目的の状態の場合は何もしない
-    if ((toFlipped && isCurrentlyFlipped) || (!toFlipped && !isCurrentlyFlipped)) {
-      return;
-    }
-
-    // パフォーマンス最適化のためのwill-change設定
-    container.style.willChange = "transform";
-
-    // デバイス検出
-    const isMobile = window.innerWidth <= 768;
-    const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-    // モバイルデバイス用の最適化設定
-    if (isMobile || isIOS || isSafari) {
-      container.style.webkitBackfaceVisibility = "hidden";
-      container.style.backfaceVisibility = "hidden";
-      container.style.webkitTransformStyle = "preserve-3d";
-      container.style.transformStyle = "preserve-3d";
-
-      // 表面と裏面にも強制的に設定
-      const front = container.querySelector(".card__front") as HTMLElement;
-      const back = container.querySelector(".card__back") as HTMLElement;
-
-      if (front) {
-        front.style.webkitBackfaceVisibility = "hidden";
-        front.style.backfaceVisibility = "hidden";
-        front.style.webkitTransformStyle = "preserve-3d";
-        front.style.transformStyle = "preserve-3d";
-      }
-
-      if (back) {
-        back.style.webkitBackfaceVisibility = "hidden";
-        back.style.backfaceVisibility = "hidden";
-        back.style.webkitTransformStyle = "preserve-3d";
-        back.style.transformStyle = "preserve-3d";
-      }
-    }
-
-    // アニメーション設定
-    const animationConfig = {
-      duration: isMobile ? 0.25 : 0.4,
-      ease: "power2.inOut",
-      force3D: true,
-      onStart: () => {
-        // アニメーション開始時にクラスを即座に適用
-        if (toFlipped) {
-          container.classList.add("flipped");
-        } else {
-          container.classList.remove("flipped");
+      // カードをフリップする関数（cards.forEach内で定義）
+      function flipCard(container: HTMLElement | null, toFlipped: boolean, resetCallback?: () => void) {
+        if (!container) {
+          console.log("iPhone Debug - flipCard: container is null");
+          return;
         }
 
-        // アニメーション開始時にもリセット処理を予約
-        setTimeout(() => {
+        console.log("iPhone Debug - flipCard called with toFlipped:", toFlipped);
+
+        // フリップ状態を内部状態で確認
+        const isCurrentlyFlipped = isCurrentlyShowingBack;
+        console.log("iPhone Debug - flipCard using internal state - isCurrentlyShowingBack:", isCurrentlyShowingBack);
+
+        console.log("iPhone Debug - Current flipped state:", isCurrentlyFlipped);
+
+        // 既に目的の状態の場合は何もしない
+        if ((toFlipped && isCurrentlyFlipped) || (!toFlipped && !isCurrentlyFlipped)) {
+          console.log("iPhone Debug - Already in target state, skipping flip");
           if (resetCallback) {
             resetCallback();
           }
-        }, 300);
-      },
-      onComplete: () => {
-        container.style.willChange = "auto";
-        // アニメーション完了後に状態を確認
-        if (toFlipped) {
-          container.classList.add("flipped");
-        } else {
-          container.classList.remove("flipped");
+          return;
         }
-        // フリップ状態をリセット（アニメーション完了後）
-        setTimeout(() => {
-          if (resetCallback) {
-            resetCallback();
-          }
-        }, 50);
-      },
-    };
 
-    // フリップアニメーション実行
-    if (toFlipped) {
-      gsap.to(container, {
-        ...animationConfig,
-        rotationY: 180,
-      });
-    } else {
-      gsap.to(container, {
-        ...animationConfig,
-        rotationY: 0,
-      });
-    }
+        // パフォーマンス最適化のためのwill-change設定
+        container.style.willChange = "transform";
+
+        // デバイス検出
+        const isMobile = window.innerWidth <= 768;
+        const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+        // モバイルデバイス用の最適化設定
+        if (isMobile || isIOS || isSafari) {
+          container.style.webkitBackfaceVisibility = "hidden";
+          container.style.backfaceVisibility = "hidden";
+          container.style.webkitTransformStyle = "preserve-3d";
+          container.style.transformStyle = "preserve-3d";
+
+          // 表面と裏面にも強制的に設定
+          const front = container.querySelector(".card__front") as HTMLElement;
+          const back = container.querySelector(".card__back") as HTMLElement;
+
+          if (front) {
+            front.style.webkitBackfaceVisibility = "hidden";
+            front.style.backfaceVisibility = "hidden";
+            front.style.webkitTransformStyle = "preserve-3d";
+            front.style.transformStyle = "preserve-3d";
+          }
+
+          if (back) {
+            back.style.webkitBackfaceVisibility = "hidden";
+            back.style.backfaceVisibility = "hidden";
+            back.style.webkitTransformStyle = "preserve-3d";
+            back.style.transformStyle = "preserve-3d";
+          }
+        }
+
+        // アニメーション設定
+        const animationConfig = {
+          duration: isMobile ? 0.25 : 0.4,
+          ease: "power2.inOut",
+          force3D: true,
+          onStart: () => {
+            console.log("iPhone Debug - Animation started, toFlipped:", toFlipped);
+
+            // アニメーション開始時にクラスを即座に適用
+            if (toFlipped) {
+              container.classList.add("flipped");
+              console.log("iPhone Debug - Added flipped class");
+            } else {
+              container.classList.remove("flipped");
+              console.log("iPhone Debug - Removed flipped class");
+            }
+          },
+          onComplete: () => {
+            console.log("iPhone Debug - Animation completed, toFlipped:", toFlipped);
+            container.style.willChange = "auto";
+
+            // アニメーション完了後に状態を確認
+            if (toFlipped) {
+              container.classList.add("flipped");
+              console.log("iPhone Debug - Ensured flipped class is present");
+            } else {
+              container.classList.remove("flipped");
+              console.log("iPhone Debug - Ensured flipped class is removed");
+            }
+
+            // フリップ状態をリセット（アニメーション完了後）
+            setTimeout(() => {
+              console.log("iPhone Debug - Resetting flip state after animation completion");
+              // 独自のフリップ状態を更新
+              if (toFlipped) {
+                isCurrentlyShowingBack = true;
+                console.log("iPhone Debug - Set isCurrentlyShowingBack to true");
+              } else {
+                isCurrentlyShowingBack = false;
+                console.log("iPhone Debug - Set isCurrentlyShowingBack to false");
+              }
+              if (resetCallback) {
+                resetCallback();
+              }
+            }, 100);
+          },
+        };
+
+        // フリップアニメーション実行
+        if (toFlipped) {
+          console.log("iPhone Debug - Starting flip to back (180 degrees)");
+          gsap.to(container, {
+            ...animationConfig,
+            rotationY: 180,
+          });
+        } else {
+          console.log("iPhone Debug - Starting flip to front (0 degrees)");
+          gsap.to(container, {
+            ...animationConfig,
+            rotationY: 0,
+          });
+        }
+      }
+    }); // cards.forEach の終了
   }
 
   // モダンな初期化方法
