@@ -124,13 +124,17 @@ const stateMachine = "State Machine 1";
                 aboutText={typedAboutText.aboutText}
                 aboutText2={typedAboutText.aboutText2}
                 aboutText3={typedAboutText.aboutText3}
-                aboutLikeHeader={typedAboutText.aboutLikeHeader}
-                aboutLikeText={typedAboutText.aboutLikeText}
+
               />
               <p class="about__text">
                 お仕事のご依頼などは、
                 <a class="about__text_link" href="/contact">お問い合わせフォーム</a>
-                からお願いします。</p>
+                からお願いします。
+              </p>
+              <AboutMe
+                aboutLikeHeader={typedAboutText.aboutLikeHeader}
+                aboutLikeText={typedAboutText.aboutLikeText}
+              />
               <div class="about__sns">
                 <ul class="about__snsMenu">
                   <Sns
@@ -512,7 +516,7 @@ const stateMachine = "State Machine 1";
   .service__menu {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(32ch, 1fr));
-    gap: 1.5rem;
+    gap: 3rem;
     margin-block-start: 2rem;
     padding: 0;
     align-items: stretch;
