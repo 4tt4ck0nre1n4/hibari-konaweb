@@ -124,17 +124,13 @@ const stateMachine = "State Machine 1";
                 aboutText={typedAboutText.aboutText}
                 aboutText2={typedAboutText.aboutText2}
                 aboutText3={typedAboutText.aboutText3}
-
               />
               <p class="about__text">
                 お仕事のご依頼などは、
                 <a class="about__text_link" href="/contact">お問い合わせフォーム</a>
                 からお願いします。
               </p>
-              <AboutMe
-                aboutLikeHeader={typedAboutText.aboutLikeHeader}
-                aboutLikeText={typedAboutText.aboutLikeText}
-              />
+              <AboutMe aboutLikeHeader={typedAboutText.aboutLikeHeader} aboutLikeText={typedAboutText.aboutLikeText} />
               <div class="about__sns">
                 <ul class="about__snsMenu">
                   <Sns
@@ -404,7 +400,6 @@ const stateMachine = "State Machine 1";
   .skills__menu {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(8ch, 1fr));
-    /* grid-template-columns: repeat(5, 12ch); */
     gap: 2rem;
     list-style: none;
     background-color: #e8e8e8;
@@ -414,7 +409,6 @@ const stateMachine = "State Machine 1";
     margin-inline: auto;
     padding-block: 2.5rem;
     padding-inline: 2rem;
-    /* padding-inline-start: 1rem; */
   }
 
   /* スマホサイズでの3列表示を確実にする */
@@ -462,26 +456,49 @@ const stateMachine = "State Machine 1";
     flex-direction: column;
     align-items: center;
     color: inherit;
-    /* text-decoration: none; */
   }
   .skills-icon__image[data-icon] {
     font-size: 2rem;
     transition: all 0.4s ease-out;
   }
-  .skills-icon .skills-icon__image:is(:hover, :focus-visible) {
-    transform: translateZ(20px) scale(1.6) rotate(180deg);
+  /* ホバー可能なデバイス（主にPC）でのみホバー効果を適用 */
+  @media (any-hover: hover) {
+    .skills-icon .skills-icon__image:is(:hover, :focus-visible) {
+      transform: translateZ(20px) scale(1.6) rotate(180deg);
+    }
+    /* .skills-icon.sass [data-icon]:is(:hover, :focus-visible),
+    .skills-icon.jquery [data-icon]:is(:hover, :focus-visible),
+    .skills-icon.wordpress [data-icon]:is(:hover, :focus-visible),
+    .skills-icon.swiper [data-icon]:is(:hover, :focus-visible),
+    .skills-icon.gsap [data-icon]:is(:hover, :focus-visible),
+    .skills-icon.react [data-icon]:is(:hover, :focus-visible),
+    .skills-icon.canva [data-icon]:is(:hover, :focus-visible),
+    .skills-icon.gulp [data-icon]:is(:hover, :focus-visible),
+    .skills-icon.netlify [data-icon]:is(:hover, :focus-visible),
+    .skills-icon.github [data-icon]:is(:hover, :focus-visible) {
+      transform: scale(1.6) rotate(720deg);
+    } */
   }
-  .skills-icon.sass [data-icon]:is(:hover, :focus-visible),
-  .skills-icon.jquery [data-icon]:is(:hover, :focus-visible),
-  .skills-icon.wordpress [data-icon]:is(:hover, :focus-visible),
-  .skills-icon.swiper [data-icon]:is(:hover, :focus-visible),
-  .skills-icon.gsap [data-icon]:is(:hover, :focus-visible),
-  .skills-icon.react [data-icon]:is(:hover, :focus-visible),
-  .skills-icon.canva [data-icon]:is(:hover, :focus-visible),
-  .skills-icon.gulp [data-icon]:is(:hover, :focus-visible),
-  .skills-icon.netlify [data-icon]:is(:hover, :focus-visible),
-  .skills-icon.github [data-icon]:is(:hover, :focus-visible) {
-    transform: scale(1.6) rotate(720deg);
+
+  /* タッチデバイス用の一時的なフィードバック */
+  @media (any-hover: none) {
+    .skills-icon .skills-icon__image:active {
+      transform: translateZ(20px) scale(1.2) rotate(90deg);
+      transition: transform 0.1s ease-out;
+    }
+    /* .skills-icon.sass [data-icon]:active,
+    .skills-icon.jquery [data-icon]:active,
+    .skills-icon.wordpress [data-icon]:active,
+    .skills-icon.swiper [data-icon]:active,
+    .skills-icon.gsap [data-icon]:active,
+    .skills-icon.react [data-icon]:active,
+    .skills-icon.canva [data-icon]:active,
+    .skills-icon.gulp [data-icon]:active,
+    .skills-icon.netlify [data-icon]:active,
+    .skills-icon.github [data-icon]:active {
+      transform: scale(1.2) rotate(360deg);
+      transition: transform 0.1s ease-out;
+    } */
   }
   .skills-icon__name {
     white-space: nowrap;
@@ -492,9 +509,12 @@ const stateMachine = "State Machine 1";
       visibility 0.3s ease;
     margin-block-start: 0.25rem;
   }
-  .skills-icon:is(:hover, :focus-visible) .skills-icon__name {
-    opacity: 1;
-    visibility: visible;
+  /* ホバー可能なデバイスでのみ名前表示 */
+  @media (any-hover: hover) {
+    .skills-icon:is(:hover, :focus-visible) .skills-icon__name {
+      opacity: 1;
+      visibility: visible;
+    }
   }
   @media (prefers-color-scheme: dark) {
     .skills-icon.swiper svg,
