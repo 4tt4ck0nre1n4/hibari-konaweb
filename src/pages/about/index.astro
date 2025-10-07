@@ -466,39 +466,23 @@ const stateMachine = "State Machine 1";
     .skills-icon .skills-icon__image:is(:hover, :focus-visible) {
       transform: translateZ(20px) scale(1.6) rotate(180deg);
     }
-    /* .skills-icon.sass [data-icon]:is(:hover, :focus-visible),
-    .skills-icon.jquery [data-icon]:is(:hover, :focus-visible),
-    .skills-icon.wordpress [data-icon]:is(:hover, :focus-visible),
-    .skills-icon.swiper [data-icon]:is(:hover, :focus-visible),
-    .skills-icon.gsap [data-icon]:is(:hover, :focus-visible),
-    .skills-icon.react [data-icon]:is(:hover, :focus-visible),
-    .skills-icon.canva [data-icon]:is(:hover, :focus-visible),
-    .skills-icon.gulp [data-icon]:is(:hover, :focus-visible),
-    .skills-icon.netlify [data-icon]:is(:hover, :focus-visible),
-    .skills-icon.github [data-icon]:is(:hover, :focus-visible) {
-      transform: scale(1.6) rotate(720deg);
-    } */
   }
 
   /* タッチデバイス用の一時的なフィードバック */
   @media (any-hover: none) {
-    .skills-icon .skills-icon__image:active {
-      transform: translateZ(20px) scale(1.2) rotate(90deg);
-      transition: transform 0.1s ease-out;
+    .skills-icon .skills-icon__image.touch-animate {
+      transform: translateZ(20px) scale(1.6) rotate(180deg);
+      transition: transform 0.3s ease-out;
     }
-    /* .skills-icon.sass [data-icon]:active,
-    .skills-icon.jquery [data-icon]:active,
-    .skills-icon.wordpress [data-icon]:active,
-    .skills-icon.swiper [data-icon]:active,
-    .skills-icon.gsap [data-icon]:active,
-    .skills-icon.react [data-icon]:active,
-    .skills-icon.canva [data-icon]:active,
-    .skills-icon.gulp [data-icon]:active,
-    .skills-icon.netlify [data-icon]:active,
-    .skills-icon.github [data-icon]:active {
-      transform: scale(1.2) rotate(360deg);
-      transition: transform 0.1s ease-out;
-    } */
+
+    /* タッチ時にスキル名を表示 */
+    .skills-icon.touch-active .skills-icon__name {
+      opacity: 1;
+      visibility: visible;
+      transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+    }
   }
   .skills-icon__name {
     white-space: nowrap;
@@ -551,4 +535,58 @@ const stateMachine = "State Machine 1";
 <script>
   import { setupFlowingLinesAnimation } from "../../scripts/flowingLines";
   setupFlowingLinesAnimation();
+
+  // タッチデバイスでのスキルアイコンのアニメーション制御
+  function setupTouchAnimations() {
+    // タッチデバイスのみで実行
+    if (window.matchMedia("(any-hover: none)").matches) {
+      const skillIcons = document.querySelectorAll(".skills-icon");
+
+      skillIcons.forEach((icon) => {
+        const image = icon.querySelector(".skills-icon__image");
+
+        if (image) {
+          // タッチ開始
+          icon.addEventListener(
+            "touchstart",
+            (e) => {
+              e.preventDefault();
+              image.classList.add("touch-animate");
+              icon.classList.add("touch-active");
+            },
+            { passive: false }
+          );
+
+          // タッチ終了
+          icon.addEventListener(
+            "touchend",
+            (e) => {
+              e.preventDefault();
+
+              // アニメーションを実行
+              setTimeout(() => {
+                image.classList.remove("touch-animate");
+                icon.classList.remove("touch-active");
+              }, 300); // アニメーション時間に合わせて
+            },
+            { passive: false }
+          );
+
+          // タッチキャンセル（スクロールなどで中断された場合）
+          icon.addEventListener(
+            "touchcancel",
+            (e) => {
+              e.preventDefault();
+              image.classList.remove("touch-animate");
+              icon.classList.remove("touch-active");
+            },
+            { passive: false }
+          );
+        }
+      });
+    }
+  }
+
+  // DOM読み込み完了後に実行
+  document.addEventListener("DOMContentLoaded", setupTouchAnimations);
 </script>
