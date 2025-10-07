@@ -90,7 +90,7 @@ export const prerender = false;
     text-align: center;
   }
   .contact__body {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     line-height: 1.8;
     letter-spacing: 0.06em;
     /* テキストの各行の頭を揃える */
@@ -99,6 +99,11 @@ export const prerender = false;
     width: 100%;
     max-width: 400px;
     display: block;
+  }
+  @media (max-width: 480px) {
+    .contact__body {
+      width: 94%;
+    }
   }
   .contact__body--required {
     color: #ff4f48;

@@ -8,7 +8,8 @@ import AboutHeading from "../../components/AboutHeading.astro";
 import AboutMe from "../../components/AboutMe.astro";
 import Sns from "../../components/Sns.astro";
 import { Image } from "astro:assets";
-import blackLady from "/public/assets/girl.jpg";
+// import blackLady from "/public/assets/girl.jpg";
+import AboutImage from "/public/favicon.svg";
 import SkillsIcon from "../../components/SkillsIcon.astro";
 import Card from "../../components/Card.astro";
 import aboutText from "../../data/aboutText.json";
@@ -86,8 +87,8 @@ const serviceSubTitle = "私の提供するサービスについてご紹介し�
 
 const aboutImage = {
   alt: "About Meのイメージ画像",
-  width: 300,
-  height: 400,
+  width: 150,
+  height: 300,
 };
 
 const cardSrc1 = "/riv/web-developer.riv";
@@ -140,7 +141,6 @@ const stateMachine = "State Machine 1";
                     ariaTitle={twitter.ariaTitle}
                     target={twitter.targetBlank}
                     snsIconSvg={twitter.icon}
-                    snsIconName={twitter.item}
                   />
                   <Sns
                     className={github_sns.className}
@@ -149,7 +149,6 @@ const stateMachine = "State Machine 1";
                     ariaTitle={github_sns.ariaTitle}
                     target={github_sns.targetBlank}
                     snsIconSvg={github_sns.icon}
-                    snsIconName={github_sns.item}
                   />
                   <Sns
                     className={typedContact.className.about}
@@ -158,7 +157,6 @@ const stateMachine = "State Machine 1";
                     ariaTitle={typedContact.ariaTitle}
                     target=""
                     snsIconSvg={typedContact.icon}
-                    snsIconName={typedContact.item.about}
                   />
                   <Sns
                     className={mail.className.about}
@@ -167,7 +165,6 @@ const stateMachine = "State Machine 1";
                     ariaLabel={mail.ariaLabel}
                     ariaTitle={mail.ariaTitle}
                     target={mail.targetBlank}
-                    snsIconName={mail.item.about}
                   />
                 </ul>
               </div>
@@ -175,7 +172,7 @@ const stateMachine = "State Machine 1";
             <div class="about__imageInner">
               <Image
                 class="about__image"
-                src={blackLady}
+                src={AboutImage}
                 alt={aboutImage.alt}
                 width={aboutImage.width}
                 height={aboutImage.height}
@@ -328,8 +325,30 @@ const stateMachine = "State Machine 1";
   .about__snsMenu {
     display: grid;
     grid-template-columns: repeat(4, 48px);
+    gap: 0.5rem;
     list-style: none;
-    margin-block-start: 1rem;
+    padding-block-start: 1.5rem;
+    padding-block-end: 0.5rem;
+    padding-inline: 0.5rem;
+  }
+  .about__snsMenu .sns-icon__item {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    border: transparent 1px solid;
+    border-radius: 50%;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    /* margin-inline: 0.5rem; */
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.3s ease;
+  }
+  .about__snsMenu .sns-icon__item:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+  }
+  .about__snsMenu .sns-icon__item:active {
+    transform: scale(0.8);
+    box-shadow: 0 8px 8px rgba(0 0 0 / 0.6);
   }
   .about__snsMenu .sns-icon__link {
     display: flex;
@@ -338,57 +357,72 @@ const stateMachine = "State Machine 1";
     color: inherit;
     text-decoration: none;
     aspect-ratio: 1 / 1;
-  }
-  .about__snsMenu .sns-icon__link {
+    padding-block-start: 0.5rem;
+    padding-inline: 0.5rem;
     transition: all 0.3s ease;
   }
   .about__snsMenu .sns-icon__link:is(:hover, :focus-visible) {
-    transform: translateY(-8px);
+    color: rebeccapurple;
+    stroke: rebeccapurple;
+    fill: rebeccapurple;
   }
-  .about__snsMenu .sns-icon__link[data-icon]:is(:hover, :focus-visible) {
-    transform: translateY(-8px);
+
+  /* ダークモード対応 */
+  html.dark .about__snsMenu .sns-icon__item {
+    box-shadow: 0 4px 8px rgba(255 255 255 / 0.6);
+  }
+  html.dark .about__snsMenu .sns-icon__item:is(:hover, :focus-visible) {
+    box-shadow: 0 8px 4px rgba(255 255 255 / 0.6);
+  }
+  html.dark .about__snsMenu .sns-icon__item:active {
+    transform: scale(0.8);
+    box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
+  }
+  html.dark .about__snsMenu .sns-icon__link svg {
+    stroke: #f1f5f9;
   }
   .about__snsMenu .sns-icon__link svg {
     font-size: 1.5rem;
     transition: all 0.3s ease;
-  }
-  .about__snsMenu .sns-icon__name {
-    color: rebeccapurple;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity 0.3s ease,
-      visibility 0.3s ease,
-      transform 0.3s ease;
-  }
-  .about__snsMenu .sns-icon__link:is(:hover, :focus-visible) .sns-icon__name {
-    display: inline-block;
-    width: 72px;
-    height: 20px;
-    font-size: 0.75rem;
-    color: rebeccapurple;
-    /* background-color: transparent; */
-    border: transparent 1px solid;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
-    text-align: center;
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(8px);
-    z-index: 1;
   }
   .about__imageInner {
     width: 100%;
     height: 100%;
     aspect-ratio: 3 / 4;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding-block: 1rem;
+  }
+  .about__imageInner::before {
+    content: "";
+    position: absolute;
+    top: 14%;
+    left: 24%;
+    width: 240px;
+    height: 240px;
+    background-image: url("/public/black-outline_favicon.svg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 1;
+    opacity: 0;
+    transform: scale(0.3) rotate(-180deg);
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* アニメーション用クラス */
+  .about__imageInner.animate::before {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
   }
   .about__image {
-    width: 100%;
-    height: 100%;
+    width: 300px;
+    height: 300px;
     object-fit: cover;
-    border-radius: 1rem;
+    z-index: 1;
   }
   .skills__wrapper {
     width: 700px;
@@ -464,14 +498,14 @@ const stateMachine = "State Machine 1";
   /* ホバー可能なデバイス（主にPC）でのみホバー効果を適用 */
   @media (any-hover: hover) {
     .skills-icon .skills-icon__image:is(:hover, :focus-visible) {
-      transform: translateZ(20px) scale(1.6) rotate(180deg);
+      transform: translateZ(20px) scale(1.6) rotate(720deg);
     }
   }
 
   /* タッチデバイス用の一時的なフィードバック */
   @media (any-hover: none) {
     .skills-icon .skills-icon__image.touch-animate {
-      transform: translateZ(20px) scale(1.6) rotate(180deg);
+      transform: translateZ(20px) scale(1.6) rotate(720deg);
       transition: transform 0.3s ease-out;
     }
 
@@ -587,6 +621,44 @@ const stateMachine = "State Machine 1";
     }
   }
 
+  // スクロール検知とアニメーション制御
+  function setupScrollAnimation() {
+    const aboutImageInner = document.querySelector(".about__imageInner");
+
+    if (!aboutImageInner) return;
+
+    // アニメーション中かどうかを管理するフラグ
+    let isAnimating = false;
+
+    // Intersection Observer の設定
+    const observerOptions = {
+      threshold: 0.3, // 要素の30%が見えたら発火
+      rootMargin: "0px 0px -50px 0px", // 少し早めに発火させる
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !isAnimating) {
+          // アニメーション開始
+          isAnimating = true;
+          aboutImageInner.classList.add("animate");
+
+          // 2秒後にアニメーションをリセット（消える）
+          setTimeout(() => {
+            aboutImageInner.classList.remove("animate");
+            isAnimating = false;
+          }, 2000);
+        }
+      });
+    }, observerOptions);
+
+    // 要素の監視を開始
+    observer.observe(aboutImageInner);
+  }
+
   // DOM読み込み完了後に実行
-  document.addEventListener("DOMContentLoaded", setupTouchAnimations);
+  document.addEventListener("DOMContentLoaded", () => {
+    setupTouchAnimations();
+    setupScrollAnimation();
+  });
 </script>
