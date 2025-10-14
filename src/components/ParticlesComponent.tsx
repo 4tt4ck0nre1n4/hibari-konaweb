@@ -1,7 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import Particles from "@tsparticles/react";
-import { loadSlim } from "@tsparticles/slim";
-import { loadStarShape } from "@tsparticles/shape-star";
 import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
 import { tsparticlesOptions } from "../scripts/tsparticlesOptions";
 import { Icon } from "@iconify/react";
@@ -10,9 +7,10 @@ import particlesStyles from "../styles/particlesStyles.module.css";
 const playIconButton = "fluent-emoji:party-popper";
 const pauseIconButton = "fluent-emoji-high-contrast:party-popper";
 const stopIconButton = "fluent-emoji:magic-wand";
-const playSound = new Audio("/sounds/playSound.mp3");
-const pauseSound = new Audio("/sounds/pauseSound.mp3");
-const stopSound = new Audio("/sounds/stopSound.mp3");
+
+let playSound: HTMLAudioElement | null = null;
+let pauseSound: HTMLAudioElement | null = null;
+let stopSound: HTMLAudioElement | null = null;
 
 declare global {
   interface Window {
@@ -22,16 +20,40 @@ declare global {
 
 export default function ParticlesComponent() {
   const [ready, setReady] = useState(false);
+  const [ParticlesLib, setParticlesLib] = useState<any>(null);
 
   useEffect(() => {
+    // Initialize audio only in browser
+    if (typeof window !== "undefined") {
+      playSound = new Audio("/sounds/playSound.mp3");
+      pauseSound = new Audio("/sounds/pauseSound.mp3");
+      stopSound = new Audio("/sounds/stopSound.mp3");
+    }
+
+    // Load tsparticles dynamically
     void (async () => {
-      const { initParticlesEngine } = await import("@tsparticles/react");
-      await initParticlesEngine(async (engine: Engine) => {
-        await loadSlim(engine);
-        await loadStarShape(engine);
-        console.log("tsParticles engine loaded (slim + star)");
-      });
-      setReady(true);
+      try {
+        const [
+          { default: Particles, initParticlesEngine },
+          { loadSlim },
+          { loadStarShape },
+        ] = await Promise.all([
+          import("@tsparticles/react"),
+          import("@tsparticles/slim"),
+          import("@tsparticles/shape-star"),
+        ]);
+
+        await initParticlesEngine(async (engine: Engine) => {
+          await loadSlim(engine);
+          await loadStarShape(engine);
+          console.log("tsParticles engine loaded (slim + star)");
+        });
+
+        setParticlesLib(() => Particles);
+        setReady(true);
+      } catch (error) {
+        console.error("Failed to load tsParticles:", error);
+      }
     })();
   }, []);
 
@@ -48,7 +70,7 @@ export default function ParticlesComponent() {
     };
   }, []);
 
-  if (!ready) return null;
+  if (!ready || !ParticlesLib) return null;
 
   const handlePlay = () => {
     const container = window.tsparticlesContainer;
@@ -63,7 +85,7 @@ export default function ParticlesComponent() {
 
     const isSoundOn = localStorage.getItem("sound-enabled") === "true";
 
-    if (isSoundOn) {
+    if (isSoundOn && playSound) {
       try {
         playSound.currentTime = 0;
         void playSound.play();
@@ -78,7 +100,7 @@ export default function ParticlesComponent() {
 
     const isSoundOn = localStorage.getItem("sound-enabled") === "true";
 
-    if (isSoundOn) {
+    if (isSoundOn && pauseSound) {
       try {
         pauseSound.currentTime = 0;
         void pauseSound.play();
@@ -101,7 +123,7 @@ export default function ParticlesComponent() {
 
     const isSoundOn = localStorage.getItem("sound-enabled") === "true";
 
-    if (isSoundOn) {
+    if (isSoundOn && stopSound) {
       try {
         stopSound.currentTime = 0;
         void stopSound.play();
@@ -110,8 +132,6 @@ export default function ParticlesComponent() {
       }
     }
   };
-
-  if (!ready) return null;
 
   return (
     <>
@@ -150,7 +170,7 @@ export default function ParticlesComponent() {
             <Icon className={particlesStyles.particles__icon} icon={stopIconButton} width="56" height="56" />
           </button>
         </div>
-        <Particles
+        <ParticlesLib
           id="tsparticles"
           options={defaultOptions}
           particlesLoaded={(container?: Container): Promise<void> => {

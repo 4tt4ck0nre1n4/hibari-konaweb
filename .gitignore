@@ -36,6 +36,7 @@ logs/
 # Local development
 .local/
 .cache/
+.vite-cache/
 
 # WordPress specific
 app/
