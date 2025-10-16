@@ -4,7 +4,7 @@ import react from "@astrojs/react";
 import node from "@astrojs/node";
 import icon from "astro-icon";
 import pagefind from "astro-pagefind";
-import dynamicImport from 'vite-plugin-dynamic-import';
+// import dynamicImport from 'vite-plugin-dynamic-import'; // pagefindと競合するため削除
 import sitemap from "@astrojs/sitemap";
 
 import netlify from "@astrojs/netlify";
@@ -41,7 +41,8 @@ export default defineConfig({
           "xd",
           "vitejs",
           "astro",
-          "vscode"
+          "vscode",
+          "vercel"
         ],
         "logos": [
           "wordpress-icon",
@@ -132,21 +133,19 @@ export default defineConfig({
   },
   base: "/",
   trailingSlash: "ignore",
-  // output: "static",
-  output: "server",
-  build: {
-    outdir: "dist",
-  },
-  adapter: netlify(),
+  output: "static", // 完全静的サイト生成（pagefind対応）
+  // output: "server", // SSRが必要な場合（pagefind非対応）
   server: {
     host: true,
     open: true,
   },
   vite: {
     plugins: [
-      dynamicImport()
+      // dynamicImport() // pagefindと競合するため削除
     ],
+    cacheDir: ".vite-cache", // node_modules外にキャッシュを配置
     build: {
+      emptyOutDir: false, // Windowsのファイルロック問題を回避
       commonjsOptions: {
         transformMixedEsModules: true,
       },

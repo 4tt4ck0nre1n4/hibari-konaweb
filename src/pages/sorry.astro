@@ -11,7 +11,8 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 import globalText from "../data/globalText.json";
 import errorText from "../data/errorText.json";
 
-export const prerender = false;
+// 静的サイト生成でpagefindを使用するため、prerenderをtrueに設定
+export const prerender = true;
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "Sorry..." }];
 

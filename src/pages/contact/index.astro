@@ -24,7 +24,8 @@ const jsonLd = JSON.stringify({
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
-export const prerender = false;
+// 静的サイト生成でpagefindを使用するため、prerenderをtrueに設定
+export const prerender = true;
 ---
 
 <Layout

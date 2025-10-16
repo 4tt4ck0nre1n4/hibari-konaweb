@@ -99,3 +99,8 @@ export const cursor = {
   icon: "vscode-icons:file-type-cursorrules",
   item: "Cursor",
 };
+export const vercel = {
+  className: "vercel",
+  icon: "devicon:vercel",
+  item: "Vercel",
+};

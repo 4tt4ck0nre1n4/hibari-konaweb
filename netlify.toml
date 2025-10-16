@@ -11,4 +11,4 @@
 
 # 環境変数の設定（必要に応じてNetlify UIで設定）
 # [context.production.environment]
-#   WORDPRESS_API_URL = "http://headless-wordpress-testsite.local"
+#   WORDPRESS_API_URL = "http://hibari-konaweb.local"

@@ -30,6 +30,7 @@ interface Works {
     right_link?: string;
     description?: string;
     icon_vscode?: string;
+    icon_cursor?: string;
     icon_html?: string;
     icon_css?: string;
     icon_sass?: string;
@@ -45,6 +46,9 @@ interface Works {
     icon_gulp?: string;
     icon_webpack?: string;
     icon_astro?: string;
+    icon_netlify?: string;
+    icon_vercel?: string;
+    icon_github?: string;
     icon_canva?: string;
     icon_adobexd?: string;
     icon_photoshop?: string;
@@ -175,8 +179,9 @@ const jsonLd = JSON.stringify({
 
 const worksSlugLinks = {
   slug: { rendered: work?.slug },
-  ariaLabel: "のページへ",
-  ariaTitle: "のページへ",
+  ariaLabel: "のページへ(新しいタブで開きます)",
+  ariaTitle: "のページへ(新しいタブで開きます)",
+  targetBlank: "_blank"
 };
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, { name: worksSlugTitle }];
@@ -273,6 +278,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                     aria-label={`${worksSlugRightLink}${worksSlugLinks.ariaLabel}`}
                     title={`${worksSlugRightLink}${worksSlugLinks.ariaTitle}`}
                     set:html={worksSlugRightLink}
+                    target={worksSlugLinks.targetBlank}
                   />
                   <ul class="right__iconMenu">
                     {icons.length > 0 ? (
