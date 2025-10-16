@@ -17,8 +17,8 @@
 
 :where(html) {
   block-size: 100%;
-  -moz-text-size-adjust: none;
-  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  text-size-adjust: none;
   text-size-adjust: none;
   color-scheme: dark light;
   tab-size: 2;
@@ -40,7 +40,7 @@
   font-family: system-ui, sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeSpeed;
+  text-rendering: optimizespeed;
   min-block-size: 100%;
 }
 
@@ -65,7 +65,7 @@
 }
 
 :where(a:not([class])) {
-  color: currentColor;
+  color: currentcolor;
   text-decoration-skip-ink: auto;
 }
 
@@ -85,15 +85,15 @@
   text-align: inherit;
   word-spacing: inherit;
   text-transform: inherit;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  appearance: none;
+  appearance: none;
   appearance: none;
 }
 
 :where(button, button[type], input[type="button"], input[type="submit"], input[type="reset"]) {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
+  user-select: none;
   user-select: none;
   text-align: center;
 }
@@ -128,13 +128,13 @@ button:-moz-focusring,
 }
 
 :where(input[type="checkbox"]) {
-  -webkit-appearance: checkbox;
   appearance: checkbox;
+  appearance: auto;
 }
 
 :where(input[type="radio"]) {
-  -webkit-appearance: radio;
   appearance: radio;
+  appearance: auto;
 }
 
 :where(input[type="file"]) {
@@ -176,16 +176,18 @@ button:-moz-focusring,
 
 :where(img, svg, video) {
   max-inline-size: 100%;
+
   /* block-size: auto; */
 }
 
 :where(svg) {
   stroke: none;
-  fill: currentColor;
+  fill: currentcolor;
 }
 
 :where(svg):where(:not([fill])) {
   /* stroke: currentColor; */
+
   /* fill: none; */
   stroke-linecap: round;
   stroke-linejoin: round;

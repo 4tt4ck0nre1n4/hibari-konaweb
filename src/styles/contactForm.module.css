@@ -1,6 +1,7 @@
 :root {
   --color-red: #ff4f48;
 }
+
 .form__inner {
   width: 100%;
   max-width: 700px;
@@ -8,23 +9,35 @@
   background: transparent;
   border: none;
   border: 1px solid #ffffff26;
+
   /* filter: drop-shadow(30px 30px 30px #000); */
+
   /* filter: blur(1px); */
   border-radius: 1rem;
+
   /* box-shadow: 0px 10px 40px aqua; */
-  box-shadow: 0px 10px 40px rgba(0 0 0 / 0.66);
+  box-shadow: 0 10px 40px rgb(0 0 0 / 0.66);
+
   /* box-shadow: 0 25px 45px #0000000d; */
+
   /* position: relative; */
+
   /* transform-style: preserve-3d; */
+
   /* transform: perspective(1000px) translateZ(20px); */
+
   /* cursor: pointer; */
   margin-block: 1rem;
   margin-inline: auto;
   padding-block: 1rem;
   padding-inline: 3rem;
+
   /* position: absolute; */
+
   /* inset: 0; */
+
   /* top: 48%; */
+
   /* left: 30%; */
   z-index: 0;
 }
@@ -54,7 +67,7 @@
   font-size: 0.75rem;
   color: var(--color-red);
   margin-inline-start: 0.25rem;
-  -webkit-appearance: none;
+  appearance: none;
   appearance: none;
   -webkit-text-fill-color: var(--color-red);
   -webkit-opacity: 1;
@@ -65,8 +78,8 @@
   line-height: 1.8;
   color: #020202;
   background: #f1f5f9;
-  border: 1px solid #cccccc;
-  box-shadow: 0 0 8px rgba(0 255 255 / 0.6);
+  border: 1px solid #ccc;
+  box-shadow: 0 0 8px rgb(0 255 255 / 0.6);
   border-radius: 0.5rem;
   margin-block-start: 0.5rem;
   padding-block: 0.5rem;
@@ -76,7 +89,7 @@
 .input__name:is(:hover, :focus-within),
 .input__email:is(:hover, :focus-within) {
   background-color: transparent;
-  box-shadow: 0 10px 10px rgba(0 255 255 / 0.6);
+  box-shadow: 0 10px 10px rgb(0 255 255 / 0.6);
 }
 
 .label__email {
@@ -91,8 +104,8 @@
   line-height: 2;
   color: #232323;
   background: #f1f5f9;
-  border: 1px solid #cccccc;
-  box-shadow: 0 0 8px rgba(0 255 255 / 0.6);
+  border: 1px solid #ccc;
+  box-shadow: 0 0 8px rgb(0 255 255 / 0.6);
   border-radius: 0.5rem;
   margin-block-start: 0.5rem;
   padding-block: 0.5rem;
@@ -141,17 +154,18 @@
   line-height: 2;
   color: #020202;
   background: #f1f5f9;
-  border: 1px solid #cccccc;
-  box-shadow: 0 0 8px rgba(0 255 255 / 0.6);
+  border: 1px solid #ccc;
+  box-shadow: 0 0 8px rgb(0 255 255 / 0.6);
   border-radius: 0.5rem;
   resize: vertical;
   margin-block-start: 0.5rem;
   padding-block: 0.5rem;
   padding-inline: 0.5rem;
 }
+
 .textarea__message:is(:hover, :focus-within) {
   background-color: transparent;
-  box-shadow: 0 10px 10px rgba(0 255 255 / 0.6);
+  box-shadow: 0 10px 10px rgb(0 255 255 / 0.6);
 }
 
 .label__checkbox {
@@ -164,16 +178,18 @@
   margin-block-start: 1.25rem;
   margin-inline: auto;
 }
+
 .checkbox {
   width: 24px;
   height: 24px;
-  background: #ffffff;
-  box-shadow: 0 0 10px rgba(0 255 255 / 0.6);
+  background: #fff;
+  box-shadow: 0 0 10px rgb(0 255 255 / 0.6);
   border: solid 2px #808080;
   border-radius: 0.25rem;
   appearance: none;
   position: relative;
 }
+
 .checkbox::before {
   content: "";
   width: 100%;
@@ -184,11 +200,11 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  -webkit-mask-image: url("../assets/svg/check.svg");
   mask-image: url("../assets/svg/check.svg");
-  -webkit-mask-repeat: no-repeat;
+  mask-image: url("../assets/svg/check.svg");
   mask-repeat: no-repeat;
-  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-size: contain;
   mask-size: contain;
 }
 
@@ -200,6 +216,7 @@
   font-size: 0.875rem;
   color: rebeccapurple;
 }
+
 .checkbox__link:is(:hover, :focus-within) {
   color: rebeccapurple;
   text-decoration: underline;
@@ -215,7 +232,7 @@
   background-color: blueviolet;
   border: none;
   border-radius: 0.5rem;
-  box-shadow: 0 0 10px rgba(0 255 255 / 0.6);
+  box-shadow: 0 0 10px rgb(0 255 255 / 0.6);
   white-space: nowrap;
   position: relative;
   overflow: hidden;
@@ -228,19 +245,22 @@
     transform 0.1s ease,
     box-shadow 0.4s ease;
 }
+
 @media (prefers-color-scheme: dark) {
   .submit:active {
     transform: scale(0.8);
-    box-shadow: 0 8px 8px rgba(0 255 255 / 0.6);
+    box-shadow: 0 8px 8px rgb(0 255 255 / 0.6);
   }
 }
 
 .submit:is(:hover, :focus-visible) {
   color: rebeccapurple;
   background-color: aliceblue;
+
   /* box-shadow: 0 0 10px rgba(0 255 255 / 0.6); */
-  filter: drop-shadow(0 5px 10px rgba(0 255 255 / 0.6));
+  filter: drop-shadow(0 5px 10px rgb(0 255 255 / 0.6));
 }
+
 .form__inner p {
   font-size: 1rem;
   color: var(--color-red);
@@ -249,16 +269,19 @@
   margin-block-start: 0.25rem;
   padding: 0;
 }
-@media (max-width: 480px) {
+
+@media (width <= 480px) {
   .form__inner {
     width: 96%;
     min-height: 100%;
     padding-block: 2rem;
     padding-inline: 0.5rem;
   }
+
   .checkbox__link {
     font-size: 0.9375rem;
   }
+
   .checkbox__text {
     font-size: 0.9375rem;
   }

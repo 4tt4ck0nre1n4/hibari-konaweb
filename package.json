@@ -13,6 +13,9 @@
     "build:clean": "npm run clean && npm run build",
     "format": "prettier --write 'src/**/*.{js,ts,jsx,tsx,.d.ts,astro,css,scss}'",
     "eslint": "eslint . --config eslint.config.mjs",
+    "stylelint": "stylelint 'src/**/*.{css,scss}'",
+    "stylelint:fix": "stylelint 'src/**/*.{css,scss}' --fix",
+    "lint": "npm run eslint && npm run stylelint",
     "postbuild": "pagefind --site dist/ --output-subdir pagefind",
     "preview": "astro preview",
     "astro": "astro"
@@ -91,6 +94,9 @@
     "prettier": "^3.3.3",
     "prettier-plugin-astro": "^0.14.1",
     "sass-embedded": "^1.80.6",
+    "stylelint": "^16.25.0",
+    "stylelint-config-recommended": "^17.0.0",
+    "stylelint-config-standard": "^39.0.1",
     "ts-node": "^10.9.2",
     "vite-plugin-dynamic-import": "^1.6.0"
   }

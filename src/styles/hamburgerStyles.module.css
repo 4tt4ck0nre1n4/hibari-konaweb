@@ -8,6 +8,7 @@
   border: none;
   z-index: 1001;
 }
+
 .hamburger__line {
   display: block;
   width: 100%;
@@ -16,6 +17,7 @@
   position: relative;
   transition: background 0.3s ease;
 }
+
 .hamburger__line::before {
   content: "";
   display: block;
@@ -29,6 +31,7 @@
     top 0.3s ease,
     bottom 0.3s ease;
 }
+
 .hamburger__line::after {
   content: "";
   display: block;
@@ -42,29 +45,35 @@
     top 0.3s ease,
     bottom 0.3s ease;
 }
+
 .hamburger__line::before {
   top: -8px;
 }
+
 .hamburger__line::after {
   bottom: -8px;
 }
+
 .hamburger__button.open .hamburger__line {
   background-color: transparent;
 }
+
 .hamburger__button.open .hamburger__line::before {
   transform: rotate(45deg);
   top: 0;
 }
+
 .hamburger__button.open .hamburger__line::after {
   transform: rotate(-45deg);
   bottom: 0;
 }
+
 .hamburger__menu {
   display: none;
   width: 280px;
   height: 90vh;
-  color: #333333;
-  background: #ffffff;
+  color: #333;
+  background: #fff;
   border-radius: 0.5rem;
   position: fixed;
   top: 0;
@@ -76,6 +85,7 @@
   transform: translateX(-100%);
   transition: transform 0.3s ease-in-out;
 }
+
 .hamburger__menu ul {
   display: flex;
   flex-direction: column;
@@ -86,22 +96,27 @@
   margin: 0;
   padding: 0;
 }
+
 .hamburger__menu.open {
   display: block;
   transform: translateX(0);
 }
+
 .hamburger__menu_item {
   width: 100%;
   min-height: 48px;
   display: block;
   border: transparent 1px solid;
   border-radius: 1rem;
+
   /* overflow: hidden; */
   transition: box-shadow 0.4s ease;
 }
+
 .hamburger__menu_item:is(:hover, :focus-visible) {
-  box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+  box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
 }
+
 .hamburger__menu_link {
   width: 100%;
   min-height: 48px;
@@ -113,12 +128,15 @@
   position: relative;
   padding: 1rem;
 }
+
 .hamburger__menu_link:is(:focus-visible) {
-  outline: currentColor 2px solid;
+  outline: currentcolor 2px solid;
+
   /* outline: #0078d4 2px solid; */
   outline-offset: 4px;
   border-radius: 0.5rem;
 }
+
 .hamburger__menu_icon {
   display: inline-block;
   flex-shrink: 0;
@@ -126,14 +144,16 @@
   height: 32px;
   margin-inline: 1rem;
 }
+
 .hamburger__menu_label {
   display: inline-block;
   font-size: 1rem;
 }
+
 .hamburger__overlay {
   width: 100vw;
   height: 100vh;
-  background: rgba(0 0 0 / 0.6);
+  background: rgb(0 0 0 / 0.6);
   position: fixed !important;
   top: 0;
   right: 0;

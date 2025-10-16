@@ -23,8 +23,7 @@ export default [
       ".github",
       ".env",
       ".cache",
-      ".env",
-      ".cache",
+      ".vite-cache/**",
       "src/env.d.ts",
       "package-lock.json",
       "eslint.config.js",
@@ -38,16 +37,12 @@ export default [
       "app/public/wp-includes/blocks/**/*",
       "vite.config.js",
       "@types/**",
-      "*.d.ts"
+      "*.d.ts",
     ],
   },
   {
-    files: [
-      "**/.astro/*.ts"
-    ],
-    ignores: [
-      "**/.astro/*.ts"
-    ],
+    files: ["**/.astro/*.ts"],
+    ignores: ["**/.astro/*.ts"],
   },
   eslintJs.configs.recommended,
   ...tsEslint.configs.recommendedTypeChecked,
@@ -77,9 +72,7 @@ export default [
     },
   },
   {
-    files: [
-      "**/*.ts", "**/*.tsx"
-    ],
+    files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parser: tsEslint.parser,
       parserOptions: {
@@ -89,18 +82,14 @@ export default [
     },
   },
   {
-    files: [
-      "**/*.d.ts"
-    ],
+    files: ["**/*.d.ts"],
     rules: {
       "@typescript-eslint/await-thenable": "off",
-      "@typescript-eslint/no-array-delete": "off"
+      "@typescript-eslint/no-array-delete": "off",
     },
   },
   {
-    files: [
-      "**/*.astro"
-    ],
+    files: ["**/*.astro"],
     languageOptions: {
       parser: astroParser,
       parserOptions: {
@@ -134,9 +123,7 @@ export default [
     },
   },
   {
-    files: [
-      "**/*.{ts,tsx,astro}"
-    ],
+    files: ["**/*.{ts,tsx,astro}"],
     rules: {
       "no-undef": "off",
       "@typescript-eslint/no-unused-expressions": "off",
@@ -146,10 +133,10 @@ export default [
       "@typescript-eslint/strict-boolean-expressions": [
         "warn",
         {
-          "allowString": false,
-          "allowNumber": false,
+          allowString: false,
+          allowNumber: false,
           // nullチェック 初期値はfalse
-          "allowNullableObject": true,
+          allowNullableObject: true,
         },
       ],
       // 型強制の禁止
@@ -158,13 +145,13 @@ export default [
       "@typescript-eslint/restrict-plus-operands": [
         "error",
         {
-          "skipCompoundAssignments": false,
-          "allowBoolean": false,
-          "allowNullish": false,
-          "allowNumberAndString": false,
-          "allowRegExp": false,
-          "allowAny": false
-        }
+          skipCompoundAssignments: false,
+          allowBoolean: false,
+          allowNullish: false,
+          allowNumberAndString: false,
+          allowRegExp: false,
+          allowAny: false,
+        },
       ],
       // 文字列同士の + による連結の禁止
       "prefer-template": "error",
@@ -189,7 +176,7 @@ export default [
     rules: {
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
-      "@wordpress/valid-sprintf": "error"
+      "@wordpress/valid-sprintf": "error",
     },
   },
 ];
