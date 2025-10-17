@@ -92,9 +92,7 @@ try {
 
   console.log(`Fetching posts for category ID: ${category.id}`);
 
-  const postsRes = await fetch(
-    `${CATEGORY_ID_API}${category.id}&_embed&acf_format=standard&per_page=100`
-  );
+  const postsRes = await fetch(`${CATEGORY_ID_API}${category.id}&_embed&acf_format=standard&per_page=100`);
 
   if (!postsRes.ok) {
     throw new Error(`Failed to fetch posts for category: ${postsRes.status}`);

@@ -12,10 +12,12 @@ NetlifyにデプロイしたAstroサイトでworksページやblogページが40
 ### ステップ1: Netlifyに環境変数を設定
 
 1. **Netlifyダッシュボードにアクセス**
+
    - https://app.netlify.com/ にログイン
    - あなたのサイト（hibari-konaweb）を選択
 
 2. **環境変数設定ページを開く**
+
    - 左メニューの「Site configuration」をクリック
    - 「Environment variables」セクションを選択
 
@@ -66,9 +68,11 @@ NetlifyにデプロイしたAstroサイトでworksページやblogページが40
 ConoHa WINGのWordPress管理画面で確認：
 
 1. **WordPress管理画面にログイン**
+
    - `https://あなたのドメイン.com/wp-admin`
 
 2. **お問い合わせフォームを開く**
+
    - 左メニュー「お問い合わせ」→「コンタクトフォーム」
 
 3. **IDを確認**
@@ -85,6 +89,7 @@ WordPressがNetlifyからのリクエストを受け入れるようにCORS設定
 1. **WordPress管理画面にログイン**
 
 2. **プラグインをインストール**
+
    - 「プラグイン」→「新規追加」
    - 「WP-CORS」または「WP Headless CMS」を検索
    - 「今すぐインストール」→「有効化」
@@ -150,6 +155,7 @@ https://あなたのConoHa WINGのドメイン.com/wp-json/wp/v2/categories
 
 **正しい場合**：JSONデータが表示される
 **エラーの場合**：
+
 - 404エラー → パーマリンク設定を保存し直す（下記参照）
 - 403エラー → CORS設定を確認
 
@@ -215,11 +221,13 @@ GitHubにプッシュすると、Netlifyが自動的に再ビルド・再デプ�
 ### 問題1: ビルドが失敗する
 
 **エラーメッセージ**：
+
 ```
 Please set environment variables: PUBLIC_API_URL
 ```
 
 **解決策**：
+
 - Netlifyの環境変数が正しく設定されているか確認
 - 変数名が完全に一致しているか確認（大文字小文字、スペースなど）
 - 環境変数のScopesが「Production」または「All scopes」になっているか確認
@@ -227,13 +235,15 @@ Please set environment variables: PUBLIC_API_URL
 ### 問題2: CORSエラーが出る
 
 **エラーメッセージ（ブラウザのコンソール）**：
+
 ```
-Access to fetch at 'https://your-domain.com/wp-json/...' 
-from origin 'https://hibari-konaweb.netlify.app' 
+Access to fetch at 'https://your-domain.com/wp-json/...'
+from origin 'https://hibari-konaweb.netlify.app'
 has been blocked by CORS policy
 ```
 
 **解決策**：
+
 - ConoHa WINGのWordPress側でCORS設定を追加（ステップ3参照）
 - functions.phpのコードが正しく追加されているか確認
 - キャッシュをクリアして再度試す
@@ -241,6 +251,7 @@ has been blocked by CORS policy
 ### 問題3: REST APIが404エラーを返す
 
 **解決策**：
+
 1. WordPress管理画面にログイン
 2. 「設定」→「パーマリンク設定」を開く
 3. 何も変更せずに「変更を保存」をクリック
@@ -250,6 +261,7 @@ has been blocked by CORS policy
 ### 問題4: 画像が表示されない
 
 **原因**：
+
 - 画像のURLがまだローカルのままになっている可能性
 
 **解決策**：
@@ -274,6 +286,7 @@ has been blocked by CORS policy
 ### 問題5: データが古い（WordPressで更新したのにNetlifyに反映されない）
 
 **原因**：
+
 - Astroは静的サイトジェネレーター（SSG）のため、ビルド時にデータを取得
 - WordPressでコンテンツを更新しても、Netlifyを再ビルドしないと反映されない
 
@@ -288,6 +301,7 @@ git push origin main
 **解決策2: Netlify Build Hookを設定（自動化）**
 
 1. **Netlify Build Hookを作成**
+
    - Netlify Dashboard → Site configuration → Build & deploy
    - 「Build hooks」→「Add build hook」
    - 名前: "WordPress Content Update"
@@ -349,4 +363,3 @@ REST API - カテゴリー: https://あなたのドメイン.com/wp-json/wp/v2/c
 以上の手順を完了すれば、Netlifyにデプロイしたサイトでworksページとblogページが正しく表示されるようになります。
 
 何か問題が発生した場合は、このガイドのトラブルシューティングセクションを参照してください。
-
