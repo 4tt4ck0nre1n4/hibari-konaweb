@@ -35,8 +35,13 @@ export function generateBreadcrumbs(urlPath: string): Crumb[] {
 
     pathAccumulator += `/${segment}`;
 
-    const key = segments.slice(0, i + 1).join("/");
-    const rawLabel = labelMap[key] ?? labelMap[segment] ?? toTitleCase(segment);
+    // .html拡張子を削除してlabelMapのキーとして使用
+    const cleanSegment = segment.replace(/\.html$/i, "");
+    const key = segments
+      .slice(0, i + 1)
+      .join("/")
+      .replace(/\.html$/i, "");
+    const rawLabel = labelMap[key] ?? labelMap[cleanSegment] ?? toTitleCase(cleanSegment);
     const label: string = typeof rawLabel === "string" ? rawLabel : String(rawLabel);
 
     crumbs.push(isLast ? { name: label } : { name: label, path: pathAccumulator });
