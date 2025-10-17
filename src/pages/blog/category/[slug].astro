@@ -7,6 +7,7 @@ import { Icon } from "astro-icon/components";
 import { generateBreadcrumbs } from "../../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import globalText from "../../../data/globalText.json";
+import { CATEGORY_PAGE_API, CATEGORY_SLUG_API, CATEGORY_ID_API } from "../../../api/headlessCms";
 
 interface CategoryPosts {
   id: number;
@@ -36,9 +37,9 @@ interface Post {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
-    console.log("Fetching Categories from API...");
+    console.log("Fetching Categories from API:", CATEGORY_PAGE_API);
 
-    const response = await fetch(`http://hibari-konaweb.local/wp-json/wp/v2/categories?per_page=100`);
+    const response = await fetch(CATEGORY_PAGE_API);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch posts for category slugs: ${response.status}`);
@@ -75,7 +76,7 @@ let posts: Post[] = [];
 try {
   console.log(`Fetching category details for slug: ${slug}`);
 
-  const categoryRes = await fetch(`http://hibari-konaweb.local/wp-json/wp/v2/categories?slug=${slug}&per_page=100`);
+  const categoryRes = await fetch(`${CATEGORY_SLUG_API}${slug}&per_page=100`);
 
   if (!categoryRes.ok) {
     throw new Error(`Failed to fetch category datails: ${categoryRes.status}`);
@@ -92,7 +93,7 @@ try {
   console.log(`Fetching posts for category ID: ${category.id}`);
 
   const postsRes = await fetch(
-    `http://hibari-konaweb.local/wp-json/wp/v2/posts?_embed&acf_format=standard&categories=${category.id}&per_page=100`
+    `${CATEGORY_ID_API}${category.id}&_embed&acf_format=standard&per_page=100`
   );
 
   if (!postsRes.ok) {
