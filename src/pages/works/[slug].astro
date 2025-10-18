@@ -181,7 +181,7 @@ const worksSlugLinks = {
   slug: { rendered: work?.slug },
   ariaLabel: "のページへ(新しいタブで開きます)",
   ariaTitle: "のページへ(新しいタブで開きます)",
-  targetBlank: "_blank"
+  targetBlank: "_blank",
 };
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, { name: worksSlugTitle }];
@@ -219,18 +219,25 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                     />
                   </div>
                   <div class="left__inner">
-                    <h1 class="left__title" set:html={worksSlugTitle ?? "No title available"} />
+                    {/* サイトタイトル */}
+                    <h2 class="left__title" set:html={worksSlugTitle ?? "No title available"} />
                     <a
                       class="left__link"
                       href={worksSlugLeftLink}
                       aria-label={`${worksSlugTitle}${worksSlugLinks.ariaLabel}`}
                       title={`${worksSlugTitle}${worksSlugLinks.ariaTitle}`}
                     >
+                      {/* Basic認証テキスト */}
                       <span set:html={work?.acf?.span_access ?? ""} />
+                      {/* アクセス権限テキスト */}
                       <span set:html={work?.acf?.span_user ?? ""} />
+                      {/* ユーザー名 */}
                       <span set:html={work?.acf?.span_password ?? ""} />
+                      {/* パスワード */}
                       <span set:html={worksSlugLeftLink ?? ""} />
+                      {/* サイトリンク URL */}
                     </a>
+                    {/* サイトの特徴 */}
                     <ul class="left__leadMenu">
                       {workTextData?.left_leadMenu && workTextData.left_leadMenu.length > 0 ? (
                         workTextData.left_leadMenu.map(({ header, body }) => (
@@ -249,6 +256,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                 </div>
 
                 <div class="split right site1">
+                  {/* サイト pc画像 */}
                   <img
                     class="right__pcImage"
                     src={worksPcImage ?? ""}
@@ -256,7 +264,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                     loading="lazy"
                     decoding="async"
                   />
-                  <p class="right__header" set:html={worksRightHeader ?? "No title available"} />
+                  {/* サイトタイトル */}
+                  <h1 class="right__header" set:html={worksRightHeader ?? "No title available"} />
+                  {/* ロゴアイコン */}
                   <img
                     class="right__logoIcon"
                     src={worksIconImage ?? ""}
@@ -264,7 +274,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                     loading="lazy"
                     decoding="async"
                   />
+                  {/* Basic認証テキスト */}
                   <p class="right__text" set:html={worksRightAccess ?? ""} />
+                  {/* サイト sp画像 */}
                   <img
                     class="right__spImage"
                     src={worksSpImage ?? ""}
@@ -272,6 +284,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                     loading="lazy"
                     decoding="async"
                   />
+                  {/* サイトリンク URL */}
                   <a
                     class="right__link"
                     href={worksSlugRightLink}
@@ -280,6 +293,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                     set:html={worksSlugRightLink}
                     target={worksSlugLinks.targetBlank}
                   />
+                  {/* スキルアイコン */}
                   <ul class="right__iconMenu">
                     {icons.length > 0 ? (
                       icons.map(({ name, url }) => (
@@ -336,12 +350,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     color: white;
     position: relative;
     z-index: 1;
-    margin-block-start: 5rem;
-    padding-block-start: 3rem;
+    height: 100vh;
+    /* margin-block-start: 1rem; */
+    /* padding-block-start: 3rem; */
   }
   .split__container {
     width: 100%;
-    height: 100vh;
+    height: 100%;
     background: var(--container-bg-color);
     position: relative;
   }
@@ -390,7 +405,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     display: grid;
     place-items: end;
   }
-  /* 左サイド サイト画像 */
+  /* 左サイド  */
   .split.left {
     top: 0;
     left: 0;
@@ -398,6 +413,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     background-size: contain;
     background-repeat: no-repeat;
   }
+  /* 左サイド サイト画像 */
   .left__imageInner {
     aspect-ratio: 16 / 9;
     overflow: hidden;
@@ -442,6 +458,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     font-weight: 700;
     color: #010101;
     white-space: nowrap;
+    margin-block-start: 1rem;
   }
   /* 左サイド サイトテキスト */
   .left__text {
@@ -498,7 +515,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
     border-radius: 50%;
     position: absolute;
-    top: 8%;
+    top: 16%;
     left: 4%;
     z-index: 1;
     animation: transLogo 2s ease-in infinite alternate;
@@ -511,13 +528,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       transform: translateY(20px);
     }
   }
-  /* 右サイド ヘッダー Portforlio */
+  /* 右サイド ヘッダー サイトタイトル */
   .right__header {
     font-size: 1.5rem;
     color: inherit;
     white-space: nowrap;
     position: absolute;
-    top: 2%;
+    top: 10%;
     left: 4%;
   }
   .right__header span {
@@ -537,6 +554,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   /* 右サイド Basic認証テキスト */
   .right__text {
     width: 34rem;
+    width: 100%;
+    max-width: 600px;
     font-size: 1rem;
     color: inherit;
     background-color: transparent;
@@ -550,25 +569,18 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     border: rgba(43, 255, 152, 1) 0.2em solid;
     border-radius: 0.5rem;
     position: absolute;
-    top: 70%;
+    top: 74%;
     left: 20%;
+    left: 4%;
     opacity: 1;
     padding-block: 0.25rem;
     padding-inline: 1rem;
   }
+  /* デスクトップサイズでは.right__textのspanを通常表示（WordPressから来る構造を保持） */
   .right__text span {
-    display: inline-block;
-    transition: all 0.3s ease-in-out;
-    opacity: 0;
-    transform: translateY(-24px);
-  }
-  .right__text span + span {
-    padding: 2px;
-  }
-  .right__text span.is-active {
+    display: inline;
     opacity: 1;
-    transform: translateY(0);
-    transition: all 0.6s ease;
+    transition: opacity 0.8s ease;
   }
   /* 右サイド サイト pc画像 */
   .split.right {
@@ -587,7 +599,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     width: 40%;
     height: 40%;
     position: absolute;
-    top: 12%;
+    top: 16%;
     right: 2%;
     animation: rotateCircle 10s linear infinite alternate;
   }
@@ -599,12 +611,14 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       transform: translateY(24px);
     }
   }
+  /* 右サイド サイトリンク URL */
   .right__link {
     width: 26rem;
     max-width: 100%;
     font-family: "Poppins", sans-serif;
     font-size: 1rem;
     font-weight: 700;
+    letter-spacing: 0.04em;
     color: white;
     background-color: transparent;
     text-decoration: none;
@@ -619,8 +633,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     white-space: nowrap;
     overflow: hidden;
     position: absolute;
-    top: 60%;
-    right: 30%;
+    top: 64%;
+    left: 4%;
     opacity: 0;
     transition: opacity 0.8s ease;
     cursor: pointer;
@@ -696,7 +710,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     background-position: 200%;
     background-size: 40px 80px;
     position: absolute;
-    bottom: 10%;
+    bottom: 4%;
     right: 0%;
   }
 
@@ -736,5 +750,348 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   }
   .right__iconMenu_item .right__iconMenu_cover {
     display: none;
+  }
+
+  /* レスポンシブ対応 */
+  @media (max-width: 768px) {
+    .work {
+      height: auto;
+      min-height: 100vh;
+    }
+
+    .split__container {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      min-height: 100vh;
+      background: transparent;
+    }
+
+    /* 右サイドを上に配置 */
+    .split.right {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      height: 100%;
+      min-height: 600px;
+      /* max-height: 580px; */
+      order: 1;
+      top: auto;
+      right: auto;
+      overflow: visible;
+    }
+
+    /* 左サイドを下に配置 */
+    .split.left {
+      position: relative;
+      width: 100%;
+      height: auto;
+      min-height: 100vh;
+      order: 2;
+      top: auto;
+      left: auto;
+    }
+
+    /* スマホでのホバーエフェクト無効化 */
+    .hover-left .left,
+    .hover-right .right,
+    .hover-left .right,
+    .hover-right .left {
+      width: 100% !important;
+    }
+
+    .hover-left .split.left::before,
+    .hover-right .split.right::before {
+      background: transparent;
+    }
+
+    /* 左サイドの背景色を解除（透明に） */
+    .split.left::before {
+      background: transparent;
+    }
+
+    /* 右サイドの背景色を解除（透明に） */
+    .split.right::before {
+      background: transparent;
+    }
+
+    /* 左サイド モーダル風の調整 */
+    .split.left.left1 .left__inner {
+      position: static;
+      width: 100%;
+      left: 0;
+      /* opacity: 1; スクロールアニメーションで制御 */
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background-image: none;
+      box-shadow: none;
+      margin-block: 2rem;
+      padding-block: 2rem;
+      padding-inline: 1.5rem;
+    }
+
+    .left__title {
+      font-size: 1.125rem;
+    }
+
+    .left__leadMenu_header {
+      font-size: 0.9375rem;
+      margin-block-start: 1.5rem;
+    }
+
+    .left__leadMenu_body {
+      font-size: 0.8125rem;
+    }
+
+    /* 右サイド ロゴアイコンの調整 */
+    .right__logoIcon {
+      width: 2.5rem;
+      height: 2.5rem;
+      top: 8%;
+      top: 2%;
+      left: 50%;
+      left: 10%;
+      transform: translateX(-50%);
+    }
+
+    /* 右サイド ヘッダーの調整 */
+    .right__header {
+      font-size: 1.25rem;
+      top: 4%;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: normal;
+      text-align: center;
+      width: 90%;
+    }
+
+    /* 右サイド サイト sp画像の調整 */
+    .split.right .right__spImage {
+      width: 50%;
+      height: auto;
+      max-height: 40%;
+      top: 12%;
+      right: 25%;
+      transform: translateX(50%);
+      animation: rotateCircleMobile 10s linear infinite alternate;
+    }
+
+    @keyframes rotateCircleMobile {
+      0% {
+        transform: translateX(50%) translateY(-12px);
+      }
+      100% {
+        transform: translateX(50%) translateY(12px);
+      }
+    }
+
+    /* 右サイド Basic認証テキストの調整 */
+    .right__text {
+      max-width: 90%;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      top: auto;
+      top: 42%;
+      bottom: 20%;
+      bottom: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: normal;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-block: 1rem;
+      padding-inline: 1.25rem;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      border-radius: 0.75rem;
+    }
+
+    /* 右サイド Basic認証テキスト内のspan調整 - 各行を改行 */
+    .right__text > span {
+      display: block !important;
+      white-space: normal !important;
+      word-break: keep-all;
+      transition: all 0.3s ease;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+
+    /* 1行目（Basic認証）をヘッダー風に */
+    .right__text > span:first-child {
+      font-weight: 700;
+      font-size: 1.125rem;
+      letter-spacing: 0.05em;
+      color: rgba(43, 255, 152, 1);
+      text-shadow: 0 0 10px rgba(43, 255, 152, 0.3);
+      padding-block-end: 0.5rem;
+      border-bottom: 2px solid rgba(43, 255, 152, 0.3);
+      margin-block-end: 0.25rem;
+    }
+
+    /* 2行目（ユーザー） */
+    .right__text > span:nth-child(2) {
+      font-size: 0.875rem;
+      font-family: "Courier New", monospace;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(0, 0, 0, 0.2);
+      padding-block: 0.5rem;
+      padding-inline: 0.75rem;
+      border-radius: 0.375rem;
+      border-left: 3px solid rgba(43, 255, 152, 0.6);
+      text-align: left;
+    }
+
+    /* 3行目（パスワード） */
+    .right__text > span:nth-child(3) {
+      font-size: 0.875rem;
+      font-family: "Courier New", monospace;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(0, 0, 0, 0.2);
+      padding-block: 0.5rem;
+      padding-inline: 0.75rem;
+      border-radius: 0.375rem;
+      border-left: 3px solid rgba(43, 255, 152, 0.6);
+      text-align: left;
+    }
+
+    /* 4行目以降があれば同じスタイル */
+    .right__text > span:nth-child(n + 4) {
+      font-size: 0.875rem;
+      font-family: "Courier New", monospace;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(0, 0, 0, 0.2);
+      padding-block: 0.5rem;
+      padding-inline: 0.75rem;
+      border-radius: 0.375rem;
+      border-left: 3px solid rgba(43, 255, 152, 0.6);
+      text-align: left;
+    }
+
+    /* ホバーエフェクト（タッチデバイスでは無効） */
+    @media (hover: hover) {
+      .right__text > span:nth-child(n + 2):hover {
+        background: rgba(43, 255, 152, 0.1);
+        border-left-color: rgba(43, 255, 152, 1);
+        transform: translateX(4px);
+      }
+    }
+
+    /* 右サイド サイトリンクの調整 */
+    .right__link {
+      width: 90%;
+      max-width: 90%;
+      font-size: 0.875rem;
+      top: auto;
+      top: 58%;
+      bottom: 28%;
+      bottom: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: normal;
+      word-break: break-all;
+      opacity: 1;
+      padding-block: 0.75rem;
+      padding-inline: 0.75rem;
+    }
+
+    /* 右サイド スキルアイコンの調整 - 折り返し対応 */
+    .right__iconMenu {
+      width: 100%;
+      height: auto;
+      min-height: 80px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      padding-block: 1rem;
+      padding-inline: 0.5rem;
+      top: 68%;
+      bottom: 0;
+    }
+
+    .right__iconMenu_item {
+      width: calc(20% - 0.5rem);
+      min-width: 60px;
+      height: 60px;
+      flex-shrink: 0;
+    }
+
+    .right__iconMenu_image {
+      width: 100%;
+      max-width: 40px;
+      height: auto;
+    }
+
+    .right__iconMenu_text {
+      font-size: 0.625rem;
+      margin-top: -12px;
+    }
+
+    .right__iconMenu_item.is-active .right__iconMenu_image {
+      transform: translateY(-12px);
+    }
+  }
+
+  /* より小さい画面向けの調整 */
+  @media (max-width: 480px) {
+    .right__header {
+      font-size: 1.125rem;
+    }
+
+    .right__text {
+      max-width: 95%;
+      gap: 0.5rem;
+      padding-block: 0.875rem;
+      padding-inline: 1rem;
+    }
+
+    .right__text > span:first-child {
+      font-size: 1rem;
+      padding-block-end: 0.375rem;
+    }
+
+    .right__text > span:nth-child(2),
+    .right__text > span:nth-child(3),
+    .right__text > span:nth-child(n + 4) {
+      font-size: 0.8125rem;
+      padding-block: 0.375rem;
+      padding-inline: 0.625rem;
+    }
+
+    .right__link {
+      font-size: 0.75rem;
+      padding-block: 0.5rem;
+      padding-inline: 0.5rem;
+    }
+
+    .right__iconMenu_item {
+      width: calc(25% - 0.5rem);
+      min-width: 50px;
+      height: 50px;
+    }
+
+    .right__iconMenu_image {
+      max-width: 32px;
+    }
+
+    .right__iconMenu_text {
+      font-size: 0.5625rem;
+    }
+
+    .left__title {
+      font-size: 1rem;
+    }
+
+    .left__leadMenu_header {
+      font-size: 0.875rem;
+    }
+
+    .left__leadMenu_body {
+      font-size: 0.75rem;
+    }
   }
 </style>
