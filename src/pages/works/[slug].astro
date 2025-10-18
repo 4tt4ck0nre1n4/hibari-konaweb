@@ -767,21 +767,19 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       background: transparent;
     }
 
-    /* 右サイドを上に配置 */
+    /* 右サイドを固定 */
     .split.right {
-      position: relative;
+      position: sticky;
+      top: 0;
       width: 100%;
       height: 100vh;
-      height: 100%;
       min-height: 600px;
-      /* max-height: 580px; */
       order: 1;
-      top: auto;
-      right: auto;
       overflow: visible;
+      z-index: 1;
     }
 
-    /* 左サイドを下に配置 */
+    /* 左サイドを下に配置（.rightの上を被さる） */
     .split.left {
       position: relative;
       width: 100%;
@@ -790,6 +788,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       order: 2;
       top: auto;
       left: auto;
+      z-index: 2;
     }
 
     /* スマホでのホバーエフェクト無効化 */
@@ -820,7 +819,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       position: static;
       width: 100%;
       left: 0;
-      /* opacity: 1; スクロールアニメーションで制御 */
+      opacity: 0;
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
       background-image: none;
@@ -848,9 +847,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       width: 2.5rem;
       height: 2.5rem;
       top: 8%;
-      top: 2%;
+      /* top: 2%; */
       left: 50%;
-      left: 10%;
+      left: 5%;
       transform: translateX(-50%);
     }
 
@@ -861,7 +860,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       left: 50%;
       transform: translateX(-50%);
       white-space: normal;
-      text-align: center;
+      text-align: left;
       width: 90%;
     }
 
@@ -888,95 +887,17 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     /* 右サイド Basic認証テキストの調整 */
     .right__text {
       max-width: 90%;
-      font-size: 0.875rem;
+      font-size: 0.8125rem;
       line-height: 1.5;
       top: auto;
-      top: 42%;
+      top: 50%;
       bottom: 20%;
       bottom: auto;
       left: 50%;
       transform: translateX(-50%);
       white-space: normal;
-      word-break: keep-all;
-      overflow-wrap: break-word;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      padding-block: 1rem;
-      padding-inline: 1.25rem;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-      border-radius: 0.75rem;
-    }
-
-    /* 右サイド Basic認証テキスト内のspan調整 - 各行を改行 */
-    .right__text > span {
-      display: block !important;
-      white-space: normal !important;
-      word-break: keep-all;
-      transition: all 0.3s ease;
-      opacity: 1 !important;
-      transform: none !important;
-    }
-
-    /* 1行目（Basic認証）をヘッダー風に */
-    .right__text > span:first-child {
-      font-weight: 700;
-      font-size: 1.125rem;
-      letter-spacing: 0.05em;
-      color: rgba(43, 255, 152, 1);
-      text-shadow: 0 0 10px rgba(43, 255, 152, 0.3);
-      padding-block-end: 0.5rem;
-      border-bottom: 2px solid rgba(43, 255, 152, 0.3);
-      margin-block-end: 0.25rem;
-    }
-
-    /* 2行目（ユーザー） */
-    .right__text > span:nth-child(2) {
-      font-size: 0.875rem;
-      font-family: "Courier New", monospace;
-      color: rgba(255, 255, 255, 0.9);
-      background: rgba(0, 0, 0, 0.2);
       padding-block: 0.5rem;
       padding-inline: 0.75rem;
-      border-radius: 0.375rem;
-      border-left: 3px solid rgba(43, 255, 152, 0.6);
-      text-align: left;
-    }
-
-    /* 3行目（パスワード） */
-    .right__text > span:nth-child(3) {
-      font-size: 0.875rem;
-      font-family: "Courier New", monospace;
-      color: rgba(255, 255, 255, 0.9);
-      background: rgba(0, 0, 0, 0.2);
-      padding-block: 0.5rem;
-      padding-inline: 0.75rem;
-      border-radius: 0.375rem;
-      border-left: 3px solid rgba(43, 255, 152, 0.6);
-      text-align: left;
-    }
-
-    /* 4行目以降があれば同じスタイル */
-    .right__text > span:nth-child(n + 4) {
-      font-size: 0.875rem;
-      font-family: "Courier New", monospace;
-      color: rgba(255, 255, 255, 0.9);
-      background: rgba(0, 0, 0, 0.2);
-      padding-block: 0.5rem;
-      padding-inline: 0.75rem;
-      border-radius: 0.375rem;
-      border-left: 3px solid rgba(43, 255, 152, 0.6);
-      text-align: left;
-    }
-
-    /* ホバーエフェクト（タッチデバイスでは無効） */
-    @media (hover: hover) {
-      .right__text > span:nth-child(n + 2):hover {
-        background: rgba(43, 255, 152, 0.1);
-        border-left-color: rgba(43, 255, 152, 1);
-        transform: translateX(4px);
-      }
     }
 
     /* 右サイド サイトリンクの調整 */
@@ -1004,7 +925,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       min-height: 80px;
       display: flex;
       flex-wrap: wrap;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       gap: 0.5rem;
       padding-block: 1rem;
@@ -1043,23 +964,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     }
 
     .right__text {
-      max-width: 95%;
-      gap: 0.5rem;
-      padding-block: 0.875rem;
-      padding-inline: 1rem;
-    }
-
-    .right__text > span:first-child {
-      font-size: 1rem;
-      padding-block-end: 0.375rem;
-    }
-
-    .right__text > span:nth-child(2),
-    .right__text > span:nth-child(3),
-    .right__text > span:nth-child(n + 4) {
-      font-size: 0.8125rem;
-      padding-block: 0.375rem;
-      padding-inline: 0.625rem;
+      font-size: 0.75rem;
+      padding-block: 0.5rem;
+      padding-inline: 0.5rem;
     }
 
     .right__link {

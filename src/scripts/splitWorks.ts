@@ -55,59 +55,35 @@ document.addEventListener("DOMContentLoaded", function () {
         addStyledText(splitElement.rightHeader, 200);
       }
 
-      // 左サイドを初期状態で非表示＆下に配置
+      // 左サイドを初期状態で表示（.rightの上を被さる）
       if (splitElement.left) {
+        // 左サイドは通常表示
         gsap.set(splitElement.left, {
-          opacity: 0,
-          y: 100,
+          opacity: 1,
+          y: 0,
         });
 
         const leftInner = splitElement.left.querySelector(".left__inner");
         if (leftInner) {
           gsap.set(leftInner, {
-            opacity: 0,
-            y: 50,
+            opacity: 1,
+            y: 0,
           });
         }
 
-        // スクロールで左サイドが出現するアニメーション
-        ScrollTrigger.create({
-          trigger: splitElement.right,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1,
-          onUpdate: (self) => {
-            const progress = self.progress;
-
-            // 右サイドを少し上にスクロール（パララックス効果）
-            gsap.to(splitElement.right, {
-              y: -50 * progress,
-              duration: 0.1,
-            });
-          },
-        });
-
-        // 左サイドの出現アニメーション
+        // 左サイドがスクロールで登場するフェードイン効果
         ScrollTrigger.create({
           trigger: splitElement.left,
-          start: "top 80%",
-          end: "top 20%",
+          start: "top bottom",
+          end: "top center",
           scrub: 1,
-          onEnter: () => {
-            gsap.to(splitElement.left, {
-              opacity: 1,
-              y: 0,
-              duration: 1,
-              ease: "power2.out",
-            });
-          },
           onUpdate: (self) => {
             const progress = self.progress;
 
             if (leftInner) {
               gsap.to(leftInner, {
                 opacity: progress,
-                y: 50 * (1 - progress),
+                y: 30 * (1 - progress),
                 duration: 0.1,
               });
             }
@@ -124,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
             scrub: 1,
             onUpdate: (self) => {
               gsap.to(leftImage, {
-                y: -30 * self.progress,
+                y: -20 * self.progress,
                 duration: 0.1,
               });
             },

@@ -1,10 +1,5 @@
 :root {
-  --gradient: linear-gradient(
-    90deg,
-    rgb(238 161 255 / 1) 0%,
-    rgb(147 183 255 / 1) 55%,
-    rgb(170 244 254 / 1) 100%
-  );
+  --gradient: linear-gradient(90deg, rgb(238 161 255 / 1) 0%, rgb(147 183 255 / 1) 55%, rgb(170 244 254 / 1) 100%);
   --color-red: #ff4f48;
 
   /* --gradient: linear-gradient(
@@ -27,33 +22,19 @@ html {
   font-family: sans-serif;
   color: #020202;
   background-color: #f1f5f9;
-
-  /* background-color: transparent; */
 }
 
 html.dark {
   color: #f1f5f9;
-
-  /* color: inherit; */
   background-color: #0d0950;
-
-  /* background-color: #020202; */
 }
 
 html.dark header {
-  /* background-color: slateblue; */
   background-color: transparent;
 }
 
 html.dark footer {
-  /* background-color: darkcyan; */
-
-  /* background-color: slateblue; */
   background-color: transparent;
-}
-
-.dark .nav-links a {
-  color: #f1f5f9;
 }
 
 #outer-container {
@@ -108,6 +89,113 @@ html.dark footer {
   content: "";
 }
 
+/* ページネーション */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  position: relative;
+  margin-block: 3rem;
+  margin-inline: auto;
+}
+
+.pagination__menu {
+  width: 390px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6ch, 1fr));
+  gap: 1.5rem;
+  justify-content: flex-end;
+  list-style: none;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+.pagination__menu a {
+  width: 100%;
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rebeccapurple;
+  background-color: white;
+  border: rebeccapurple 1px solid;
+  box-shadow: 0 10px 18px rgb(0 0 0 / 0.5);
+  text-align: center;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.pagination__menu .pagination__link_current {
+  color: white;
+  background-color: rebeccapurple;
+  border: rebeccapurple 1px solid;
+  transition: background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pagination__menu .pagination__link_current:is(:hover, :focus-within) {
+  color: rebeccapurple;
+  background-color: white;
+}
+
+.pagination__link_empty {
+  display: inline-block;
+  background: transparent;
+}
+
+/* ページネーション スマホ対応 */
+@media (width <= 768px) {
+  .pagination__menu {
+    width: 100%;
+    max-width: 390px;
+    gap: 1rem;
+  }
+
+  .pagination__menu a {
+    font-size: 0.9375rem;
+    padding: 0.875rem;
+  }
+}
+
+@media (width <= 480px) {
+  .pagination {
+    margin-block: 2rem;
+  }
+
+  .pagination__menu {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    padding-inline: 0.5rem;
+  }
+
+  .pagination__menu_item {
+    flex: 0 0 auto;
+  }
+
+  .pagination__menu a {
+    min-width: 48px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    padding: 0.75rem;
+  }
+
+  .pagination__link_empty {
+    display: none;
+  }
+}
+
+html.dark .nav-links a {
+  color: #f1f5f9;
+}
+
 /* 読み上げ専用CSS */
 .screenReader-only {
   width: 1px;
@@ -115,7 +203,7 @@ html.dark footer {
   border: 0;
   position: absolute;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   margin: -1px;
   padding: 0;
@@ -204,65 +292,4 @@ html.dark footer {
 .serverError__menu_link:is(:hover, :focus-within) {
   color: blue;
   text-decoration: none;
-}
-
-/* ページネーション */
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  font-size: 0.8125rem;
-  position: relative;
-  margin-block: 3rem;
-  margin-inline: auto;
-}
-
-.pagination__menu {
-  width: 390px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(6ch, 1fr));
-  gap: 1.5rem;
-  justify-content: flex-end;
-  list-style: none;
-  margin-inline: auto;
-  padding-inline: 1rem;
-}
-
-.pagination__menu_item {
-}
-
-.pagination__menu_item a {
-  width: 100%;
-  display: block;
-  font-size: 1rem;
-  font-weight: 700;
-  color: rebeccapurple;
-  background-color: white;
-  border: rebeccapurple 1px solid;
-  box-shadow: 0 10px 18px rgb(0 0 0 / 0.5);
-  text-align: center;
-  text-decoration: none;
-  border-radius: 0.5rem;
-  padding: 1rem;
-}
-
-.pagination__menu_item .pagination__link_current {
-  color: white;
-  background-color: rebeccapurple;
-  border: rebeccapurple 1px solid;
-  transition: background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.pagination__menu_item .pagination__link_current:is(:hover, :focus-within) {
-  color: rebeccapurple;
-  background-color: white;
-}
-
-.pagination span {
-}
-
-.pagination__link_empty {
-  display: inline-block;
-  background: transparent;
 }
