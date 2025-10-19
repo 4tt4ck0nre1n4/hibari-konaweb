@@ -344,6 +344,7 @@ const worksPagination = {
     max-width: calc(100% - 2rem);
     margin-inline: auto;
   }
+  /* 背景スクロール画像 */
   .scrollImage {
     position: fixed;
     top: 0;
@@ -354,10 +355,8 @@ const worksPagination = {
     width: 700px;
     height: 400px;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.5rem;
-    /* background: transparent; */
     list-style: none;
     filter: sepia(10%);
     opacity: 0;
@@ -384,8 +383,6 @@ const worksPagination = {
   .scrollImage__menu_item {
     width: 100%;
     display: grid;
-    /* grid-template-rows: subgrid; */
-    /* grid-row: span 4; */
     color: rebeccapurple;
     background-color: whitesmoke;
     background-color: transparent;
@@ -431,9 +428,11 @@ const worksPagination = {
     margin-block-start: 1rem;
     padding-inline: 0.75rem;
   }
+  /* Worksページ タイトル */
   .works__title {
     font-size: 2rem;
   }
+  /* Worksページ テキスト */
   .works__text {
     font-size: 1rem;
     line-height: 1.8;
@@ -441,12 +440,11 @@ const worksPagination = {
     color: inherit;
     padding-inline: 1rem;
   }
+  /* Worksページ カード */
   .worksCard__menu {
     width: 100%;
     display: grid;
-    /* grid-template-columns: repeat(auto-fill, minmax(24ch, 1fr)); */
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    /* grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); */
     gap: 1.5rem;
     list-style: none;
     margin-block-start: 3rem;
@@ -455,9 +453,6 @@ const worksPagination = {
     display: grid;
     grid-template-rows: subgrid;
     grid-row: span 4;
-    /* flex-direction: column; */
-    /* align-items: center;
-    justify-content: center; */
     color: rebeccapurple;
     background-color: whitesmoke;
     border: rebeccapurple 1px solid;
@@ -466,7 +461,6 @@ const worksPagination = {
     overflow: hidden;
     position: relative;
     padding-block: 1rem;
-    /* transform: translateX(300px) skew(-32deg); */
     transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .worksCard__menu_item::before {
@@ -486,24 +480,6 @@ const worksPagination = {
       rgba(170, 244, 254, 1),
       transparent
     );
-    /* background: linear-gradient(
-      -90deg,
-      transparent,
-      #ffffff71,
-      transparent,
-      #ffffff71,
-      transparent
-    ); */
-    /* background: linear-gradient(
-      -90deg,
-      transparent,
-      #ffffff,
-      #ffffff71,
-      #ffffff,
-      #ffffff71,
-      #ffffff,
-      transparent
-    ); */
     position: absolute;
     top: 0;
     right: 0;
@@ -511,7 +487,6 @@ const worksPagination = {
     transform: translateX(300px) skew(-32deg);
     opacity: 0;
     animation: shineCard 2.5s linear infinite;
-    /* animation: shineCard 2s linear infinite; */
   }
   @keyframes shineCard {
     0% {
@@ -537,12 +512,6 @@ const worksPagination = {
     background-color: transparent;
     box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
   }
-  /* @media (prefers-color-scheme: light) {
-    html.light .worksCard__menu_item:is(:hover, :focus-visible) {
-      color: rebeccapurple;
-      color: red;
-    }
-  } */
   @media (prefers-color-scheme: dark) {
     html.dark .worksCard__menu_item:is(:hover, :focus-visible) {
       color: #f1f5f9;
@@ -566,13 +535,9 @@ const worksPagination = {
   .worksCard__link {
     display: block;
     font-size: 0.875rem;
-    /* border-bottom: 1px solid white;
-    box-shadow: 0 6px 10px rgba(0 0 0 / 0.6);
-    border-radius: 0.5rem; */
     text-decoration: none;
     text-align: center;
     margin-block-start: auto;
-    /* margin-inline: 1rem; */
     padding-inline: 0.5rem;
     transition: all 0.4s ease;
   }
@@ -583,7 +548,7 @@ const worksPagination = {
     box-shadow: 0 6px 10px rgba(0 0 0 / 0.6);
     border-radius: 0.5rem;
     /* transform: scale(1.1); */
-    margin-inline: 1.5rem;
+    margin-inline: 0.5rem;
   }
   @media (prefers-color-scheme: dark) {
     html.dark .worksCard__link:is(:hover, :focus-visible) {
@@ -595,7 +560,6 @@ const worksPagination = {
     width: 100%;
     height: 100%;
     box-shadow: 0 6px 10px rgba(0 0 0 / 0.6);
-    /* align-self: center; */
     object-fit: contain;
     overflow: hidden;
     transition: all 0.3s ease-in;
@@ -607,11 +571,15 @@ const worksPagination = {
     filter: brightness(125%) saturate(125%);
   }
   .worksCard__body {
-    /* align-self: center; */
     flex-shrink: 0;
     font-size: 0.75rem;
     text-align: center;
     margin-block-start: auto;
     padding-inline: 0.75rem;
+  }
+  @media (max-width: 768px) {
+    .worksCard__menu_item {
+      background-color: transparent;
+    }
   }
 </style>
