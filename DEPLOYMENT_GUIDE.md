@@ -1114,13 +1114,60 @@ WordPressのコンテンツ更新時に自動的にNetlifyをトリガーする�
    - ブランチ: main
    - URLをコピー（例: `https://api.netlify.com/build_hooks/xxx`）
 
-2. **WordPressにプラグインをインストール**
+2. **WordPressにWebhook機能を追加**
 
-   - 「WP Webhooks」プラグインをインストール
-   - Webhookを設定してNetlifyのBuild Hook URLを指定
+   プラグイン不要で実装できます。以下の方法から選択してください：
+
+   **方法A: Code Snippetsプラグインを使用（推奨・初心者向け）**
+
+   1. 「Code Snippets」プラグインをインストール・有効化
+   2. 「Snippets」→「Add New」
+   3. タイトル: "Netlify Build Hook"
+   4. 以下のコードを貼り付け:
+
+   ```php
+   // 投稿が公開・更新されたときにNetlify Build Hookをトリガー
+   add_action('save_post', 'trigger_netlify_build', 10, 3);
+
+   function trigger_netlify_build($post_id, $post, $update) {
+       // 自動保存やリビジョンは除外
+       if (wp_is_post_autosave($post_id) || wp_is_post_revision($post_id)) {
+           return;
+       }
+
+       // 公開済み投稿のみ
+       if ($post->post_status !== 'publish') {
+           return;
+       }
+
+       // Netlify Build Hook URL（ステップ1でコピーしたURLに置き換える）
+       $build_hook_url = 'https://api.netlify.com/build_hooks/YOUR_HOOK_ID';
+
+       // POSTリクエストを送信
+       wp_remote_post($build_hook_url, array(
+           'method' => 'POST',
+           'timeout' => 5,
+           'blocking' => false // 非同期で実行
+       ));
+   }
+   ```
+
+   5. `YOUR_HOOK_ID`をステップ1でコピーした実際のBuild Hook URLに置き換え
+   6. 「Run snippet everywhere」を選択
+   7. 「Save Changes and Activate」をクリック
+
+   **方法B: テーマのfunctions.phpに追加（上級者向け）**
+
+   1. 外観 → テーマファイルエディター
+   2. functions.php を開く
+   3. 上記のコードを最後に追加
+   4. ファイルを更新
+
+   ⚠️ **注意**: 子テーマを使用していない場合、テーマ更新時にコードが消えるため、方法Aを推奨
 
 3. **投稿保存時に自動トリガー**
    - 投稿を公開/更新すると自動的にフロントエンドが再ビルドされる
+   - 初回は投稿を更新してNetlifyのDeploy履歴で動作確認
 
 ---
 
