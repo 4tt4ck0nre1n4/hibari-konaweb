@@ -103,10 +103,13 @@ const mouseItem = {
   </div>
 </div>
 
-<canvas id="canvas" class="confetti__wrapper" width="210" height="100"></canvas>
+<canvas id="canvas" class="confetti__wrapper"></canvas>
 
 <style>
   .swiper__wrapper {
+    width: 100%;
+    max-width: 320px;
+    margin-inline: auto;
     background: transparent;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     border-radius: 1rem;
@@ -274,6 +277,7 @@ const mouseItem = {
   }
   .confetti__wrapper {
     width: 100%;
+    max-width: 320px;
     height: 130px;
     background: transparent;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
@@ -292,8 +296,12 @@ const mouseItem = {
 
   /* スマホサイズでのレスポンシブ対応 */
   @media screen and (max-width: 768px) {
+    .swiper__wrapper,
     .confetti__wrapper {
       width: 100%;
+      max-width: 100%;
+    }
+    .confetti__wrapper {
       margin-block-start: 0;
     }
     .swiper__wrapper {
@@ -335,6 +343,8 @@ const mouseItem = {
   @media screen and (max-width: 480px) {
     .swiper__wrapper,
     .confetti__wrapper {
+      width: 100%;
+      max-width: 100%;
       height: 150px;
     }
 

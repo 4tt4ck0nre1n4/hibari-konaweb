@@ -1,16 +1,17 @@
 ---
 import { Image } from "astro:assets";
-import FvImage from "../assets/responsive__my-portfolio-site.webp";
+import fvImage from "../assets/responsive__my-portfolio-site.webp";
 ---
+
 <div class="responsive-fv">
   <div class="responsive-fv__wrapper">
     <div class="responsive-fv__inner">
       <Image
         class="responsive-fv__image"
-        src={FvImage}
+        src={fvImage}
         alt="ファーストビュー画像"
-        width="495"
-        height="623"
+        width={495}
+        height={623}
         loading="eager"
         decoding="async"
       />
