@@ -24,7 +24,10 @@ import sodenoura2 from "../assets/svg/sodenoura2.svg";
 import gaura2 from "../assets/svg/gauraStudio2.svg";
 import pikucha2 from "../assets/svg/pikucha2.svg";
 import contactCat from "../assets/svg/contact_cat.svg";
-import backgroundImage from "../assets/background.webp";
+import backgroundImageSrc from "../assets/background.webp";
+import { getImage } from "astro:assets";
+
+const backgroundImage = await getImage({ src: backgroundImageSrc });
 const portfolioRiv = "/riv/my-portfolio.riv";
 const welcomeRiv = "/riv/working-office.riv";
 const webDesignerRiv = "/riv/designer-life.riv";
@@ -46,7 +49,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
       <div class="breadcrumbs__wrapper breadcrumbs__wrapper_top">
         <Breadcrumbs crumbs={[]} />
       </div>
-      <div id="main-container">
+      <div id="main-container" style={`background-image: url(${backgroundImage.src})`}>
         <ResponsiveFv />
         <aside class="toolbar">
           <Aside />
@@ -242,7 +245,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
   <script src="../scripts/confetti.ts"></script>
 </Layout>
 
-<style is:global define:vars={{ backgroundImage: backgroundImage.src }}>
+<style is:global>
   /* ResponsiveFvコンポーネントの表示制御 */
   .responsive-fv {
     display: none;
@@ -252,7 +255,6 @@ const webDesignerRiv = "/riv/designer-life.riv";
     display: grid;
     grid-template-columns: 24% 50% 24%;
     gap: 1%;
-    background-image: url(var(--backgroundImage));
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

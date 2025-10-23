@@ -7,7 +7,10 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import globalText from "../../data/globalText.json";
 import contactText from "../../data/contactText.json";
-import backgroundImage2 from "../../assets/background2.webp";
+import backgroundImage2Src from "../../assets/background2.webp";
+import { getImage } from "astro:assets";
+
+const backgroundImage2 = await getImage({ src: backgroundImage2Src });
 interface Props {
   pageTitle: string;
 }
@@ -44,7 +47,7 @@ export const prerender = true;
       <div class="breadcrumbs__wrapper">
         <Breadcrumbs {crumbs} />
       </div>
-      <div class="contact">
+      <div class="contact" style={`background-image: url(${backgroundImage2.src})`}>
         <div class="contact__wrapper">
           <h1 class="contact__title">
             {pageTitle}
@@ -63,12 +66,11 @@ export const prerender = true;
   </div>
 </Layout>
 
-<style is:global is:global define:vars={{ backgroundImage2: backgroundImage2.src }}>
+<style is:global>
   .contact {
     width: 100%;
     min-height: 100vh;
     color: #020202;
-    background-image: url(var(--backgroundImage2));
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
