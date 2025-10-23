@@ -5,6 +5,7 @@ import Footer from "../components/Footer.astro";
 import Logo from "../components/Logo.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import Aside from "../components/Aside.astro";
+import ResponsiveFv from "../components/ResponsiveFv.astro";
 import GridRive from "../components/GridRive.astro";
 import GridSvg from "../components/GridSvg.astro";
 import gridText from "../data/gridText.json";
@@ -23,6 +24,7 @@ import sodenoura2 from "../assets/svg/sodenoura2.svg";
 import gaura2 from "../assets/svg/gauraStudio2.svg";
 import pikucha2 from "../assets/svg/pikucha2.svg";
 import contactCat from "../assets/svg/contact_cat.svg";
+import backgroundImage from "../assets/background.webp";
 const portfolioRiv = "/riv/my-portfolio.riv";
 const welcomeRiv = "/riv/working-office.riv";
 const webDesignerRiv = "/riv/designer-life.riv";
@@ -45,6 +47,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
         <Breadcrumbs crumbs={[]} />
       </div>
       <div id="main-container">
+        <ResponsiveFv />
         <aside class="toolbar">
           <Aside />
         </aside>
@@ -229,9 +232,6 @@ const webDesignerRiv = "/riv/designer-life.riv";
           <SwiperMenu />
         </div>
       </div>
-      <!-- <div class="particles-container">
-        <ParticlesComponent client:only="react" />
-      </div> -->
 
       <div class="swiper-display-container">
         <SwiperDisplay />
@@ -242,12 +242,17 @@ const webDesignerRiv = "/riv/designer-life.riv";
   <script src="../scripts/confetti.ts"></script>
 </Layout>
 
-<style is:global>
+<style is:global define:vars={{ backgroundImage: backgroundImage.src }}>
+  /* ResponsiveFvコンポーネントの表示制御 */
+  .responsive-fv {
+    display: none;
+  }
+
   #main-container {
     display: grid;
     grid-template-columns: 24% 50% 24%;
     gap: 1%;
-    background-image: url(/assets/background1.png);
+    background-image: url(var(--backgroundImage));
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -257,6 +262,12 @@ const webDesignerRiv = "/riv/designer-life.riv";
 
   /* スマホサイズでのレスポンシブ対応 */
   @media screen and (max-width: 768px) {
+    .responsive-fv {
+      display: block;
+      order: 1;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
     #main-container {
       display: flex;
       flex-direction: column;
