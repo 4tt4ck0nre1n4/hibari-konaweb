@@ -3,43 +3,25 @@ import JSConfetti from "js-confetti";
 const confetti: HTMLElement | null = document.getElementById("confettiButton");
 const canvasElement = document.getElementById("canvas");
 
-  if (canvasElement instanceof HTMLCanvasElement) {
-    // デバイス検出とキャンバスサイズの設定
-    const screenWidth = window.innerWidth;
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isAndroid = /Android/.test(navigator.userAgent);
+if (canvasElement instanceof HTMLCanvasElement) {
+  // デバイス検出とキャンバスサイズの設定
+  const screenWidth = window.innerWidth;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid = /Android/.test(navigator.userAgent);
 
-    // 高DPI対応のためのスケールファクター
-    const devicePixelRatio = window.devicePixelRatio ?? 1;
+  // 高DPI対応のためのスケールファクター
+  const devicePixelRatio = window.devicePixelRatio ?? 1;
 
-  if (screenWidth <= 480) {
-    // スマホサイズ: デバイスに応じたキャンバスサイズ
-    if (isIOS) {
-      canvasElement.width = 320;
-      canvasElement.height = 200;
-    } else if (isAndroid) {
-      canvasElement.width = 300;
-      canvasElement.height = 190;
-    } else {
-      canvasElement.width = 280;
-      canvasElement.height = 180;
-    }
-  } else if (screenWidth <= 768) {
-    // タブレットサイズ
-    canvasElement.width = 350;
-    canvasElement.height = 220;
-  } else {
-    // デスクトップサイズ
-    canvasElement.width = 400;
-    canvasElement.height = 250;
-  }
-
-  // 高DPI対応: キャンバスの実際のサイズを設定
+  // CSSで設定された実際のサイズを取得
   const rect = canvasElement.getBoundingClientRect();
+
+  // canvasの内部解像度をCSSサイズに合わせる
+  canvasElement.width = rect.width * devicePixelRatio;
+  canvasElement.height = rect.height * devicePixelRatio;
+
+  // CSSサイズを明示的に設定
   canvasElement.style.width = `${rect.width}px`;
   canvasElement.style.height = `${rect.height}px`;
-  canvasElement.width = canvasElement.width * devicePixelRatio;
-  canvasElement.height = canvasElement.height * devicePixelRatio;
 
   const jsConfetti = new JSConfetti({ canvas: canvasElement });
   const context = canvasElement.getContext("2d");
@@ -68,10 +50,10 @@ const canvasElement = document.getElementById("canvas");
       } else if (screenWidth <= 768) {
         // タブレットサイズ
         fontSize = 48;
-        } else {
-          // デスクトップサイズ
-          fontSize = 20;
-        }
+      } else {
+        // デスクトップサイズ
+        fontSize = 20;
+      }
 
       // より安全なフォント設定
       context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
@@ -121,42 +103,23 @@ const canvasElement = document.getElementById("canvas");
 
     // ウィンドウリサイズ時にキャンバスサイズとテキストサイズを再調整
     window.addEventListener("resize", () => {
-      const newScreenWidth = window.innerWidth;
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      const isAndroid = /Android/.test(navigator.userAgent);
-
-      if (newScreenWidth <= 480) {
-        // スマホサイズ: デバイスに応じたキャンバスサイズ
-        if (isIOS) {
-          canvasElement.width = 320;
-          canvasElement.height = 200;
-        } else if (isAndroid) {
-          canvasElement.width = 300;
-          canvasElement.height = 190;
-        } else {
-          canvasElement.width = 280;
-          canvasElement.height = 180;
-        }
-      } else if (newScreenWidth <= 768) {
-        // タブレットサイズ
-        canvasElement.width = 350;
-        canvasElement.height = 220;
-      } else {
-        // デスクトップサイズ
-        canvasElement.width = 400;
-        canvasElement.height = 250;
-      }
-
-      // 高DPI対応: リサイズ時も適用
       const newDevicePixelRatio = window.devicePixelRatio ?? 1;
+
+      // CSSで設定された実際のサイズを取得
       const rect = canvasElement.getBoundingClientRect();
+
+      // canvasの内部解像度をCSSサイズに合わせる
+      canvasElement.width = rect.width * newDevicePixelRatio;
+      canvasElement.height = rect.height * newDevicePixelRatio;
+
+      // CSSサイズを明示的に設定
       canvasElement.style.width = `${rect.width}px`;
       canvasElement.style.height = `${rect.height}px`;
-      canvasElement.width = canvasElement.width * newDevicePixelRatio;
-      canvasElement.height = canvasElement.height * newDevicePixelRatio;
 
       // コンテキストを再スケール
-      context.scale(newDevicePixelRatio, newDevicePixelRatio);
+      if (context) {
+        context.scale(newDevicePixelRatio, newDevicePixelRatio);
+      }
 
       drawText();
     });
