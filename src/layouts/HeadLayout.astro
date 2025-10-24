@@ -65,5 +65,31 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
       )
     }
     <!-- <link rel="preload" href="/wasm/rive.wasm" as="fetch" type="application/wasm" crossorigin="anonymous" /> -->
+
+    <!-- CSSの遅延読み込み用スクリプト -->
+    <script is:inline>
+      // 遅延読み込み対象のCSSを非同期で読み込む
+      (function () {
+        const loadDeferredStyles = () => {
+          const addStylesNode = document.getElementById("deferred-styles");
+          if (addStylesNode) {
+            const replacement = document.createElement("div");
+            replacement.innerHTML = addStylesNode.textContent;
+            document.body.appendChild(replacement);
+            addStylesNode.parentElement.removeChild(addStylesNode);
+          }
+        };
+        const raf =
+          window.requestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.webkitRequestAnimationFrame ||
+          window.msRequestAnimationFrame;
+        if (raf)
+          raf(() => {
+            window.setTimeout(loadDeferredStyles, 0);
+          });
+        else window.addEventListener("load", loadDeferredStyles);
+      })();
+    </script>
   </head>
 </html>

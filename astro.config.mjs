@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
 import react from "@astrojs/react";
 import node from "@astrojs/node";
@@ -13,6 +13,7 @@ export default defineConfig({
   site: "https://hibari-konaweb.netlify.app",
   build: {
     format: "file",
+    inlineStylesheets: "auto", // 自動的に小さなCSSをインライン化
   },
   integrations: [
     react(),
@@ -20,12 +21,12 @@ export default defineConfig({
     sitemap({
       i18n: {
         defaultLocale: "ja",
-        xslURL: "/sitemap.xsl"
+        xslURL: "/sitemap.xsl",
       },
     }),
     icon({
       include: {
-        "devicon": [
+        devicon: [
           "twitter",
           "github",
           "notion",
@@ -42,24 +43,12 @@ export default defineConfig({
           "vitejs",
           "astro",
           "vscode",
-          "vercel"
+          "vercel",
         ],
-        "logos": [
-          "wordpress-icon",
-          "greensock-icon",
-          "netlify-icon",
-          "gulp"
-        ],
-        "fa6-solid": [
-          "cat",
-          "envelope"
-        ],
-        "fa6-brands": [
-          "instagram"
-        ],
-        "ic": [
-          "baseline-contact-mail"
-        ],
+        logos: ["wordpress-icon", "greensock-icon", "netlify-icon", "gulp"],
+        "fa6-solid": ["cat", "envelope"],
+        "fa6-brands": ["instagram"],
+        ic: ["baseline-contact-mail"],
         "fluent-emoji": [
           "red-heart",
           "mobile-phone",
@@ -77,37 +66,15 @@ export default defineConfig({
           "woman-technologist-medium-light",
           "man-technologist-medium-light",
         ],
-        "fluent-emoji-high-contrast": [
-          "party-popper",
-          "mobile-phone",
-          "mobile-phone-with-arrow",
-        ],
-        "emojione-v1": [
-          "alarm-clock",
-          "bookmark"
-        ],
-        "bi": [
-          "alarm-fill",
-          "github"
-        ],
-        "octicon": [
-          "play-24"
-        ],
-        "carbon": [
-          "pause-outline"
-        ],
-        "ion": [
-          "play-back-circle-outline"
-        ],
-        "solar": [
-          "restart-circle-outline"
-        ],
-        "flat-color-icons": [
-          "home"
-        ],
-        "vscode-icons": [
-          "file-type-cursorrules"
-        ],
+        "fluent-emoji-high-contrast": ["party-popper", "mobile-phone", "mobile-phone-with-arrow"],
+        "emojione-v1": ["alarm-clock", "bookmark"],
+        bi: ["alarm-fill", "github"],
+        octicon: ["play-24"],
+        carbon: ["pause-outline"],
+        ion: ["play-back-circle-outline"],
+        solar: ["restart-circle-outline"],
+        "flat-color-icons": ["home"],
+        "vscode-icons": ["file-type-cursorrules"],
       },
       iconDir: "src/assets/icons",
 
@@ -127,9 +94,7 @@ export default defineConfig({
     }),
   ],
   image: {
-    domains: [
-      "astro.build",
-    ],
+    domains: ["astro.build"],
   },
   base: "/",
   trailingSlash: "ignore",
@@ -151,6 +116,8 @@ export default defineConfig({
       },
       sourcemap: false,
       minify: false,
+      cssCodeSplit: true, // CSSコード分割を有効化
+      cssMinify: true, // CSSの最小化を有効化
     },
     css: {
       preprocessorOptions: {
@@ -159,8 +126,6 @@ export default defineConfig({
         },
       },
     },
-    assetsInclude: [
-      "**/*.wasm"
-    ],
+    assetsInclude: ["**/*.wasm"],
   },
 });
