@@ -50,7 +50,7 @@ document.documentElement.style.overflow = "";
 
 ```css
 :where(html) {
-  scrollbar-gutter: stable both-edges; /* スクロールバーのスペースを常に確保してCLSを防止 */
+  scrollbar-gutter: stable; /* スクロールバーのスペースを常に確保してCLSを防止 */
 }
 ```
 
