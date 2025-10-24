@@ -59,6 +59,23 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     <meta name="twitter:description" content={twitterDescription} />
     <meta name="twitter:site" content={globalText.twitter.site} />
     <meta name="twitter:image" content={globalText.twitter.image} />
+
+    <!-- フォントのプリロードでCLSを削減 -->
+    <link
+      rel="preload"
+      href="/node_modules/@fontsource/poppins/files/poppins-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/node_modules/@fontsource/poppins/files/poppins-latin-700-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
     {
       typeof jsonLd === "string" && jsonLd.trim() !== "" && (
         <script is:inline type="application/ld+json" set:html={jsonLd} />
