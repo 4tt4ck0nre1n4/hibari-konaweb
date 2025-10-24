@@ -18,11 +18,10 @@
 :where(html) {
   block-size: 100%;
   text-size-adjust: none;
-  text-size-adjust: none;
-  text-size-adjust: none;
+  -webkit-text-size-adjust: none;
   color-scheme: dark light;
   tab-size: 2;
-  scrollbar-gutter: stable;
+  scrollbar-gutter: stable both-edges; /* スクロールバーのスペースを常に確保してCLSを防止 */
 }
 
 :where(html:has(dialog:modal[open])) {
@@ -86,14 +85,11 @@
   word-spacing: inherit;
   text-transform: inherit;
   appearance: none;
-  appearance: none;
-  appearance: none;
 }
 
 :where(button, button[type], input[type="button"], input[type="submit"], input[type="reset"]) {
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  user-select: none;
   user-select: none;
   text-align: center;
 }
@@ -128,12 +124,10 @@ button:-moz-focusring,
 }
 
 :where(input[type="checkbox"]) {
-  appearance: checkbox;
   appearance: auto;
 }
 
 :where(input[type="radio"]) {
-  appearance: radio;
   appearance: auto;
 }
 
