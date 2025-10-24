@@ -10,23 +10,6 @@
   ); */
 }
 
-/* フォントのfont-displayを設定してCLSを削減 */
-@font-face {
-  font-family: Poppins;
-  font-style: normal;
-  font-display: swap; /* フォント読み込み中もテキストを表示してCLSを防止 */
-  font-weight: 400;
-  src: local(poppins);
-}
-
-@font-face {
-  font-family: Poppins;
-  font-style: normal;
-  font-display: swap;
-  font-weight: 700;
-  src: local(poppins);
-}
-
 * {
   /* margin: 0;
   padding: 0;

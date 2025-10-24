@@ -59,44 +59,22 @@ document.documentElement.style.overflow = "";
 - スクロールバーの表示時にコンテンツが横にずれることを防止
 - レイアウトの安定性向上
 
-### 3. フォント読み込みの最適化（font-display: swap）
+### 3. フォント読み込みの最適化（@fontsource使用）
 
 **問題**: Poppinsフォントの読み込み中にテキストの再レンダリングが発生し、レイアウトシフトの原因に。
 
-**解決策**: `font-display: swap`を設定して、フォント読み込み中もフォールバックフォントでテキストを表示。
+**解決策**: `@fontsource`パッケージを使用。デフォルトで`font-display: swap`が設定されており、フォント読み込み中もフォールバックフォントでテキストを表示。
 
-**ファイル**: `src/styles/global.css`
-
-```css
-@font-face {
-  font-family: "Poppins";
-  font-style: normal;
-  font-display: swap; /* フォント読み込み中もテキストを表示してCLSを防止 */
-  font-weight: 400;
-  src: local("Poppins");
-}
-
-@font-face {
-  font-family: "Poppins";
-  font-style: normal;
-  font-display: swap;
-  font-weight: 700;
-  src: local("Poppins");
-}
-```
-
-**ファイル**: `src/layouts/HeadLayout.astro`
+**ファイル**: `src/layouts/Layout.astro`
 
 ```astro
-<!-- フォントのプリロードでCLSを削減 -->
-<link
-  rel="preload"
-  href="/node_modules/@fontsource/poppins/files/poppins-latin-400-normal.woff2"
-  as="font"
-  type="font/woff2"
-  crossorigin="anonymous"
-/>
+---
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/700.css";
+---
 ```
+
+**注意**: `@fontsource`は自動的にフォントを最適化してバンドルするため、手動での`@font-face`定義やプリロードは不要（むしろ404エラーの原因となる）。
 
 **効果**:
 
