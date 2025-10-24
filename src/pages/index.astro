@@ -42,6 +42,9 @@ const webDesignerRiv = "/riv/designer-life.riv";
   twitterTitle={globalText.top.title}
   twitterDescription={globalText.top.description}
 >
+  <!-- LCP背景画像のプリロード（PageSpeed Insights最適化） -->
+  <link slot="head" rel="preload" href={backgroundImage.src} as="image" fetchpriority="high" />
+
   <div id="outer-container">
     <Header />
     <main id="page-wrap">
