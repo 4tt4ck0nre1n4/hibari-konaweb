@@ -83,6 +83,9 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     }
     <!-- <link rel="preload" href="/wasm/rive.wasm" as="fetch" type="application/wasm" crossorigin="anonymous" /> -->
 
+    <!-- ページ固有の追加head要素（LCP最適化など） -->
+    <slot name="head" />
+
     <!-- CSSの遅延読み込み用スクリプト -->
     <script is:inline>
       // 遅延読み込み対象のCSSを非同期で読み込む

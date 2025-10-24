@@ -28,7 +28,9 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     twitterTitle={twitterTitle}
     twitterDescription={twitterDescription}
     jsonLd={jsonLd}
-  />
+  >
+    <slot name="head" slot="head" />
+  </HeadLayout>
   <body>
     <div id="overlay-root"></div>
     <slot />
