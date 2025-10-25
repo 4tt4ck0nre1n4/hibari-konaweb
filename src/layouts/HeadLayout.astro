@@ -148,17 +148,6 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.8/700.css" />
     </noscript>
 
-    <!-- Swiper CSSの遅延読み込み（レンダリングブロッキング回避） -->
-    <link
-      rel="preload"
-      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    </noscript>
-
     <!-- ページ固有の追加head要素（LCP最適化など） -->
     <slot name="head" />
 

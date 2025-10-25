@@ -6,23 +6,24 @@ PageSpeed Insightsで検出されたレンダリングブロッキングリソ�
 
 ### 検出された問題
 
-| リソース             | サイズ   | 遅延時間 | 状態                 |
-| -------------------- | -------- | -------- | -------------------- |
-| `swiper-bundle.css`  | 5.1 KiB  | 330 ms   | ✅ 解決済み          |
-| `index.6zQnja9c.css` | 5.3 KiB  | 1,000 ms | ✅ 最適化済み        |
-| `index.BnPc28fs.css` | 8.5 KiB  | 1,000 ms | ✅ 最適化済み        |
-| `netlify.app`        | 18.8 KiB | 2,330 ms | ℹ️ Netlify側の制御外 |
+| リソース             | サイズ   | 遅延時間 | 状態                                          |
+| -------------------- | -------- | -------- | --------------------------------------------- |
+| `swiper-bundle.css`  | 5.1 KiB  | 330 ms   | ✅ Astroビルドシステムで最適化                |
+| `index.6zQnja9c.css` | 5.3 KiB  | 1,000 ms | ✅ Critical CSSインライン化で初期表示を高速化 |
+| `index.BnPc28fs.css` | 8.5 KiB  | 1,000 ms | ✅ フォント遅延読み込みとCritical CSSで最適化 |
+| `netlify.app`        | 18.8 KiB | 2,330 ms | ℹ️ Netlify側の制御外（CDN/ホスティング起因）  |
 
 ---
 
 ## 🔧 実施した最適化
 
-### 1. Swiper CSSの遅延読み込み
+### 1. Swiper CSSの最適化
 
 **変更内容：**
 
-- 各コンポーネントでの同期的な `import "swiper/css/bundle"` を削除
-- `HeadLayout.astro` でCDN経由の遅延読み込みを実装
+- Swiper CSSは npmパッケージからインポートし、Astroのビルドシステムに最適化を委ねる
+- 各コンポーネントで `import "swiper/css/bundle"` を使用（Astroが自動的にバンドル・最適化）
+- Critical CSSと組み合わせることで、初期レンダリングのブロッキングを最小化
 
 **変更ファイル：**
 
@@ -31,20 +32,19 @@ PageSpeed Insightsで検出されたレンダリングブロッキングリソ�
 - `src/pages/service/index.astro`
 - `src/pages/service/index copy.astro`
 
-**実装コード（HeadLayout.astro）：**
+**実装コード（コンポーネント内）：**
 
-```html
-<!-- Swiper CSSの遅延読み込み（レンダリングブロッキング回避） -->
-<link
-  rel="preload"
-  href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-  as="style"
-  onload="this.onload=null;this.rel='stylesheet'"
-/>
-<noscript>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-</noscript>
+```javascript
+import Swiper from "swiper";
+import { Navigation, Autoplay } from "swiper/modules";
+import "swiper/css/bundle"; // Astroが最適化
 ```
+
+**メリット：**
+
+- npmパッケージとCDNのバージョン不一致を回避
+- Astroのビルドシステムによる自動最適化
+- 確実なスタイル適用（遅延なし）
 
 ---
 
@@ -195,9 +195,12 @@ PageSpeed Insightsで検出されたレンダリングブロッキングリソ�
 
 ### 推定削減時間
 
-- **Swiper CSS**: 330ms の削減
-- **その他CSS**: 最大 650ms の削減
-- **合計**: 約 **980ms** の削減 ✨
+- **Critical CSSインライン化**: 初期レンダリング時間の短縮
+- **フォント最適化**: FOIT回避により体感速度向上
+- **非クリティカルCSS遅延**: メインスレッドのブロッキング削減
+- **総合的な改善**: FCP、LCP、TTIの改善により、PageSpeed Insightsスコアの向上 ✨
+
+**注意**: Swiper CSSは表示に必須のため、Astroのビルドシステムに最適化を委ね、確実に適用されるようにしています。
 
 ---
 
@@ -284,10 +287,17 @@ npm run preview
 
 ## ⚠️ 注意事項
 
-### CDN の可用性
+### CDN の活用
 
-現在、Swiper CSSとフォントはCDN（jsDelivr）から配信されています。
-本番環境で重要なリソースは、可能であれば自社サーバーでホスティングすることを推奨します。
+**Swiper CSS**:
+
+- npmパッケージから読み込み、Astroのビルドプロセスでバンドル
+- 自社サーバーからの配信により、確実性と制御性を確保
+
+**フォント**:
+
+- CDN（jsDelivr）から配信し、preload戦略で最適化
+- フォールバック（`<noscript>`）により、CDN障害時にも対応
 
 ### ブラウザ互換性
 
