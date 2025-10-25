@@ -98,7 +98,6 @@ const mouseItem = {
       title={mouseItem.ariaTitle}
     >
       <Image id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" />
-      <!-- <img id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" style="display: none;" /> -->
     </button>
   </div>
 </div>
@@ -113,7 +112,7 @@ const mouseItem = {
     background: transparent;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     border-radius: 1rem;
-    padding-block: 0.5rem;
+    padding-block-start: 1rem;
     transition: box-shadow 0.4s ease;
   }
   .swiper__wrapper:is(:hover, :focus-visible) {
@@ -125,7 +124,7 @@ const mouseItem = {
   #swiper1.swiper {
     width: 100%;
     max-width: 320px;
-    height: 240px;
+    height: 220px;
     overflow: hidden;
     border-radius: 1rem;
     background-image: url("/assets/pc.svg");
@@ -193,9 +192,6 @@ const mouseItem = {
     }
   }
 
-  .swiper-wrapper {
-  }
-
   #swiper1 .swiper-slide {
     width: 100%;
     height: 100%;
@@ -225,18 +221,16 @@ const mouseItem = {
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
-    padding-inline-end: 1.5rem;
+    padding-inline-end: 2rem;
   }
 
   #js-mouseButton {
     width: 120px;
-    height: 90px;
     background: transparent;
     border: transparent 1px solid;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     border-radius: 1rem;
-    margin-block-start: 0.5rem;
-    padding: 0.5rem;
+    margin-block-start: 1rem;
     transition:
       transform 0.1s ease,
       box-shadow 0.4s ease;
@@ -244,6 +238,7 @@ const mouseItem = {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    aspect-ratio: 5 / 4;
   }
   html.dark #js-mouseButton:is(:hover, :focus-visible) {
     box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
@@ -254,14 +249,9 @@ const mouseItem = {
   #js-mouseButton:active {
     box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
   }
-  /* @media (prefers-color-scheme: dark) {
-    html.dark #js-mouseButton {
-      background: #f1f5f9;
-    }
-  } */
   #js-mouse {
     width: 100px;
-    height: 70px;
+    height: 80px;
     object-fit: contain;
     transform: rotate(0deg) translateX(0px);
     transition:
@@ -278,8 +268,7 @@ const mouseItem = {
   .confetti__wrapper {
     width: 100%;
     max-width: 320px;
-    height: 100%;
-    min-height: 130px;
+    height: calc(96px + 2rem - 40px);
     background: transparent;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     border-radius: 1rem;
@@ -297,16 +286,18 @@ const mouseItem = {
 
   /* スマホサイズでのレスポンシブ対応 */
   @media screen and (max-width: 768px) {
-    .swiper__wrapper,
-    .confetti__wrapper {
+    .swiper__wrapper {
       width: 100%;
       max-width: 100%;
     }
     .confetti__wrapper {
-      margin-block-start: 0;
-    }
-    .swiper__wrapper {
-      height: 200px;
+      width: 100%;
+      max-width: 100%;
+      height: calc(80px + 0.5rem);
+      margin-block-start: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #swiper1.swiper {
@@ -322,8 +313,6 @@ const mouseItem = {
 
     #js-mouseButton {
       width: 100px;
-      height: 75px;
-      padding: 0.5rem;
     }
 
     #js-mouse {
@@ -332,24 +321,19 @@ const mouseItem = {
       display: block !important;
       visibility: visible !important;
     }
-
-    .confetti__wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
   }
 
   /* 480px以下での超小型スマホ最適化 */
   @media screen and (max-width: 480px) {
-    .swiper__wrapper,
+    .swiper__wrapper {
+      width: 100%;
+      max-width: 100%;
+    }
     .confetti__wrapper {
       width: 100%;
       max-width: 100%;
-      height: 150px;
-    }
-
-    .swiper__wrapper {
+      height: calc(64px + 0.5rem);
+      margin-block-start: 0.35rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -395,8 +379,6 @@ const mouseItem = {
 
     #js-mouseButton {
       width: 80px;
-      height: 60px;
-      padding: 0.25rem;
     }
 
     #js-mouse {

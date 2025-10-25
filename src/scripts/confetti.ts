@@ -4,11 +4,6 @@ const confetti: HTMLElement | null = document.getElementById("confettiButton");
 const canvasElement = document.getElementById("canvas");
 
 if (canvasElement instanceof HTMLCanvasElement) {
-  // デバイス検出とキャンバスサイズの設定
-  const screenWidth = window.innerWidth;
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isAndroid = /Android/.test(navigator.userAgent);
-
   // 高DPI対応のためのスケールファクター
   const devicePixelRatio = window.devicePixelRatio ?? 1;
 
@@ -19,9 +14,7 @@ if (canvasElement instanceof HTMLCanvasElement) {
   canvasElement.width = rect.width * devicePixelRatio;
   canvasElement.height = rect.height * devicePixelRatio;
 
-  // CSSサイズを明示的に設定
-  canvasElement.style.width = `${rect.width}px`;
-  canvasElement.style.height = `${rect.height}px`;
+  // CSSサイズはCSSに任せる（style.widthとstyle.heightは設定しない）
 
   const jsConfetti = new JSConfetti({ canvas: canvasElement });
   const context = canvasElement.getContext("2d");
@@ -112,14 +105,7 @@ if (canvasElement instanceof HTMLCanvasElement) {
       canvasElement.width = rect.width * newDevicePixelRatio;
       canvasElement.height = rect.height * newDevicePixelRatio;
 
-      // CSSサイズを明示的に設定
-      canvasElement.style.width = `${rect.width}px`;
-      canvasElement.style.height = `${rect.height}px`;
-
-      // コンテキストを再スケール
-      if (context) {
-        context.scale(newDevicePixelRatio, newDevicePixelRatio);
-      }
+      // CSSサイズはCSSに任せる（style.widthとstyle.heightは設定しない）
 
       drawText();
     });
