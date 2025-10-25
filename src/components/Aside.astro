@@ -71,7 +71,7 @@ import ConfettiButton from "./ConfettiButton.astro";
     .clock-search__container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      gap: 0.5rem;
     }
 
     .clock__wrapper,
@@ -82,13 +82,17 @@ import ConfettiButton from "./ConfettiButton.astro";
     .particles__container {
       height: 200px;
     }
+    .particles-tools__container {
+      gap: 0.5rem;
+      margin-block-start: 0;
+    }
   }
 
   /* 480px以下での超小型スマホ最適化 */
   @media screen and (max-width: 480px) {
     .clock-search__container {
       grid-template-columns: 1fr 1fr;
-      gap: 0.5rem;
+      gap: 0.25rem;
     }
 
     .search__wrapper {
@@ -103,6 +107,9 @@ import ConfettiButton from "./ConfettiButton.astro";
     .particles__container {
       height: 80px;
     }
+    .particles-tools__container {
+      gap: 0.35rem;
+    }
   }
   .particles-tools__container {
     display: flex;
@@ -112,14 +119,14 @@ import ConfettiButton from "./ConfettiButton.astro";
   }
   .particles__wrapper {
     width: 100%;
-    height: 60%;
+    height: 100%;
     display: grid;
     align-items: center;
     background: transparent;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     border-radius: 1rem;
     position: relative;
-    padding-block: 1rem;
+    padding-block: 1.5rem;
     padding-inline: 0.5rem;
     transition: box-shadow 0.4s ease;
   }
@@ -135,6 +142,7 @@ import ConfettiButton from "./ConfettiButton.astro";
   }
   .tools__wrapper {
     height: 60%;
+    height: 100%;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
     gap: 1rem;
@@ -142,7 +150,7 @@ import ConfettiButton from "./ConfettiButton.astro";
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     border-radius: 1rem;
     position: relative;
-    padding-block: 1rem;
+    padding-block: 1.5rem;
     padding-inline: 0.5rem;
     transition: box-shadow 0.4s ease;
   }
