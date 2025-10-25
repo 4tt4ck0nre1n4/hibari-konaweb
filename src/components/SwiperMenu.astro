@@ -393,7 +393,7 @@ const mouseItem = {
 <script>
   import Swiper from "swiper";
   import { Navigation, Autoplay } from "swiper/modules";
-  import "swiper/css/bundle";
+  // Swiper CSSは遅延読み込みされるため、ここではインポートしない
 
   const initSwiper1 = () => {
     new Swiper("#swiper1", {
