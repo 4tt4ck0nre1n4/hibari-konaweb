@@ -83,7 +83,7 @@ try {
 <script>
   import Swiper from "swiper";
   import { Navigation, Autoplay } from "swiper/modules";
-  // Swiper CSSは遅延読み込みされるため、ここではインポートしない
+  import "swiper/css/bundle";
 
   const initSwiper = () => {
     new Swiper(".swiper", {
