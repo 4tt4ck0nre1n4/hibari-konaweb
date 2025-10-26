@@ -567,10 +567,13 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
 <script>
   // @ts-nocheck
 
+  // GSAPを動的にインポート（メインスレッド処理の最適化）
+  // トップレベルでインポートを開始
+  const gsapPromise = import("gsap");
+
   // シンプルで確実なカードフリップ機能
   async function initCardFlip() {
-    // GSAPを動的にインポート（メインスレッド処理の最適化）
-    const { gsap } = await import("gsap");
+    const { gsap } = await gsapPromise;
     const cards = document.querySelectorAll(".card__item");
 
     cards.forEach((card) => {

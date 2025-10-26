@@ -366,8 +366,8 @@ const webDesignerRiv = "/riv/designer-life.riv";
     }
   }
   #main-container.is-notImage {
-    background-image: none;
-    background-color: transparent;
+    background-image: none !important;
+    background-color: transparent !important;
   }
   .is-notImage {
     transition: background 2s ease-in-out;
@@ -799,8 +799,11 @@ const webDesignerRiv = "/riv/designer-life.riv";
   }
 
   // GSAPを動的にインポート（メインスレッド処理の最適化）
+  // トップレベルでインポートを開始
+  const gsapPromise = Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
+
   window.addEventListener("load", async () => {
-    const [{ gsap }, { ScrollTrigger }] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
+    const [{ gsap }, { ScrollTrigger }] = await gsapPromise;
 
     gsap.registerPlugin(ScrollTrigger);
     const grid: HTMLElement | null = document.getElementById("js-grid");
@@ -822,9 +825,8 @@ const webDesignerRiv = "/riv/designer-life.riv";
         },
         "-=0.3"
       );
-  });
 
-  document.addEventListener("DOMContentLoaded", () => {
+    // Astro要素のスクロールアニメーション
     const pageContainer: HTMLElement | null = document.getElementById("page-wrap");
     const astroElement: HTMLElement | null = document.querySelector(".astro-a");
 
@@ -840,169 +842,255 @@ const webDesignerRiv = "/riv/designer-life.riv";
         },
       });
     }
-  });
 
-  document.querySelectorAll(".grid__menu_item").forEach((item) => {
-    const tooltipRight = item.querySelector(".item__tooltip_right") as HTMLElement;
-    const tooltipLeft = item.querySelector(".item__tooltip_left") as HTMLElement;
+    // Tooltipのアニメーション
+    document.querySelectorAll(".grid__menu_item").forEach((item) => {
+      const tooltipRight = item.querySelector(".item__tooltip_right") as HTMLElement;
+      const tooltipLeft = item.querySelector(".item__tooltip_left") as HTMLElement;
 
-    item.addEventListener("mouseenter", () => {
-      [tooltipRight, tooltipLeft].forEach((tooltip) => {
-        if (tooltip) {
-          gsap.to(tooltip, {
-            opacity: 1,
-            y: -10,
-            duration: 0.3,
-            ease: "power1.out",
-          });
-        }
+      item.addEventListener("mouseenter", () => {
+        [tooltipRight, tooltipLeft].forEach((tooltip) => {
+          if (tooltip) {
+            gsap.to(tooltip, {
+              opacity: 1,
+              y: -10,
+              duration: 0.3,
+              ease: "power1.out",
+            });
+          }
+        });
+      });
+
+      item.addEventListener("mouseleave", () => {
+        [tooltipRight, tooltipLeft].forEach((tooltip) => {
+          if (tooltip) {
+            gsap.to(tooltip, {
+              opacity: 0,
+              y: 0,
+              duration: 0.3,
+              ease: "power1.in",
+            });
+          }
+        });
       });
     });
 
-    item.addEventListener("mouseleave", () => {
-      [tooltipRight, tooltipLeft].forEach((tooltip) => {
-        if (tooltip) {
-          gsap.to(tooltip, {
-            opacity: 0,
-            y: 0,
-            duration: 0.3,
-            ease: "power1.in",
-          });
+    // 画面サイズとデバイスに応じたアニメーション設定
+    const getAnimationSettings = (): [string, gsap.TweenVars][] => {
+      const screenWidth = window.innerWidth;
+      const isMobile = screenWidth <= 768;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+
+      let item4X: number;
+      let item6X: number;
+
+      if (isMobile) {
+        if (isIOS) {
+          // iPhone: はみ出しを防ぐため少し小さめに調整
+          item4X = 250;
+          item6X = -250;
+        } else if (isAndroid) {
+          // Android: 足りない分を補うため少し大きめに調整
+          item4X = 264;
+          item6X = -264;
+        } else {
+          // その他のデバイス
+          item4X = 254;
+          item6X = -254;
         }
-      });
-    });
-  });
-
-  // 画面サイズとデバイスに応じたアニメーション設定
-  const getAnimationSettings = (): [string, gsap.TweenVars][] => {
-    const screenWidth = window.innerWidth;
-    const isMobile = screenWidth <= 768;
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isAndroid = /Android/.test(navigator.userAgent);
-
-    let item4X: number;
-    let item6X: number;
-
-    if (isMobile) {
-      if (isIOS) {
-        // iPhone: はみ出しを防ぐため少し小さめに調整
-        item4X = 250;
-        item6X = -250;
-      } else if (isAndroid) {
-        // Android: 足りない分を補うため少し大きめに調整
-        item4X = 264;
-        item6X = -264;
       } else {
-        // その他のデバイス
-        item4X = 254;
-        item6X = -254;
+        // デスクトップ
+        item4X = 440;
+        item6X = -440;
       }
-    } else {
-      // デスクトップ
-      item4X = 440;
-      item6X = -440;
-    }
 
-    return [
-      [".item-1", { y: 230, rotation: 720, duration: 1.2 }],
-      [".item-2", { y: 230, rotation: 360, duration: 1.6 }],
-      [".item-3", { y: 230, rotation: 720, duration: 2 }],
-      [".item-4", { x: item4X, rotation: 360, duration: 2.3 }],
-      [".item-5", { x: 0, rotation: 1080, duration: 2.6 }],
-      [".item-6", { x: item6X, rotation: 360, duration: 2.3 }],
-      [".item-7", { y: -230, rotation: 720, duration: 1.4 }],
-      [".item-8", { y: -230, rotation: 360, duration: 1.8 }],
-      [".item-9", { y: -230, rotation: 720, duration: 2.2 }],
-      [".item-10", { y: -230, rotation: 720, duration: 1.4 }],
-      [".item-11", { y: -230, rotation: 360, duration: 1.8 }],
-      [".item-12", { y: -230, rotation: 720, duration: 2.2 }],
-    ];
-  };
+      return [
+        [".item-1", { y: 230, rotation: 720, duration: 1.2 }],
+        [".item-2", { y: 230, rotation: 360, duration: 1.6 }],
+        [".item-3", { y: 230, rotation: 720, duration: 2 }],
+        [".item-4", { x: item4X, rotation: 360, duration: 2.3 }],
+        [".item-5", { x: 0, rotation: 1080, duration: 2.6 }],
+        [".item-6", { x: item6X, rotation: 360, duration: 2.3 }],
+        [".item-7", { y: -230, rotation: 720, duration: 1.4 }],
+        [".item-8", { y: -230, rotation: 360, duration: 1.8 }],
+        [".item-9", { y: -230, rotation: 720, duration: 2.2 }],
+        [".item-10", { y: -230, rotation: 720, duration: 1.4 }],
+        [".item-11", { y: -230, rotation: 360, duration: 1.8 }],
+        [".item-12", { y: -230, rotation: 720, duration: 2.2 }],
+      ];
+    };
 
-  const animationSettings = getAnimationSettings();
+    const animationSettings = getAnimationSettings();
 
-  // アニメーション設定を適用
-  animationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
+    // アニメーション設定を適用
+    animationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
 
-  // ウィンドウリサイズ時にアニメーション設定を再生成
-  window.addEventListener("resize", () => {
-    // 既存のtweenをクリア
-    tweens.forEach((tween) => tween.kill());
-    tweens.length = 0;
+    // ウィンドウリサイズ時にアニメーション設定を再生成
+    window.addEventListener("resize", () => {
+      // 既存のtweenをクリア
+      tweens.forEach((tween) => tween.kill());
+      tweens.length = 0;
 
-    // 新しい設定でtweenを作成
-    const newAnimationSettings = getAnimationSettings();
-    newAnimationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
+      // 新しい設定でtweenを作成
+      const newAnimationSettings = getAnimationSettings();
+      newAnimationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
+    });
+
+    // restartボタンの回転アニメーション（GSAPを使用）
+    const rotateRestartButton = () => {
+      const restartButton = document.getElementById("restart");
+      if (!restartButton) return;
+
+      gsap.fromTo(
+        restartButton,
+        {
+          rotation: 0,
+          scale: 1,
+        },
+        {
+          rotation: 720,
+          scale: 1.3,
+          duration: 1.5,
+          ease: "power2.inOut",
+          onComplete: () => {
+            gsap.set(restartButton, {
+              clearProps: "rotation, scale",
+            });
+          },
+        }
+      );
+    };
+
+    let lastTriggeredSecond: number | null = null;
+
+    const rotateRestartButtonTimeInterval = () => {
+      setInterval(() => {
+        const now = new Date();
+        const seconds = now.getSeconds();
+
+        if ((seconds === 0 || seconds === 30) && seconds !== lastTriggeredSecond) {
+          rotateRestartButton();
+
+          lastTriggeredSecond = seconds;
+        } else if (seconds !== 0 && seconds !== 30) {
+          lastTriggeredSecond = null;
+        }
+      }, 1000);
+    };
+
+    // 時刻アニメーションを開始
+    rotateRestartButtonTimeInterval();
   });
 
-  function updateTooltipClassByPosition(): void {
-    const item4 = document.querySelector(".item-4");
-    const item6 = document.querySelector(".item-6");
-    if (!item4 || !item6) return;
+  // DOMContentLoadedでボタンイベントを初期化（GSAPに依存しない）
+  document.addEventListener("DOMContentLoaded", () => {
+    function updateTooltipClassByPosition(): void {
+      const item4 = document.querySelector(".item-4");
+      const item6 = document.querySelector(".item-6");
+      if (!item4 || !item6) return;
 
-    const rect4 = item4.getBoundingClientRect();
-    const rect6 = item6.getBoundingClientRect();
+      const rect4 = item4.getBoundingClientRect();
+      const rect6 = item6.getBoundingClientRect();
 
-    const tooltip4 = item4.querySelector(".item__tooltip_left, .item__tooltip_right");
-    const tooltip6 = item6.querySelector(".item__tooltip_left, .item__tooltip_right");
+      const tooltip4 = item4.querySelector(".item__tooltip_left, .item__tooltip_right");
+      const tooltip6 = item6.querySelector(".item__tooltip_left, .item__tooltip_right");
 
-    if (tooltip4) {
-      tooltip4.classList.remove("item__tooltip_left", "item__tooltip_right");
-      tooltip4.classList.add(rect4.left < rect6.left ? "item__tooltip_left" : "item__tooltip_right");
-    }
-
-    if (tooltip6) {
-      tooltip6.classList.remove("item__tooltip_left", "item__tooltip_right");
-      tooltip6.classList.add(rect6.left < rect4.left ? "item__tooltip_left" : "item__tooltip_right");
-    }
-  }
-
-  function playAll(): void {
-    tweens.forEach((tween) => tween.play());
-    updateTooltipClassByPosition();
-    playSound();
-  }
-  function pauseAll(): void {
-    tweens.forEach((tween) => tween.pause());
-    updateTooltipClassByPosition();
-    playSound();
-  }
-  function reverseAll(): void {
-    tweens.forEach((tween) => tween.reverse());
-    updateTooltipClassByPosition();
-    playSound();
-  }
-  function restartAll(): void {
-    tweens.forEach((tween) => tween.restart());
-    updateTooltipClassByPosition();
-    playSound();
-  }
-
-  document.getElementById("play")?.addEventListener("click", playAll);
-  document.getElementById("pause")?.addEventListener("click", pauseAll);
-  document.getElementById("reverse")?.addEventListener("click", reverseAll);
-  document.getElementById("restart")?.addEventListener("click", restartAll);
-
-  const controlMenu = document.querySelector(".control__menu");
-  const buttons = document.querySelectorAll(".button");
-
-  // 各ボタンの回転タイムアウトを管理するMap
-  const buttonRotationTimeouts = new Map();
-
-  buttons.forEach((button) => {
-    button.addEventListener("mouseenter", () => {
-      // 既存のタイムアウトをクリア
-      const existingTimeout = buttonRotationTimeouts.get(button);
-      if (existingTimeout) {
-        clearTimeout(existingTimeout);
-        buttonRotationTimeouts.delete(button);
+      if (tooltip4) {
+        tooltip4.classList.remove("item__tooltip_left", "item__tooltip_right");
+        tooltip4.classList.add(rect4.left < rect6.left ? "item__tooltip_left" : "item__tooltip_right");
       }
 
-      button.classList.remove("reset-rotation");
-      button.classList.add("is-rotating");
+      if (tooltip6) {
+        tooltip6.classList.remove("item__tooltip_left", "item__tooltip_right");
+        tooltip6.classList.add(rect6.left < rect4.left ? "item__tooltip_left" : "item__tooltip_right");
+      }
+    }
 
-      // 3秒後に自動的に回転を停止
-      const timeoutId = setTimeout(() => {
+    function playAll(): void {
+      tweens.forEach((tween) => tween.play());
+      updateTooltipClassByPosition();
+      playSound();
+    }
+    function pauseAll(): void {
+      tweens.forEach((tween) => tween.pause());
+      updateTooltipClassByPosition();
+      playSound();
+    }
+    function reverseAll(): void {
+      tweens.forEach((tween) => tween.reverse());
+      updateTooltipClassByPosition();
+      playSound();
+    }
+    function restartAll(): void {
+      tweens.forEach((tween) => tween.restart());
+      updateTooltipClassByPosition();
+      playSound();
+    }
+
+    document.getElementById("play")?.addEventListener("click", playAll);
+    document.getElementById("pause")?.addEventListener("click", pauseAll);
+    document.getElementById("reverse")?.addEventListener("click", reverseAll);
+    document.getElementById("restart")?.addEventListener("click", restartAll);
+
+    const controlMenu = document.querySelector(".control__menu");
+    const buttons = document.querySelectorAll(".button");
+
+    // 各ボタンの回転タイムアウトを管理するMap
+    const buttonRotationTimeouts = new Map();
+
+    buttons.forEach((button) => {
+      button.addEventListener("mouseenter", () => {
+        // 既存のタイムアウトをクリア
+        const existingTimeout = buttonRotationTimeouts.get(button);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+          buttonRotationTimeouts.delete(button);
+        }
+
+        button.classList.remove("reset-rotation");
+        button.classList.add("is-rotating");
+
+        // 3秒後に自動的に回転を停止
+        const timeoutId = setTimeout(() => {
+          button.classList.remove("is-rotating");
+          button.classList.add("reset-rotation");
+          button.addEventListener(
+            "transitionend",
+            () => {
+              button.classList.remove("reset-rotation");
+            },
+            {
+              once: true,
+            }
+          );
+          buttonRotationTimeouts.delete(button);
+        }, 3000);
+
+        buttonRotationTimeouts.set(button, timeoutId);
+      });
+
+      button.addEventListener("mouseleave", () => {
+        // タイムアウトをクリア
+        const timeoutId = buttonRotationTimeouts.get(button);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          buttonRotationTimeouts.delete(button);
+        }
+
+        button.classList.remove("is-rotating");
+      });
+    });
+
+    controlMenu?.addEventListener("mouseleave", () => {
+      buttons.forEach((button) => {
+        // タイムアウトをクリア
+        const timeoutId = buttonRotationTimeouts.get(button);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          buttonRotationTimeouts.delete(button);
+        }
+
         button.classList.remove("is-rotating");
         button.classList.add("reset-rotation");
         button.addEventListener(
@@ -1014,90 +1102,12 @@ const webDesignerRiv = "/riv/designer-life.riv";
             once: true,
           }
         );
-        buttonRotationTimeouts.delete(button);
-      }, 3000);
-
-      buttonRotationTimeouts.set(button, timeoutId);
-    });
-
-    button.addEventListener("mouseleave", () => {
-      // タイムアウトをクリア
-      const timeoutId = buttonRotationTimeouts.get(button);
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        buttonRotationTimeouts.delete(button);
-      }
-
-      button.classList.remove("is-rotating");
+      });
     });
   });
 
-  controlMenu?.addEventListener("mouseleave", () => {
-    buttons.forEach((button) => {
-      // タイムアウトをクリア
-      const timeoutId = buttonRotationTimeouts.get(button);
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-        buttonRotationTimeouts.delete(button);
-      }
-
-      button.classList.remove("is-rotating");
-      button.classList.add("reset-rotation");
-      button.addEventListener(
-        "transitionend",
-        () => {
-          button.classList.remove("reset-rotation");
-        },
-        {
-          once: true,
-        }
-      );
-    });
-  });
-
-  const rotateRestartButton = () => {
-    const restartButton = document.getElementById("restart");
-    if (!restartButton) return;
-
-    gsap.fromTo(
-      restartButton,
-      {
-        rotation: 0,
-        scale: 1,
-      },
-      {
-        rotation: 720,
-        scale: 1.3,
-        duration: 1.5,
-        ease: "power2.inOut",
-        onComplete: () => {
-          gsap.set(restartButton, {
-            clearProps: "rotation, scale",
-          });
-        },
-      }
-    );
-  };
-
-  let lastTriggeredSecond: number | null = null;
-
-  const rotateRestartButtonTimeInterval = () => {
-    setInterval(() => {
-      const now = new Date();
-      const seconds = now.getSeconds();
-
-      if ((seconds === 0 || seconds === 30) && seconds !== lastTriggeredSecond) {
-        rotateRestartButton();
-
-        lastTriggeredSecond = seconds;
-      } else if (seconds !== 0 && seconds !== 30) {
-        lastTriggeredSecond = null;
-      }
-    }, 1000);
-  };
-
-  // riv画像のプリロード機能
-  const preloadRiveImages = () => {
+  // riv画像のプリロード機能（即座に実行）
+  (() => {
     const riveImages = ["/riv/my-portfolio.riv", "/riv/working-office.riv", "/riv/designer-life.riv"];
 
     riveImages.forEach((src) => {
@@ -1108,12 +1118,5 @@ const webDesignerRiv = "/riv/designer-life.riv";
       link.crossOrigin = "anonymous";
       document.head.appendChild(link);
     });
-  };
-
-  // ページ読み込み時にriv画像をプリロード
-  document.addEventListener("DOMContentLoaded", preloadRiveImages);
-
-  window.addEventListener("load", () => {
-    rotateRestartButtonTimeInterval();
-  });
+  })();
 </script>
