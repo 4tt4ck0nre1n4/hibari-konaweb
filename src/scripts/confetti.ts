@@ -1,21 +1,15 @@
 import JSConfetti from "js-confetti";
 
-// DOMの準備ができてから初期化（既にロード済みの場合も対応）
 function initConfetti() {
-  // DOMが既に準備完了しているか確認
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", runInit);
-  } else {
-    // 既にDOMContentLoadedが発火済み
-    runInit();
-  }
-}
-
-function runInit() {
+  console.log("initConfetti called");
   const confetti: HTMLElement | null = document.getElementById("confettiButton");
   const canvasElement = document.getElementById("canvas");
 
+  console.log("confettiButton:", confetti);
+  console.log("canvas:", canvasElement);
+
   if (canvasElement instanceof HTMLCanvasElement) {
+    console.log("Canvas element found, initializing...");
     // 高DPI対応のためのスケールファクター
     const devicePixelRatio = window.devicePixelRatio ?? 1;
 
@@ -97,9 +91,6 @@ function runInit() {
         context.globalAlpha = 1;
       };
 
-      // 初回描画
-      drawText();
-
       // ウィンドウリサイズ時にキャンバスサイズとテキストサイズを再調整
       window.addEventListener("resize", () => {
         const newDevicePixelRatio = window.devicePixelRatio ?? 1;
@@ -117,7 +108,9 @@ function runInit() {
       });
 
       if (confetti) {
+        console.log("Adding click listener to confetti button");
         confetti.addEventListener("click", () => {
+          console.log("Confetti button clicked!");
           jsConfetti
             .addConfetti({
               emojis: ["💜", "💖", "🌈", "✨", "💫", "🌸", "thanks", "💛", "💗", "💘", "🌟", "happy"],
@@ -138,12 +131,19 @@ function runInit() {
               console.error("Confetti animation failed:", error);
             });
         });
+      } else {
+        console.error("confettiButton element not found!");
       }
     }
   } else {
-    console.error("Canvas element not found or confettiButton not found");
+    console.error("Canvas element not found!");
   }
 }
 
-// 初期化を実行
-initConfetti();
+// DOMが完全にロードされてから初期化
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initConfetti);
+} else {
+  // 既にロード済みの場合は即座に実行
+  initConfetti();
+}
