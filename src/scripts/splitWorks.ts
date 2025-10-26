@@ -1,8 +1,4 @@
 // split
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-gsap.registerPlugin(ScrollTrigger);
-
 interface SplitElement {
   containers: HTMLDivElement | null;
   left: HTMLDivElement | null;
@@ -16,6 +12,14 @@ interface SplitElement {
 
 // left ⇔ right アニメーション
 document.addEventListener("DOMContentLoaded", function () {
+  // GSAPを動的にインポート（メインスレッド処理の最適化）
+  void initSplitAnimations();
+});
+
+async function initSplitAnimations() {
+  const [{ gsap }, { ScrollTrigger }] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
+
+  gsap.registerPlugin(ScrollTrigger);
   const containers = document.querySelectorAll(".split__container");
   const isMobile = window.innerWidth <= 768;
 
@@ -158,35 +162,35 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
   });
-});
 
-// 左サイド モーダルウィンドウ in
-function fadeInElement(element: Element | null | undefined): void {
-  if (element) {
-    gsap.to(element, {
-      opacity: 1,
-      duration: 1.2,
-      ease: "power1.out",
+  // 左サイド モーダルウィンドウ in
+  function fadeInElement(element: Element | null | undefined): void {
+    if (element) {
+      gsap.to(element, {
+        opacity: 1,
+        duration: 1.2,
+        ease: "power1.out",
+      });
+    }
+  }
+
+  function fadeOutElement(element: Element | null | undefined): void {
+    if (element) {
+      gsap.to(element, {
+        opacity: 0,
+        duration: 1,
+        ease: "power1.out",
+      });
+    }
+  }
+
+  // テキストアニメーション
+  function addStyledText(element: HTMLElement, delay: number): void {
+    const newText = [...(element.textContent ?? "")].map((char) => `<span>${char}</span>`);
+    element.innerHTML = newText.join("");
+
+    Array.from(element.children).forEach((char, index) => {
+      setTimeout(() => char.classList.add("is-active"), delay * index);
     });
   }
-}
-
-function fadeOutElement(element: Element | null | undefined): void {
-  if (element) {
-    gsap.to(element, {
-      opacity: 0,
-      duration: 1,
-      ease: "power1.out",
-    });
-  }
-}
-
-// テキストアニメーション
-function addStyledText(element: HTMLElement, delay: number): void {
-  const newText = [...(element.textContent ?? "")].map((char) => `<span>${char}</span>`);
-  element.innerHTML = newText.join("");
-
-  Array.from(element.children).forEach((char, index) => {
-    setTimeout(() => char.classList.add("is-active"), delay * index);
-  });
 }

@@ -787,13 +787,9 @@ const webDesignerRiv = "/riv/designer-life.riv";
     }
   }
 
-  import { gsap } from "gsap";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
-  gsap.registerPlugin(ScrollTrigger);
-
   const tweens: gsap.core.Tween[] = [];
 
-  function createTween(selector: string, props: gsap.TweenVars) {
+  function createTween(gsap: any, selector: string, props: gsap.TweenVars) {
     tweens.push(
       gsap.to(selector, {
         ...props,
@@ -802,7 +798,11 @@ const webDesignerRiv = "/riv/designer-life.riv";
     );
   }
 
-  window.addEventListener("load", () => {
+  // GSAPを動的にインポート（メインスレッド処理の最適化）
+  window.addEventListener("load", async () => {
+    const [{ gsap }, { ScrollTrigger }] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
+
+    gsap.registerPlugin(ScrollTrigger);
     const grid: HTMLElement | null = document.getElementById("js-grid");
     const gridMenu: HTMLElement | null = document.getElementById("js-grid__menu");
 
@@ -922,7 +922,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
   const animationSettings = getAnimationSettings();
 
   // アニメーション設定を適用
-  animationSettings.forEach(([selector, props]) => createTween(selector, props));
+  animationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
 
   // ウィンドウリサイズ時にアニメーション設定を再生成
   window.addEventListener("resize", () => {
@@ -932,7 +932,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
 
     // 新しい設定でtweenを作成
     const newAnimationSettings = getAnimationSettings();
-    newAnimationSettings.forEach(([selector, props]) => createTween(selector, props));
+    newAnimationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
   });
 
   function updateTooltipClassByPosition(): void {

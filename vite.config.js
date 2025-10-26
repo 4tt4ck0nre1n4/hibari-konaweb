@@ -5,6 +5,22 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // 重いライブラリを個別のチャンクに分割
+          if (id.includes("@rive-app")) {
+            return "rive";
+          }
+          if (id.includes("@tsparticles") || id.includes("tsparticles")) {
+            return "particles";
+          }
+          if (id.includes("gsap")) {
+            return "gsap";
+          }
+          if (id.includes("swiper")) {
+            return "swiper";
+          }
+          if (id.includes("react") || id.includes("react-dom")) {
+            return "react-vendor";
+          }
           if (id.includes("node_modules")) {
             return "vendor";
           }

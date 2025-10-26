@@ -2,6 +2,11 @@
   "name": "hibari-konaweb",
   "type": "module",
   "version": "0.0.1",
+  "sideEffects": [
+    "*.css",
+    "*.scss",
+    "*.astro"
+  ],
   "scripts": {
     "copy": "node -e \"require('fs-extra').copySync('./app/public/wp-content/uploads', './public/wp-content/uploads')\"",
     "clean": "node -e \"const fs = require('fs-extra'); const path = require('path'); const dirs = ['.vite-cache', 'node_modules/.vite', 'node_modules/.astro', 'dist', '.astro']; dirs.forEach(dir => { try { const fullPath = path.resolve(process.cwd(), dir); if (fs.existsSync(fullPath)) { fs.removeSync(fullPath); console.log('Cleaned:', dir); } else { console.log('Not exists:', dir); } } catch (e) { console.log('Failed:', dir, e.message); } });\"",
