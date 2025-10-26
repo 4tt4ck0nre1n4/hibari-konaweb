@@ -596,11 +596,14 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   }
   /* 右サイド サイト sp画像 */
   .split.right .right__spImage {
-    width: 40%;
-    height: 40%;
+    width: auto;
+    max-width: 40%;
+    height: auto;
+    max-height: 50%;
     position: absolute;
     top: 16%;
     right: 2%;
+    object-fit: contain;
     animation: rotateCircle 10s linear infinite alternate;
   }
   @keyframes rotateCircle {
@@ -871,12 +874,14 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
     /* 右サイド サイト sp画像の調整 */
     .split.right .right__spImage {
-      width: 50%;
+      width: auto;
+      max-width: 30%;
       height: auto;
-      max-height: 40%;
+      max-height: 50%;
       top: 12%;
       right: 25%;
       transform: translateX(50%);
+      object-fit: contain;
       animation: rotateCircleMobile 10s linear infinite alternate;
     }
 

@@ -10,14 +10,17 @@ interface SplitElement {
   iconMenuItems: NodeListOf<HTMLLIElement> | null;
 }
 
+// GSAPを動的にインポート（メインスレッド処理の最適化）
+// トップレベルでインポートを開始し、DOMContentLoadedで初期化
+const gsapPromise = Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
+
 // left ⇔ right アニメーション
 document.addEventListener("DOMContentLoaded", function () {
-  // GSAPを動的にインポート（メインスレッド処理の最適化）
   void initSplitAnimations();
 });
 
 async function initSplitAnimations() {
-  const [{ gsap }, { ScrollTrigger }] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
+  const [{ gsap }, { ScrollTrigger }] = await gsapPromise;
 
   gsap.registerPlugin(ScrollTrigger);
   const containers = document.querySelectorAll(".split__container");

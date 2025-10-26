@@ -27,7 +27,7 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     <meta name="viewport" content="width=device-width" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: http://hibari-konaweb.local https://cdn.jsdelivr.net https://hibari-konaweb.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:; connect-src 'self' blob: data: https://unpkg.com https://cdn.jsdelivr.net https://api.iconify.design https://hibari-konaweb.com; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none';"
+      content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: http://hibari-konaweb.local https://cdn.jsdelivr.net https://hibari-konaweb.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' blob: data: https://unpkg.com https://cdn.jsdelivr.net https://api.iconify.design https://hibari-konaweb.com; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none';"
     />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -114,39 +114,7 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     }
     <!-- <link rel="preload" href="/wasm/rive.wasm" as="fetch" type="application/wasm" crossorigin="anonymous" /> -->
 
-    <!-- フォントのpreload（レンダリング最適化） -->
-    <link
-      rel="preload"
-      href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.8/files/poppins-latin-400-normal.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.8/files/poppins-latin-700-normal.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-
-    <!-- フォントCSSの遅延読み込み -->
-    <link
-      rel="preload"
-      href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.8/400.css"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <link
-      rel="preload"
-      href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.8/700.css"
-      as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <noscript>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.8/400.css" />
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.8/700.css" />
-    </noscript>
+    <!-- フォントは@fontsource/poppinsをLayout.astroでインポート済み -->
 
     <!-- ページ固有の追加head要素（LCP最適化など） -->
     <slot name="head" />

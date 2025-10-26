@@ -28,58 +28,98 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
     role="presentation"
   />
 </button>
-<p id="ariaLiveStatus" class="screenReader-only" role="status" aria-live="polite"></p>
+<p id="ariaLiveStatus__background" class="screenReader-only" role="status" aria-live="polite"></p>
 
 <script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const mainContainer = document.getElementById("main-container");
-    const backgroundButton = document.getElementById("toggleBackgroundButton");
-    const offIcon = document.querySelector(".offBackgroundIcon");
-    const onIcon = document.querySelector(".onBackgroundIcon");
-    const ariaLiveStatus = document.getElementById("ariaLiveStatus");
+  // 即座に実行（DOMContentLoadedを待たない）
+  (() => {
+    const initBackgroundToggle = () => {
+      const mainContainer = document.getElementById("main-container");
+      const backgroundButton = document.getElementById("toggleBackgroundButton");
+      const ariaLiveStatus = document.getElementById("ariaLiveStatus__background");
 
-    if (!mainContainer || !backgroundButton || !offIcon || !onIcon || !ariaLiveStatus) {
-      return;
-    }
-
-    let isImageOff = false;
-    let ariaLabel = "背景画像を切り替える（背景画像あり）";
-    let title = "背景画像を切り替える（背景画像あり）";
-
-    const updateAccessibility = () => {
-      backgroundButton.setAttribute("aria-label", ariaLabel);
-      backgroundButton.setAttribute("title", title);
-    };
-
-    const updateIcons = () => {
-      if (isImageOff) {
-        offIcon.classList.replace("background-visible", "background-hidden");
-        onIcon.classList.replace("background-hidden", "background-visible");
-      } else {
-        onIcon.classList.replace("background-visible", "background-hidden");
-        offIcon.classList.replace("background-hidden", "background-visible");
-      }
-    };
-
-    updateIcons();
-
-    backgroundButton.addEventListener("click", () => {
-      isImageOff = mainContainer.classList.toggle("is-notImage");
-
-      if (isImageOff) {
-        ariaLabel = "背景画像を切り替える（背景画像なし）";
-        title = "背景画像を切り替える（背景画像なし）";
-        ariaLiveStatus.textContent = "背景画像なしに切り替えました";
-      } else {
-        ariaLabel = "背景画像を切り替える（背景画像あり）";
-        title = "背景画像を切り替える（背景画像あり）";
-        ariaLiveStatus.textContent = "背景画像ありに切り替えました";
+      if (!mainContainer || !backgroundButton || !ariaLiveStatus) {
+        console.error("BackgroundImage: 必要な要素が見つかりません", {
+          mainContainer: !!mainContainer,
+          backgroundButton: !!backgroundButton,
+          ariaLiveStatus: !!ariaLiveStatus,
+        });
+        return;
       }
 
-      updateAccessibility();
+      // ボタン内のアイコンだけを取得
+      const offIcon = backgroundButton.querySelector(".offBackgroundIcon");
+      const onIcon = backgroundButton.querySelector(".onBackgroundIcon");
+
+      if (!offIcon || !onIcon) {
+        console.error("BackgroundImage: アイコンが見つかりません", {
+          offIcon: !!offIcon,
+          onIcon: !!onIcon,
+        });
+        return;
+      }
+
+      let isImageOff = false;
+      let ariaLabel = "背景画像を切り替える（背景画像あり）";
+      let title = "背景画像を切り替える（背景画像あり）";
+
+      const updateAccessibility = () => {
+        backgroundButton.setAttribute("aria-label", ariaLabel);
+        backgroundButton.setAttribute("title", title);
+      };
+
+      const updateIcons = () => {
+        if (isImageOff) {
+          offIcon.classList.replace("background-visible", "background-hidden");
+          onIcon.classList.replace("background-hidden", "background-visible");
+        } else {
+          onIcon.classList.replace("background-visible", "background-hidden");
+          offIcon.classList.replace("background-hidden", "background-visible");
+        }
+      };
+
       updateIcons();
-    });
-  });
+
+      backgroundButton.addEventListener("click", () => {
+        console.log("BackgroundImage: ボタンがクリックされました");
+        console.log("mainContainer before toggle:", mainContainer.className);
+
+        isImageOff = mainContainer.classList.toggle("is-notImage");
+
+        console.log("mainContainer after toggle:", mainContainer.className);
+        console.log("isImageOff:", isImageOff);
+
+        if (isImageOff) {
+          ariaLabel = "背景画像を切り替える（背景画像なし）";
+          title = "背景画像を切り替える（背景画像なし）";
+          ariaLiveStatus.textContent = "背景画像なしに切り替えました";
+        } else {
+          ariaLabel = "背景画像を切り替える（背景画像あり）";
+          title = "背景画像を切り替える（背景画像あり）";
+          ariaLiveStatus.textContent = "背景画像ありに切り替えました";
+        }
+
+        updateAccessibility();
+        updateIcons();
+
+        console.log("BackgroundImage: 切り替え完了");
+      });
+
+      console.log("BackgroundImage: 初期化完了", {
+        mainContainer: mainContainer,
+        backgroundButton: backgroundButton,
+        offIcon: offIcon,
+        onIcon: onIcon,
+      });
+    };
+
+    // DOMContentLoadedまたは即座に実行
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initBackgroundToggle);
+    } else {
+      initBackgroundToggle();
+    }
+  })();
 </script>
 
 <style>

@@ -1,7 +1,8 @@
 ---
 import HeadLayout from "./HeadLayout.astro";
-// フォントはpreload戦略を使用するため、ここではインポートしない
 // @fontsourceはfont-display: swapをデフォルトで含む
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/700.css";
 
 interface Props {
   title: string;
@@ -50,7 +51,15 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     /* background-size: 224px; */
   }
   body {
-    font-family: "Poppins", sans-serif;
+    font-family:
+      "Poppins",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      Arial,
+      sans-serif;
     background-size: 224px;
   }
 </style>
