@@ -1,11 +1,17 @@
 import JSConfetti from "js-confetti";
 
-// DOMの準備ができてから初期化
-document.addEventListener("DOMContentLoaded", () => {
-  initConfetti();
-});
-
+// DOMの準備ができてから初期化（既にロード済みの場合も対応）
 function initConfetti() {
+  // DOMが既に準備完了しているか確認
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", runInit);
+  } else {
+    // 既にDOMContentLoadedが発火済み
+    runInit();
+  }
+}
+
+function runInit() {
   const confetti: HTMLElement | null = document.getElementById("confettiButton");
   const canvasElement = document.getElementById("canvas");
 
@@ -91,14 +97,8 @@ function initConfetti() {
         context.globalAlpha = 1;
       };
 
-      window.addEventListener("DOMContentLoaded", () => {
-        const checkContext = setInterval(() => {
-          if (canvasElement.getContext("2d")) {
-            clearInterval(checkContext);
-            drawText();
-          }
-        }, 50);
-      });
+      // 初回描画
+      drawText();
 
       // ウィンドウリサイズ時にキャンバスサイズとテキストサイズを再調整
       window.addEventListener("resize", () => {
@@ -144,3 +144,6 @@ function initConfetti() {
     console.error("Canvas element not found or confettiButton not found");
   }
 }
+
+// 初期化を実行
+initConfetti();
