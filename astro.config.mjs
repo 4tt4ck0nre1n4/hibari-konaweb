@@ -115,9 +115,11 @@ export default defineConfig({
         transformMixedEsModules: true,
       },
       sourcemap: false,
-      minify: false,
+      minify: "esbuild", // JavaScriptの最小化を有効化（パフォーマンス改善）
       cssCodeSplit: true, // CSSコード分割を有効化
       cssMinify: true, // CSSの最小化を有効化
+      // チャンクサイズの最適化
+      chunkSizeWarningLimit: 500,
     },
     css: {
       preprocessorOptions: {
