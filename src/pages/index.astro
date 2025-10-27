@@ -249,7 +249,176 @@ const webDesignerRiv = "/riv/designer-life.riv";
 </Layout>
 
 <script>
-  import "../scripts/confetti.ts";
+  import JSConfetti from "js-confetti";
+
+  function initConfetti() {
+    console.log("initConfetti called");
+    const confetti: HTMLElement | null = document.getElementById("confettiButton");
+    const canvasElement = document.getElementById("canvas");
+    const textCanvasElement = document.getElementById("confetti-text-canvas");
+
+    console.log("confettiButton:", confetti);
+    console.log("canvas:", canvasElement);
+    console.log("textCanvas:", textCanvasElement);
+
+    if (canvasElement instanceof HTMLCanvasElement && textCanvasElement instanceof HTMLCanvasElement) {
+      console.log("Canvas elements found, initializing...");
+      const devicePixelRatio = window.devicePixelRatio ?? 1;
+
+      const rect = canvasElement.getBoundingClientRect();
+      canvasElement.width = rect.width * devicePixelRatio;
+      canvasElement.height = rect.height * devicePixelRatio;
+
+      const textRect = textCanvasElement.getBoundingClientRect();
+      textCanvasElement.width = textRect.width * devicePixelRatio;
+      textCanvasElement.height = textRect.height * devicePixelRatio;
+
+      const jsConfetti = new JSConfetti({ canvas: canvasElement });
+      const context = textCanvasElement.getContext("2d");
+
+      if (context) {
+        let isAnimating = false;
+        let currentOpacity = 0;
+
+        const drawText = (opacity: number = 1) => {
+          context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
+          context.globalAlpha = opacity;
+          currentOpacity = opacity;
+
+          const screenWidth = window.innerWidth;
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+          const isAndroid = /Android/.test(navigator.userAgent);
+
+          let fontSize: number;
+
+          if (screenWidth <= 480) {
+            if (isIOS) {
+              fontSize = 44;
+            } else if (isAndroid) {
+              fontSize = 44;
+            } else {
+              fontSize = 40;
+            }
+          } else if (screenWidth <= 768) {
+            fontSize = 48;
+          } else {
+            fontSize = 20;
+          }
+
+          context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+          const isDarkMode = document.documentElement.classList.contains("dark");
+          context.fillStyle = isDarkMode ? "#f1f5f9" : "#020202";
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+
+          context.shadowColor = isDarkMode ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.8)";
+          context.shadowBlur = 2;
+          context.shadowOffsetX = 1;
+          context.shadowOffsetY = 1;
+
+          const text = "Thank you for viewing my portfolio site!";
+          const maxWidth = textCanvasElement.width * 0.9;
+          const textMetrics = context.measureText(text);
+
+          if (textMetrics.width > maxWidth) {
+            const ratio = maxWidth / textMetrics.width;
+            const minFontSize = screenWidth > 768 ? 28 : 28;
+            fontSize = Math.max(minFontSize, fontSize * ratio);
+            context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+          }
+
+          context.fillText(text, textCanvasElement.width / 2, textCanvasElement.height / 2);
+
+          context.shadowColor = "transparent";
+          context.shadowBlur = 0;
+          context.shadowOffsetX = 0;
+          context.shadowOffsetY = 0;
+        };
+
+        window.addEventListener("resize", () => {
+          const newDevicePixelRatio = window.devicePixelRatio ?? 1;
+
+          const rect = canvasElement.getBoundingClientRect();
+          canvasElement.width = rect.width * newDevicePixelRatio;
+          canvasElement.height = rect.height * newDevicePixelRatio;
+
+          const textRect = textCanvasElement.getBoundingClientRect();
+          textCanvasElement.width = textRect.width * newDevicePixelRatio;
+          textCanvasElement.height = textRect.height * newDevicePixelRatio;
+
+          if (isAnimating && currentOpacity > 0) {
+            drawText(currentOpacity);
+          } else if (!isAnimating && currentOpacity > 0) {
+            drawText();
+          }
+        });
+
+        if (confetti) {
+          console.log("Adding click listener to confetti button");
+          confetti.addEventListener("click", () => {
+            console.log("Confetti button clicked!");
+
+            context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
+            currentOpacity = 0;
+            isAnimating = true;
+
+            jsConfetti
+              .addConfetti({
+                emojis: ["💜", "💖", "🌈", "✨", "💫", "🌸", "thanks", "💛", "💗", "💘", "🌟", "happy"],
+              })
+              .then(() => jsConfetti.addConfetti({ confettiRadius: 3 }))
+              .then(() => {
+                let opacity = 0;
+                const fadeIn = setInterval(() => {
+                  if (opacity < 1) {
+                    opacity += 0.05;
+                    drawText(opacity);
+                  } else {
+                    clearInterval(fadeIn);
+
+                    setTimeout(() => {
+                      let fadeOpacity = 1;
+                      const fadeOut = setInterval(() => {
+                        if (fadeOpacity > 0) {
+                          fadeOpacity -= 0.05;
+                          drawText(fadeOpacity);
+                        } else {
+                          clearInterval(fadeOut);
+                          context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
+                          currentOpacity = 0;
+                          isAnimating = false;
+                        }
+                      }, 50);
+                    }, 3000);
+                  }
+                }, 50);
+              })
+              .catch((error) => {
+                console.error("Confetti animation failed:", error);
+                isAnimating = false;
+              });
+          });
+        } else {
+          console.error("confettiButton element not found!");
+        }
+      }
+    } else {
+      if (!canvasElement) {
+        console.error("Full-screen canvas element (#canvas) not found!");
+      }
+      if (!textCanvasElement) {
+        console.error("Text canvas element (#confetti-text-canvas) not found!");
+      }
+    }
+  }
+
+  // より確実な初期化方法
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initConfetti);
+  } else {
+    // DOM既にロード済みの場合は即座に実行
+    initConfetti();
+  }
 </script>
 
 <style is:global>
