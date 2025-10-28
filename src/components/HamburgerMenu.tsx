@@ -98,7 +98,13 @@ const HamburgerMenu = () => {
 
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = isOpen ? "hidden" : "auto";
+
+    // CLS対策: scrollbar-gutterがあるためbodyのoverflowでも問題なし
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);

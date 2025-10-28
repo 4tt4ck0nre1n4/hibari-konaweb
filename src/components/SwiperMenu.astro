@@ -108,6 +108,7 @@ const mouseItem = {
   .swiper__wrapper {
     width: 100%;
     /* max-width: 320px; */
+    min-height: 300px; /* CLS対策: Swiper初期化前の高さを確保 */
     margin-inline: auto;
     background: transparent;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
@@ -192,6 +193,11 @@ const mouseItem = {
     }
   }
 
+  /* CLS対策: Swiperのwrapper要素に明示的な高さを設定 */
+  .swiper-wrapper {
+    min-height: 220px;
+  }
+
   #swiper1 .swiper-slide {
     width: 100%;
     height: 100%;
@@ -269,6 +275,7 @@ const mouseItem = {
     width: 100%;
     /* max-width: 320px; */
     height: calc(124px + 2rem - 40px);
+    min-height: 116px; /* CLS対策: 固定の最小高さを設定 */
     background: transparent;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     border-radius: 1rem;
