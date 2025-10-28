@@ -527,6 +527,10 @@ const webDesignerRiv = "/riv/designer-life.riv";
       min-height: auto;
     }
 
+    .grid {
+      margin-block-start: 1rem; /* スマホサイズでの余白調整 */
+    }
+
     .grid__menu {
       grid-template-columns: 1fr;
       gap: 0.25rem;
@@ -591,6 +595,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     border-radius: 8%;
     position: relative;
+    z-index: 1;
     overflow: hidden;
     padding-block: 2rem;
     transform-origin: center;
@@ -976,12 +981,10 @@ const webDesignerRiv = "/riv/designer-life.riv";
     );
   }
 
-  // GSAPを動的にインポート（メインスレッド処理の最適化）
-  // トップレベルでインポートを開始
-  const gsapPromise = Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
-
-  window.addEventListener("load", async () => {
-    const [{ gsap }, { ScrollTrigger }] = await gsapPromise;
+  // GSAPを動的にインポート（パフォーマンス最適化）
+  // ブラウザがアイドル状態になってから読み込む
+  const initGSAP = async () => {
+    const [{ gsap }, { ScrollTrigger }] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
 
     gsap.registerPlugin(ScrollTrigger);
 
@@ -1158,7 +1161,19 @@ const webDesignerRiv = "/riv/designer-life.riv";
 
     // 時刻アニメーションを開始
     rotateRestartButtonTimeInterval();
-  });
+  };
+
+  // パフォーマンス最適化: ブラウザがアイドル状態になってから読み込む
+  if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+    (window as Window & typeof globalThis).requestIdleCallback(() => {
+      void initGSAP();
+    });
+  } else if (typeof window !== "undefined") {
+    // フォールバック: requestIdleCallbackが使えない場合はloadイベント後に実行
+    setTimeout(() => {
+      void initGSAP();
+    }, 100);
+  }
 
   // DOMContentLoadedでボタンイベントを初期化（GSAPに依存しない）
   document.addEventListener("DOMContentLoaded", () => {
@@ -1283,17 +1298,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
     });
   });
 
-  // riv画像のプリロード機能（即座に実行）
-  (() => {
-    const riveImages = ["/riv/my-portfolio.riv", "/riv/working-office.riv", "/riv/designer-life.riv"];
-
-    riveImages.forEach((src) => {
-      const link = document.createElement("link");
-      link.rel = "preload";
-      link.as = "fetch";
-      link.href = src;
-      link.crossOrigin = "anonymous";
-      document.head.appendChild(link);
-    });
-  })();
+  // riv画像のプリロードを削除（パフォーマンス最適化: client:visibleで遅延読み込み）
+  // Riveアニメーションは初期表示に必須ではないため、ビューポートに入るまで読み込まない
+  // これによりクリティカルパスの最大待ち時間が大幅に短縮される
 </script>

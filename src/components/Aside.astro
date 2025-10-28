@@ -20,7 +20,8 @@ import ConfettiButton from "./ConfettiButton.astro";
 <div class="particles-tools__container">
   <div class="particles__wrapper">
     <div class="particles__container">
-      <ParticlesComponent client:only="react" />
+      <!-- パフォーマンス最適化: ブラウザがアイドル状態になったら読み込む -->
+      <ParticlesComponent client:idle />
     </div>
   </div>
   <div class="tools__wrapper">
@@ -93,6 +94,7 @@ import ConfettiButton from "./ConfettiButton.astro";
     .clock-search__container {
       grid-template-columns: 1fr 1fr;
       gap: 0.25rem;
+      margin-block-start: 1rem; /* スマホサイズでの余白調整 */
     }
 
     .search__wrapper {
@@ -178,20 +180,24 @@ import ConfettiButton from "./ConfettiButton.astro";
       display: flex;
       flex-direction: row;
       gap: 0.5rem;
+      margin-block-start: 1rem; /* スマホサイズでの余白調整 */
     }
     .particles__wrapper {
       flex: 1;
-      height: 90px;
+      height: 90px; /* tools__wrapperと同じheight */
+      min-height: 90px; /* 通常スタイルのmin-heightを上書き */
       padding-block: 0.5rem;
       padding-inline: 0.25rem;
     }
     .tools__wrapper {
       flex: 1;
-      height: 90px;
+      height: 90px; /* particles__wrapperと同じheight */
+      min-height: 90px; /* 通常スタイルのmin-height: 120pxを上書き */
       grid-template-columns: 1fr 1fr 1fr 1fr;
       gap: 0.25rem;
       align-items: center;
       justify-items: center;
+      padding-block: 0.5rem; /* particles__wrapperと同じpadding */
       padding-inline: 0.25rem;
     }
   }

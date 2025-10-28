@@ -19,7 +19,8 @@ const { className, href, ariaLabel, ariaTitle, src, tooltipText, tooltipPosition
 <li class={`grid__menu_item ${className}`}>
   <a class="grid__menu_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
     <div class="grid__menu_rive">
-      <RiveComponent src={src} stateMachines={stateMachines} minWidth={100} minHeight={100} client:only="react" />
+      <!-- パフォーマンス最適化: ビューポートに入るまで読み込まない -->
+      <RiveComponent src={src} stateMachines={stateMachines} minWidth={100} minHeight={100} client:visible />
     </div>
     <span class={`item__tooltip_${tooltipPosition}`}>
       {tooltipText}
