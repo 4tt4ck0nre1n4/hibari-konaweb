@@ -582,6 +582,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
   .grid__menu {
     width: 100%;
     height: 100%;
+    min-height: 408px; /* CLS対策: グリッドアイテム(100px x 4行) + gap + padding */
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 1rem;
@@ -983,25 +984,24 @@ const webDesignerRiv = "/riv/designer-life.riv";
     const [{ gsap }, { ScrollTrigger }] = await gsapPromise;
 
     gsap.registerPlugin(ScrollTrigger);
-    const grid: HTMLElement | null = document.getElementById("js-grid");
-    const gridMenu: HTMLElement | null = document.getElementById("js-grid__menu");
 
-    gsap
-      .timeline()
-      .from(grid, {
-        scale: 0.4,
-        duration: 1,
-        ease: "power1.in",
-      })
-      .from(
-        gridMenu,
-        {
-          y: -200,
-          duration: 1,
-          ease: "power1.inOut",
-        },
-        "-=0.3"
-      );
+    // 初期アニメーションを削除（CLS対策）
+    // gsap
+    //   .timeline()
+    //   .from(grid, {
+    //     scale: 0.4,
+    //     duration: 1,
+    //     ease: "power1.in",
+    //   })
+    //   .from(
+    //     gridMenu,
+    //     {
+    //       y: -200,
+    //       duration: 1,
+    //       ease: "power1.inOut",
+    //     },
+    //     "-=0.3"
+    //   );
 
     // Astro要素のスクロールアニメーション
     const pageContainer: HTMLElement | null = document.getElementById("page-wrap");
