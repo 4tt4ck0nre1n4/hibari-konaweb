@@ -44,9 +44,11 @@ const contact = {
     <ThemeColor />
   </li>
   <li class="header__menu_item">
-    <SoundToggle client:only="react" />
+    <!-- パフォーマンス最適化: アイドル時に読み込む -->
+    <SoundToggle client:idle />
   </li>
   <li class="header__menu_item header__menu_item--hamburger">
+    <!-- すぐに使用される可能性があるためclient:loadを維持 -->
     <HamburgerMenu client:load />
   </li>
 </ul>
