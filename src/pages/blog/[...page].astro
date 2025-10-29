@@ -59,34 +59,32 @@ interface PageDataObject {
 
 export const getStaticPaths: GetStaticPaths = async ({ paginate }: { paginate: PaginateFunction }) => {
   try {
+    console.log("🔍 [Blog Pagination] Fetching posts from:", BLOG_PAGE_API);
     const dataPage = await fetch(BLOG_PAGE_API);
 
     if (!dataPage.ok) {
-      throw new Error(`Failed to fetch posts: ${dataPage.status}`);
+      console.error(`❌ [Blog Pagination] Failed to fetch posts: ${dataPage.status} ${dataPage.statusText}`);
+      console.error(`❌ [Blog Pagination] API URL: ${BLOG_PAGE_API}`);
+      throw new Error(`Failed to fetch posts: ${dataPage.status} ${dataPage.statusText}`);
     }
 
     const allPosts: PostDataObject[] = (await dataPage.json()) as unknown as PostDataObject[];
+    console.log(`✅ [Blog Pagination] Successfully fetched ${allPosts.length} posts`);
 
     if (!Array.isArray(allPosts) || allPosts.length === 0) {
-      console.warn("No posts found. Returning empty paths.");
+      console.warn("⚠️ [Blog Pagination] No posts found. Returning empty paths.");
+      console.warn("⚠️ [Blog Pagination] This will result in 404 errors for blog pages.");
       return [];
     }
 
     const paginatedPages = paginate(allPosts, { pageSize: 6 });
 
-    console.log("Paginated posts data:", JSON.stringify(paginatedPages, null, 2));
-
-    console.log(
-      "Checking path.params.page before mapping:",
-      paginatedPages.map((p) => p.params.page)
-    );
+    console.log(`📄 [Blog Pagination] Generated ${paginatedPages.length} paginated pages`);
 
     const paths = paginatedPages.map((path) => ({
       params: { page: path.params?.page },
       props: path.props,
     }));
-
-    console.log("Generated paths before modification:", paths);
 
     const hasPage1: boolean = paths.some((p) => p.params.page === "1");
 
@@ -102,11 +100,16 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }: { paginate: P
       });
     }
 
-    console.log("Generated paths after modification:", paths);
+    console.log(`✅ [Blog Pagination] Generated ${paths.length} total paths (including /blog and /blog/1)`);
 
     return paths;
   } catch (error) {
-    console.error("Error in getStaticPaths:", error);
+    console.error("❌ [Blog Pagination] Error in getStaticPaths:", error);
+    console.error("❌ [Blog Pagination] API URL:", BLOG_PAGE_API);
+    if (error instanceof Error) {
+      console.error("❌ [Blog Pagination] Error message:", error.message);
+      console.error("❌ [Blog Pagination] Error stack:", error.stack);
+    }
     return [];
   }
 };

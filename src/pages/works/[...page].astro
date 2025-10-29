@@ -41,33 +41,32 @@ interface PageObject {
 
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
   try {
-    console.log("Fetching data from WORKS_PAGE_API:", WORKS_PAGE_API);
+    console.log("🔍 [Works Pagination] Fetching works from:", WORKS_PAGE_API);
 
     const worksData = await fetch(WORKS_PAGE_API);
 
     if (!worksData.ok) {
-      throw new Error(`Failed to fetch works: ${worksData.status}`);
+      console.error(`❌ [Works Pagination] Failed to fetch works: ${worksData.status} ${worksData.statusText}`);
+      console.error(`❌ [Works Pagination] API URL: ${WORKS_PAGE_API}`);
+      throw new Error(`Failed to fetch works: ${worksData.status} ${worksData.statusText}`);
     }
 
     const allWorks = (await worksData.json()) as WorkObject[];
-
-    console.log("API Response:", allWorks);
+    console.log(`✅ [Works Pagination] Successfully fetched ${allWorks.length} works`);
 
     if (!Array.isArray(allWorks) || allWorks.length === 0) {
-      console.warn("No works found. Returning empty paths.");
+      console.warn("⚠️ [Works Pagination] No works found. Returning empty paths.");
+      console.warn("⚠️ [Works Pagination] This will result in 404 errors for works pages.");
       return [];
     }
 
     const paginatedData = paginate(allWorks, { pageSize: 4 });
-
-    console.log("Paginated works data:", paginatedData);
+    console.log(`📄 [Works Pagination] Generated ${paginatedData.length} paginated pages`);
 
     const paths = paginatedData.map((path, index) => ({
       params: { page: String(index + 1) },
       props: path.props,
     }));
-
-    console.log("Generated paths before modification:", paths);
 
     if (paths.length > 0) {
       const defaultPageProps = (paginatedData[0]?.props ?? {
@@ -89,11 +88,16 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
       });
     }
 
-    console.log("Generated paths after modification:", paths);
+    console.log(`✅ [Works Pagination] Generated ${paths.length} total paths (including /works and /works/1)`);
 
     return paths;
   } catch (error) {
-    console.error("Error in getStaticPaths:", error);
+    console.error("❌ [Works Pagination] Error in getStaticPaths:", error);
+    console.error("❌ [Works Pagination] API URL:", WORKS_PAGE_API);
+    if (error instanceof Error) {
+      console.error("❌ [Works Pagination] Error message:", error.message);
+      console.error("❌ [Works Pagination] Error stack:", error.stack);
+    }
     return [];
   }
 };
