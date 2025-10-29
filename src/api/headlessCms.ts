@@ -1,10 +1,24 @@
+// 環境変数のチェックと詳細なエラーメッセージ
 if (import.meta.env["PUBLIC_API_URL"] === undefined) {
+  console.error("❌ Environment variable PUBLIC_API_URL is not set!");
+  console.error("❌ This will cause 404 errors for dynamically generated pages.");
+  console.error("❌ Please set PUBLIC_API_URL in your environment variables.");
+  console.error("❌ For local development: create a .env file");
+  console.error("❌ For Netlify: set it in Site Settings → Environment Variables");
   throw new Error("Please set environment variables: PUBLIC_API_URL");
 }
 
-export const headlessCmsUrl = import.meta.env["PUBLIC_API_URL"] as string;
+if (import.meta.env.PUBLIC_API_PREFIX === undefined) {
+  console.error("❌ Environment variable PUBLIC_API_PREFIX is not set!");
+  console.error("❌ Using default value: /wp-json/wp/v2/");
+}
 
-export const headlessCmsApiPrefix = import.meta.env.PUBLIC_API_PREFIX as string;
+export const headlessCmsUrl = import.meta.env["PUBLIC_API_URL"] as string;
+export const headlessCmsApiPrefix = (import.meta.env.PUBLIC_API_PREFIX ?? "/wp-json/wp/v2/") as string;
+
+// ビルド時に環境変数をログ出力（デバッグ用）
+console.log("🔧 [API Config] WordPress API URL:", headlessCmsUrl);
+console.log("🔧 [API Config] API Prefix:", headlessCmsApiPrefix);
 
 export const worksPageApi = "works?context=embed&acf_format=standard&per_page=20";
 export const worksSlugApi = "works?context=embed&acf_format=standard&slug=";

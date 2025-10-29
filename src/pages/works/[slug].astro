@@ -110,30 +110,40 @@ try {
 
 export async function getStaticPaths() {
   try {
-    const res = await fetch(
-      WORKS_PATH_API
-      // `${import.meta.env.PUBLIC_API_URL}works?_fields=id,title,slug&acf_format=standard`,
-    );
-
-    console.log("Fetching data WORKS_PATH_API:", WORKS_PATH_API);
+    console.log("🔍 [Works Slug] Fetching works from:", WORKS_PATH_API);
+    const res = await fetch(WORKS_PATH_API);
 
     if (!res.ok) {
-      throw new Error("Failed to fetch works data");
+      console.error(`❌ [Works Slug] Failed to fetch works: ${res.status} ${res.statusText}`);
+      console.error(`❌ [Works Slug] API URL: ${WORKS_PATH_API}`);
+      throw new Error(`Failed to fetch works data: ${res.status} ${res.statusText}`);
     }
 
     const dataWorks = (await res.json()) as Works[];
+    console.log(`✅ [Works Slug] Successfully fetched ${dataWorks.length} works`);
 
-    console.log("API Response:", dataWorks);
+    if (!Array.isArray(dataWorks) || dataWorks.length === 0) {
+      console.warn("⚠️ [Works Slug] No works found. Returning empty paths.");
+      console.warn("⚠️ [Works Slug] This will result in 404 errors for work detail pages.");
+      return [];
+    }
 
     const paths = dataWorks.map((work) => ({
       params: { slug: work.slug },
       props: { work },
     }));
 
+    console.log(`✅ [Works Slug] Generated ${paths.length} work detail pages`);
+    console.log(`📋 [Works Slug] Slugs:`, paths.map((p) => p.params.slug).join(", "));
+
     return paths;
   } catch (error) {
-    console.error("Error in getStaticPaths:", error);
-
+    console.error("❌ [Works Slug] Error in getStaticPaths:", error);
+    console.error("❌ [Works Slug] API URL:", WORKS_PATH_API);
+    if (error instanceof Error) {
+      console.error("❌ [Works Slug] Error message:", error.message);
+      console.error("❌ [Works Slug] Error stack:", error.stack);
+    }
     return [];
   }
 }

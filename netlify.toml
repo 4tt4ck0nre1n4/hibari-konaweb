@@ -1,14 +1,28 @@
 [build]
-  command = "astro check && astro build && pagefind --site dist"
+  # ビルドコマンド（環境変数チェック付き）
+  command = "npm run build:safe"
   publish = "dist"
 
 [build.environment]
   NODE_VERSION = "20"
+  # ビルドログを詳細にする
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 # WordPress uploads フォルダをコピーするためのディレクトリ設定
 [build.processing]
   skip_processing = false
 
-# 環境変数の設定（必要に応じてNetlify UIで設定）
-# [context.production.environment]
-#   WORDPRESS_API_URL = "http://hibari-konaweb.local"
+# 環境変数の設定
+# 以下の環境変数をNetlify UIで設定してください：
+# Site Settings → Environment Variables
+#
+# 必須:
+#   PUBLIC_API_URL = https://your-production-wordpress-url.com
+#   PUBLIC_API_PREFIX = /wp-json/wp/v2/
+#
+# オプション（Contact Form 7を使用する場合）:
+#   PUBLIC_WPCF7_API_PREFIX = contact-form-7/v1/contact-forms/
+#   PUBLIC_WPCF7_API_ID = 123
+#   PUBLIC_WPCF7_ID = 123
+#   PUBLIC_WPCF7_UNIT_TAG = wpcf7-f123-p456-o1
+#   PUBLIC_WPCF7_POST_ID = 456
