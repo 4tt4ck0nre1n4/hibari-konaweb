@@ -34,7 +34,7 @@ async function initSplitAnimations() {
       rightHeader: container.querySelector(".right__header") as HTMLElement,
       rightText: container.querySelector(".right__text") as HTMLElement,
       spImage: container.querySelector(".right__spImage") as HTMLImageElement,
-      rightLink: container.querySelector("right__link") as HTMLAnchorElement,
+      rightLink: container.querySelector(".right__link") as HTMLAnchorElement,
       iconMenuItems: container.querySelectorAll(".right__iconMenu_item"),
     };
 

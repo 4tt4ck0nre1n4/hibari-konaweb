@@ -341,7 +341,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   <Footer />
 </Layout>
 
-<script src="../../scripts/splitWorks.ts"></script>
+<script>
+  import "../../scripts/splitWorks.ts";
+</script>
 
 <style is:global>
   :root {
@@ -461,6 +463,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     margin-inline: auto;
     padding-block: 3rem;
     padding-inline: 2rem;
+    transition: opacity 1.2s ease;
+  }
+  
+  /* ホバー時に.left__innerを表示 */
+  .hover-left .left__inner {
+    opacity: 1 !important;
   }
   /* 左サイド サイトタイトル */
   .left__title {
