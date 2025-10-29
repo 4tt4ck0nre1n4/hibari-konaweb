@@ -8,7 +8,7 @@
     "*.astro"
   ],
   "scripts": {
-    "copy": "node -e \"require('fs-extra').copySync('./app/public/wp-content/uploads', './public/wp-content/uploads')\"",
+    "copy": "node -e \"const fs = require('fs-extra'); const src = './app/public/wp-content/uploads'; const dest = './public/wp-content/uploads'; if (fs.existsSync(src)) { fs.copySync(src, dest); console.log('✅ Copied uploads folder'); } else { console.log('⚠️  Uploads folder not found, skipping copy'); }\"",
     "clean": "node -e \"const fs = require('fs-extra'); const path = require('path'); const dirs = ['.vite-cache', 'node_modules/.vite', 'node_modules/.astro', 'dist', '.astro']; dirs.forEach(dir => { try { const fullPath = path.resolve(process.cwd(), dir); if (fs.existsSync(fullPath)) { fs.removeSync(fullPath); console.log('Cleaned:', dir); } else { console.log('Not exists:', dir); } } catch (e) { console.log('Failed:', dir, e.message); } });\"",
     "check-env": "node scripts/check-env.mjs",
     "dev": "npm run copy && astro dev",
