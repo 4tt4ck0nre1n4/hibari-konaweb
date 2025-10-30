@@ -435,11 +435,6 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     object-fit: cover;
   }
   /* 左サイド モーダル風 */
-  .split.left::before.left1 .left__inner {
-    opacity: 0;
-    transition: all 0.85s ease;
-    display: none;
-  }
   .split.left.left1 .left__inner {
     width: 95%;
     height: 100%;
@@ -468,7 +463,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
   /* ホバー時に.left__innerを表示 */
   .hover-left .left__inner {
-    opacity: 1 !important;
+    opacity: 1;
   }
   /* 左サイド サイトタイトル */
   .left__title {
