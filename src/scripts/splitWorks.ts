@@ -15,9 +15,15 @@ interface SplitElement {
 const gsapPromise = Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
 
 // left ⇔ right アニメーション
-document.addEventListener("DOMContentLoaded", function () {
+// DOMが既に読み込まれている場合とこれから読み込まれる場合の両方に対応
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", function () {
+    void initSplitAnimations();
+  });
+} else {
+  // DOMが既に読み込まれている場合は即座に実行
   void initSplitAnimations();
-});
+}
 
 async function initSplitAnimations() {
   const [{ gsap }, { ScrollTrigger }] = await gsapPromise;
@@ -149,6 +155,7 @@ async function initSplitAnimations() {
 
           if (splitElement.spImage) fadeOutElement(splitElement.spImage);
           if (splitElement.rightText) fadeOutElement(splitElement.rightText);
+          if (splitElement.rightLink) fadeOutElement(splitElement.rightLink);
         });
       }
     }
