@@ -1,4 +1,10 @@
 // split
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// GSAPプラグインを登録
+gsap.registerPlugin(ScrollTrigger);
+
 interface SplitElement {
   containers: HTMLDivElement | null;
   left: HTMLDivElement | null;
@@ -10,25 +16,18 @@ interface SplitElement {
   iconMenuItems: NodeListOf<HTMLLIElement> | null;
 }
 
-// GSAPを動的にインポート（メインスレッド処理の最適化）
-// トップレベルでインポートを開始し、DOMContentLoadedで初期化
-const gsapPromise = Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
-
 // left ⇔ right アニメーション
 // DOMが既に読み込まれている場合とこれから読み込まれる場合の両方に対応
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", function () {
-    void initSplitAnimations();
+    initSplitAnimations();
   });
 } else {
   // DOMが既に読み込まれている場合は即座に実行
-  void initSplitAnimations();
+  initSplitAnimations();
 }
 
-async function initSplitAnimations() {
-  const [{ gsap }, { ScrollTrigger }] = await gsapPromise;
-
-  gsap.registerPlugin(ScrollTrigger);
+function initSplitAnimations() {
   const containers = document.querySelectorAll(".split__container");
   const isMobile = window.innerWidth <= 768;
 
