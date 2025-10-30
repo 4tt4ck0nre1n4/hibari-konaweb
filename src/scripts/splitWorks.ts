@@ -18,13 +18,16 @@ interface SplitElement {
 
 // left ⇔ right アニメーション
 // DOMが既に読み込まれている場合とこれから読み込まれる場合の両方に対応
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", function () {
+// ブラウザ環境でのみ実行（SSR時のエラーを防ぐ）
+if (typeof window !== "undefined" && typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      initSplitAnimations();
+    });
+  } else {
+    // DOMが既に読み込まれている場合は即座に実行
     initSplitAnimations();
-  });
-} else {
-  // DOMが既に読み込まれている場合は即座に実行
-  initSplitAnimations();
+  }
 }
 
 function initSplitAnimations() {

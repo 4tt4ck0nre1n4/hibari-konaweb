@@ -114,12 +114,22 @@ export default defineConfig({
       commonjsOptions: {
         transformMixedEsModules: true,
       },
-      sourcemap: false,
+      sourcemap: true, // デバッグ用に一時的に有効化
       minify: "esbuild", // JavaScriptの最小化を有効化（パフォーマンス改善）
       cssCodeSplit: true, // CSSコード分割を有効化
       cssMinify: true, // CSSの最小化を有効化
       // チャンクサイズの最適化
       chunkSizeWarningLimit: 500,
+      rollupOptions: {
+        output: {
+          // GSAPなどのライブラリを適切にバンドル
+          manualChunks: (id) => {
+            if (id.includes('node_modules/gsap')) {
+              return 'gsap';
+            }
+          },
+        },
+      },
     },
     css: {
       preprocessorOptions: {

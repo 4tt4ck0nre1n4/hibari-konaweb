@@ -342,7 +342,186 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 </Layout>
 
 <script>
-  import "../../scripts/splitWorks.ts";
+  // @ts-nocheck
+  // GSAPとScrollTriggerを動的にインポート
+  import("https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js")
+    .then((gsapModule) => {
+      const gsap = gsapModule.gsap || gsapModule.default;
+
+      return import("https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js").then(() => {
+        // ScrollTriggerを登録
+        gsap.registerPlugin(ScrollTrigger);
+
+        // アニメーション初期化
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", function () {
+            initSplitAnimations(gsap, ScrollTrigger);
+          });
+        } else {
+          initSplitAnimations(gsap, ScrollTrigger);
+        }
+
+        function initSplitAnimations(gsap, ScrollTrigger) {
+          const containers = document.querySelectorAll(".split__container");
+          const isMobile = window.innerWidth <= 768;
+
+          containers.forEach((container) => {
+            const splitElement = {
+              containers: container,
+              left: container.querySelector(".left"),
+              right: container.querySelector(".right"),
+              rightHeader: container.querySelector(".right__header"),
+              rightText: container.querySelector(".right__text"),
+              spImage: container.querySelector(".right__spImage"),
+              rightLink: container.querySelector(".right__link"),
+              iconMenuItems: container.querySelectorAll(".right__iconMenu_item"),
+            };
+
+            // スマホサイズの場合、パララックス効果とスクロールアニメーション
+            if (isMobile) {
+              if (splitElement.spImage) {
+                gsap.set(splitElement.spImage, { opacity: 1 });
+              }
+              if (splitElement.rightText) {
+                gsap.set(splitElement.rightText, { opacity: 1 });
+              }
+              if (splitElement.rightLink) {
+                gsap.set(splitElement.rightLink, { opacity: 1 });
+                if (splitElement.rightLink.textContent) {
+                  addStyledText(splitElement.rightLink, 100);
+                }
+              }
+              if (splitElement.rightHeader && splitElement.rightHeader.textContent) {
+                addStyledText(splitElement.rightHeader, 200);
+              }
+
+              if (splitElement.left) {
+                gsap.set(splitElement.left, { opacity: 1, y: 0 });
+
+                const leftInner = splitElement.left.querySelector(".left__inner");
+                if (leftInner) {
+                  gsap.set(leftInner, { opacity: 1, y: 0 });
+                }
+
+                ScrollTrigger.create({
+                  trigger: splitElement.left,
+                  start: "top bottom",
+                  end: "top center",
+                  scrub: 1,
+                  onUpdate: (self) => {
+                    const progress = self.progress;
+                    if (leftInner) {
+                      gsap.to(leftInner, {
+                        opacity: progress,
+                        y: 30 * (1 - progress),
+                        duration: 0.1,
+                      });
+                    }
+                  },
+                });
+
+                const leftImage = splitElement.left.querySelector(".left__image");
+                if (leftImage) {
+                  ScrollTrigger.create({
+                    trigger: splitElement.left,
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: 1,
+                    onUpdate: (self) => {
+                      gsap.to(leftImage, {
+                        y: -20 * self.progress,
+                        duration: 0.1,
+                      });
+                    },
+                  });
+                }
+              }
+            } else {
+              // デスクトップサイズの場合、ホバーアニメーションを有効化
+              if (splitElement.left) {
+                splitElement.left.addEventListener("mouseenter", () => {
+                  container.classList.add("hover-left");
+                  setTimeout(() => fadeInElement(splitElement.left?.querySelector(".left__inner")), 1100);
+                });
+
+                splitElement.left.addEventListener("mouseleave", () => {
+                  container.classList.remove("hover-left");
+                  fadeOutElement(splitElement.left?.querySelector(".left__inner"));
+                });
+              }
+
+              if (splitElement.right) {
+                splitElement.right.addEventListener("mouseenter", () => {
+                  container.classList.add("hover-right");
+
+                  if (splitElement.spImage) setTimeout(() => fadeInElement(splitElement.spImage), 800);
+                  if (splitElement.rightHeader) addStyledText(splitElement.rightHeader, 200);
+                  if (splitElement.rightLink) {
+                    setTimeout(() => fadeInElement(splitElement.rightLink), 800);
+                    addStyledText(splitElement.rightLink, 100);
+                  }
+                  if (splitElement.rightText) {
+                    setTimeout(() => fadeInElement(splitElement.rightText), 800);
+                  }
+                });
+
+                splitElement.right.addEventListener("mouseleave", () => {
+                  container.classList.remove("hover-right");
+
+                  if (splitElement.spImage) fadeOutElement(splitElement.spImage);
+                  if (splitElement.rightText) fadeOutElement(splitElement.rightText);
+                  if (splitElement.rightLink) fadeOutElement(splitElement.rightLink);
+                });
+              }
+            }
+
+            // アイコンホバー
+            if (splitElement.iconMenuItems) {
+              splitElement.iconMenuItems.forEach((icon) => {
+                icon.addEventListener("mouseenter", () => {
+                  icon.classList.add("is-active");
+                });
+                icon.addEventListener("mouseleave", () => {
+                  icon.classList.remove("is-active");
+                });
+              });
+            }
+          });
+
+          function fadeInElement(element) {
+            if (element) {
+              gsap.to(element, {
+                opacity: 1,
+                duration: 1.2,
+                ease: "power1.out",
+              });
+            }
+          }
+
+          function fadeOutElement(element) {
+            if (element) {
+              gsap.to(element, {
+                opacity: 0,
+                duration: 1,
+                ease: "power1.out",
+              });
+            }
+          }
+
+          function addStyledText(element, delay) {
+            const newText = [...(element.textContent || "")].map((char) => `<span>${char}</span>`);
+            element.innerHTML = newText.join("");
+
+            Array.from(element.children).forEach((char, index) => {
+              setTimeout(() => char.classList.add("is-active"), delay * index);
+            });
+          }
+        }
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to load GSAP:", error);
+    });
 </script>
 
 <style is:global>
