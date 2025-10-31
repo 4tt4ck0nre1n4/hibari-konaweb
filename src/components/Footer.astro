@@ -92,15 +92,17 @@ const typedContact = contact as ContactType;
       </div>
       <div class="footer__menuInner">
         <FooterHeader footerHeader="Contact Me" />
-        <p class="footer__text_ja">
-          {footerText.contactMe.ja1}
-        </p>
-        <p class="footer__text_ja">
-          {footerText.contactMe.ja2}
-        </p>
-        <p class="footer__text_en">
-          {footerText.contactMe.en}
-        </p>
+        <div class="footer__textInner">
+          <p class="footer__text_ja">
+            {footerText.contactMe.ja1}
+          </p>
+          <p class="footer__text_ja">
+            {footerText.contactMe.ja2}
+          </p>
+          <p class="footer__text_en">
+            {footerText.contactMe.en}
+          </p>
+        </div>
         <ul class="footer__contactMenu">
           <FooterIcon
             className={typedContact.className.footer}
@@ -268,6 +270,9 @@ const typedContact = contact as ContactType;
   .footer__menu_item {
     margin-block-start: 0.5rem;
   }
+  .footer__menu_item:not(:first-child) {
+    margin-block-start: 1rem;
+  }
   .footer__menu_link {
     font-size: 0.75rem;
     letter-spacing: 0.04em;
@@ -394,7 +399,7 @@ const typedContact = contact as ContactType;
       gap: 1rem;
       padding-inline: 1rem;
     }
-    .footer__menu_item {
+    .footer__menu_item:not(:first-child) {
       margin-block-start: 1rem;
     }
     .footer__middleRow {
