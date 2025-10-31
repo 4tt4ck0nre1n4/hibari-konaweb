@@ -33,7 +33,7 @@ export const hrefLink = {
   privacy: "/privacy",
   sorry: "/sorry",
   twitter: "/sorry", //https://twitter.com"
-  github: "/sorry", //"https://github.com"
+  github: "https://github.com/4tt4ck0nre1n4", //"https://github.com"
   notion: "/sorry", //"https://notion.so"
   instagram: "/sorry", //"https://instagram.com"
   mail: "mailto:webengineer@hibari-konaweb.com",
