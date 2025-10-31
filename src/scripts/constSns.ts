@@ -22,7 +22,7 @@ export const twitter = {
 };
 export const github_sns = {
   className: "sns-icon__link",
-  href: "/sorry",
+  href: "https://github.com/4tt4ck0nre1n4",
   icon: "bi:github",
   item: "Github",
   ariaLabel: "Githubページへ(新しいタブで開く)",
