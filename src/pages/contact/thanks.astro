@@ -92,17 +92,21 @@ const thanksLinks = {
 <style>
   .thanks__wrapper {
     width: 100%;
-    max-width: 500px;
+    max-width: 700px;
     margin-inline: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     perspective: 100px;
   }
+  @media (max-width: 768px) {
+    .thanks__wrapper {
+      width: 90%;
+    }
+  }
   .thanks__header {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: inherit;
-    /* text-align: center; */
     margin-block: 3rem;
   }
   .text-gradient {
@@ -129,6 +133,7 @@ const thanksLinks = {
     font-size: 1rem;
     line-height: 2;
     letter-spacing: 0.16em;
+    text-align: left;
     margin-block-start: 0.5rem;
   }
   .thanks__image {
@@ -154,14 +159,16 @@ const thanksLinks = {
     font-size: 1rem;
     line-height: 2;
     letter-spacing: 0.2em;
-    /* text-align: center; */
-    margin-block-start: 0.5rem;
+    margin-block-start: 1rem;
   }
   .thanks__link {
     display: block;
     color: rebeccapurple;
-    /* text-align: center; */
-    /* margin-block-start: 1rem; */
-    /* padding-block: 1rem; */
+    text-align: center;
+    text-decoration: underline;
+  }
+  .thanks__link:is(:hover, :focus-visible) {
+    color: #ff4f48;
+    text-decoration: none;
   }
 </style>
