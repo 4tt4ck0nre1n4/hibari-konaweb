@@ -16,13 +16,26 @@ type FormValues = {
   wpcf7_unit_tag: string;
 };
 
+// Contact Form 7 API レスポンスの型定義
+type WPCF7InvalidField = {
+  message: string;
+  idref: string | null;
+  error_id: string;
+};
+
+type WPCF7Response = {
+  status: "mail_sent" | "validation_failed" | "mail_failed" | "aborted" | "spam";
+  message: string;
+  invalid_fields?: WPCF7InvalidField[];
+  posted_data_hash?: string;
+};
+
 export default function ContactForm() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
   const [hoveredField, setHoveredField] = useState<"name" | "email" | "message" | null>(null);
 
   const [hoveredSubmit, setHoveredSubmit] = useState(false);
-  // const [hoveredSubmit, setHoveredSubmit] = useState<"submit" | null>("submit");
 
   const {
     register,
@@ -49,25 +62,77 @@ export default function ContactForm() {
     formData.append("your-message", data.message);
     formData.append("_wpcf7_unit_tag", data.wpcf7_unit_tag);
 
-    await fetch(CONTACT_WPCF7_API, {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => {
-        console.log(response);
-        window.location.replace(THANKS_URL);
-        return response.text();
-      })
-      .then((text) => {
-        console.log(text);
-        console.log(JSON.parse(text));
-      })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    try {
+      const response = await fetch(CONTACT_WPCF7_API, {
+        method: "POST",
+        body: formData,
       });
+
+      // ステータスコードを確認
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseText = await response.text();
+      let responseData: WPCF7Response;
+
+      try {
+        const parsed = JSON.parse(responseText) as unknown;
+        // 基本的な型チェック
+        if (
+          typeof parsed === "object" &&
+          parsed !== null &&
+          "status" in parsed &&
+          typeof (parsed as { status: unknown }).status === "string"
+        ) {
+          responseData = parsed as WPCF7Response;
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (parseError) {
+        console.error("Failed to parse response:", responseText);
+        throw new Error("サーバーからの応答が正しくありません。");
+      }
+
+      // レスポンスをコンソールに出力（デバッグ用）
+      console.log("Contact Form 7 Response:", responseData);
+
+      // Contact Form 7のレスポンスステータスを確認
+      if (responseData.status === "mail_sent") {
+        // メール送信成功時のみリダイレクト
+        console.log("Mail sent successfully. Redirecting to thanks page...");
+        window.location.replace(THANKS_URL);
+      } else if (responseData.status === "validation_failed") {
+        // バリデーションエラー
+        const errorMessages = responseData.invalid_fields
+          ? responseData.invalid_fields.map((field) => field.message).join("\n")
+          : responseData.message !== ""
+            ? responseData.message
+            : "入力内容に誤りがあります。";
+        alert(errorMessages);
+      } else if (responseData.status === "mail_failed") {
+        // メール送信失敗
+        console.error("Mail sending failed:", responseData);
+        alert(
+          "メール送信に失敗しました。しばらく時間をおいて再度お試しください。\n" +
+            "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
+        );
+      } else {
+        // その他のエラー
+        console.error("Unexpected response status:", responseData);
+        alert(
+          "送信処理中にエラーが発生しました。\n" +
+            "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
+        );
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert(
+        "送信処理中にエラーが発生しました。\n" +
+          "ネットワーク接続を確認し、しばらく時間をおいて再度お試しください。\n" +
+          "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
+      );
+    }
   });
 
   return (
