@@ -63,6 +63,9 @@ export default function ContactForm() {
     formData.append("_wpcf7_unit_tag", data.wpcf7_unit_tag);
 
     try {
+      // デバッグ用: 送信先のエンドポイントをログ出力
+      console.log("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
+
       const response = await fetch(CONTACT_WPCF7_API, {
         method: "POST",
         body: formData,
@@ -70,6 +73,13 @@ export default function ContactForm() {
 
       // ステータスコードを確認
       if (!response.ok) {
+        const responseText = await response.text();
+        console.error("❌ [Contact Form] HTTP Error Response:", {
+          status: response.status,
+          statusText: response.statusText,
+          url: CONTACT_WPCF7_API,
+          responseText: responseText,
+        });
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
