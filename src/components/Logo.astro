@@ -133,6 +133,8 @@ const gradientTitle = "My Portfolio";
           loadingScreen.style.visibility = "hidden";
           // メインコンテンツの表示を許可（CLSを防ぐためhtmlに設定）
           document.documentElement.style.overflow = "";
+          // ローディング画面が消えたことを通知するカスタムイベントを発火
+          window.dispatchEvent(new CustomEvent("loadingComplete"));
         },
       });
     }, LOADING_DURATION);
