@@ -710,11 +710,23 @@ const webDesignerRiv = "/riv/designer-life.riv";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  /* .webp画像に明示的にobject-fit: containを指定 */
+  /* .webp画像に明示的にobject-fit: containを指定し、鮮明な表示を実現 */
   .grid__menu_item.item-10 .grid__menu_svg img,
   .grid__menu_item.item-11 .grid__menu_svg img,
   .grid__menu_item.item-12 .grid__menu_svg img {
     object-fit: contain;
+    /* 画像を鮮明に表示するための設定 */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    /* ブラウザの最適化を無効化して高品質レンダリング */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* GPUアクセラレーションを有効化 */
+    transform: translateZ(0);
+    will-change: transform;
+    /* アンチエイリアシングの最適化 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   .grid__menu_item:not(.item-4, .item-5, .item-6) .grid__menu_svg {
     /* background: transparent; */
