@@ -139,6 +139,15 @@ const notFoundLinks = {
     object-fit: contain;
     margin-block-start: 1rem;
     margin-inline: auto;
+    animation: movingCat 2s alternate infinite;
+  }
+  @keyframes movingCat {
+    0% {
+      transform: translateY(0) translateZ(0);
+    }
+    100% {
+      transform: translateY(-10px) translateZ(16px);
+    }
   }
 
   .notFound__link {
@@ -147,7 +156,7 @@ const notFoundLinks = {
     text-decoration: underline;
   }
   .notFound__link:is(:hover, :focus-visible) {
-    color: blue;
+    color: #ff4f48;
     text-decoration: none;
   }
 </style>

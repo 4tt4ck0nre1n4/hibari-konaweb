@@ -47,6 +47,9 @@ export default {
 
     // Font family name quotes
     "font-family-name-quotes": "always-where-recommended",
+
+    // Keyframes name pattern (allow camelCase)
+    "keyframes-name-pattern": null,
   },
   ignoreFiles: ["node_modules/**", "dist/**", ".astro/**", "public/**", "app/**"],
 };
