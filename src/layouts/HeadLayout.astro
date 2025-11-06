@@ -119,17 +119,24 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     <!-- ページ固有の追加head要素（LCP最適化など） -->
     <slot name="head" />
 
-    <!-- 非クリティカルCSSの読み込みを遅延させるヘルパー -->
+    <!-- Swiper CSS非同期読み込みのフォールバックスクリプト -->
     <script is:inline>
-      // preload with media="print" hack のフォールバック
+      // media="print" hack のフォールバック（Swiper CSS用）
       (function () {
-        const links = document.querySelectorAll('link[rel="preload"][as="style"]');
-        links.forEach((link) => {
-          if (link.onload === null) {
-            link.onload = function () {
-              this.onload = null;
-              this.rel = "stylesheet";
-            };
+        const links = document.querySelectorAll('link[rel="stylesheet"][media="print"]');
+        links.forEach(function (link) {
+          const href = link.getAttribute("href");
+          // Swiper CSSのみを処理
+          if (href && href.includes("swiper")) {
+            // onloadがサポートされていない場合は、即座にmedia="all"に変換
+            if (!("onload" in link)) {
+              link.media = "all";
+            } else {
+              // onloadがサポートされている場合は、onloadイベントを設定
+              link.onload = function () {
+                this.media = "all";
+              };
+            }
           }
         });
       })();
