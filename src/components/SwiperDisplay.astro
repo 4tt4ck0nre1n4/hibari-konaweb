@@ -131,31 +131,6 @@ const swiperText2 = "Thank you for viewing my site.";
     z-index: 5; */
     margin-block-start: 1rem;
   }
-
-  /* スマホサイズでのテキスト中央配置 */
-  @media (max-width: 480px) {
-    .textArea {
-      top: 30%;
-      left: 20%;
-    }
-    .swipers__header {
-      width: 100%;
-    }
-
-    .swipers__text {
-      width: 100%;
-      margin-block-start: 0;
-      line-height: 1.8;
-    }
-
-    .swipers__text:first-of-type {
-      margin-block-start: 1rem;
-    }
-
-    .swipers__text:last-of-type {
-      margin-block-start: 0.5rem;
-    }
-  }
   .swipers {
     width: 100%;
     height: 100vh;
@@ -185,6 +160,14 @@ const swiperText2 = "Thank you for viewing my site.";
     }
     to {
       transform: perspective(1600px) rotateX(-24deg) rotateY(360deg);
+    }
+  }
+  @keyframes rotation-mobile {
+    from {
+      transform: perspective(1800px) rotateX(-20deg) rotateY(0deg);
+    }
+    to {
+      transform: perspective(1800px) rotateX(-20deg) rotateY(360deg);
     }
   }
   .swipers-slide {
@@ -218,6 +201,24 @@ const swiperText2 = "Thank you for viewing my site.";
     animation: reflection 32s linear infinite;
   }
   @keyframes reflection {
+    0% {
+      transform: translateY(0%);
+      background-position-x: 400%;
+    }
+    24% {
+      transform: translateY(0%);
+      background-position-x: 240%;
+    }
+    56% {
+      transform: translateY(0%);
+      background-position-x: 0%;
+    }
+    100% {
+      transform: translateY(0%);
+      background-position-x: -320%;
+    }
+  }
+  @keyframes reflection-mobile {
     0% {
       transform: translateY(0%);
       background-position-x: 400%;
@@ -287,5 +288,70 @@ const swiperText2 = "Thank you for viewing my site.";
     pointer-events: none;
     margin-block-start: 1.5rem;
     padding: 1rem;
+  }
+
+  /* スマホサイズでのテキスト中央配置 */
+  @media (max-width: 480px) {
+    .textArea {
+      top: 30%;
+      left: 20%;
+    }
+    .swipers__header {
+      width: 100%;
+    }
+
+    .swipers__text {
+      width: 100%;
+      margin-block-start: 0;
+      line-height: 1.8;
+    }
+
+    .swipers__text:first-of-type {
+      margin-block-start: 1rem;
+    }
+
+    .swipers__text:last-of-type {
+      margin-block-start: 0.5rem;
+    }
+
+    /* スマホサイズでのスワイパー調整：引きの画角、小さな画像、滑らかなアニメーション */
+    .swipers-wrapper {
+      width: 150px;
+      height: 200px;
+      min-height: 200px;
+      left: calc(50% - 75px);
+      transform: perspective(1800px);
+      animation: rotation-mobile 32s ease-in-out infinite;
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+
+    .swipers-slide {
+      transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(280px) scale(-1, 1);
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+
+    .swipers-slide::before {
+      left: calc(50% - 75px);
+      transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(280px);
+      animation: reflection-mobile 32s ease-in-out infinite;
+      will-change: transform, background-position;
+    }
+
+    .swipers-slide::after {
+      left: calc(50% - 75px);
+      transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(280px);
+      animation: reflection-mobile 32s ease-in-out infinite;
+      will-change: transform;
+    }
+
+    .swipers__image {
+      left: calc(50% - 75px);
+    }
+
+    .swipers__shadow {
+      left: calc(50% - 75px);
+    }
   }
 </style>

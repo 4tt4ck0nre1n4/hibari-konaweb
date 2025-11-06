@@ -245,8 +245,12 @@ html.dark .nav-links a {
 .serverError__image {
   width: 200px;
   height: auto;
+  border-radius: 20%;
   object-fit: cover;
+  margin-block-start: 1rem;
   margin-inline: auto;
+  padding-block: 1rem;
+  padding-inline: 1rem;
   animation: movingCat 2s alternate infinite;
 }
 
