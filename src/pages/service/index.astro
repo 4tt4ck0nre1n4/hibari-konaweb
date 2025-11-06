@@ -106,20 +106,38 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     height: 200px;
     object-fit: contain;
     margin-inline: auto;
+    animation: movingCat 2s alternate infinite;
+  }
+  @keyframes movingCat {
+    0% {
+      transform: translateY(0) translateZ(0);
+    }
+    100% {
+      transform: translateY(-10px) translateZ(16px);
+    }
   }
   .price__link {
     letter-spacing: 0.1em;
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-align: center;
+    text-decoration: underline;
     margin-block-start: 1rem;
   }
   .price__link_secondary {
-    /* display: block; */
     letter-spacing: 0.1em;
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-align: center;
+    text-decoration: underline;
     margin-block-start: 1rem;
     padding-block: 1rem;
+  }
+  .price__link:is(:hover, :focus-within) {
+    color: var(--color-red);
+    text-decoration: none;
+  }
+  .price__link_secondary:is(:hover, :focus-within) {
+    color: var(--color-red);
+    text-decoration: none;
   }
 </style>
 

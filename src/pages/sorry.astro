@@ -60,6 +60,10 @@ const sorryImageMeta = {
 </Layout>
 
 <style>
+  :root {
+    --color-purple: rgb(102 51 153);
+    --color-red: #ff4f48;
+  }
   .sorry__wrapper {
     width: 100%;
     max-width: 700px;
@@ -72,7 +76,7 @@ const sorryImageMeta = {
   }
   .sorry__header {
     font-size: 2rem;
-    color: inherit;
+    color: var(--color-red);
     text-align: center;
     margin-block-start: 3rem;
   }
@@ -83,18 +87,26 @@ const sorryImageMeta = {
     letter-spacing: 0.1em;
     color: inherit;
     text-align: center;
-    margin-block-start: 3rem;
+    margin-block-start: 1rem;
   }
-
+  .sorry__body:nth-of-type(3) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   @media (max-width: 768px) {
     .sorry__header {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
+      text-align: left;
     }
     .sorry__body {
       font-size: 0.9375rem;
       line-height: 1.8;
       letter-spacing: 0.05em;
       text-align: left;
+    }
+    .sorry__body:nth-of-type(3) {
+      text-align: center;
     }
   }
 
@@ -104,13 +116,27 @@ const sorryImageMeta = {
     height: 200px;
     object-fit: contain;
     margin-inline: auto;
+    animation: movingCat 2s alternate infinite;
+  }
+  @keyframes movingCat {
+    0% {
+      transform: translateY(0) translateZ(0);
+    }
+    100% {
+      transform: translateY(-10px) translateZ(16px);
+    }
   }
 
-  .sorry__link {
+  /* .sorry__link {
     display: block;
     color: rebeccapurple;
     text-align: center;
+    text-decoration: underline;
     margin-block-start: 3rem;
     padding-block: 1rem;
   }
+  .sorry__link:is(:hover, :focus-within) {
+    color: #ff4f48;
+    text-decoration: none;
+  } */
 </style>

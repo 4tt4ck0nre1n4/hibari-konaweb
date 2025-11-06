@@ -1,5 +1,7 @@
 :root {
   --gradient: linear-gradient(90deg, rgb(238 161 255 / 1) 0%, rgb(147 183 255 / 1) 55%, rgb(170 244 254 / 1) 100%);
+  --color-white: #f1f5f9;
+  --color-purple: rgb(102 51 153);
   --color-red: #ff4f48;
 
   /* --gradient: linear-gradient(
@@ -21,11 +23,11 @@
 html {
   font-family: Poppins, system-ui, sans-serif;
   color: #020202;
-  background-color: #f1f5f9;
+  background-color: var(--color-white);
 }
 
 html.dark {
-  color: #f1f5f9;
+  color: var(--color-white);
   background-color: #0d0950;
 }
 
@@ -57,13 +59,9 @@ html.dark footer {
 .breadcrumbs__wrapper {
   width: 100%;
   max-width: 700px;
-
-  /* background-color: antiquewhite; */
   margin-block-start: 4rem;
   margin-inline: auto;
   padding-block: 1.25rem;
-
-  /* outline: 1px solid red; */
 }
 
 .breadcrumbs__wrapper.breadcrumbs__wrapper_top {
@@ -117,9 +115,9 @@ html.dark footer {
   display: block;
   font-size: 1rem;
   font-weight: 700;
-  color: rebeccapurple;
-  background-color: white;
-  border: rebeccapurple 1px solid;
+  color: var(--color-purple);
+  background-color: var(--color-white);
+  border: var(--color-purple) 1px solid;
   box-shadow: 0 10px 18px rgb(0 0 0 / 0.5);
   text-align: center;
   text-decoration: none;
@@ -128,15 +126,15 @@ html.dark footer {
 }
 
 .pagination__menu .pagination__link_current {
-  color: white;
-  background-color: rebeccapurple;
-  border: rebeccapurple 1px solid;
+  color: var(--color-white);
+  background-color: var(--color-purple);
+  border: var(--color-purple) 1px solid;
   transition: background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .pagination__menu .pagination__link_current:is(:hover, :focus-within) {
-  color: rebeccapurple;
-  background-color: white;
+  color: var(--color-purple);
+  background-color: var(--color-white);
 }
 
 .pagination__link_empty {
@@ -193,7 +191,7 @@ html.dark footer {
 }
 
 html.dark .nav-links a {
-  color: #f1f5f9;
+  color: var(--color-white);
 }
 
 /* 読み上げ専用CSS */
@@ -224,7 +222,7 @@ html.dark .nav-links a {
 
 .serverError__header {
   font-size: 2rem;
-  color: #ff4f48;
+  color: var(--color-red);
   text-align: center;
   margin-block-start: 3rem;
 }
@@ -249,10 +247,20 @@ html.dark .nav-links a {
   height: auto;
   object-fit: cover;
   margin-inline: auto;
+  animation: movingCat 2s alternate infinite;
+}
+
+@keyframes movingCat {
+  0% {
+    transform: translateY(0) translateZ(0);
+  }
+
+  100% {
+    transform: translateY(-10px) translateZ(16px);
+  }
 }
 
 .serverError__inner {
-  /* border: red 1px solid; */
   border-radius: 0.5rem;
   margin-block-start: 1rem;
   padding-block: 1rem;
@@ -284,12 +292,26 @@ html.dark .nav-links a {
 
 .serverError__menu_link {
   display: inline-block;
-  color: rebeccapurple;
+  color: var(--color-purple);
   text-decoration: underline;
   transition: all 0.6s ease;
 }
 
 .serverError__menu_link:is(:hover, :focus-within) {
-  color: blue;
+  color: var(--color-red);
+  text-decoration: none;
+}
+
+.sorry__link {
+  display: block;
+  color: rebeccapurple;
+  text-align: center;
+  text-decoration: underline;
+  padding-block: 1rem;
+  padding-inline: 0.25rem;
+}
+
+.sorry__link:is(:hover, :focus-within) {
+  color: #ff4f48;
   text-decoration: none;
 }
