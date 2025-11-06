@@ -8,7 +8,6 @@ import pagefind from "astro-pagefind";
 import sitemap from "@astrojs/sitemap";
 
 import netlify from "@astrojs/netlify";
-import { asyncCssPlugin } from "./astro-plugin-async-css.js";
 
 export default defineConfig({
   site: "https://hibari-konaweb.netlify.app",
@@ -93,7 +92,6 @@ export default defineConfig({
         ],
       },
     }),
-    asyncCssPlugin(), // 非クリティカルCSSのみを非同期読み込み
   ],
   image: {
     domains: ["astro.build"],
