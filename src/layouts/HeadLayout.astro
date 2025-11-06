@@ -143,62 +143,21 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     <!-- ページ固有の追加head要素（LCP最適化など） -->
     <slot name="head" />
 
-    <!-- CSSを非同期読み込みにするスクリプト（レンダリングブロック削減・フォールバック） -->
+    <!-- media="print" hack のフォールバックスクリプト（古いブラウザ対応） -->
     <script is:inline>
-      // プラグインが動作しない場合のフォールバック（開発環境など）
+      // onloadがサポートされていないブラウザのフォールバック
       (function () {
-        // DOMContentLoadedで実行して、Astroが生成したCSSリンクを処理
-        function asyncLoadCSS() {
-          const stylesheets = document.querySelectorAll('link[rel="stylesheet"]:not([data-critical])');
-          stylesheets.forEach(function (link) {
-            const href = link.getAttribute("href");
-            if (!href || href.startsWith("data:") || link.hasAttribute("data-async-loaded")) return;
-
-            // preloadに変換
-            link.setAttribute("data-async-loaded", "true");
-            link.rel = "preload";
-            link.as = "style";
+        const links = document.querySelectorAll('link[rel="stylesheet"][media="print"]');
+        links.forEach(function (link) {
+          // onloadがサポートされていない場合は、即座にmedia="all"に変換
+          if (!("onload" in link)) {
+            link.media = "all";
+          } else {
+            // onloadがサポートされている場合は、onloadイベントを設定
             link.onload = function () {
-              this.onload = null;
-              this.rel = "stylesheet";
+              this.media = "all";
             };
-          });
-        }
-
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", asyncLoadCSS);
-        } else {
-          asyncLoadCSS();
-        }
-
-        // MutationObserverで後から追加されるCSSリンクも処理
-        const observer = new MutationObserver(function (mutations) {
-          mutations.forEach(function (mutation) {
-            mutation.addedNodes.forEach(function (node) {
-              if (node.nodeType === 1 && node.tagName === "LINK" && node.rel === "stylesheet") {
-                const href = node.getAttribute("href");
-                if (
-                  href &&
-                  !href.startsWith("data:") &&
-                  !node.hasAttribute("data-critical") &&
-                  !node.hasAttribute("data-async-loaded")
-                ) {
-                  node.rel = "preload";
-                  node.as = "style";
-                  node.onload = function () {
-                    this.onload = null;
-                    this.rel = "stylesheet";
-                  };
-                  node.setAttribute("data-async-loaded", "true");
-                }
-              }
-            });
-          });
-        });
-
-        observer.observe(document.head, {
-          childList: true,
-          subtree: true,
+          }
         });
       })();
     </script>

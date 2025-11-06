@@ -1,6 +1,7 @@
 /**
- * Astroプラグイン: CSSを非同期読み込みにする
+ * Astroプラグイン: 非クリティカルCSSのみを非同期読み込みにする
  * レンダリングブロックを削減してLCPを改善
+ * メインのCSS（reset.css, global.css）は通常通り読み込み、SwiperなどのライブラリCSSのみを非同期化
  */
 import fs from "fs";
 import path from "path";
@@ -16,7 +17,6 @@ export function asyncCssPlugin() {
       "astro:build:done": async ({ dir }) => {
         try {
           // ビルド後のHTMLファイルを処理
-          // dirはURLオブジェクトまたは文字列の可能性がある
           const buildDir = typeof dir === "string" ? dir : dir.pathname || dir.href || "./dist";
           const htmlFiles = findHtmlFiles(buildDir);
 
@@ -26,7 +26,7 @@ export function asyncCssPlugin() {
             let html = fs.readFileSync(htmlFile, "utf-8");
             let modified = false;
 
-            // CSSの<link>タグを非同期読み込みに変換
+            // 非クリティカルなCSS（Swiperなど）のみを非同期読み込みに変換
             html = html.replace(/<link([^>]*?)rel=["']stylesheet["']([^>]*?)>/gi, (match, before, after) => {
               // すでにpreloadやその他の特別な属性がある場合はスキップ
               if (match.includes('rel="preload"') || match.includes('media="print"')) {
@@ -46,18 +46,21 @@ export function asyncCssPlugin() {
                 return match;
               }
 
-              // クリティカルCSS（critical.cssなど）はスキップ
-              if (href.includes("critical") || href.includes("inline")) {
-                return match;
+              // メインのCSS（reset.css, global.css）は通常通り読み込み
+              // 非クリティカルなライブラリCSS（Swiper、Pagefindなど）のみを非同期化
+              const isNonCritical = href.includes("swiper") || href.includes("pagefind") || href.includes("ui.css");
+
+              if (!isNonCritical) {
+                return match; // メインCSSは変更しない
               }
 
               modified = true;
 
-              // preload + onload で非同期読み込み
-              // パスを相対パスに正規化（必要に応じて）
+              // media="print" hack を使用して非同期読み込み
+              // より確実に動作し、CSPにも対応
               const normalizedHref = href.startsWith("/") ? href : `/${href}`;
 
-              return `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+              return `<link rel="stylesheet" href="${normalizedHref}" media="print" onload="this.media='all'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
             });
 
             if (modified) {
