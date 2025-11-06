@@ -1,9 +1,6 @@
 // split
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-// GSAPプラグインを登録
-gsap.registerPlugin(ScrollTrigger);
+// GSAPを動的インポート（パフォーマンス最適化）
+// ブラウザがアイドル状態になってから読み込む
 
 interface SplitElement {
   containers: HTMLDivElement | null;
@@ -16,21 +13,17 @@ interface SplitElement {
   iconMenuItems: NodeListOf<HTMLLIElement> | null;
 }
 
-// left ⇔ right アニメーション
-// DOMが既に読み込まれている場合とこれから読み込まれる場合の両方に対応
-// ブラウザ環境でのみ実行（SSR時のエラーを防ぐ）
-if (typeof window !== "undefined" && typeof document !== "undefined") {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function () {
-      initSplitAnimations();
-    });
-  } else {
-    // DOMが既に読み込まれている場合は即座に実行
-    initSplitAnimations();
-  }
-}
+// GSAPを動的インポートして初期化
+async function initSplitAnimations() {
+  const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+    import("gsap"),
+    import("gsap/ScrollTrigger"),
+  ]);
 
-function initSplitAnimations() {
+  // GSAPプラグインを登録
+  gsap.registerPlugin(ScrollTrigger);
+
+  // left ⇔ right アニメーション
   const containers = document.querySelectorAll(".split__container");
   const isMobile = window.innerWidth <= 768;
 
@@ -127,12 +120,12 @@ function initSplitAnimations() {
       if (splitElement.left) {
         splitElement.left.addEventListener("mouseenter", () => {
           container.classList.add("hover-left");
-          setTimeout(() => fadeInElement(splitElement.left?.querySelector(".left__inner")), 1100);
+          setTimeout(() => fadeInElement(gsap, splitElement.left?.querySelector(".left__inner")), 1100);
         });
 
         splitElement.left.addEventListener("mouseleave", () => {
           container.classList.remove("hover-left");
-          fadeOutElement(splitElement.left?.querySelector(".left__inner"));
+          fadeOutElement(gsap, splitElement.left?.querySelector(".left__inner"));
         });
       }
 
@@ -140,24 +133,24 @@ function initSplitAnimations() {
         splitElement.right.addEventListener("mouseenter", () => {
           container.classList.add("hover-right");
 
-          if (splitElement.spImage) setTimeout(() => fadeInElement(splitElement.spImage), 800);
+          if (splitElement.spImage) setTimeout(() => fadeInElement(gsap, splitElement.spImage), 800);
           if (splitElement.rightHeader) addStyledText(splitElement.rightHeader, 200);
           if (splitElement.rightLink) {
-            setTimeout(() => fadeInElement(splitElement.rightLink), 800);
+            setTimeout(() => fadeInElement(gsap, splitElement.rightLink), 800);
             addStyledText(splitElement.rightLink, 100);
           }
           // .right__textにはaddStyledTextを適用しない（WordPressから来るspan構造を保持）
           if (splitElement.rightText) {
-            setTimeout(() => fadeInElement(splitElement.rightText), 800);
+            setTimeout(() => fadeInElement(gsap, splitElement.rightText), 800);
           }
         });
 
         splitElement.right.addEventListener("mouseleave", () => {
           container.classList.remove("hover-right");
 
-          if (splitElement.spImage) fadeOutElement(splitElement.spImage);
-          if (splitElement.rightText) fadeOutElement(splitElement.rightText);
-          if (splitElement.rightLink) fadeOutElement(splitElement.rightLink);
+          if (splitElement.spImage) fadeOutElement(gsap, splitElement.spImage);
+          if (splitElement.rightText) fadeOutElement(gsap, splitElement.rightText);
+          if (splitElement.rightLink) fadeOutElement(gsap, splitElement.rightLink);
         });
       }
     }
@@ -176,7 +169,7 @@ function initSplitAnimations() {
   });
 
   // 左サイド モーダルウィンドウ in
-  function fadeInElement(element: Element | null | undefined): void {
+  function fadeInElement(gsap: any, element: Element | null | undefined): void {
     if (element) {
       gsap.to(element, {
         opacity: 1,
@@ -186,7 +179,7 @@ function initSplitAnimations() {
     }
   }
 
-  function fadeOutElement(element: Element | null | undefined): void {
+  function fadeOutElement(gsap: any, element: Element | null | undefined): void {
     if (element) {
       gsap.to(element, {
         opacity: 0,
@@ -204,5 +197,28 @@ function initSplitAnimations() {
     Array.from(element.children).forEach((char, index) => {
       setTimeout(() => char.classList.add("is-active"), delay * index);
     });
+  }
+}
+
+// ブラウザ環境でのみ実行（SSR時のエラーを防ぐ）
+if (typeof window !== "undefined" && typeof document !== "undefined") {
+  // requestIdleCallbackで遅延読み込み
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(() => {
+      void initSplitAnimations();
+    }, { timeout: 2000 });
+  } else {
+    // requestIdleCallbackがサポートされていない場合は少し遅延
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+          void initSplitAnimations();
+        }, 1000);
+      });
+    } else {
+      setTimeout(() => {
+        void initSplitAnimations();
+      }, 1000);
+    }
   }
 }
