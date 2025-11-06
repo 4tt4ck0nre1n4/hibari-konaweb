@@ -104,15 +104,17 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     display: block;
     width: 200px;
     height: 200px;
+    border-radius: 20%;
     object-fit: contain;
+    margin-block-start: 1rem;
     margin-inline: auto;
+    padding-block: 1rem;
+    padding-inline: 1rem;
     animation: movingCat 2s alternate infinite;
   }
   /* ダークモード時に猫の体を白色にする */
   html.dark .price__image {
     background-color: #ffffff;
-    border-radius: 0.625rem;
-    padding: 0.5rem;
   }
   @keyframes movingCat {
     0% {
