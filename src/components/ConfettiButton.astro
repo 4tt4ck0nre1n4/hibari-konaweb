@@ -137,7 +137,19 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     }, 1000);
   };
 
-  window.addEventListener("load", () => {
+  function initConfettiButton() {
     turnConfettiIconTimeInterval();
+  }
+
+  // window.loadまたはローディング完了後に初期化
+  if (document.readyState === "complete") {
+    initConfettiButton();
+  } else {
+    window.addEventListener("load", initConfettiButton);
+  }
+
+  // ローディング画面が消えた後に再初期化
+  window.addEventListener("loadingComplete", () => {
+    initConfettiButton();
   });
 </script>

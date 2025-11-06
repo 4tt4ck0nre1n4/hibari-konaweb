@@ -7,8 +7,19 @@ import "@pagefind/default-ui/css/ui.css";
 <script>
   import { PagefindUI } from "@pagefind/default-ui";
 
-  document.addEventListener("DOMContentLoaded", () => {
-    new PagefindUI({
+  let pagefindUI: PagefindUI | null = null;
+
+  function initSearch() {
+    // 既存のPagefindUIインスタンスを破棄
+    if (pagefindUI) {
+      const searchElement = document.querySelector("#search");
+      if (searchElement) {
+        searchElement.innerHTML = "";
+      }
+    }
+
+    // 新しくPagefindUIを初期化
+    pagefindUI = new PagefindUI({
       element: "#search",
       showImages: true,
     });
@@ -51,6 +62,18 @@ import "@pagefind/default-ui/css/ui.css";
         subtree: true,
       });
     }
+  }
+
+  // DOMContentLoadedで初期化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSearch);
+  } else {
+    initSearch();
+  }
+
+  // ローディング画面が消えた後に再初期化
+  window.addEventListener("loadingComplete", () => {
+    setTimeout(initSearch, 100);
   });
 </script>
 

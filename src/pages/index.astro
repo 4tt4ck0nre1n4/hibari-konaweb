@@ -419,6 +419,11 @@ const webDesignerRiv = "/riv/designer-life.riv";
     // DOM既にロード済みの場合は即座に実行
     initConfetti();
   }
+
+  // ローディング画面が消えた後に再初期化
+  window.addEventListener("loadingComplete", () => {
+    setTimeout(initConfetti, 100);
+  });
 </script>
 
 <style is:global>
@@ -1175,8 +1180,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
     }, 1000);
   }
 
-  // DOMContentLoadedでボタンイベントを初期化（GSAPに依存しない）
-  document.addEventListener("DOMContentLoaded", () => {
+  function initButtonEvents() {
     function updateTooltipClassByPosition(): void {
       const item4 = document.querySelector(".item-4");
       const item6 = document.querySelector(".item-6");
@@ -1296,6 +1300,18 @@ const webDesignerRiv = "/riv/designer-life.riv";
         );
       });
     });
+  }
+
+  // DOMContentLoadedでボタンイベントを初期化（GSAPに依存しない）
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initButtonEvents);
+  } else {
+    initButtonEvents();
+  }
+
+  // ローディング画面が消えた後に再初期化
+  window.addEventListener("loadingComplete", () => {
+    setTimeout(initButtonEvents, 100);
   });
 
   // riv画像のプリロードを削除（パフォーマンス最適化: client:visibleで遅延読み込み）
