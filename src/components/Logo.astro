@@ -37,97 +37,115 @@ const gradientTitle = "My Portfolio";
 </div>
 
 <script>
-  import { gsap } from "gsap";
+  // GSAPを動的インポート（パフォーマンス最適化）
+  // ブラウザがアイドル状態になってから読み込む
+  async function initLogoAnimation() {
+    const { gsap } = await import("gsap");
 
-  // ローディングアニメーションの設定
-  const LOADING_DURATION = 3000; // 3秒間のローディング表示
+    // ローディングアニメーションの設定
+    const LOADING_DURATION = 3000; // 3秒間のローディング表示
 
-  // DOM要素の取得とアニメーション初期化
-  function initLoadingAnimation() {
-    const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
-    const logoImage = document.querySelector(".logo-image") as HTMLElement;
-    const title = document.querySelector(".title") as HTMLElement;
-    const spinner = document.querySelector(".spinner") as HTMLElement;
+    // DOM要素の取得とアニメーション初期化
+    function initLoadingAnimation() {
+      const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
+      const logoImage = document.querySelector(".logo-image") as HTMLElement;
+      const title = document.querySelector(".title") as HTMLElement;
+      const spinner = document.querySelector(".spinner") as HTMLElement;
 
-    if (!loadingScreen || !logoImage || !title || !spinner) {
-      console.warn("Loading animation elements not found");
-      return;
-    }
+      if (!loadingScreen || !logoImage || !title || !spinner) {
+        console.warn("Loading animation elements not found");
+        return;
+      }
 
-    // ページ読み込み中はスクロールを無効化（CLSを防ぐためbodyではなくhtmlに設定）
-    document.documentElement.style.overflow = "hidden";
+      // ページ読み込み中はスクロールを無効化（CLSを防ぐためbodyではなくhtmlに設定）
+      document.documentElement.style.overflow = "hidden";
 
-    // 初期状態の設定
-    gsap.set(loadingScreen, {
-      opacity: 1,
-      display: "flex",
-      visibility: "visible",
-    });
+      // 初期状態の設定
+      gsap.set(loadingScreen, {
+        opacity: 1,
+        display: "flex",
+        visibility: "visible",
+      });
 
-    gsap.set([logoImage, title], {
-      opacity: 0,
-      scale: 0.8,
-    });
-
-    gsap.set(spinner, {
-      opacity: 0,
-      scale: 0.8,
-    });
-
-    // ローディングアニメーションの実行
-    const tl = gsap.timeline({
-      onComplete: () => {
-        // スピナーの回転アニメーションを開始
-        gsap.to(spinner, {
-          rotation: 360,
-          duration: 1.2,
-          ease: "none",
-          repeat: -1,
-        });
-      },
-    });
-
-    // ロゴとタイトルのフェードイン
-    tl.to([logoImage, title], {
-      opacity: 1,
-      scale: 1,
-      duration: 0.8,
-      ease: "back.out(1.7)",
-      stagger: 0.2,
-    })
-      // スピナーの表示
-      .to(
-        spinner,
-        {
-          opacity: 1,
-          scale: 1,
-          duration: 0.5,
-          ease: "power2.out",
-        },
-        "-=0.3"
-      );
-
-    // 指定時間後にフェードアウト
-    setTimeout(() => {
-      gsap.to(loadingScreen, {
+      gsap.set([logoImage, title], {
         opacity: 0,
-        duration: 0.8,
-        ease: "power2.inOut",
+        scale: 0.8,
+      });
+
+      gsap.set(spinner, {
+        opacity: 0,
+        scale: 0.8,
+      });
+
+      // ローディングアニメーションの実行
+      const tl = gsap.timeline({
         onComplete: () => {
-          loadingScreen.style.display = "none";
-          loadingScreen.style.visibility = "hidden";
-          // メインコンテンツの表示を許可（CLSを防ぐためhtmlに設定）
-          document.documentElement.style.overflow = "";
+          // スピナーの回転アニメーションを開始
+          gsap.to(spinner, {
+            rotation: 360,
+            duration: 1.2,
+            ease: "none",
+            repeat: -1,
+          });
         },
       });
-    }, LOADING_DURATION);
+
+      // ロゴとタイトルのフェードイン
+      tl.to([logoImage, title], {
+        opacity: 1,
+        scale: 1,
+        duration: 0.8,
+        ease: "back.out(1.7)",
+        stagger: 0.2,
+      })
+        // スピナーの表示
+        .to(
+          spinner,
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.5,
+            ease: "power2.out",
+          },
+          "-=0.3"
+        );
+
+      // 指定時間後にフェードアウト
+      setTimeout(() => {
+        gsap.to(loadingScreen, {
+          opacity: 0,
+          duration: 0.8,
+          ease: "power2.inOut",
+          onComplete: () => {
+            loadingScreen.style.display = "none";
+            loadingScreen.style.visibility = "hidden";
+            // メインコンテンツの表示を許可（CLSを防ぐためhtmlに設定）
+            document.documentElement.style.overflow = "";
+          },
+        });
+      }, LOADING_DURATION);
+    }
+
+    // DOM読み込み完了後にアニメーションを初期化
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initLoadingAnimation);
+    } else {
+      initLoadingAnimation();
+    }
   }
 
-  // DOM読み込み完了後にアニメーションを初期化
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initLoadingAnimation);
-  } else {
-    initLoadingAnimation();
+  // requestIdleCallbackで遅延読み込み
+  if (typeof window !== "undefined") {
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(() => {
+        void initLogoAnimation();
+      }, { timeout: 2000 });
+    } else {
+      // requestIdleCallbackがサポートされていない場合は少し遅延
+      setTimeout(() => {
+        void initLogoAnimation();
+      }, 1000);
+    }
   }
 </script>
 

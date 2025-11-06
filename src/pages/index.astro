@@ -1167,12 +1167,12 @@ const webDesignerRiv = "/riv/designer-life.riv";
   if (typeof window !== "undefined" && "requestIdleCallback" in window) {
     (window as Window & typeof globalThis).requestIdleCallback(() => {
       void initGSAP();
-    });
+    }, { timeout: 2000 });
   } else if (typeof window !== "undefined") {
-    // フォールバック: requestIdleCallbackが使えない場合はloadイベント後に実行
+    // フォールバック: requestIdleCallbackが使えない場合は少し遅延
     setTimeout(() => {
       void initGSAP();
-    }, 100);
+    }, 1000);
   }
 
   // DOMContentLoadedでボタンイベントを初期化（GSAPに依存しない）
