@@ -66,14 +66,16 @@ import "@pagefind/default-ui/css/ui.css";
 
   // DOMContentLoadedで初期化
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initSearch);
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(initSearch, 200);
+    });
   } else {
-    initSearch();
+    setTimeout(initSearch, 200);
   }
 
   // ローディング画面が消えた後に再初期化
   window.addEventListener("loadingComplete", () => {
-    setTimeout(initSearch, 100);
+    setTimeout(initSearch, 500);
   });
 </script>
 

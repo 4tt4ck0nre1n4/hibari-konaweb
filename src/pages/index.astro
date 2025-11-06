@@ -413,16 +413,28 @@ const webDesignerRiv = "/riv/designer-life.riv";
   }
 
   // より確実な初期化方法
+  function initConfettiWithRetry(retries = 5, delay = 200) {
+    const textCanvasElement = document.getElementById("confetti-text-canvas");
+    if (textCanvasElement || retries === 0) {
+      initConfetti();
+    } else {
+      setTimeout(() => {
+        initConfettiWithRetry(retries - 1, delay);
+      }, delay);
+    }
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initConfetti);
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => initConfettiWithRetry(), 200);
+    });
   } else {
-    // DOM既にロード済みの場合は即座に実行
-    initConfetti();
+    setTimeout(() => initConfettiWithRetry(), 200);
   }
 
   // ローディング画面が消えた後に再初期化
   window.addEventListener("loadingComplete", () => {
-    setTimeout(initConfetti, 100);
+    setTimeout(() => initConfettiWithRetry(), 500);
   });
 </script>
 
@@ -1303,15 +1315,30 @@ const webDesignerRiv = "/riv/designer-life.riv";
   }
 
   // DOMContentLoadedでボタンイベントを初期化（GSAPに依存しない）
+  function initButtonEventsWithRetry(retries = 5, delay = 200) {
+    const controlMenu = document.querySelector(".control__menu");
+    const buttons = document.querySelectorAll(".button");
+
+    if ((controlMenu && buttons.length > 0) || retries === 0) {
+      initButtonEvents();
+    } else {
+      setTimeout(() => {
+        initButtonEventsWithRetry(retries - 1, delay);
+      }, delay);
+    }
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initButtonEvents);
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => initButtonEventsWithRetry(), 200);
+    });
   } else {
-    initButtonEvents();
+    setTimeout(() => initButtonEventsWithRetry(), 200);
   }
 
   // ローディング画面が消えた後に再初期化
   window.addEventListener("loadingComplete", () => {
-    setTimeout(initButtonEvents, 100);
+    setTimeout(() => initButtonEventsWithRetry(), 500);
   });
 
   // riv画像のプリロードを削除（パフォーマンス最適化: client:visibleで遅延読み込み）
