@@ -710,6 +710,12 @@ const webDesignerRiv = "/riv/designer-life.riv";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  /* .webp画像に明示的にobject-fit: containを指定 */
+  .grid__menu_item.item-10 .grid__menu_svg img,
+  .grid__menu_item.item-11 .grid__menu_svg img,
+  .grid__menu_item.item-12 .grid__menu_svg img {
+    object-fit: contain;
+  }
   .grid__menu_item:not(.item-4, .item-5, .item-6) .grid__menu_svg {
     /* background: transparent; */
     box-shadow: 0 0 0 rgba(0 0 0 / 0.1);
