@@ -8,6 +8,7 @@ import pagefind from "astro-pagefind";
 import sitemap from "@astrojs/sitemap";
 
 import netlify from "@astrojs/netlify";
+import { asyncCssPlugin } from "./astro-plugin-async-css.js";
 
 export default defineConfig({
   site: "https://hibari-konaweb.netlify.app",
@@ -92,6 +93,7 @@ export default defineConfig({
         ],
       },
     }),
+    asyncCssPlugin(), // CSS非同期読み込みプラグイン
   ],
   image: {
     domains: ["astro.build"],
@@ -124,8 +126,8 @@ export default defineConfig({
         output: {
           // GSAPなどのライブラリを適切にバンドル
           manualChunks: (id) => {
-            if (id.includes('node_modules/gsap')) {
-              return 'gsap';
+            if (id.includes("node_modules/gsap")) {
+              return "gsap";
             }
           },
         },
