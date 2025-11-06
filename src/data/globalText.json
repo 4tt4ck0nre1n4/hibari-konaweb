@@ -1,5 +1,5 @@
 {
-  "url": "https://hibari-konaweb.com",
+  "url": "https://hibari-konaweb.netlify.app",
   "global": {
     "themeColor": "",
     "colorScheme": "light dark",
@@ -11,29 +11,29 @@
     "creator": "hibari-konaweb.com",
     "publisher": "hibari-konaweb.com",
     "robots": "index follow",
-    "formatDetection": "telephone=no, address=no, email=no",
+    "formatDetection": "telephone=no, address=no",
     "mobileWebAppCapable": "yes",
     "appleMobileWebAppTitle": "hibari-konaweb.com My Portfolio Site"
   },
   "link": {
     "sitemap": "/sitemap-index.xml",
-    "author": "https://hibari-konaweb.com",
-    "canonical": "https://hibari-konaweb.com"
+    "author": "https://hibari-konaweb.netlify.app",
+    "canonical": "https://hibari-konaweb.netlify.app"
   },
   "og": {
     "local": "ja_JP",
     "title": "hibari-konaweb.com My Portfolio Site",
-    "description": "ポートフォリオサイトをご覧いただきありがとうございます。私は千葉県袖ケ浦市を拠点に活動している個人事業主の開発者です。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
+    "description": "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
     "type": "website",
-    "url": "https://hibari-konaweb.com",
+    "url": "https://hibari-konaweb.netlify.app",
     "image": "",
     "site_name": "My Portfolio Site"
   },
   "twitter": {
     "card": "summary_large_image",
     "title": "hibari-konaweb.com My Portfolio Site",
-    "description": "ポートフォリオサイトをご覧いただきありがとうございます。私は千葉県袖ケ浦市を拠点に活動している個人事業主の開発者です。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
-    "site": "hibari-konaweb",
+    "description": "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
+    "site": "https://hibari-konaweb.netlify.app",
     "image": ""
   },
   "local": {
