@@ -93,7 +93,7 @@ export default defineConfig({
         ],
       },
     }),
-    asyncCssPlugin(), // CSS非同期読み込みプラグイン
+    asyncCssPlugin(), // 非クリティカルCSSのみを非同期読み込み
   ],
   image: {
     domains: ["astro.build"],
