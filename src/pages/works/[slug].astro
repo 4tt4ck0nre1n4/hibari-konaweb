@@ -343,36 +343,26 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
 <script>
   // @ts-nocheck
-  // GSAPを動的インポート（パフォーマンス最適化）
-  // ブラウザがアイドル状態になってから読み込む
-  async function initGSAP() {
-    const [{ gsap }, { ScrollTrigger }] = await Promise.all([
-      import("gsap"),
-      import("gsap/ScrollTrigger"),
-    ]);
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-    // GSAPプラグインを登録
-    gsap.registerPlugin(ScrollTrigger);
+  // GSAPプラグインを登録
+  gsap.registerPlugin(ScrollTrigger);
 
-    // アニメーション初期化
-    initSplitAnimations(gsap, ScrollTrigger);
-  }
-
-  // requestIdleCallbackで遅延読み込み
-  if (typeof window !== "undefined") {
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(() => {
-        void initGSAP();
-      }, { timeout: 2000 });
+  // アニメーション初期化
+  function init() {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () {
+        initSplitAnimations();
+      });
     } else {
-      // requestIdleCallbackがサポートされていない場合は少し遅延
-      setTimeout(() => {
-        void initGSAP();
-      }, 1000);
+      initSplitAnimations();
     }
   }
 
-  function initSplitAnimations(gsap, ScrollTrigger) {
+  init();
+
+  function initSplitAnimations() {
     const containers = document.querySelectorAll(".split__container");
     const isMobile = window.innerWidth <= 768;
 
@@ -452,12 +442,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
         if (splitElement.left) {
           splitElement.left.addEventListener("mouseenter", () => {
             container.classList.add("hover-left");
-            setTimeout(() => fadeInElement(gsap, splitElement.left?.querySelector(".left__inner")), 600);
+            setTimeout(() => fadeInElement(splitElement.left?.querySelector(".left__inner")), 600);
           });
 
           splitElement.left.addEventListener("mouseleave", () => {
             container.classList.remove("hover-left");
-            fadeOutElement(gsap, splitElement.left?.querySelector(".left__inner"));
+            fadeOutElement(splitElement.left?.querySelector(".left__inner"));
           });
         }
 
@@ -465,23 +455,23 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
           splitElement.right.addEventListener("mouseenter", () => {
             container.classList.add("hover-right");
 
-            if (splitElement.spImage) setTimeout(() => fadeInElement(gsap, splitElement.spImage), 800);
+            if (splitElement.spImage) setTimeout(() => fadeInElement(splitElement.spImage), 800);
             if (splitElement.rightHeader) addStyledText(splitElement.rightHeader, 200);
             if (splitElement.rightLink) {
-              setTimeout(() => fadeInElement(gsap, splitElement.rightLink), 800);
+              setTimeout(() => fadeInElement(splitElement.rightLink), 800);
               addStyledText(splitElement.rightLink, 100);
             }
             if (splitElement.rightText) {
-              setTimeout(() => fadeInElement(gsap, splitElement.rightText), 800);
+              setTimeout(() => fadeInElement(splitElement.rightText), 800);
             }
           });
 
           splitElement.right.addEventListener("mouseleave", () => {
             container.classList.remove("hover-right");
 
-            if (splitElement.spImage) fadeOutElement(gsap, splitElement.spImage);
-            if (splitElement.rightText) fadeOutElement(gsap, splitElement.rightText);
-            if (splitElement.rightLink) fadeOutElement(gsap, splitElement.rightLink);
+            if (splitElement.spImage) fadeOutElement(splitElement.spImage);
+            if (splitElement.rightText) fadeOutElement(splitElement.rightText);
+            if (splitElement.rightLink) fadeOutElement(splitElement.rightLink);
           });
         }
       }
@@ -499,7 +489,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       }
     });
 
-    function fadeInElement(gsap, element) {
+    function fadeInElement(element) {
       if (element) {
         gsap.to(element, {
           opacity: 1,
@@ -509,7 +499,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       }
     }
 
-    function fadeOutElement(gsap, element) {
+    function fadeOutElement(element) {
       if (element) {
         gsap.to(element, {
           opacity: 0,

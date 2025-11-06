@@ -133,23 +133,6 @@ const gradientTitle = "My Portfolio";
           loadingScreen.style.visibility = "hidden";
           // メインコンテンツの表示を許可（CLSを防ぐためhtmlに設定）
           document.documentElement.style.overflow = "";
-          // ローディング画面が消えたことを通知するカスタムイベントを発火
-          window.dispatchEvent(new CustomEvent("loadingComplete"));
-          // client:idleとclient:visibleのコンポーネントを強制的にハイドレーション
-          // requestIdleCallbackを使って、アイドル状態を強制的にトリガー
-          if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-            window.requestIdleCallback(
-              () => {
-                // ページをスクロールして、client:visibleのコンポーネントをトリガー
-                window.scrollTo(0, 0);
-                setTimeout(() => {
-                  window.scrollTo(0, 1);
-                  setTimeout(() => window.scrollTo(0, 0), 10);
-                }, 100);
-              },
-              { timeout: 500 }
-            );
-          }
         },
       });
     }, LOADING_DURATION);
