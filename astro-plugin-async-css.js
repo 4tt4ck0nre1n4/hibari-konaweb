@@ -1,7 +1,7 @@
 /**
- * Astroプラグイン: 非クリティカルCSSのみを非同期読み込みにする
+ * Astroプラグイン: CSSを非同期読み込みにする
  * レンダリングブロックを削減してLCPを改善
- * メインのCSS（reset.css, global.css）は通常通り読み込み、SwiperなどのライブラリCSSのみを非同期化
+ * クリティカルCSSはインライン化済みのため、すべてのCSSファイルを非同期化
  */
 import fs from "fs";
 import path from "path";
@@ -26,7 +26,8 @@ export function asyncCssPlugin() {
             let html = fs.readFileSync(htmlFile, "utf-8");
             let modified = false;
 
-            // 非クリティカルなCSS（Swiperなど）のみを非同期読み込みに変換
+            // すべてのCSSを非同期読み込みに変換
+            // クリティカルCSSはすでにインライン化されているため安全
             html = html.replace(/<link([^>]*?)rel=["']stylesheet["']([^>]*?)>/gi, (match, before, after) => {
               // すでにpreloadやその他の特別な属性がある場合はスキップ
               if (match.includes('rel="preload"') || match.includes('media="print"')) {
@@ -44,14 +45,6 @@ export function asyncCssPlugin() {
               // インライン化されたCSSはスキップ
               if (href.startsWith("data:")) {
                 return match;
-              }
-
-              // メインのCSS（reset.css, global.css）は通常通り読み込み
-              // 非クリティカルなライブラリCSS（Swiper、Pagefindなど）のみを非同期化
-              const isNonCritical = href.includes("swiper") || href.includes("pagefind") || href.includes("ui.css");
-
-              if (!isNonCritical) {
-                return match; // メインCSSは変更しない
               }
 
               modified = true;
