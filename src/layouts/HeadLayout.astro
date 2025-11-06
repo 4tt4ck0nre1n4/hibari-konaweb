@@ -61,7 +61,7 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     <meta name="twitter:site" content={globalText.twitter.site} />
     <meta name="twitter:image" content={globalText.twitter.image} />
 
-    <!-- Critical CSS インライン化 -->
+    <!-- Critical CSS インライン化（拡充版） -->
     <style>
       /* 最小限のクリティカルCSS */
       *,
@@ -71,21 +71,40 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
         padding: 0;
         box-sizing: border-box;
       }
+      :root {
+        --gradient: linear-gradient(
+          90deg,
+          rgb(238 161 255 / 1) 0%,
+          rgb(147 183 255 / 1) 55%,
+          rgb(170 244 254 / 1) 100%
+        );
+        --color-white: #f1f5f9;
+        --color-purple: rgb(102 51 153);
+        --color-red: #ff4f48;
+      }
       html {
-        font-family: system-ui, sans-serif;
+        font-family: Poppins, system-ui, sans-serif;
         color: #020202;
-        background-color: #f1f5f9;
+        background-color: var(--color-white);
         text-size-adjust: none;
         scrollbar-gutter: stable;
+        block-size: 100%;
       }
       html.dark {
-        color: #f1f5f9;
+        color: var(--color-white);
         background-color: #0d0950;
+      }
+      html.dark header {
+        background-color: transparent;
+      }
+      html.dark footer {
+        background-color: transparent;
       }
       body {
         min-height: 100vh;
         line-height: 1.5;
         -webkit-font-smoothing: antialiased;
+        text-rendering: optimizespeed;
       }
       img,
       svg,
@@ -105,6 +124,11 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
         position: relative;
         z-index: 1;
       }
+      @media (width <= 480px) {
+        #page-wrap {
+          margin-block-start: 7rem;
+        }
+      }
     </style>
 
     {
@@ -119,18 +143,62 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     <!-- ページ固有の追加head要素（LCP最適化など） -->
     <slot name="head" />
 
-    <!-- 非クリティカルCSSの読み込みを遅延させるヘルパー -->
+    <!-- CSSを非同期読み込みにするスクリプト（レンダリングブロック削減・フォールバック） -->
     <script is:inline>
-      // preload with media="print" hack のフォールバック
+      // プラグインが動作しない場合のフォールバック（開発環境など）
       (function () {
-        const links = document.querySelectorAll('link[rel="preload"][as="style"]');
-        links.forEach((link) => {
-          if (link.onload === null) {
+        // DOMContentLoadedで実行して、Astroが生成したCSSリンクを処理
+        function asyncLoadCSS() {
+          const stylesheets = document.querySelectorAll('link[rel="stylesheet"]:not([data-critical])');
+          stylesheets.forEach(function (link) {
+            const href = link.getAttribute("href");
+            if (!href || href.startsWith("data:") || link.hasAttribute("data-async-loaded")) return;
+
+            // preloadに変換
+            link.setAttribute("data-async-loaded", "true");
+            link.rel = "preload";
+            link.as = "style";
             link.onload = function () {
               this.onload = null;
               this.rel = "stylesheet";
             };
-          }
+          });
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", asyncLoadCSS);
+        } else {
+          asyncLoadCSS();
+        }
+
+        // MutationObserverで後から追加されるCSSリンクも処理
+        const observer = new MutationObserver(function (mutations) {
+          mutations.forEach(function (mutation) {
+            mutation.addedNodes.forEach(function (node) {
+              if (node.nodeType === 1 && node.tagName === "LINK" && node.rel === "stylesheet") {
+                const href = node.getAttribute("href");
+                if (
+                  href &&
+                  !href.startsWith("data:") &&
+                  !node.hasAttribute("data-critical") &&
+                  !node.hasAttribute("data-async-loaded")
+                ) {
+                  node.rel = "preload";
+                  node.as = "style";
+                  node.onload = function () {
+                    this.onload = null;
+                    this.rel = "stylesheet";
+                  };
+                  node.setAttribute("data-async-loaded", "true");
+                }
+              }
+            });
+          });
+        });
+
+        observer.observe(document.head, {
+          childList: true,
+          subtree: true,
         });
       })();
     </script>
