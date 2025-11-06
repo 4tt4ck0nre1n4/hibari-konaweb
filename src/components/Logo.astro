@@ -37,8 +37,7 @@ const gradientTitle = "My Portfolio";
 </div>
 
 <script>
-  // GSAPを動的インポート（パフォーマンス最適化）
-  // ブラウザがアイドル状態になってから読み込む
+  // GSAPを動的インポート（初期表示に必要なので遅延せずに読み込む）
   async function initLogoAnimation() {
     const { gsap } = await import("gsap");
 
@@ -134,18 +133,9 @@ const gradientTitle = "My Portfolio";
     }
   }
 
-  // requestIdleCallbackで遅延読み込み
+  // ローディングアニメーションは初期表示に必要なので、遅延せずに即座に読み込む
   if (typeof window !== "undefined") {
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(() => {
-        void initLogoAnimation();
-      }, { timeout: 2000 });
-    } else {
-      // requestIdleCallbackがサポートされていない場合は少し遅延
-      setTimeout(() => {
-        void initLogoAnimation();
-      }, 1000);
-    }
+    void initLogoAnimation();
   }
 </script>
 
