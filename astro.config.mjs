@@ -8,6 +8,7 @@ import pagefind from "astro-pagefind";
 import sitemap from "@astrojs/sitemap";
 
 import netlify from "@astrojs/netlify";
+import { asyncSwiperCssPlugin } from "./astro-plugin-async-swiper-css.js";
 
 export default defineConfig({
   site: "https://hibari-konaweb.netlify.app",
@@ -92,6 +93,7 @@ export default defineConfig({
         ],
       },
     }),
+    asyncSwiperCssPlugin(), // Swiper CSSのみを非同期読み込み
   ],
   image: {
     domains: ["astro.build"],
