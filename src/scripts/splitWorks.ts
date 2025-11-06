@@ -1,85 +1,74 @@
 // split
-// GSAPを動的インポート（パフォーマンス最適化）
-// ブラウザがアイドル状態になってから読み込む
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-interface SplitElement {
-  containers: HTMLDivElement | null;
-  left: HTMLDivElement | null;
-  right: HTMLDivElement | null;
-  rightHeader: HTMLElement | null;
-  rightText: HTMLElement | null;
-  spImage: HTMLImageElement | null;
-  rightLink: HTMLAnchorElement | null;
-  iconMenuItems: NodeListOf<HTMLLIElement> | null;
+// GSAPプラグインを登録
+gsap.registerPlugin(ScrollTrigger);
+
+// left ⇔ right アニメーション
+// DOMが既に読み込まれている場合とこれから読み込まれる場合の両方に対応
+// ブラウザ環境でのみ実行（SSR時のエラーを防ぐ）
+if (typeof window !== "undefined" && typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () {
+      initSplitAnimations();
+    });
+  } else {
+    // DOMが既に読み込まれている場合は即座に実行
+    initSplitAnimations();
+  }
 }
 
-// GSAPを動的インポートして初期化
-async function initSplitAnimations() {
-  const [{ gsap }, { ScrollTrigger }] = await Promise.all([
-    import("gsap"),
-    import("gsap/ScrollTrigger"),
-  ]);
-
-  // GSAPプラグインを登録
-  gsap.registerPlugin(ScrollTrigger);
-
-  // left ⇔ right アニメーション
+function initSplitAnimations() {
   const containers = document.querySelectorAll(".split__container");
   const isMobile = window.innerWidth <= 768;
 
   containers.forEach((container) => {
-    const splitElement: SplitElement = {
-      containers: container as HTMLDivElement,
-      left: container.querySelector(".left") as HTMLDivElement,
-      right: container.querySelector(".right") as HTMLDivElement,
-      rightHeader: container.querySelector(".right__header") as HTMLElement,
-      rightText: container.querySelector(".right__text") as HTMLElement,
-      spImage: container.querySelector(".right__spImage") as HTMLImageElement,
-      rightLink: container.querySelector(".right__link") as HTMLAnchorElement,
+    const splitElement = {
+      containers: container,
+      left: container.querySelector(".left"),
+      right: container.querySelector(".right"),
+      rightHeader: container.querySelector(".right__header"),
+      rightText: container.querySelector(".right__text"),
+      spImage: container.querySelector(".right__spImage"),
+      rightLink: container.querySelector(".right__link"),
       iconMenuItems: container.querySelectorAll(".right__iconMenu_item"),
     };
 
     // スマホサイズの場合、パララックス効果とスクロールアニメーション
     if (isMobile) {
-      // 右サイドの要素を即座に表示
       if (splitElement.spImage) {
         gsap.set(splitElement.spImage, { opacity: 1 });
       }
-      // スマホサイズでは.right__textにaddStyledTextを適用しない（HTMLの構造を保持）
       if (splitElement.rightText) {
         gsap.set(splitElement.rightText, { opacity: 1 });
       }
       if (splitElement.rightLink) {
         gsap.set(splitElement.rightLink, { opacity: 1 });
-        if (splitElement.rightLink.textContent !== null && splitElement.rightLink.textContent !== "") {
+        const linkText = splitElement.rightLink.textContent;
+        if (linkText !== null && linkText !== "") {
           addStyledText(splitElement.rightLink, 100);
         }
       }
-      if (
-        splitElement.rightHeader &&
-        splitElement.rightHeader.textContent !== null &&
-        splitElement.rightHeader.textContent !== ""
-      ) {
+      const headerText = splitElement.rightHeader?.textContent;
+      if (splitElement.rightHeader && headerText !== null && headerText !== "") {
         addStyledText(splitElement.rightHeader, 200);
       }
 
-      // 左サイドを初期状態で表示（.rightの上を被さる）
       if (splitElement.left) {
-        // 左サイドは通常表示
-        gsap.set(splitElement.left, {
-          opacity: 1,
-          y: 0,
-        });
+        gsap.set(splitElement.left, { opacity: 1, y: 0 });
 
         const leftInner = splitElement.left.querySelector(".left__inner");
         if (leftInner) {
-          gsap.set(leftInner, {
-            opacity: 1,
-            y: 0,
-          });
+          gsap.set(leftInner, { opacity: 1, y: 0 });
         }
 
-        // 左サイドがスクロールで登場するフェードイン効果
         ScrollTrigger.create({
           trigger: splitElement.left,
           start: "top bottom",
@@ -87,7 +76,6 @@ async function initSplitAnimations() {
           scrub: 1,
           onUpdate: (self) => {
             const progress = self.progress;
-
             if (leftInner) {
               gsap.to(leftInner, {
                 opacity: progress,
@@ -98,7 +86,6 @@ async function initSplitAnimations() {
           },
         });
 
-        // 左サイド内の画像にパララックス効果
         const leftImage = splitElement.left.querySelector(".left__image");
         if (leftImage) {
           ScrollTrigger.create({
@@ -120,12 +107,12 @@ async function initSplitAnimations() {
       if (splitElement.left) {
         splitElement.left.addEventListener("mouseenter", () => {
           container.classList.add("hover-left");
-          setTimeout(() => fadeInElement(gsap, splitElement.left?.querySelector(".left__inner")), 1100);
+          setTimeout(() => fadeInElement(splitElement.left?.querySelector(".left__inner")), 600);
         });
 
         splitElement.left.addEventListener("mouseleave", () => {
           container.classList.remove("hover-left");
-          fadeOutElement(gsap, splitElement.left?.querySelector(".left__inner"));
+          fadeOutElement(splitElement.left?.querySelector(".left__inner"));
         });
       }
 
@@ -133,30 +120,29 @@ async function initSplitAnimations() {
         splitElement.right.addEventListener("mouseenter", () => {
           container.classList.add("hover-right");
 
-          if (splitElement.spImage) setTimeout(() => fadeInElement(gsap, splitElement.spImage), 800);
+          if (splitElement.spImage) setTimeout(() => fadeInElement(splitElement.spImage), 800);
           if (splitElement.rightHeader) addStyledText(splitElement.rightHeader, 200);
           if (splitElement.rightLink) {
-            setTimeout(() => fadeInElement(gsap, splitElement.rightLink), 800);
+            setTimeout(() => fadeInElement(splitElement.rightLink), 800);
             addStyledText(splitElement.rightLink, 100);
           }
-          // .right__textにはaddStyledTextを適用しない（WordPressから来るspan構造を保持）
           if (splitElement.rightText) {
-            setTimeout(() => fadeInElement(gsap, splitElement.rightText), 800);
+            setTimeout(() => fadeInElement(splitElement.rightText), 800);
           }
         });
 
         splitElement.right.addEventListener("mouseleave", () => {
           container.classList.remove("hover-right");
 
-          if (splitElement.spImage) fadeOutElement(gsap, splitElement.spImage);
-          if (splitElement.rightText) fadeOutElement(gsap, splitElement.rightText);
-          if (splitElement.rightLink) fadeOutElement(gsap, splitElement.rightLink);
+          if (splitElement.spImage) fadeOutElement(splitElement.spImage);
+          if (splitElement.rightText) fadeOutElement(splitElement.rightText);
+          if (splitElement.rightLink) fadeOutElement(splitElement.rightLink);
         });
       }
     }
 
     //icon
-    if (splitElement.iconMenuItems) {
+    if (splitElement.iconMenuItems.length > 0) {
       splitElement.iconMenuItems.forEach((icon) => {
         icon.addEventListener("mouseenter", () => {
           icon.classList.add("is-active");
@@ -168,9 +154,8 @@ async function initSplitAnimations() {
     }
   });
 
-  // 左サイド モーダルウィンドウ in
-  function fadeInElement(gsap: any, element: Element | null | undefined): void {
-    if (element) {
+  function fadeInElement(element: any) {
+    if (element !== null && element !== undefined) {
       gsap.to(element, {
         opacity: 1,
         duration: 1.2,
@@ -179,8 +164,8 @@ async function initSplitAnimations() {
     }
   }
 
-  function fadeOutElement(gsap: any, element: Element | null | undefined): void {
-    if (element) {
+  function fadeOutElement(element: any) {
+    if (element !== null && element !== undefined) {
       gsap.to(element, {
         opacity: 0,
         duration: 1,
@@ -190,35 +175,14 @@ async function initSplitAnimations() {
   }
 
   // テキストアニメーション
-  function addStyledText(element: HTMLElement, delay: number): void {
-    const newText = [...(element.textContent ?? "")].map((char) => `<span>${char}</span>`);
+  function addStyledText(element: any, delay: any) {
+    const textContent = element?.textContent;
+    const text = textContent !== null && textContent !== undefined ? textContent : "";
+    const newText = [...text].map((char: any) => `<span>${char}</span>`);
     element.innerHTML = newText.join("");
 
-    Array.from(element.children).forEach((char, index) => {
+    Array.from(element.children).forEach((char: any, index: any) => {
       setTimeout(() => char.classList.add("is-active"), delay * index);
     });
-  }
-}
-
-// ブラウザ環境でのみ実行（SSR時のエラーを防ぐ）
-if (typeof window !== "undefined" && typeof document !== "undefined") {
-  // requestIdleCallbackで遅延読み込み
-  if ("requestIdleCallback" in window) {
-    window.requestIdleCallback(() => {
-      void initSplitAnimations();
-    }, { timeout: 2000 });
-  } else {
-    // requestIdleCallbackがサポートされていない場合は少し遅延
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(() => {
-          void initSplitAnimations();
-        }, 1000);
-      });
-    } else {
-      setTimeout(() => {
-        void initSplitAnimations();
-      }, 1000);
-    }
   }
 }

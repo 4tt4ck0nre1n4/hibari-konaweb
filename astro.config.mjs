@@ -127,21 +127,7 @@ export default defineConfig({
           // GSAPなどのライブラリを適切にバンドル
           manualChunks: (id) => {
             if (id.includes("node_modules/gsap")) {
-              // GSAPコアとプラグインを分割
-              if (id.includes("gsap/ScrollTrigger")) {
-                return "gsap-scrolltrigger";
-              }
               return "gsap";
-            }
-            // Reactとその他のライブラリも分割
-            if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) {
-              return "react-vendor";
-            }
-            if (id.includes("node_modules/swiper")) {
-              return "swiper";
-            }
-            if (id.includes("node_modules")) {
-              return "vendor";
             }
           },
         },
