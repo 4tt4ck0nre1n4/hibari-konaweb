@@ -3,7 +3,7 @@ import { type ISourceOptions } from "@tsparticles/engine";
 export const tsparticlesOptions: ISourceOptions = {
   fullScreen: {
     enable: true,
-    zIndex: -1,
+    zIndex: 2 /* #main-containerより上に表示（#main-containerのz-index: 1より大きい） */,
   },
   background: {
     color: {

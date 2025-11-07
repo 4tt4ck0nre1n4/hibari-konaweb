@@ -76,7 +76,7 @@
     },
     "card3": {
       "serviceHeader": "WordPress / WP REST API",
-      "serviceBody": "WordPressのオリジナルテーマの制作や、静的サイトのWordPress化に対応します。WP REST APIを活用したヘッドレスCMS構築の開発にも対応可能です。高速かつ柔軟なWebサイトを構築し、運用の自由度を高めます。",
+      "serviceBody": "WordPressのオリジナルテーマの制作や、静的サイトのWordPress化に対応します。WP REST APIを活用したヘッドレスCMS構築の開発にも対応可能です。",
       "serviceMenu": [
         {
           "item": "WordPressのオリジナルテーマの制作"

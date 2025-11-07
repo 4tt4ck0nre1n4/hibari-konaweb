@@ -53,7 +53,7 @@ const swiperText2 = "Thank you for viewing my site.";
 
 <section id="swiper" class="swipersDisplay">
   <div class="swipersDisplay__wrapper">
-    <div class="textArea">
+    <div class="swipersDisplay__textInner">
       <h2 class="swipes__header">
         {swiperHeader}
       </h2>
@@ -106,7 +106,7 @@ const swiperText2 = "Thank you for viewing my site.";
     position: relative;
     margin-inline: auto;
   }
-  .textArea {
+  .swipersDisplay__textInner {
     display: grid;
     place-items: center;
     position: absolute;
@@ -117,18 +117,10 @@ const swiperText2 = "Thank you for viewing my site.";
   .swipers__header {
     font-size: 2rem;
     color: inherit;
-    /* position: absolute;
-    top: 30%;
-    left: 36%;
-    z-index: 5; */
   }
   .swipers__text {
     font-size: 1rem;
     color: inherit;
-    /* position: absolute;
-    top: 34%;
-    left: 36%;
-    z-index: 5; */
     margin-block-start: 1rem;
   }
   .swipers {
@@ -152,7 +144,10 @@ const swiperText2 = "Thank you for viewing my site.";
     left: calc(50% - 160px);
     transform-style: preserve-3d;
     transform: perspective(1600px);
+    will-change: transform;
+    backface-visibility: hidden;
     animation: rotation 32s linear infinite;
+    animation: rotation 32s ease-in-out infinite;
   }
   @keyframes rotation {
     from {
@@ -173,15 +168,16 @@ const swiperText2 = "Thank you for viewing my site.";
   .swipers-slide {
     width: 100%;
     height: 100%;
-    box-shadow:
+    /* box-shadow:
       10px 15px 22px -5px rgba(0 0 0 / 0.2),
-      0 0 2px rgba(0 0 0 / 0.15);
+      0 0 2px rgba(0 0 0 / 0.15); */
     border-radius: 0.5rem;
     position: absolute;
     top: 0%;
     left: 0%;
     z-index: 20;
     transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(600px) scale(-1, 1);
+    will-change: transform;
   }
   .swipers-slide::before {
     content: "";
@@ -200,6 +196,8 @@ const swiperText2 = "Thank you for viewing my site.";
     transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(600px);
     animation: reflection 32s linear infinite;
   }
+
+  /* 反射アニメーション */
   @keyframes reflection {
     0% {
       transform: translateY(0%);
@@ -218,6 +216,7 @@ const swiperText2 = "Thank you for viewing my site.";
       background-position-x: -320%;
     }
   }
+  /* スマホサイズでの反射アニメーション */
   @keyframes reflection-mobile {
     0% {
       transform: translateY(0%);
@@ -236,6 +235,7 @@ const swiperText2 = "Thank you for viewing my site.";
       background-position-x: -320%;
     }
   }
+  /* swiperスライド画像 */
   .swipers__image {
     width: 100%;
     height: 100%;
@@ -245,14 +245,15 @@ const swiperText2 = "Thank you for viewing my site.";
       0 0 2px rgba(0 0 0 / 0.15);
     border-radius: 0.5rem;
     object-fit: cover;
-    position: relative;
+    position: absolute;
+    top: 0%;
     left: calc(50% - 160px);
     z-index: -1;
     overflow: hidden;
     transform-style: preserve-3d;
     transform: perspective(40px) scale(0.96);
     pointer-events: none;
-    padding: 1rem;
+    padding: 0.5rem;
   }
   .swipers-slide::after {
     content: "";
@@ -270,6 +271,7 @@ const swiperText2 = "Thank you for viewing my site.";
     transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(600px);
     animation: reflection 32s linear infinite;
   }
+  /* 反射画像（影のような透過した画像） */
   .swipers__shadow {
     width: 100%;
     height: 100%;
@@ -279,20 +281,40 @@ const swiperText2 = "Thank you for viewing my site.";
       0 0 2px rgba(0 0 0 / 0.15);
     border-radius: 0.5rem;
     object-fit: cover;
-    position: relative;
-    overflow: hidden;
+    position: absolute;
+    top: 100%;
     left: calc(50% - 160px);
-    z-index: -1;
+    z-index: 10;
     transform-style: preserve-3d;
-    transform: perspective(40px) scale(0.96, -0.96);
+    /* 親要素の3D変換を継承し、Y軸のみを反転して上下反転効果を実現 */
+    transform: scale(1, -1);
     pointer-events: none;
-    margin-block-start: 1.5rem;
     padding: 1rem;
+    /* 透明度とぼかし効果 */
+    opacity: 0.65;
+    filter: blur(0.5px) brightness(1.1);
+    /* 下部に向かってフェードアウトするグラデーションマスク */
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0 0 0 / 0.9) 0%,
+      rgba(0 0 0 / 0.8) 30%,
+      rgba(0 0 0 / 0.6) 60%,
+      rgba(0 0 0 / 0.3) 85%,
+      rgba(0 0 0 / 0) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0 0 0 / 0.9) 0%,
+      rgba(0 0 0 / 0.8) 30%,
+      rgba(0 0 0 / 0.6) 60%,
+      rgba(0 0 0 / 0.3) 85%,
+      rgba(0 0 0 / 0) 100%
+    );
   }
 
   /* スマホサイズでのテキスト中央配置 */
   @media (max-width: 480px) {
-    .textArea {
+    .swipersDisplay__textInner {
       top: 30%;
       left: 20%;
     }
@@ -322,14 +344,10 @@ const swiperText2 = "Thank you for viewing my site.";
       left: calc(50% - 75px);
       transform: perspective(1800px);
       animation: rotation-mobile 32s ease-in-out infinite;
-      will-change: transform;
-      backface-visibility: hidden;
     }
 
     .swipers-slide {
       transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(280px) scale(-1, 1);
-      will-change: transform;
-      backface-visibility: hidden;
     }
 
     .swipers-slide::before {
@@ -352,6 +370,8 @@ const swiperText2 = "Thank you for viewing my site.";
 
     .swipers__shadow {
       left: calc(50% - 75px);
+      /* 親要素の3D変換を継承し、Y軸のみを反転（上下反転） */
+      transform: scale(1, -1);
     }
   }
 </style>
