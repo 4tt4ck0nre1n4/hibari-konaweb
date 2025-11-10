@@ -24,6 +24,7 @@ html {
   font-family: Poppins, system-ui, sans-serif;
   color: #020202;
   background-color: var(--color-white);
+  transition: background-color 1.2s ease;
 }
 
 html.dark {
