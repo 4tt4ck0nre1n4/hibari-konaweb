@@ -44,8 +44,8 @@ export default function DepthAppearImage({
         if (containerRef.current) {
           const container = containerRef.current;
           // 初期状態を設定（非表示）
-          container.style.opacity = "0";
-          container.style.transform = "scale(0.1)";
+          container.style.opacity = "0.07";
+          container.style.transform = "scale(0.2)";
           container.style.visibility = "hidden";
 
           // ローディングスクリーンが消えたことを確認
@@ -105,6 +105,10 @@ export default function DepthAppearImage({
 
     // GSAPを使用する場合
     // ローディングスクリーンが消えるまで待機してからアニメーションを開始
+    // 位置更新ループの制御変数（クリーンアップ用）
+    let positionUpdateActive = true;
+    let positionRafId: number | null = null;
+
     const startGSAPAnimation = () => {
       const initGSAPAnimation = async () => {
         try {
@@ -113,13 +117,12 @@ export default function DepthAppearImage({
 
           if (!element) return;
 
-          // 初期状態：画面奥（小さく、透明、非表示、頭を奥に傾ける）
+          // 初期状態：画面奥（小さく、透明、非表示）
           gsap.set(element, {
             scale: 0.07,
             opacity: 0.2,
-            transformOrigin: "50% 50%", // 中央を基準点に設定（上から降りてくる動きを避ける）
-            rotationX: -30, // 頭を奥に傾ける（負の値で奥に）
-            y: 0, // Y軸方向の移動を0に設定（上から降りてくる動きを避ける）
+            transformOrigin: "50% 50%", // 中央を基準点に設定
+            y: 0, // Y軸方向の移動を0に設定
             visibility: "hidden",
             force3D: true, // 3D変換を強制
           });
@@ -135,50 +138,80 @@ export default function DepthAppearImage({
             });
 
             // メイン画像の位置を計算してグリッチレイヤーを同じ位置に配置
+            // この関数は継続的に実行され、GSAPのアニメーション中も位置を上書きし続ける
+            positionUpdateActive = true;
+
             const updateGlitchPosition = () => {
+              if (!positionUpdateActive) return;
+
               const mainImage = imageRef.current;
               if (mainImage && typeof window !== "undefined") {
                 const rect = mainImage.getBoundingClientRect();
                 glitchLayers.forEach((layer) => {
-                  layer.style.position = "fixed";
-                  layer.style.top = `${rect.top}px`;
-                  layer.style.left = `${rect.left}px`;
-                  layer.style.width = `${rect.width}px`;
-                  layer.style.height = `${rect.height}px`;
+                  if (layer instanceof HTMLElement) {
+                    layer.style.position = "fixed";
+                    // !importantで確実に適用（GSAPの影響を完全に排除）
+                    layer.style.setProperty("top", `${rect.top}px`, "important");
+                    layer.style.setProperty("left", `${rect.left}px`, "important");
+                    layer.style.setProperty("width", `${rect.width}px`, "important");
+                    layer.style.setProperty("height", `${rect.height}px`, "important");
+                    // transformを完全にリセット（GSAPのxプロパティの影響を排除）
+                    layer.style.setProperty("transform", "translateX(0) translateY(0) scale(1)", "important");
+                    // GSAPが設定した可能性のある全てのtransformプロパティをクリア
+                    gsap.set(layer, {
+                      x: 0,
+                      y: 0,
+                      clearProps: "x,y,transform,transformOrigin",
+                    });
+                  }
                 });
+              }
+
+              // 継続的に位置を更新（アニメーション中も位置を維持）
+              if (positionUpdateActive) {
+                positionRafId = requestAnimationFrame(updateGlitchPosition);
               }
             };
 
             // 初期位置を設定
             updateGlitchPosition();
 
-            // リサイズ時やスクロール時に位置を更新（requestAnimationFrameで最適化）
-            let rafId: number | null = null;
-            const scheduleUpdate = () => {
-              if (rafId !== null) return;
-              rafId = requestAnimationFrame(() => {
-                updateGlitchPosition();
-                rafId = null;
-              });
-            };
-
+            // リサイズ時やスクロール時にも位置を更新
             if (typeof window !== "undefined") {
-              window.addEventListener("resize", scheduleUpdate);
-              window.addEventListener("scroll", scheduleUpdate, { passive: true });
+              window.addEventListener(
+                "resize",
+                () => {
+                  if (positionUpdateActive) {
+                    updateGlitchPosition();
+                  }
+                },
+                { passive: true }
+              );
+              window.addEventListener(
+                "scroll",
+                () => {
+                  if (positionUpdateActive) {
+                    updateGlitchPosition();
+                  }
+                },
+                { passive: true }
+              );
             }
 
             // 初期状態を直接スタイルで設定（GSAPの前に確実に設定）
             glitchLayers.forEach((layer) => {
               layer.style.setProperty("opacity", "0", "important");
-              layer.style.transform = "translateX(0)";
+              layer.style.transform = "translateX(0) translateY(0)";
               layer.style.visibility = "visible";
+              // GSAPのxプロパティを使わないように、位置は常にstyleで制御
+              layer.style.setProperty("left", "0px", "important");
+              layer.style.setProperty("top", "0px", "important");
             });
             gsap.set(glitchLayers, {
               opacity: 0,
-              x: 0, // 初期位置を0に設定（位置を固定）
+              // xプロパティは使わない（position: fixedの場合はleft/topで制御）
               visibility: "visible",
               force3D: true, // 3D変換を強制
-              // clearPropsは削除（opacityがクリアされるのを防ぐ）
             });
           } else {
             console.warn("Glitch layers not found or incomplete:", {
@@ -197,15 +230,40 @@ export default function DepthAppearImage({
               gsap.set(element, { visibility: "visible" });
               const timeline = gsap.timeline({
                 delay,
-                onComplete: onAnimationComplete,
+                onComplete: () => {
+                  // アニメーション完了時にグリッチレイヤーの位置を確実にリセット
+                  if (glitchLayers.length === 2) {
+                    glitchLayers.forEach((layer) => {
+                      if (layer instanceof HTMLElement) {
+                        // GSAPが設定した可能性のある全てのプロパティをクリア
+                        gsap.set(layer, {
+                          x: 0,
+                          y: 0,
+                          clearProps: "x,y,transform,transformOrigin",
+                        });
+                        // 位置を確実に更新
+                        const mainImage = imageRef.current;
+                        if (mainImage && typeof window !== "undefined") {
+                          const rect = mainImage.getBoundingClientRect();
+                          layer.style.setProperty("top", `${rect.top}px`, "important");
+                          layer.style.setProperty("left", `${rect.left}px`, "important");
+                          layer.style.setProperty("transform", "translateX(0) translateY(0) scale(1)", "important");
+                        }
+                      }
+                    });
+                  }
+                  // アニメーション完了時も位置更新ループは継続（位置を維持）
+                  if (onAnimationComplete) {
+                    onAnimationComplete();
+                  }
+                },
               });
 
-              // 途中状態: scale: 1.15, opacity: 0.6（頭を少し奥に傾ける）
+              // 途中状態: scale: 1.1, opacity: 0.5
               timeline.to(element, {
                 scale: 1.1,
                 opacity: 0.5,
-                rotationX: -45, // 頭を少し奥に傾ける
-                transformOrigin: "100% 100%", // 中央を基準点に維持（上から降りてくる動きを避ける）
+                transformOrigin: "50% 50%", // 中央を基準点に維持
                 y: 0, // Y軸方向の移動を0に維持
                 force3D: true, // 3D変換を強制
                 duration: duration * 0.6,
@@ -217,9 +275,8 @@ export default function DepthAppearImage({
                 timeline.to(
                   glitchLayers,
                   {
-                    opacity: 0.6, // グリッチ効果の最大opacityを0.6に変更
-                    // xのアニメーションを削除（画面左に移動する挙動をやめる）
-                    clearProps: "x", // xをクリアして位置を固定
+                    opacity: 0.3, // グリッチ効果の最大opacity
+                    // xプロパティは使わない（position: fixedの場合はleft/topで制御）
                     force3D: true, // 3D変換を強制
                     duration: duration * 0.3,
                     ease: "power2.inOut",
@@ -230,18 +287,15 @@ export default function DepthAppearImage({
                       });
                     },
                     onUpdate: function (this: gsap.core.Tween) {
+                      // 位置の更新は独立したrequestAnimationFrameループで行うため、ここではopacityのみ制御
                       // 確実にopacityを適用するため、直接スタイルを設定
                       const targets = this.targets();
                       const progress = this.progress();
-                      const opacityValue = progress * 0.6; // 最大opacityを0.6に変更
+                      const opacityValue = progress * 0.3; // 最大opacityを0.3に変更
                       targets.forEach((target, index) => {
-                        const element = target as HTMLElement;
-                        if (element) {
-                          element.style.opacity = String(opacityValue);
-                          // xを完全にクリアして位置を固定
-                          gsap.set(element, { x: 0, clearProps: "x" });
-                          // transformも直接設定して確実に位置を固定
-                          element.style.transform = "translateX(0)";
+                        const element = target as HTMLElement | null;
+                        if (element && element instanceof HTMLElement) {
+                          element.style.setProperty("opacity", String(opacityValue), "important");
                           // デバッグ用（最初の数回のみログ出力）
                           if (progress < 0.1 && index === 0) {
                             console.log("Glitch onUpdate:", {
@@ -259,12 +313,11 @@ export default function DepthAppearImage({
                 );
               }
 
-              // 終了状態: scale: 1, opacity: 1（正面を向く）
+              // 終了状態: scale: 1, opacity: 1
               timeline.to(element, {
                 scale: 1,
                 opacity: 1,
-                rotationX: 0, // 正面を向く
-                transformOrigin: "50% 50%", // 中央を基準点に維持（上から降りてくる動きを避ける）
+                transformOrigin: "50% 50%", // 中央を基準点に維持
                 y: 0, // Y軸方向の移動を0に維持
                 force3D: true, // 3D変換を強制
                 duration: duration * 0.4,
@@ -277,11 +330,28 @@ export default function DepthAppearImage({
                   glitchLayers,
                   {
                     opacity: 0,
-                    clearProps: "x", // xをクリアして位置を固定
-                    duration: duration * 0.3, // 少し短くして早めに消える
+                    // xプロパティは使わない（position: fixedの場合はleft/topで制御）
+                    duration: duration * 0.2, // 少し短くして早めに消える
                     ease: "power2.inOut",
+                    onUpdate: function (this: gsap.core.Tween) {
+                      // 位置の更新は独立したrequestAnimationFrameループで行うため、ここではopacityのみ制御
+                      // opacityの更新のみ行う
+                    },
+                    onComplete: function (this: gsap.core.Tween) {
+                      // アニメーション完了時にGSAPが設定した全てのプロパティをクリア
+                      const targets = this.targets();
+                      targets.forEach((target) => {
+                        if (target instanceof HTMLElement) {
+                          gsap.set(target, {
+                            x: 0,
+                            y: 0,
+                            clearProps: "x,y,transform,transformOrigin",
+                          });
+                        }
+                      });
+                    },
                   },
-                  "<0.1" // メイン画像のアニメーションの10%の時点で開始（先に消える）
+                  "<0.3" // メイン画像のアニメーションの10%の時点で開始（先に消える）
                 );
               }
               return;
@@ -304,19 +374,44 @@ export default function DepthAppearImage({
             gsap.set(element, { visibility: "visible" });
             const timeline = gsap.timeline({
               delay,
-              onComplete: onAnimationComplete,
+              onComplete: () => {
+                // アニメーション完了時にグリッチレイヤーの位置を確実にリセット
+                if (glitchLayers.length === 2) {
+                  glitchLayers.forEach((layer) => {
+                    if (layer instanceof HTMLElement) {
+                      // GSAPが設定した可能性のある全てのプロパティをクリア
+                      gsap.set(layer, {
+                        x: 0,
+                        y: 0,
+                        clearProps: "x,y,transform,transformOrigin",
+                      });
+                      // 位置を確実に更新
+                      const mainImage = imageRef.current;
+                      if (mainImage && typeof window !== "undefined") {
+                        const rect = mainImage.getBoundingClientRect();
+                        layer.style.setProperty("top", `${rect.top}px`, "important");
+                        layer.style.setProperty("left", `${rect.left}px`, "important");
+                        layer.style.setProperty("transform", "translateX(0) translateY(0) scale(1)", "important");
+                      }
+                    }
+                  });
+                }
+                // アニメーション完了時も位置更新ループは継続（位置を維持）
+                if (onAnimationComplete) {
+                  onAnimationComplete();
+                }
+              },
             });
 
-            // 途中状態: scale: 1.15, opacity: 0.6（頭を少し奥に傾ける）
+            // 途中状態: scale: 1.1, opacity: 0.4
             timeline.to(element, {
-              scale: 1.15,
-              opacity: 0.6,
-              rotationX: -20, // 頭を少し奥に傾ける
-              transformOrigin: "50% 50%", // 中央を基準点に維持（上から降りてくる動きを避ける）
+              scale: 1.1,
+              opacity: 0.4,
+              transformOrigin: "50% 50%", // 中央を基準点に維持
               y: 0, // Y軸方向の移動を0に維持
               force3D: true, // 3D変換を強制
               duration: duration * 0.6,
-              ease: "power2.out",
+              ease: "power2.inOut",
             });
 
             // グリッチ効果を強く（途中状態）- 要素が存在する場合のみ
@@ -324,12 +419,11 @@ export default function DepthAppearImage({
               timeline.to(
                 glitchLayers,
                 {
-                  opacity: 0.7, // グリッチ効果の最大opacityを0.7に変更
-                  // xのアニメーションを削除（画面左に移動する挙動をやめる）
-                  clearProps: "x", // xをクリアして位置を固定
+                  opacity: 0.3, // グリッチ効果の最大opacity
+                  // xプロパティは使わない（position: fixedの場合はleft/topで制御）
                   force3D: true, // 3D変換を強制
                   duration: duration * 0.3,
-                  ease: "power2.out",
+                  ease: "power2.inOut",
                   onStart: function (this: gsap.core.Tween) {
                     console.log("Glitch animation started (with loading screen)", {
                       targets: this.targets(),
@@ -337,37 +431,16 @@ export default function DepthAppearImage({
                     });
                   },
                   onUpdate: function (this: gsap.core.Tween) {
-                    // メイン画像の位置を更新（アニメーション中も位置を同期）
-                    if (typeof window !== "undefined") {
-                      const mainImage = imageRef.current;
-                      if (mainImage) {
-                        const rect = mainImage.getBoundingClientRect();
-                        const targets = this.targets();
-                        targets.forEach((target) => {
-                          const element = target as HTMLElement;
-                          if (element) {
-                            element.style.top = `${rect.top}px`;
-                            element.style.left = `${rect.left}px`;
-                            element.style.width = `${rect.width}px`;
-                            element.style.height = `${rect.height}px`;
-                          }
-                        });
-                      }
-                    }
-
+                    // 位置の更新は独立したrequestAnimationFrameループで行うため、ここではopacityのみ制御
                     // 確実にopacityを適用するため、setPropertyで!importantを使用
                     const targets = this.targets();
                     const progress = this.progress();
-                    const opacityValue = progress * 0.7; // 最大opacityを0.7に変更
+                    const opacityValue = progress * 0.6; // 最大opacityを0.6に変更
                     targets.forEach((target, index) => {
-                      const element = target as HTMLElement;
-                      if (element) {
+                      const element = target as HTMLElement | null;
+                      if (element && element instanceof HTMLElement) {
                         // setPropertyで!importantフラグを使用してCSSを確実に上書き
                         element.style.setProperty("opacity", String(opacityValue), "important");
-                        // xを完全にクリアして位置を固定
-                        gsap.set(element, { x: 0, clearProps: "x" });
-                        // transformも直接設定して確実に位置を固定
-                        element.style.transform = "translateX(0)";
                         // デバッグ用（最初の数回のみログ出力）
                         if (progress < 0.1 && index === 0) {
                           console.log("Glitch onUpdate:", {
@@ -385,12 +458,11 @@ export default function DepthAppearImage({
               );
             }
 
-            // 終了状態: scale: 1, opacity: 1（正面を向く）
+            // 終了状態: scale: 1, opacity: 1
             timeline.to(element, {
               scale: 1,
               opacity: 1,
-              rotationX: 0, // 正面を向く
-              transformOrigin: "50% 50%", // 中央を基準点に維持（上から降りてくる動きを避ける）
+              transformOrigin: "50% 50%", // 中央を基準点に維持
               y: 0, // Y軸方向の移動を0に維持
               force3D: true, // 3D変換を強制
               duration: duration * 0.4,
@@ -403,11 +475,28 @@ export default function DepthAppearImage({
                 glitchLayers,
                 {
                   opacity: 0,
-                  x: 0, // xを明示的に0に設定（位置を固定）
-                  duration: duration * 0.3, // 少し短くして早めに消える
+                  // xプロパティは使わない（position: fixedの場合はleft/topで制御）
+                  duration: duration * 0.2, // 少し短くして早めに消える
                   ease: "power2.inOut",
+                  onUpdate: function (this: gsap.core.Tween) {
+                    // 位置の更新は独立したrequestAnimationFrameループで行うため、ここではopacityのみ制御
+                    // opacityの更新のみ行う
+                  },
+                  onComplete: function (this: gsap.core.Tween) {
+                    // アニメーション完了時にGSAPが設定した全てのプロパティをクリア
+                    const targets = this.targets();
+                    targets.forEach((target) => {
+                      if (target instanceof HTMLElement) {
+                        gsap.set(target, {
+                          x: 0,
+                          y: 0,
+                          clearProps: "x,y,transform,transformOrigin",
+                        });
+                      }
+                    });
+                  },
                 },
-                "<0.1" // メイン画像のアニメーションの10%の時点で開始（先に消える）
+                "<0.3" // メイン画像のアニメーションの10%の時点で開始（先に消える）
               );
             }
           };
@@ -437,6 +526,15 @@ export default function DepthAppearImage({
       // SSR時は即座に開始
       startGSAPAnimation();
     }
+
+    // クリーンアップ関数：位置更新ループを停止
+    return () => {
+      positionUpdateActive = false;
+      if (positionRafId !== null && typeof window !== "undefined") {
+        cancelAnimationFrame(positionRafId);
+        positionRafId = null;
+      }
+    };
   }, [useGSAP, duration, delay, onAnimationComplete]);
 
   const containerClassName = `${depthAppearStyles.container} ${useGSAP ? "use-gsap" : ""} ${className ?? ""}`.trim();
