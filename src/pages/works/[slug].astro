@@ -696,8 +696,6 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   }
   /* 右サイド ロゴアイコン */
   .right__logoIcon {
-    width: 2.5rem;
-    height: 2.5rem;
     width: 3rem;
     height: 3rem;
     box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
@@ -811,7 +809,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     font-size: 0.9375rem;
     font-weight: 700;
     line-height: 1.4;
-    letter-spacing: 0.02em;
+    /* letter-spacing: 0.02em; */
     color: white;
     background-color: transparent;
     text-decoration: none;
@@ -1044,9 +1042,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
     /* 右サイド ロゴアイコンの調整 */
     .right__logoIcon {
-      width: 2.5rem;
-      height: 2.5rem;
-      top: 10%;
+      width: 3.5rem;
+      height: 3.5rem;
+      top: 12%;
       left: 50%;
       left: 5%;
       transform: translateX(-50%);
@@ -1054,13 +1052,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
     /* 右サイド ヘッダーの調整 */
     .right__header {
+      width: 90%;
       font-size: 1.25rem;
       top: 4%;
       left: 50%;
       transform: translateX(-50%);
       white-space: normal;
       text-align: left;
-      width: 90%;
     }
 
     /* 右サイド サイト sp画像の調整 */
@@ -1070,7 +1068,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       height: auto;
       max-height: 50%;
       top: 12%;
-      right: 25%;
+      right: 16%;
       transform: translateX(50%);
       object-fit: contain;
       animation: rotateCircleMobile 10s linear infinite alternate;
@@ -1116,7 +1114,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       word-break: break-all;
       opacity: 1;
       padding-block: 0.75rem;
-      padding-inline: 0.75rem;
+      padding-inline: 0.5rem;
     }
 
     /* 右サイド スキルアイコンの調整 - 折り返し対応 */
@@ -1129,10 +1127,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       justify-content: flex-start;
       align-items: center;
       gap: 0.5rem;
-      padding-block: 1rem;
-      padding-inline: 0.5rem;
       top: 68%;
       bottom: 0;
+      margin-block-start: 2rem;
+      margin-block-end: 2rem;
+      padding-block: 1rem;
+      padding-inline: 0.5rem;
     }
 
     .right__iconMenu_item {
@@ -1177,6 +1177,10 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       padding-inline: 0.5rem;
     }
 
+    .right__link span + span {
+      padding: 2px;
+    }
+
     .right__iconMenu_item {
       width: calc(25% - 0.5rem);
       min-width: 50px;
@@ -1185,6 +1189,10 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
     .right__iconMenu_image {
       max-width: 32px;
+    }
+
+    .right__iconMenu {
+      min-height: 240px;
     }
 
     .right__iconMenu_text {

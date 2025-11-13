@@ -26,9 +26,6 @@ import pikucha2 from "../assets/image/pikucha2.webp";
 import contactCat from "../assets/svg/contact_cat.svg";
 import backgroundImageSrc from "../assets/background.webp";
 import { getImage } from "astro:assets";
-import DepthAppearImage from "../components/DepthAppearImage.tsx";
-import animeImageSrc from "../assets/anime.png";
-const animeImage = await getImage({ src: animeImageSrc });
 
 const backgroundImage = await getImage({ src: backgroundImageSrc });
 const portfolioRiv = "/riv/my-portfolio.riv";
@@ -54,9 +51,6 @@ const webDesignerRiv = "/riv/designer-life.riv";
       <Logo />
       <div class="breadcrumbs__wrapper breadcrumbs__wrapper_top">
         <Breadcrumbs crumbs={[]} />
-      </div>
-      <div class="animated-sprite-container">
-        <DepthAppearImage src={animeImage.src} alt="アニメーション画像" client:load />
       </div>
       <!-- タブレット・スマホ用：#main-containerの直上に配置 -->
       <div class="responsive-fv-wrapper responsive-fv-wrapper--mobile">
@@ -269,17 +263,17 @@ const webDesignerRiv = "/riv/designer-life.riv";
   import JSConfetti from "js-confetti";
 
   function initConfetti() {
-    // console.log("initConfetti called");
+    console.log("initConfetti called");
     const confetti = document.getElementById("confettiButton");
     const canvasElement = document.getElementById("canvas");
     const textCanvasElement = document.getElementById("confetti-text-canvas");
 
-    // console.log("confettiButton:", confetti);
-    // console.log("canvas:", canvasElement);
-    // console.log("textCanvas:", textCanvasElement);
+    console.log("confettiButton:", confetti);
+    console.log("canvas:", canvasElement);
+    console.log("textCanvas:", textCanvasElement);
 
     if (canvasElement instanceof HTMLCanvasElement && textCanvasElement instanceof HTMLCanvasElement) {
-      // console.log("Canvas elements found, initializing...");
+      console.log("Canvas elements found, initializing...");
       const devicePixelRatio = window.devicePixelRatio ?? 1;
 
       const rect = canvasElement.getBoundingClientRect();
@@ -371,9 +365,9 @@ const webDesignerRiv = "/riv/designer-life.riv";
         });
 
         if (confetti) {
-          // console.log("Adding click listener to confetti button");
+          console.log("Adding click listener to confetti button");
           confetti.addEventListener("click", () => {
-            // console.log("Confetti button clicked!");
+            console.log("Confetti button clicked!");
 
             context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
             currentOpacity = 0;
@@ -481,19 +475,6 @@ const webDesignerRiv = "/riv/designer-life.riv";
   .swiper-display-container--desktop {
     display: block; /* デスクトップでは表示 */
     width: 100%;
-  }
-
-  /* アニメーション画像コンテナ */
-  .animated-sprite-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 1400px;
-    min-height: 100vh;
-    margin-block-start: -2rem;
-    margin-inline: auto;
-    padding-inline: 2rem;
   }
 
   /* tsParticlesが#main-containerの上に表示されるようにz-indexを調整 */

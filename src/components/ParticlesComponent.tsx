@@ -35,11 +35,7 @@ export default function ParticlesComponent() {
     // Load tsparticles dynamically
     void (async () => {
       try {
-        const [
-          { default: Particles, initParticlesEngine },
-          { loadSlim },
-          { loadStarShape },
-        ] = await Promise.all([
+        const [{ default: Particles, initParticlesEngine }, { loadSlim }, { loadStarShape }] = await Promise.all([
           import("@tsparticles/react"),
           import("@tsparticles/slim"),
           import("@tsparticles/shape-star"),

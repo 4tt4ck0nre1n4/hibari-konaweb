@@ -120,7 +120,7 @@ console.log("Astro props:", JSON.stringify(page, null, 2));
 const posts = Array.isArray(page.data) ? page.data : [];
 
 const hasNextPage = page.size < page.total ? true : false;
-
+// const headingId = `blog-post-${post.id ?? post.slug}-title`;
 const blogTitle = "Blog";
 const blogText = "ブログ記事の一覧です。";
 const errorBlogText = "ブログ記事が見つかりませんでした。";
@@ -129,6 +129,8 @@ const postAriaLabel = "の記事へ";
 const postAriaTitle = "の記事へ";
 const categoryAriaLabel = "のカテゴリー記事へ";
 const categoryAriaTitle = "のカテゴリー記事へ";
+const datetime = "投稿日:";
+const category = "カテゴリー:";
 
 const dateIcon = {
   icon: "emojione-v1:alarm-clock",
@@ -183,13 +185,24 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
               posts.length > 0 ? (
                 posts.map((post: PostDataObject) => (
                   <li class="blog__menu_item">
-                    <article class="blog__menu_article">
+                    <article
+                      class="blog__menu_article"
+                      aria-labelledby={`blog-post-${post.id ?? post.slug}-${post.acf?.blog_title ?? post.title.rendered}`}
+                    >
                       <a
                         class="blog__menu_link"
                         href={`/blog/${post.slug ?? ""}`}
                         aria-label={`${post.slug}${postAriaLabel}`}
                         title={`${post.slug}${postAriaTitle}`}
                       >
+                        <div class="blog__contents">
+                          <h2
+                            id={`blog-post-${post.id ?? post.slug}-${post.acf?.blog_title ?? post.title.rendered}`}
+                            class="blog__header"
+                          >
+                            {post.acf?.blog_title ?? post.title.rendered}
+                          </h2>
+                        </div>
                         <div class="blog__thumbnail">
                           <img
                             class="blog__menu_image"
@@ -199,13 +212,11 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
                             decoding="async"
                           />
                         </div>
-                        <div class="blog__contents">
-                          <h2 class="blog__header">{post.acf?.blog_title ?? post.title.rendered}</h2>
-                        </div>
                       </a>
                       <div class="blog__footer">
                         <div class="blog__times">
                           <SafeIcon name={dateIcon.icon} width={dateIcon.width} height={dateIcon.height} />
+                          <span class="blog__datetime_span screenReader-only">{datetime}</span>
                           <time
                             class="blog__dateTime"
                             datetime={new Date(post.date)
@@ -237,6 +248,7 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
                                 width={categoryIcon.width}
                                 height={categoryIcon.height}
                               />
+                              <span class="blog__category_span screenReader-only">{category}</span>
                               <span class="category__link_span" set:html={post.cat_info[0]?.name} />
                             </a>
                           ) : (
@@ -384,7 +396,7 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     background-color: aliceblue;
     border: 1px solid rebeccapurple;
     border: none;
-    box-shadow: 0 0 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 0 8px rgb(0 0 0 / 0.6);
     border-radius: 1rem;
     overflow: hidden;
     position: relative;
@@ -394,7 +406,7 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   }
   .blog__menu_item:is(:hover, :focus-visible) {
     border: transparent 1px solid;
-    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
   }
 
   .blog__menu_article {
@@ -405,38 +417,11 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   }
 
   .blog__menu_link {
-    text-decoration: none;
-    flex: 1;
     display: flex;
     flex-direction: column;
+    flex: 1;
+    text-decoration: none;
     pointer-events: none;
-  }
-
-  .blog__thumbnail {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .blog__thumbnail {
-    aspect-ratio: 2 / 1;
-    overflow: hidden;
-  }
-
-  .blog__menu_image {
-    width: 100%;
-    height: auto;
-    flex-shrink: 0;
-    box-shadow: 0 6px 10px rgba(0 0 0 / 0.6);
-    object-fit: contain;
-    overflow: hidden;
-    transition: transform 0.5s ease;
-    margin-block-start: 1rem;
-    padding-inline: 0.25rem;
-  }
-
-  .blog__menu_image:is(:hover, :focus-visible) {
-    transform: scale(1.2);
   }
 
   .blog__contents {
@@ -451,19 +436,43 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   }
 
   .blog__header {
-    font-size: 1.125rem;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
     font-size: 1rem;
+    line-height: 1.5;
     letter-spacing: 0.02em;
     color: inherit;
     text-align: justify;
     overflow: hidden;
     margin-block-start: 1rem;
-    flex: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    line-height: 1.4;
   }
+  .blog__thumbnail {
+    width: 100%;
+    position: relative;
+    aspect-ratio: 2 / 1;
+    order: -1;
+    overflow: hidden;
+  }
+
+  .blog__menu_image {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-shrink: 0;
+    box-shadow: 0 8px 8px rgb(0 0 0 / 0.6);
+    object-fit: contain;
+    overflow: hidden;
+    transition: transform 0.5s ease;
+    margin-block-start: 1rem;
+    padding-inline: 0.25rem;
+  }
+
+  .blog__menu_image:is(:hover, :focus-visible) {
+    transform: scale(1.2);
+  }
+
   .blog__footer {
     display: flex;
     align-items: center;

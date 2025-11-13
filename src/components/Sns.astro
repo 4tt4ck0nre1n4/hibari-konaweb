@@ -5,7 +5,7 @@ interface SnsProps {
   className: string;
   href: string;
   snsIconSvg?: string;
-  snsIconName: string;
+  snsIconName?: string;
   ariaLabel: string;
   ariaTitle: string;
   targetBlank?: string;
@@ -15,13 +15,30 @@ const { className, href, snsIconSvg, snsIconName, ariaLabel, ariaTitle, targetBl
 
 const snsIconWidth: number = 28;
 const snsIconHeight: number = 28;
+const isSvgAsset =
+  typeof snsIconSvg === "string" &&
+  snsIconSvg.trim() !== "" &&
+  (snsIconSvg.endsWith(".svg") || snsIconSvg.startsWith("/") || snsIconSvg.startsWith("."));
 ---
 
 <li class="sns-icon__item">
   <a class={className} href={href} target={targetBlank} aria-label={ariaLabel} title={ariaTitle}>
-    <SafeIcon name={snsIconSvg} width={snsIconWidth} height={snsIconHeight} />
-    <span class="sns-icon__name">
-      {snsIconName}
-    </span>
+    {
+      isSvgAsset ? (
+        <img
+          src={snsIconSvg}
+          width={snsIconWidth}
+          height={snsIconHeight}
+          alt={snsIconName ?? ""}
+          loading="lazy"
+          decoding="async"
+          aria-hidden={snsIconName == null}
+          data-sns-icon={snsIconSvg}
+        />
+      ) : (
+        <SafeIcon name={snsIconSvg} width={snsIconWidth} height={snsIconHeight} />
+      )
+    }
+    {snsIconName && <span class="sns-icon__name">{snsIconName}</span>}
   </a>
 </li>
