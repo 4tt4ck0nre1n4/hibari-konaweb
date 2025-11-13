@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import hamburgerStyles from "../styles/hamburgerStyles.module.css";
 import ReactDOM from "react-dom";
 import { Icon } from "@iconify/react";
-import PrivacyConsent from "./PrivacyConsent";
 
 const menuItems = [
   {
@@ -349,14 +348,6 @@ const HamburgerMenu = () => {
 
   const buttonWithPortal = portalTarget && isOpen ? ReactDOM.createPortal(buttonNode, portalTarget) : buttonNode;
 
-
-  const snsNode = (
-    <div className={hamburgerStyles.hamburger__sns}>
-      <ul className={hamburgerStyles.hamburger__snsMenu}>
-        <PrivacyConsent />
-      </ul>
-    </div>
-  );
 
   return (
     <>

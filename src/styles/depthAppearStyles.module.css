@@ -133,7 +133,7 @@
     transform: scale(0.1) translateZ(-400px);
     filter: blur(4px);
 
-    --glitch-offset: 40px;
+    --glitch-offset: 0px;
     --glitch-opacity: 0;
   }
 
