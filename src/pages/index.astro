@@ -496,6 +496,21 @@ const webDesignerRiv = "/riv/designer-life.riv";
     padding-inline: 2rem;
   }
 
+  /* スマホサイズでのアニメーション画像コンテナ調整 */
+  @media screen and (max-width: 768px) {
+    .animated-sprite-container {
+      min-height: 100vh;
+      padding-inline: 1rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .animated-sprite-container {
+      min-height: 100vh;
+      padding-inline: 0.5rem;
+    }
+  }
+
   /* tsParticlesが#main-containerの上に表示されるようにz-indexを調整 */
   #main-container {
     position: relative;
