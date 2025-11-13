@@ -175,7 +175,7 @@ export default function DepthAppearImage({
             });
             gsap.set(glitchLayers, {
               opacity: 0,
-              x: 0,
+              x: 0, // 初期位置を0に設定（位置を固定）
               visibility: "visible",
               force3D: true, // 3D変換を強制
               // clearPropsは削除（opacityがクリアされるのを防ぐ）
@@ -217,8 +217,9 @@ export default function DepthAppearImage({
                 timeline.to(
                   glitchLayers,
                   {
-                    opacity: 0.9, // より強い効果のため少し下げる
-                    x: (index) => (index === 0 ? -30 : 30), // オフセットを大きく
+                    opacity: 0.6, // グリッチ効果の最大opacityを0.6に変更
+                    // xのアニメーションを削除（画面左に移動する挙動をやめる）
+                    clearProps: "x", // xをクリアして位置を固定
                     force3D: true, // 3D変換を強制
                     duration: duration * 0.3,
                     ease: "power2.inOut",
@@ -232,11 +233,15 @@ export default function DepthAppearImage({
                       // 確実にopacityを適用するため、直接スタイルを設定
                       const targets = this.targets();
                       const progress = this.progress();
-                      const opacityValue = progress * 0.9;
+                      const opacityValue = progress * 0.6; // 最大opacityを0.6に変更
                       targets.forEach((target, index) => {
                         const element = target as HTMLElement;
                         if (element) {
                           element.style.opacity = String(opacityValue);
+                          // xを完全にクリアして位置を固定
+                          gsap.set(element, { x: 0, clearProps: "x" });
+                          // transformも直接設定して確実に位置を固定
+                          element.style.transform = "translateX(0)";
                           // デバッグ用（最初の数回のみログ出力）
                           if (progress < 0.1 && index === 0) {
                             console.log("Glitch onUpdate:", {
@@ -266,17 +271,17 @@ export default function DepthAppearImage({
                 ease: "power2.inOut",
               });
 
-              // グリッチ効果を弱める（終了状態）
+              // グリッチ効果を弱める（終了状態）- anime.pngより先に消えるように早めに開始
               if (glitchLayers.length === 2) {
                 timeline.to(
                   glitchLayers,
                   {
                     opacity: 0,
-                    x: 0, // 位置をリセット
-                    duration: duration * 0.4,
+                    clearProps: "x", // xをクリアして位置を固定
+                    duration: duration * 0.3, // 少し短くして早めに消える
                     ease: "power2.inOut",
                   },
-                  "<"
+                  "<0.1" // メイン画像のアニメーションの10%の時点で開始（先に消える）
                 );
               }
               return;
@@ -319,8 +324,9 @@ export default function DepthAppearImage({
               timeline.to(
                 glitchLayers,
                 {
-                  opacity: 0.9, // より強い効果のため少し下げる
-                  x: (index) => (index === 0 ? -30 : 30), // オフセットを大きく
+                  opacity: 0.7, // グリッチ効果の最大opacityを0.7に変更
+                  // xのアニメーションを削除（画面左に移動する挙動をやめる）
+                  clearProps: "x", // xをクリアして位置を固定
                   force3D: true, // 3D変換を強制
                   duration: duration * 0.3,
                   ease: "power2.out",
@@ -352,12 +358,16 @@ export default function DepthAppearImage({
                     // 確実にopacityを適用するため、setPropertyで!importantを使用
                     const targets = this.targets();
                     const progress = this.progress();
-                    const opacityValue = progress * 0.9;
+                    const opacityValue = progress * 0.7; // 最大opacityを0.7に変更
                     targets.forEach((target, index) => {
                       const element = target as HTMLElement;
                       if (element) {
                         // setPropertyで!importantフラグを使用してCSSを確実に上書き
                         element.style.setProperty("opacity", String(opacityValue), "important");
+                        // xを完全にクリアして位置を固定
+                        gsap.set(element, { x: 0, clearProps: "x" });
+                        // transformも直接設定して確実に位置を固定
+                        element.style.transform = "translateX(0)";
                         // デバッグ用（最初の数回のみログ出力）
                         if (progress < 0.1 && index === 0) {
                           console.log("Glitch onUpdate:", {
@@ -387,17 +397,17 @@ export default function DepthAppearImage({
               ease: "power2.inOut",
             });
 
-            // グリッチ効果を弱める（終了状態）
+            // グリッチ効果を弱める（終了状態）- anime.pngより先に消えるように早めに開始
             if (glitchLayers.length === 2) {
               timeline.to(
                 glitchLayers,
                 {
                   opacity: 0,
-                  x: 0,
-                  duration: duration * 0.4,
+                  x: 0, // xを明示的に0に設定（位置を固定）
+                  duration: duration * 0.3, // 少し短くして早めに消える
                   ease: "power2.inOut",
                 },
-                "<"
+                "<0.1" // メイン画像のアニメーションの10%の時点で開始（先に消える）
               );
             }
           };
