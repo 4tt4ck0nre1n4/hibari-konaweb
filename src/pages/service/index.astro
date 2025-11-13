@@ -11,10 +11,6 @@ import serviceText from "../../data/serviceText.json";
 import { Image } from "astro:assets";
 import sorryImage from "/public/assets/sorry.webp";
 
-// const crumbs= [
-//   { name: "Home", path: "/" },
-//   { name: "Service" }
-// ];
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
 // const cardSrc1 = "/riv/web-developer.riv";

@@ -2,6 +2,7 @@ export interface SnsProps {
   className: string;
   href: string;
   icon: string;
+  src: string;
   item: string;
   ariaLabel: string;
   ariaTitle: string;
@@ -9,8 +10,8 @@ export interface SnsProps {
   targetBlank: string;
 }
 
-// export const ariaHidden = "true";
-
+// const logoSvg = "/logo_outline.svg";
+const logoSvg = "/favicon.svg";
 export const twitter = {
   className: "sns-icon__link",
   href: "/sorry",
@@ -48,6 +49,14 @@ export const instagram = {
   targetBlank: "_blank",
 };
 export const about = {
+  className: "sns-icon__link",
+  href: "/about",
+  icon: logoSvg,
+  item: "About Page",
+  ariaLabel: "Aboutページへ",
+  ariaTitle: "Aboutページへ",
+};
+export const aboutPage = {
   className: "sns-icon__link",
   href: "/about",
   icon: "fa6-solid:cat",

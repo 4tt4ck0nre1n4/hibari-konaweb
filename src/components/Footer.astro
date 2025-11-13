@@ -15,6 +15,7 @@ interface ContactType {
   };
   href: string;
   icon: string;
+  src: string;
   item: {
     about: string;
     footer: string;
@@ -250,6 +251,7 @@ const typedContact = contact as ContactType;
     vertical-align: middle;
     transition: all 0.4s ease;
   }
+
   .footer__snsMenu .sns-icon__link svg:is(:hover, :focus-visible) {
     color: rebeccapurple;
   }
@@ -259,8 +261,29 @@ const typedContact = contact as ContactType;
   .footer__snsMenu .sns-icon__link svg:nth-of-type(2):is(:hover, :focus-visible) {
     background: rebeccapurple;
   }
+  .footer__snsMenu .sns-icon__link svg:nth-of-type(4):is(:hover, :focus-visible) {
+    background: rebeccapurple;
+  }
   html.dark .footer__snsMenu .sns-icon__link svg {
     stroke: #f1f5f9;
+  }
+  .footer__snsMenu [data-sns-icon="/logo_outline.svg"] {
+    display: block;
+    filter: brightness(0) saturate(100%);
+    /* transition: filter 0.3s ease; */
+  }
+  .footer__snsMenu:is(:hover, :focus-visible) [data-sns-icon="/logo_outline.svg"] {
+    display: block;
+    filter: hue-rotate(240deg);
+  }
+  .footer__snsMenu [data-sns-icon="/favicon.svg"] {
+    display: block;
+    filter: brightness(0) saturate(100%);
+    /* transition: filter 0.3s ease; */
+  }
+  .footer__snsMenu:is(:hover, :focus-visible) [data-sns-icon="/favicon.svg"] {
+    /* display: block; */
+    filter: hue-rotate(240deg) saturate(80%);
   }
   .footer .footer__menu {
     padding-block: 0.5rem;

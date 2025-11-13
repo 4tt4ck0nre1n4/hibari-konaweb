@@ -111,9 +111,12 @@ const categoryError = "このカテゴリーには記事がありません。";
 const categoryLink = "カテゴリー記事一覧のページへ";
 const title = category?.name ?? "カテゴリー記事が見つかりません";
 const description = category?.acf?.description ?? "No description";
+const postAriaLabel = "の記事へ";
+const postAriaTitle = "の記事へ";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 const dateIcon = "emojione-v1:alarm-clock";
+const datetime = "投稿日:";
 ---
 
 <Layout
@@ -145,9 +148,24 @@ const dateIcon = "emojione-v1:alarm-clock";
             posts.length > 0 ? (
               posts.map((post) => (
                 <li class="category__menu_item">
-                  <a class="category__menu_link" href={`/blog/${post.slug}`}>
-                    <div class="category__thumbnail">
-                      <figure class="category__figure">
+                  <article
+                    class="category__menu_article"
+                    aria-labelledby={`category-post-${post.id ?? post.slug}-${post.acf?.blog_title ?? post.title.rendered}`}
+                  >
+                    <a
+                      class="category__menu_link"
+                      href={`/blog/${post.slug}`}
+                      aria-label={`${post.slug}${postAriaLabel}`}
+                      title={`${post.slug}${postAriaTitle}`}
+                    >
+                      <div class="category__contents">
+                        <h2
+                          id={`category-post-${post.id ?? post.slug}-${post.acf?.blog_title ?? post.title.rendered}`}
+                          class="category__header"
+                          set:html={post.acf?.blog_title ?? post.title.rendered}
+                        />
+                      </div>
+                      <div class="category__thumbnail">
                         <img
                           class="category__image"
                           src={post.acf?.blog_image ?? undefined}
@@ -155,13 +173,11 @@ const dateIcon = "emojione-v1:alarm-clock";
                           decoding="async"
                           loading="lazy"
                         />
-                      </figure>
-                    </div>
-                    <div class="category__contents">
-                      <h2 class="category__header" set:html={post.acf?.blog_title ?? post.title.rendered} />
+                      </div>
                       <div class="category__footer">
                         <div class="category__times">
                           <Icon name={dateIcon} />
+                          <span class="category__datetime_span screenReader-only">{datetime}</span>
                           <time
                             class="category__dateTime"
                             datetime={new Date(post.date)
@@ -181,8 +197,8 @@ const dateIcon = "emojione-v1:alarm-clock";
                           />
                         </div>
                       </div>
-                    </div>
-                  </a>
+                    </a>
+                  </article>
                 </li>
               ))
             ) : (
@@ -262,8 +278,6 @@ const dateIcon = "emojione-v1:alarm-clock";
     width: 100%;
     overflow: hidden;
     position: relative;
-  }
-  .category__figure {
     width: 100%;
     display: flex;
     aspect-ratio: 2 / 1;
@@ -317,9 +331,6 @@ const dateIcon = "emojione-v1:alarm-clock";
   .category__dateTime {
     flex-shrink: 0;
     font-size: 0.75rem;
-    /* color: inherit;
-    color: white;
-    color: rebeccapurple; */
     align-self: flex-end;
     margin-block-start: auto;
     margin-inline-start: 0.25rem;

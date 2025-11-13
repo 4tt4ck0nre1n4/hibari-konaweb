@@ -201,7 +201,9 @@ const worksPagination = {
               works.length > 0 ? (
                 works.map((work: WorkObject) => (
                   <li class="worksCard__menu_item">
-                    <h2 class="worksCard__header">
+                    <article class="worksCard__article" aria-labelledby={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`}>
+
+                    <h2 id={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`} class="worksCard__header">
                       <a
                         class="worksCard__slug"
                         href={`/works/${work.slug}`}
@@ -235,6 +237,7 @@ const worksPagination = {
                       set:html={work?.acf?.left_link ?? ""}
                     />
                     <p class="worksCard__body" set:html={work?.acf?.right_access ?? "No additional information"} />
+                    </article>
                   </li>
                 ))
               ) : (
@@ -454,14 +457,14 @@ const worksPagination = {
     margin-block-start: 3rem;
   }
   .worksCard__menu_item {
-    display: grid;
+    display: block grid;
     grid-template-rows: subgrid;
     grid-row: span 4;
     color: rebeccapurple;
     background-color: whitesmoke;
     border: rebeccapurple 1px solid;
     border-radius: 1rem;
-    box-shadow: 0 0 8px 0 rgba(0 0 0 / 0.6);
+    box-shadow: 0 0 8px rgba(0 0 0 / 0.6);
     overflow: hidden;
     position: relative;
     padding-block: 1rem;
@@ -523,6 +526,11 @@ const worksPagination = {
     html.dark .worksCard__menu_item::before {
       background: linear-gradient(-90deg, transparent, #ffffff71, transparent, #ffffff71, transparent);
     }
+  }
+  .worksCard__article {
+    display: block grid;
+    grid-template-rows: subgrid;
+    grid-row: span 4;
   }
   .worksCard__header {
     font-size: 1rem;

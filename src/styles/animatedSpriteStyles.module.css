@@ -1,0 +1,13 @@
+.sprite {
+  width: 400px;          /* 1フレーム分の幅 */
+  height: 300px;         /* 1フレーム分の高さ */
+  background-image: url('/assets/sprite.png');
+  background-repeat: no-repeat;
+  background-size: calc(100% * n) 100%;
+  animation: play 1s steps(n) infinite;
+}
+
+@keyframes play {
+  from { background-position:    0 0; }
+  to   { background-position: -100% 0; }
+}

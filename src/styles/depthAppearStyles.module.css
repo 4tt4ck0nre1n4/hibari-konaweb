@@ -1,0 +1,255 @@
+.container {
+  display: block;
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  height: auto;
+  transform-origin: center center;
+  will-change: transform, opacity;
+
+  /* overflow: hidden; を削除（グリッチレイヤーが切れるのを防ぐ） */
+
+  /* 3D変換を有効化 */
+  transform-style: preserve-3d;
+  perspective: 1000px; /* より強い3D効果のため値を小さく */
+  perspective-origin: center center;
+
+  /* アニメーション設定（ショートハンドプロパティを最後に配置） */
+  animation-name: depthAppear;
+  animation-duration: var(--animation-duration, 1.8s);
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation-delay: var(--animation-delay, 0.5s);
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: forwards;
+  animation-play-state: running;
+
+  /* 初期状態 */
+  opacity: 0.07;
+  transform: scale(0.1);
+}
+
+.image {
+  position: relative;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 900px;
+  max-height: 100vh;
+  object-fit: contain;
+  display: block;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%; /* 中央を基準点に設定（上から降りてくる動きを避ける） */
+  will-change: transform; /* パフォーマンス最適化 */
+  z-index: 1;
+}
+
+/* グリッチ効果レイヤー（手法3: mix-blend-mode + 複数レイヤー） */
+.glitchRed,
+.glitchBlue {
+  position: fixed; /* 親要素のopacityの影響を受けないようにfixedに変更 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: 900px;
+  max-height: 100vh;
+  object-fit: contain;
+  pointer-events: none;
+
+  /* より確実なグリッチ効果のため、screenを使用 */
+  mix-blend-mode: screen;
+  opacity: 0; /* GSAPで制御するため、初期値は0 */
+  transform: translateX(0);
+
+  /* GSAPアニメーションで確実に適用されるように */
+  transition: none; /* トランジションを無効化 */
+  will-change: transform, opacity;
+  display: block;
+
+  /* 確実に表示されるように */
+  visibility: visible;
+
+  /* 画像の上に確実に配置 */
+  z-index: 10;
+}
+
+.glitchRed {
+  /* より強いグリッチ効果のため、mix-blend-modeを変更 */
+
+  /* screenは暗い背景では効果が弱いため、color-dodgeやdifferenceも試す */
+
+  /* 暗い背景でも効果が出るように、複数のブレンドモードを試す */
+
+  /* lighten → screen → color-dodge → difference の順で試す */
+
+  /* より確実なグリッチ効果のため、screenを使用 */
+  mix-blend-mode: screen;
+  z-index: 100;
+
+  /* 赤チャンネルを強調 - より強く */
+
+  /* CSS filterで赤チャンネルを強調 - より直接的な方法 */
+
+  /* より強い効果のため、brightnessとcontrastを上げる */
+  filter: blur(0.8px) contrast(15) saturate(15) brightness(5) drop-shadow(-25px 0 0 rgb(255 0 0 / 1))
+    drop-shadow(-15px 0 0 rgb(255 0 0 / 1)) drop-shadow(-8px 0 0 rgb(255 0 0 / 0.9));
+}
+
+.glitchBlue {
+  /* より強いグリッチ効果のため、mix-blend-modeを変更 */
+
+  /* screenは暗い背景では効果が弱いため、color-dodgeやdifferenceも試す */
+
+  /* 暗い背景でも効果が出るように、複数のブレンドモードを試す */
+
+  /* lighten → screen → color-dodge → difference の順で試す */
+
+  /* より確実なグリッチ効果のため、screenを使用 */
+  mix-blend-mode: screen;
+  z-index: 101;
+
+  /* 青チャンネルを強調 - より強く */
+
+  /* CSS filterで青チャンネルを強調 - より直接的な方法 */
+
+  /* より強い効果のため、brightnessとcontrastを上げる */
+  filter: blur(0.8px) contrast(15) saturate(15) brightness(5) drop-shadow(25px 0 0 rgb(0 0 255 / 1))
+    drop-shadow(15px 0 0 rgb(0 0 255 / 1)) drop-shadow(8px 0 0 rgb(0 0 255 / 0.9));
+}
+
+/* フォールバッククラスが付いている場合はアニメーションを無効化 */
+.container.fallback {
+  animation: none;
+  opacity: 1;
+  transform: scale(1);
+}
+
+@keyframes depthAppear {
+  0% {
+    opacity: 0.07;
+    transform: scale(0.1) translateZ(-400px);
+    filter: blur(4px);
+
+    --glitch-offset: 40px;
+    --glitch-opacity: 0;
+  }
+
+  30% {
+    --glitch-offset: 40px;
+    --glitch-opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05) translateZ(-100px);
+    filter: blur(1px);
+
+    --glitch-offset: 60px;
+    --glitch-opacity: 1;
+  }
+
+  70% {
+    --glitch-offset: 80px;
+    --glitch-opacity: 0.8;
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+    filter: blur(0);
+
+    --glitch-offset: 0px;
+    --glitch-opacity: 0;
+  }
+}
+
+/* CSSアニメーション時のグリッチ効果 */
+
+/* GSAPを使用している場合はCSSアニメーションを無効化 */
+.container.use-gsap .glitchRed,
+.container.use-gsap .glitchBlue {
+  animation: none;
+}
+
+/* CSSアニメーションを使用する場合のみ適用 */
+.container:not(.fallback, .use-gsap) .glitchRed {
+  animation: glitchRed var(--animation-duration, 1.8s) ease-out forwards;
+  animation-delay: var(--animation-delay, 0.5s);
+}
+
+.container:not(.fallback, .use-gsap) .glitchBlue {
+  animation: glitchBlue var(--animation-duration, 1.8s) ease-out forwards;
+  animation-delay: var(--animation-delay, 0.5s);
+}
+
+@keyframes glitchRed {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateX(calc(-1 * var(--glitch-offset, 40px)));
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(calc(-1 * var(--glitch-offset, 60px)));
+  }
+
+  70% {
+    opacity: 0.8;
+    transform: translateX(calc(-1 * var(--glitch-offset, 40px)));
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glitchBlue {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateX(var(--glitch-offset, 20px));
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(var(--glitch-offset, 30px));
+  }
+
+  70% {
+    opacity: 0.8;
+    transform: translateX(var(--glitch-offset, 20px));
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+/* GSAP使用時やフォールバック時のスタイル */
+.fallback {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* レスポンシブ対応 */
+@media (prefers-reduced-motion: reduce) {
+  .container {
+    animation: none;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
