@@ -486,6 +486,17 @@ const webDesignerRiv = "/riv/designer-life.riv";
     display: block; /* デスクトップでは表示 */
     width: 100%;
   }
+  .glitch-container {
+    width: 100%;
+    max-width: 1400px;
+    background: #000000;
+    margin-inline: auto;
+  }
+  @media screen and (max-width: 480px) {
+    .glitch-container {
+      width: 90%;
+    }
+  }
 
   /* アニメーション画像コンテナ */
   .animated-sprite-container {
