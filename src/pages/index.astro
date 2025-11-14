@@ -26,9 +26,10 @@ import pikucha2 from "../assets/image/pikucha2.webp";
 import contactCat from "../assets/svg/contact_cat.svg";
 import backgroundImageSrc from "../assets/background.webp";
 import { getImage } from "astro:assets";
-import DepthAppearImage from "../components/DepthAppearImage.tsx";
-import animeImageSrc from "../assets/anime.png";
-const animeImage = await getImage({ src: animeImageSrc });
+// import DepthAppearImage from "../components/DepthAppearImage.tsx";
+import Glitch from "../components/Glitch.astro";
+// import animeImageSrc from "../assets/anime.png";
+// const animeImage = await getImage({ src: animeImageSrc });
 
 const backgroundImage = await getImage({ src: backgroundImageSrc });
 const portfolioRiv = "/riv/my-portfolio.riv";
@@ -55,9 +56,12 @@ const webDesignerRiv = "/riv/designer-life.riv";
       <div class="breadcrumbs__wrapper breadcrumbs__wrapper_top">
         <Breadcrumbs crumbs={[]} />
       </div>
-      <div class="animated-sprite-container">
-        <DepthAppearImage src={animeImage.src} alt="アニメーション画像" client:load />
+      <div class="glitch-container">
+        <Glitch />
       </div>
+      <!-- <div class="animated-sprite-container">
+        <DepthAppearImage src={animeImage.src} alt="アニメーション画像" client:load />
+      </div> -->
       <!-- タブレット・スマホ用：#main-containerの直上に配置 -->
       <!-- <div class="responsive-fv-wrapper responsive-fv-wrapper--mobile">
         <ResponsiveFv />
