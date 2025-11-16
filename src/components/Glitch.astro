@@ -72,9 +72,73 @@ const glitchImage = await getImage({ src: glitchImageSrc });
         glitchImages.forEach((img) => {
           const element = img as HTMLElement;
           // shakeアニメーションのみに切り替え
-          element.style.animation = "shake 8s infinite ease-in-out";
+          element.style.animation = "shake 8s ease-in-out";
         });
       }, 6000); // 6秒後
+
+      // 3. 14秒後（shake終了後）にopacityアニメーションを発動
+      setTimeout(() => {
+        console.log("Starting opacity animation...");
+        glitchImages.forEach((img) => {
+          const element = img as HTMLElement;
+          // opacityアニメーションを追加
+          element.style.animation = "opacity 8s linear";
+        });
+      }, 14000); // 6秒 + 8秒 = 14秒後
+
+      // 4. 22秒後（opacity開始から8秒後）に::beforeアニメーションを停止し、画像を正常表示
+      setTimeout(() => {
+        console.log("Stopping ::before animations and showing final image...");
+
+        // CSSでアニメーションを停止し、エフェクトレイヤーを非表示にする
+        const style = document.createElement("style");
+        style.textContent = `
+          .glitch-image.r::before {
+            animation: none !important;
+            opacity: 0 !important;
+            transition: opacity 3s ease-out !important;
+          }
+          .glitch-image.g::before {
+            animation: none !important;
+            opacity: 0 !important;
+            transition: opacity 3s ease-out !important;
+          }
+          .glitch-image.b::before {
+            animation: none !important;
+            opacity: 0 !important;
+            transition: opacity 3s ease-out !important;
+          }
+          .glitch-image.f::before {
+            animation: none !important;
+            opacity: 0 !important;
+            transition: opacity 3s ease-out !important;
+          }
+        `;
+        document.head.appendChild(style);
+
+        // トランジションを設定してから値を変更
+        if (glitchR) {
+          glitchR.style.transition = "opacity 3s ease-out";
+          glitchR.style.opacity = "0";
+        }
+        if (glitchG) {
+          glitchG.style.transition = "opacity 3s ease-out";
+          glitchG.style.opacity = "0";
+        }
+        if (glitchB) {
+          glitchB.style.transition = "opacity 3s ease-out";
+          glitchB.style.opacity = "0";
+        }
+        if (glitchF) {
+          glitchF.style.transition = "opacity 3s ease-out, mix-blend-mode 0s 3s";
+          glitchF.style.animation = "none";
+          glitchF.style.opacity = "1";
+          // 3秒後にブレンドモードを変更（トランジション完了後）
+          setTimeout(() => {
+            if (glitchF) glitchF.style.mixBlendMode = "normal";
+          }, 3000);
+        }
+      }, 22000); // 14秒 + 8秒 = 22秒後
     };
 
     // チェック開始
@@ -133,7 +197,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
     100% {
       transform: translate3d(0, 0, 0);
-      opacity: 0;
+      opacity: 0.5;
     }
   }
 
@@ -149,17 +213,17 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   }
   .r::before {
     background: #ff0000;
-    filter: drop-shadow(20px 4px 8px #ff0000) brightness(1.5);
+    filter: drop-shadow(20px 4px 8px #ff0000);
     animation: glitchAnime-1 1.2s infinite linear;
   }
   .g::before {
     background: #00ff00;
-    filter: drop-shadow(-20px 4px 8px #00ff00) brightness(1.5);
+    filter: drop-shadow(-20px 4px 8px #00ff00);
     animation: glitchAnime-2 1.4s infinite linear;
   }
   .b::before {
     background: #0000ff;
-    filter: drop-shadow(-8px 4px 8px #0000ff) brightness(1.5);
+    filter: drop-shadow(-8px 4px 8px #0000ff);
     animation: glitchAnime-3 1.6s infinite linear;
   }
 
@@ -301,7 +365,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   @keyframes glitchAnime-1 {
     0% {
       clip-path: polygon(0 0, 100% 16%, 100% 24%, 0 40%);
-      opacity: 1;
+      /* opacity: 1; */
       transform: translate(16px, 0);
     }
     2% {
@@ -344,14 +408,14 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
 
     21.9% {
-      opacity: 1;
+      /* opacity: 1; */
       transform: translate(16px, 0);
     }
 
     22%,
     to {
       clip-path: polygon(0 0, 0 0, 0 0, 0 0);
-      opacity: 0;
+      /* opacity: 0; */
       transform: translate(0, 0);
     }
   }
@@ -359,8 +423,8 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   @keyframes glitchAnime-2 {
     0% {
       clip-path: polygon(0 24%, 100% 24%, 100% 32%, 0 32%);
-      opacity: 1;
-      transform: translate(16px, 0);
+      /* opacity: 1; */
+      transform: translate(8px, 0);
     }
 
     3% {
@@ -404,14 +468,14 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
 
     21.9% {
-      opacity: 1;
+      /* opacity: 1; */
       transform: translate(8px, 0);
     }
 
     22%,
     to {
       clip-path: polygon(0 0, 0 0, 0 0, 0 0);
-      opacity: 0;
+      /* opacity: 0; */
       transform: translate(0, 0);
     }
   }
@@ -419,8 +483,8 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   @keyframes glitchAnime-3 {
     0% {
       clip-path: polygon(0 1%, 100% 1%, 100% 4%, 0 1%);
-      opacity: 1;
-      transform: translate3d(0, calc(8px * -1), 0) scale3d(-1, -1, 1);
+      /* opacity: 1; */
+      transform: translate(-8px, 0);
     }
 
     1.5% {
@@ -496,15 +560,15 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
 
     21.9% {
-      opacity: 1;
-      transform: translate3d(0, calc(var(8px * -1), 0)) scale3d(-1, -1, 1);
+      /* opacity: 1; */
+      transform: translate(8px, 0);
     }
 
     22%,
     to {
       clip-path: polygon(0 0, 0 0, 0 0, 0 0);
-      opacity: 0;
-      transform: translateZ(0);
+      /* opacity: 0; */
+      transform: translate(0, 0);
     }
   }
 
