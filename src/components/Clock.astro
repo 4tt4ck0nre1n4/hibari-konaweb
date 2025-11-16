@@ -214,7 +214,20 @@
   let shineInterval: ReturnType<typeof setInterval> | null = null;
   let colorInterval: ReturnType<typeof setInterval> | null = null;
 
-  window.addEventListener("load", () => {
+  // DOMContentLoaded を使用してより早期に初期化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeClock);
+  } else {
+    // ページが既に読み込まれている場合は即座に実行
+    initializeClock();
+  }
+
+  function initializeClock() {
+    // 既に初期化されている場合は既存のインターバルをクリア
+    if (clockInterval) clearInterval(clockInterval);
+    if (shineInterval) clearInterval(shineInterval);
+    if (colorInterval) clearInterval(colorInterval);
+
     clock();
     clockInterval = setInterval(clock, 1000);
 
@@ -243,7 +256,7 @@
         }, 1000);
       }
     }, 1000);
-  });
+  }
 
   // ページがアンロードされる時にインターバルをクリア
   window.addEventListener("beforeunload", () => {

@@ -490,7 +490,19 @@ const webDesignerRiv = "/riv/designer-life.riv";
     width: 100%;
     max-width: 1400px;
     background: #000000;
+    background-image: repeating-conic-gradient(#000000 0% 25%, #111111 0% 50%);
+    background-size: 4px 4px;
+    animation: noise 1s infinite linear;
     margin-inline: auto;
+
+  }
+  @keyframes noise {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 100% 100%;
+    }
   }
   @media screen and (max-width: 480px) {
     .glitch-container {
