@@ -103,8 +103,14 @@ export default defineConfig({
   output: "static", // 完全静的サイト生成（pagefind対応）
   // output: "server", // SSRが必要な場合（pagefind非対応）
   server: {
+    port: 4321, // ポートを4321に固定
     host: true,
     open: true,
+    hmr: {
+      host: "localhost",
+      port: 4321,
+      protocol: "ws",
+    },
   },
   vite: {
     plugins: [
