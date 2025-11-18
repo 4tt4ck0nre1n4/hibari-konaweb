@@ -84,7 +84,7 @@ export const prerender = true;
   }
   @media (max-width: 480px) {
     .contact__wrapper {
-      /* max-width: 320px; */
+      width: 90%;
     }
   }
   .contact__title {
@@ -103,10 +103,15 @@ export const prerender = true;
     text-align: left;
     margin-inline: auto;
   }
+
+  .contact__body:first-of-type {
+    margin-block-start: 1rem;
+  }
   @media (max-width: 480px) {
     .contact__body {
-      width: 90%;
-      letter-spacing: 0.02em;
+      max-width: 480px;
+      text-align: justify;
+      padding-inline: 0.5rem;
     }
   }
   .contact__body--required {
