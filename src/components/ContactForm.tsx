@@ -148,7 +148,7 @@ export default function ContactForm() {
   return (
     <div className="wpcf7">
       <div className={styles.form__inner}>
-        <form onSubmit={(e) => void onSubmit(e)}>
+        <form onSubmit={(e) => void onSubmit(e)} aria-labelledby="contact-form-title" aria-describedby="contact-form-description">
           <div className={styles.form_hidden}>
             <input type="hidden" name="_wpcf7" value={wpcf7Id} />
             <input type="hidden" name="_wpcf7_version" value="5.9.7" />

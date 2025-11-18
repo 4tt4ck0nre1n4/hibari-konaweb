@@ -1,0 +1,337 @@
+---
+interface MenuItem {
+  href: string;
+  ariaLabel: string;
+  ariaTitle: string;
+  menuItem: string;
+}
+
+const menuItems: MenuItem[] = [
+  { href: "/", ariaLabel: "ホーム", ariaTitle: "ホーム", menuItem: "Home" },
+  { href: "/about", ariaLabel: "アバウト", ariaTitle: "アバウト", menuItem: "About" },
+  { href: "/works", ariaLabel: "ワークス", ariaTitle: "ワークス", menuItem: "Works" },
+  { href: "/blog", ariaLabel: "ブログ", ariaTitle: "ブログ", menuItem: "Blog" },
+  { href: "/contact", ariaLabel: "お問い合わせ", ariaTitle: "お問い合わせ", menuItem: "Contact" },
+];
+---
+
+<div class="navi-card__wrapper">
+  <button
+    class="navi-card__button"
+    type="button"
+    value="Navigation"
+    aria-label="メニューを開く"
+    aria-expanded="false"
+    aria-controls="navi-card"
+  >
+    <span class="navi-card__button_text">Navigation</span>
+  </button>
+  <ul id="navi-card" class="navi-card__menu" aria-hidden="true">
+    {
+      menuItems.map((item, index) => (
+        <li class="navi-card__menu_item" data-index={index}>
+          <a class="navi-card__menu_link" href={item.href} aria-label={item.ariaLabel} title={item.ariaTitle}>
+            <span class="navi-card__menu_text">{item.menuItem}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<script>
+  function initNaviCard() {
+    const button = document.querySelector(".navi-card__button") as HTMLButtonElement;
+    const menu = document.querySelector(".navi-card__menu") as HTMLUListElement;
+    const menuItems = document.querySelectorAll(".navi-card__menu_item") as NodeListOf<HTMLLIElement>;
+
+    if (!button || !menu || !menuItems.length) return;
+
+    let isOpen = false;
+
+    button.addEventListener("click", () => {
+      isOpen = !isOpen;
+
+      // ARIA属性の更新
+      button.setAttribute("aria-expanded", String(isOpen));
+      button.setAttribute("aria-label", isOpen ? "メニューを閉じる" : "メニューを開く");
+      menu.setAttribute("aria-hidden", String(!isOpen));
+
+      // クラスの切り替え
+      button.classList.toggle("is-open", isOpen);
+      menu.classList.toggle("is-open", isOpen);
+
+      // 各アイテムのアニメーション
+      menuItems.forEach((item, index) => {
+        if (isOpen) {
+          item.classList.add("is-open");
+          item.style.transitionDelay = `${index * 0.08}s`;
+        } else {
+          item.classList.remove("is-open");
+          item.style.transitionDelay = `${(menuItems.length - index - 1) * 0.05}s`;
+        }
+      });
+    });
+
+    // メニュー外クリックで閉じる
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (isOpen && !button.contains(target) && !menu.contains(target)) {
+        button.click();
+      }
+    });
+  }
+
+  // 初期化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initNaviCard);
+  } else {
+    initNaviCard();
+  }
+</script>
+
+<style is:global>
+  .navi-card__wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .navi-card__button {
+    position: absolute;
+    top: 88px;
+    left: 32px;
+    width: 180px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.95) 0%, rgba(168, 85, 247, 0.95) 100%);
+    border-radius: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4);
+    backdrop-filter: blur(10px);
+  }
+
+  .navi-card__button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(147, 51, 234, 0.6);
+  }
+
+  .navi-card__button.is-open {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.95) 0%, rgba(147, 51, 234, 0.95) 100%);
+  }
+
+  .navi-card__button_text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.05em;
+  }
+
+  .navi-card__menu {
+    position: absolute;
+    top: 88px;
+    left: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .navi-card__menu.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .navi-card__menu_item {
+    width: 120px;
+    height: 150px;
+    background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    border: 2px solid rgba(147, 51, 234, 0.2);
+    transform-origin: bottom center;
+    transform: translateY(0) translateX(0) rotateZ(0deg) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.6s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .navi-card__menu_item.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* 各カードの展開位置 */
+  .navi-card__menu_item[data-index="0"].is-open {
+    transform: translateY(-100px) translateX(-80px) rotateZ(-15deg) scale(1);
+  }
+
+  .navi-card__menu_item[data-index="1"].is-open {
+    transform: translateY(-80px) translateX(-40px) rotateZ(-8deg) scale(1);
+  }
+
+  .navi-card__menu_item[data-index="2"].is-open {
+    transform: translateY(-60px) translateX(0) rotateZ(0deg) scale(1);
+  }
+
+  .navi-card__menu_item[data-index="3"].is-open {
+    transform: translateY(-40px) translateX(40px) rotateZ(8deg) scale(1);
+  }
+
+  .navi-card__menu_item[data-index="4"].is-open {
+    transform: translateY(-20px) translateX(80px) rotateZ(15deg) scale(1);
+  }
+
+  .navi-card__menu_item:hover {
+    box-shadow: 0 12px 32px rgba(147, 51, 234, 0.4);
+    transform: translateY(-5px) scale(1.05) !important;
+    z-index: 10;
+  }
+
+  .navi-card__menu_link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    padding: 1.5rem;
+  }
+
+  .navi-card__menu_text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #7c3aed;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .navi-card__menu_link:hover .navi-card__menu_text {
+    color: #6d28d9;
+    transform: scale(1.1);
+  }
+
+  html.dark .navi-card__menu_item {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    border-color: rgba(168, 85, 247, 0.3);
+  }
+
+  html.dark .navi-card__menu_text {
+    color: #a78bfa;
+  }
+
+  html.dark .navi-card__menu_link:hover .navi-card__menu_text {
+    color: #c4b5fd;
+  }
+
+  /* レスポンシブ対応 */
+  @media screen and (max-width: 768px) {
+    .navi-card__button {
+      top: 20px;
+      left: 16px;
+      width: 140px;
+      height: 60px;
+    }
+
+    .navi-card__button_text {
+      font-size: 1rem;
+    }
+
+    .navi-card__menu {
+      top: 20px;
+      left: 16px;
+    }
+
+    .navi-card__menu_item {
+      width: 120px;
+      height: 160px;
+    }
+
+    .navi-card__menu_item[data-index="0"].is-open {
+      transform: translateY(-80px) translateX(-60px) rotateZ(-12deg) scale(1);
+    }
+
+    .navi-card__menu_item[data-index="1"].is-open {
+      transform: translateY(-60px) translateX(-30px) rotateZ(-6deg) scale(1);
+    }
+
+    .navi-card__menu_item[data-index="2"].is-open {
+      transform: translateY(-40px) translateX(0) rotateZ(0deg) scale(1);
+    }
+
+    .navi-card__menu_item[data-index="3"].is-open {
+      transform: translateY(-20px) translateX(30px) rotateZ(6deg) scale(1);
+    }
+
+    .navi-card__menu_item[data-index="4"].is-open {
+      transform: translateY(0px) translateX(60px) rotateZ(12deg) scale(1);
+    }
+
+    .navi-card__menu_text {
+      font-size: 1.125rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .navi-card__button {
+      width: 120px;
+      height: 50px;
+    }
+
+    .navi-card__button_text {
+      font-size: 0.875rem;
+    }
+
+    .navi-card__menu_item {
+      width: 100px;
+      height: 140px;
+    }
+
+    .navi-card__menu_item[data-index="0"].is-open {
+      transform: translateY(-70px) translateX(-50px) rotateZ(-10deg) scale(1);
+    }
+
+    .navi-card__menu_item[data-index="1"].is-open {
+      transform: translateY(-50px) translateX(-25px) rotateZ(-5deg) scale(1);
+    }
+
+    .navi-card__menu_item[data-index="2"].is-open {
+      transform: translateY(-30px) translateX(0) rotateZ(0deg) scale(1);
+    }
+
+    .navi-card__menu_item[data-index="3"].is-open {
+      transform: translateY(-10px) translateX(25px) rotateZ(5deg) scale(1);
+    }
+
+    .navi-card__menu_item[data-index="4"].is-open {
+      transform: translateY(10px) translateX(50px) rotateZ(10deg) scale(1);
+    }
+
+    .navi-card__menu_text {
+      font-size: 1rem;
+    }
+  }
+</style>

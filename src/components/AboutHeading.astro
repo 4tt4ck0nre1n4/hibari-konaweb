@@ -31,4 +31,9 @@ const { aboutTitle, aboutSubTitle } = Astro.props as AboutProps;
     text-align: center;
     margin-block-start: 1rem;
   }
+  @media screen and (max-width: 480px) {
+    .about__subTitle {
+      letter-spacing: 0.04em;
+    }
+  }
 </style>
