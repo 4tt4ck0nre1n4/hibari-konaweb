@@ -267,13 +267,15 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
                 <div class="split right site1">
                   {/* サイト pc画像 */}
-                  <img
-                    class="right__pcImage"
-                    src={worksPcImage ?? ""}
-                    alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  <div class="right__pcImageInner">
+                    <img
+                      class="right__pcImage"
+                      src={worksPcImage ?? ""}
+                      alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
                   {/* サイトタイトル */}
                   <h1 class="right__header" set:html={worksRightHeader ?? "No title available"} />
                   {/* ロゴアイコン */}
@@ -590,7 +592,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   }
   .split.right {
     display: grid;
-    place-items: end;
+    /* place-items: end; */
   }
   /* 左サイド  */
   .split.left {
@@ -739,7 +741,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   }
   /* 右サイド Basic認証テキスト */
   .right__text {
-    width: 34rem;
+    width: 100%;
     width: 100%;
     max-width: 600px;
     font-size: 1rem;
@@ -749,8 +751,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     backdrop-filter: blur(12px);
     background-image: linear-gradient(120deg, rgba(255 255 255 / 0.3), rgba(0 0 0 / 0.2));
     background-size: 100px 0px;
-    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
-    box-shadow: 0px 4px 60px 0 rgba(56, 74, 244, 0.75);
+    box-shadow: 0px 4px 10px rgba(56 74 244 /0.75);
     white-space: nowrap;
     border: rgba(43, 255, 152, 1) 0.2em solid;
     border-radius: 0.5rem;
@@ -760,7 +761,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     left: 4%;
     opacity: 1;
     padding-block: 0.25rem;
-    padding-inline: 1rem;
+    padding-inline: 0.5rem;
   }
   /* デスクトップサイズでは.right__textのspanを通常表示（WordPressから来る構造を保持） */
   .right__text span {
@@ -773,6 +774,11 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     top: 0;
     right: 0;
     z-index: 0;
+    overflow: hidden;
+  }
+
+  .right__pcImageInner {
+    aspect-ratio: 16 / 9;
     overflow: hidden;
   }
   .right__pcImage {
@@ -802,25 +808,21 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   }
   /* 右サイド サイトリンク URL */
   .right__link {
-    width: auto;
-    min-width: 26rem;
+    width: 100%;
     max-width: 90%;
+    max-width: 600px;
     font-family: "Poppins", sans-serif;
     font-size: 0.9375rem;
-    font-weight: 700;
-    line-height: 1.4;
-    /* letter-spacing: 0.02em; */
-    color: white;
+    color: var(--color-white);
     background-color: transparent;
+    background-image: linear-gradient(120deg, rgba(255 255 255 / 0.3), rgba(0 0 0 / 0.2));
+    background-size: 100px 0px;
     text-decoration: none;
-    text-shadow: 0 0 80px aqua;
-    background: var(--gradient);
-    background-size: 48px;
-    border: rgba(43, 255, 152, 1) 2px solid;
-    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    border: rgba(43 255 152 / 1) 0.2em solid;
+    box-shadow: 0 4px 16px rgba(49 196 190 / 0.75);
     border-radius: 0.5rem;
-    -webkit-backdrop-filter: blur(1px);
-    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -828,8 +830,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     top: 64%;
     left: 4%;
     opacity: 0;
-    transition: opacity 0.8s ease;
-    cursor: pointer;
+    transition: opacity 0.8s ease, transform 0.8s ease-in-out;
     padding-block: 0.5rem;
     padding-inline: 1rem;
   }
@@ -842,12 +843,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     transform: translateY(-50%) scale(0.1);
     transition:
       opacity 0.5s,
-      transform 0s;
+      transform 0.8s ease-in-out;
     transition-delay: 0s, 0.4s;
   }
-  .split.right .right__link:is(:hover, :focus-visible) {
+  /* .split.right .right__link:is(:hover, :focus-visible) {
     background: transparent;
-  }
+  } */
   .hover-right .right__link {
     opacity: 1;
   }
@@ -855,14 +856,14 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   .split.right .right__link:is(:hover, :focus-visible)::after {
     opacity: 1;
     content: "";
-    width: 32rem;
-    height: 2.5rem;
+    width: 100%;
+    height: auto;
     position: absolute;
     top: 4%;
     left: 0.5%;
     z-index: -1;
-    background: var(--gradient);
-    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    /* background: var(--gradient); */
+    box-shadow: 0 4px 16px rgba(49 196 190 /0.75);
     opacity: 1;
     transform: scale(1.1);
     transition-delay: 0s;
@@ -1160,8 +1161,16 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
   /* より小さい画面向けの調整 */
   @media (max-width: 480px) {
+
+    .split.right .right__spImage {
+      right: 15%;
+    }
     .right__header {
       font-size: 1.125rem;
+    }
+
+    .right__pcImageInner {
+      aspect-ratio: 9 / 16;
     }
 
     .right__text {
@@ -1171,10 +1180,11 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     }
 
     .right__link {
-      font-size: 0.75rem;
+      max-width: 400px;
+      font-size: 0.875rem;
       font-weight: normal;
       padding-block: 0.5rem;
-      padding-inline: 0.5rem;
+      padding-inline: 0.25rem;
     }
 
     .right__link span + span {
@@ -1192,11 +1202,11 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     }
 
     .right__iconMenu {
-      min-height: 240px;
+      min-height: 300px;
     }
 
     .right__iconMenu_text {
-      font-size: 0.6875rem;
+      font-size: 0.75rem;
     }
   }
 </style>

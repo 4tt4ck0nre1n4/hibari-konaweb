@@ -166,6 +166,14 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     overflow: hidden;
     margin-inline: auto;
   }
+
+  @media screen and (max-width: 480px) {
+    .glitch {
+      max-width: 480px;
+      height: 560px;
+      /* background-size: contain; */
+    }
+  }
   .glitch-image {
     background: inherit;
     background-size: cover;
