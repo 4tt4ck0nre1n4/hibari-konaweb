@@ -113,10 +113,10 @@ const stateMachine = "State Machine 1";
       <div class="breadcrumbs__wrapper">
         <Breadcrumbs {crumbs} />
       </div>
-      <section class="about">
+      <section class="about" aria-labelledby={`${aboutMeTitle} ${aboutMeSubTitle}`}>
         <div class="about__wrapper">
           <FlowingLinesWrapper>
-            <AboutHeading aboutTitle={aboutMeTitle} aboutSubTitle={aboutMeSubTitle} />
+            <AboutHeading id={`${aboutMeTitle} ${aboutMeSubTitle}`} aboutTitle={aboutMeTitle} aboutSubTitle={aboutMeSubTitle} />
           </FlowingLinesWrapper>
           <div class="about__inner">
             <div class="about__textInner">
@@ -131,7 +131,6 @@ const stateMachine = "State Machine 1";
                 <a class="about__text_link" href="/contact">お問い合わせフォーム</a>
                 からお願いします。
               </p>
-              <AboutMe aboutLikeHeader={typedAboutText.aboutLikeHeader} aboutLikeText={typedAboutText.aboutLikeText} />
               <div class="about__sns">
                 <ul class="about__snsMenu">
                   <Sns
@@ -183,39 +182,41 @@ const stateMachine = "State Machine 1";
           </div>
         </div>
       </section>
-      <section class="skills">
+      <section class="skills" aria-labelledby={`${skillsTitle} ${skillsSubTitle}`}>
         <div class="skills__wrapper">
           <FlowingLinesWrapper>
-            <AboutHeading aboutTitle={skillsTitle} aboutSubTitle={skillsSubTitle} />
+            <AboutHeading id={`${skillsTitle} ${skillsSubTitle}`} aboutTitle={skillsTitle} aboutSubTitle={skillsSubTitle} />
           </FlowingLinesWrapper>
-          <ul class="skills__menu">
-            <SkillsIcon className={html.className} iconSvg={html.icon} iconName={html.item} />
-            <SkillsIcon className={css.className} iconSvg={css.icon} iconName={css.item} />
-            <SkillsIcon className={sass.className} iconSvg={sass.icon} iconName={sass.item} />
-            <SkillsIcon className={javascript.className} iconSvg={javascript.icon} iconName={javascript.item} />
-            <SkillsIcon className={typescript.className} iconSvg={typescript.icon} iconName={typescript.item} />
-            <SkillsIcon className={jquery.className} iconSvg={jquery.icon} iconName={jquery.item} />
-            <SkillsIcon className={wordpress.className} iconSvg={wordpress.icon} iconName={wordpress.item} />
-            <SkillsIcon className={swiper.className} iconSvg={swiper.icon} iconName={swiper.item} />
-            <SkillsIcon className={gsap.className} iconSvg={gsap.icon} iconName={gsap.item} />
-            <SkillsIcon className={react.className} iconSvg={react.icon} iconName={react.item} />
-            <SkillsIcon className={canva.className} iconSvg={canva.icon} iconName={canva.item} />
-            <SkillsIcon className={adobexd.className} iconSvg={adobexd.icon} iconName={adobexd.item} />
-            <SkillsIcon className={gulp.className} iconSvg={gulp.icon} iconName={gulp.item} />
-            <SkillsIcon className={vite.className} iconSvg={vite.icon} iconName={vite.item} />
-            <SkillsIcon className={astro.className} iconSvg={astro.icon} iconName={astro.item} />
-            <SkillsIcon className={vscode.className} iconSvg={vscode.icon} iconName={vscode.item} />
-            <SkillsIcon className={cursor.className} iconSvg={cursor.icon} iconName={cursor.item} />
-            <SkillsIcon className={netlify.className} iconSvg={netlify.icon} iconName={netlify.item} />
-            <SkillsIcon className={vercel.className} iconSvg={vercel.icon} iconName={vercel.item} />
-            <SkillsIcon className={github.className} iconSvg={github.icon} iconName={github.item} />
-          </ul>
+          <div class="skills__inner">
+            <ul class="skills__menu">
+              <SkillsIcon className={html.className} iconSvg={html.icon} iconName={html.item} />
+              <SkillsIcon className={css.className} iconSvg={css.icon} iconName={css.item} />
+              <SkillsIcon className={sass.className} iconSvg={sass.icon} iconName={sass.item} />
+              <SkillsIcon className={javascript.className} iconSvg={javascript.icon} iconName={javascript.item} />
+              <SkillsIcon className={typescript.className} iconSvg={typescript.icon} iconName={typescript.item} />
+              <SkillsIcon className={jquery.className} iconSvg={jquery.icon} iconName={jquery.item} />
+              <SkillsIcon className={wordpress.className} iconSvg={wordpress.icon} iconName={wordpress.item} />
+              <SkillsIcon className={swiper.className} iconSvg={swiper.icon} iconName={swiper.item} />
+              <SkillsIcon className={gsap.className} iconSvg={gsap.icon} iconName={gsap.item} />
+              <SkillsIcon className={react.className} iconSvg={react.icon} iconName={react.item} />
+              <SkillsIcon className={canva.className} iconSvg={canva.icon} iconName={canva.item} />
+              <SkillsIcon className={adobexd.className} iconSvg={adobexd.icon} iconName={adobexd.item} />
+              <SkillsIcon className={gulp.className} iconSvg={gulp.icon} iconName={gulp.item} />
+              <SkillsIcon className={vite.className} iconSvg={vite.icon} iconName={vite.item} />
+              <SkillsIcon className={astro.className} iconSvg={astro.icon} iconName={astro.item} />
+              <SkillsIcon className={vscode.className} iconSvg={vscode.icon} iconName={vscode.item} />
+              <SkillsIcon className={cursor.className} iconSvg={cursor.icon} iconName={cursor.item} />
+              <SkillsIcon className={netlify.className} iconSvg={netlify.icon} iconName={netlify.item} />
+              <SkillsIcon className={vercel.className} iconSvg={vercel.icon} iconName={vercel.item} />
+              <SkillsIcon className={github.className} iconSvg={github.icon} iconName={github.item} />
+            </ul>
+          </div>
         </div>
       </section>
-      <section class="service">
+      <section class="service" aria-labelledby={`${serviceTitle} ${serviceSubTitle}`}>
         <div class="service__wrapper">
           <FlowingLinesWrapper>
-            <AboutHeading aboutTitle={serviceTitle} aboutSubTitle={serviceSubTitle} />
+            <AboutHeading id={`${serviceTitle} ${serviceSubTitle}`} aboutTitle={serviceTitle} aboutSubTitle={serviceSubTitle} />
           </FlowingLinesWrapper>
           <div class="service__inner">
             <ul class="service__menu">
@@ -265,52 +266,57 @@ const stateMachine = "State Machine 1";
 </Layout>
 
 <style is:global>
-  .about {
-  }
   .about__wrapper {
     width: 100%;
     max-width: 700px;
     margin-block-start: 4rem;
     margin-inline: auto;
   }
+
+  @media screen and (max-width: 768px) {
+    .about__wrapper {
+      width: 90%;
+    }
+  }
   .about__inner {
     display: grid;
     grid-template-columns: 320px 2fr;
     gap: 2rem;
-    background-color: #e8e8e8;
+    background-color: inherit;
     border-radius: 1rem;
-    /* background-image: url(/assets/background3.png);
-    background-image: url(/assets/background1.png);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat; */
+    box-shadow: 0 10px 40px rgb(0 0 0 / 0.6);
     margin-block-start: 2rem;
     padding-block: 2rem;
     padding-inline: 1rem;
+    transform: perspective(1000px) translateZ(20px);
   }
   @media screen and (max-width: 768px) {
     .about__inner {
       grid-template-columns: 1fr;
     }
   }
+
+  html.dark .about__inner {
+    box-shadow: 0 10px 40px rgb(255 255 255 / 0.6);
+  }
   .about__textInner {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    flex-shrink: 0;
     color: #020202;
     background: transparent;
+    padding-inline: 1rem;
+  }
 
-    /* border: 1px solid pink; */
-    margin-block-start: 0rem;
-    padding-inline: 2.5rem;
+  html.dark .about__textInner {
+    color: #f1f5f9;
   }
   .about__text {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     line-height: 1.8;
     letter-spacing: 0.06em;
-    text-align: left;
+    text-align: justify;
   }
   .about__text_link {
     color: rebeccapurple;
@@ -320,13 +326,20 @@ const stateMachine = "State Machine 1";
     color: blue;
     text-decoration: underline;
   }
+
+  html.dark .about__text_link {
+    color: var(--color-red);
+  }
+  html.dark .about__text_link:is(:hover, :focus-visible) {
+    color: var(--color-purple);
+  }
   .about__sns {
     margin-block-start: auto;
   }
   .about__snsMenu {
     display: grid;
     grid-template-columns: repeat(4, 48px);
-    gap: 0.5rem;
+    gap: 0.75rem;
     list-style: none;
     padding-block-start: 1.5rem;
     padding-block-end: 0.5rem;
@@ -339,7 +352,6 @@ const stateMachine = "State Machine 1";
     border: transparent 1px solid;
     border-radius: 50%;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
-    /* margin-inline: 0.5rem; */
     transition:
       transform 0.1s ease,
       box-shadow 0.3s ease;
@@ -395,7 +407,7 @@ const stateMachine = "State Machine 1";
     justify-content: center;
     align-items: center;
     position: relative;
-    padding-block: 1rem;
+    margin-block-start: 1rem;
   }
   .about__imageInner::before {
     content: "";
@@ -426,24 +438,37 @@ const stateMachine = "State Machine 1";
     z-index: 1;
   }
   .skills__wrapper {
-    width: 700px;
-    max-width: calc(100% - 2rem);
+    width: 100%;
+    max-width: 700px;
     margin-block-start: 4rem;
     margin-inline: auto;
-    /* padding: 1rem; */
+  }
+  @media screen and (max-width: 768px) {
+    .skills__wrapper {
+      width: 90%;
+    }
+  }
+  .skills__inner {
+    background-color: inherit;
+    border-radius: 1rem;
+    box-shadow: 0 10px 40px rgb(0 0 0 / 0.6);
+    transform: perspective(1000px) translateZ(20px);
+    margin-block-start: 2rem;
+    padding-block: 2rem;
+    padding-inline: 1rem;
+  }
+
+
+  html.dark .skills__inner {
+    box-shadow: 0 10px 40px rgb(255 255 255 / 0.6);
   }
   .skills__menu {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(8ch, 1fr));
     gap: 2rem;
     list-style: none;
-    background-color: #e8e8e8;
-    border-radius: 1rem;
     perspective: 1000px;
     margin-block-start: 2rem;
-    margin-inline: auto;
-    padding-block: 2.5rem;
-    padding-inline: 2rem;
   }
 
   /* スマホサイズでの3列表示を確実にする */
@@ -493,7 +518,10 @@ const stateMachine = "State Machine 1";
     color: inherit;
   }
   .skills-icon__image[data-icon] {
+    width: 40px;
+    height: 40px;
     font-size: 2rem;
+    text-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     transition: all 0.4s ease-out;
   }
   /* ホバー可能なデバイス（主にPC）でのみホバー効果を適用 */
@@ -542,15 +570,19 @@ const stateMachine = "State Machine 1";
       fill: initial;
     }
     .skills-icon__name {
-      color: #020202;
+      color: inherit;
     }
   }
   .service__wrapper {
-    width: 700px;
-    max-width: calc(100% - 2rem);
+    width: 100%;
+    max-width: 700px;
     margin-block-start: 4rem;
     margin-inline: auto;
-    /* padding: 1rem; */
+  }
+  @media screen and (max-width: 768px) {
+    .service__wrapper {
+      width: 90%;
+    }
   }
   .service__menu {
     display: grid;
@@ -559,6 +591,12 @@ const stateMachine = "State Machine 1";
     margin-block-start: 2rem;
     padding: 0;
     align-items: stretch;
+  }
+
+  @media screen and (max-width: 768px) {
+    .service__menu {
+      gap: 4rem;
+    }
   }
 
   .service__menu .card__item {

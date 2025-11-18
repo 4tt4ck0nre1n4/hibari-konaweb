@@ -26,6 +26,7 @@ import pikucha2 from "../assets/image/pikucha2.webp";
 import contactCat from "../assets/svg/contact_cat.svg";
 import backgroundImageSrc from "../assets/background.webp";
 import { getImage } from "astro:assets";
+import NaviCard from "../components/NaviCard.astro";
 // import DepthAppearImage from "../components/DepthAppearImage.tsx";
 import Glitch from "../components/Glitch.astro";
 // import animeImageSrc from "../assets/anime.png";
@@ -57,6 +58,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
         <Breadcrumbs crumbs={[]} />
       </div>
       <div class="glitch-container">
+        <NaviCard />
         <Glitch />
       </div>
       <!-- <div class="animated-sprite-container">
@@ -273,17 +275,11 @@ const webDesignerRiv = "/riv/designer-life.riv";
   import JSConfetti from "js-confetti";
 
   function initConfetti() {
-    // console.log("initConfetti called");
     const confetti = document.getElementById("confettiButton");
     const canvasElement = document.getElementById("canvas");
     const textCanvasElement = document.getElementById("confetti-text-canvas");
 
-    // console.log("confettiButton:", confetti);
-    // console.log("canvas:", canvasElement);
-    // console.log("textCanvas:", textCanvasElement);
-
     if (canvasElement instanceof HTMLCanvasElement && textCanvasElement instanceof HTMLCanvasElement) {
-      // console.log("Canvas elements found, initializing...");
       const devicePixelRatio = window.devicePixelRatio ?? 1;
 
       const rect = canvasElement.getBoundingClientRect();
@@ -494,7 +490,8 @@ const webDesignerRiv = "/riv/designer-life.riv";
     background-size: 4px 4px;
     animation: noise 1s infinite linear; */
     margin-inline: auto;
-
+    position: relative;
+    isolation: isolate;
   }
   @keyframes noise {
     0% {

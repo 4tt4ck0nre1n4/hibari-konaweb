@@ -49,11 +49,11 @@ export const prerender = true;
       </div>
       <div class="contact" style={`background-image: url(${backgroundImage2.src})`}>
         <div class="contact__wrapper">
-          <h1 class="contact__title">
+          <h1 class="contact__title" id="contact-form-title">
             {pageTitle}
           </h1>
-          {contactText.contact.body.map(({ text }) => <p class="contact__body" set:html={text} />)}
-          <p class="contact__body">
+          {contactText.contact.body.map(({ text }) => <p id="contact-form-description" class="contact__body" set:html={text} />)}
+          <p id="contact-form-description" class="contact__body">
             <span class="contact__body--required">【必須】</span>のついた項目は必ずご記入ください。
           </p>
           <div class="contactForm">
@@ -93,19 +93,20 @@ export const prerender = true;
     text-align: center;
   }
   .contact__body {
+    width: 100%;
+    max-width: 400px;
+    display: block;
     font-size: 0.9375rem;
     line-height: 1.8;
     letter-spacing: 0.06em;
     /* テキストの各行の頭を揃える */
     text-align: left;
     margin-inline: auto;
-    width: 100%;
-    max-width: 400px;
-    display: block;
   }
   @media (max-width: 480px) {
     .contact__body {
       width: 90%;
+      letter-spacing: 0.02em;
     }
   }
   .contact__body--required {
