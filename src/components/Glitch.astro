@@ -206,9 +206,9 @@ const glitchImage = await getImage({ src: glitchImageSrc });
 
               // .glitchコンテナの背景色を黒に戻す（背景画像とサイズを保持）
               if (glitchContainer) {
-                // 親要素から高さを取得
-                const parent = glitchContainer.parentElement;
-                const parentHeight = parent ? window.getComputedStyle(parent).height : "100vh";
+                // 画面サイズに応じて高さを設定
+                const isSmartphone = window.innerWidth <= 480;
+                const containerHeight = isSmartphone ? "560px" : "100vh";
 
                 glitchContainer.style.transition = "";
                 glitchContainer.style.backgroundColor = "#000000";
@@ -216,7 +216,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 glitchContainer.style.backgroundSize = "cover";
                 glitchContainer.style.backgroundPosition = "center";
                 glitchContainer.style.backgroundRepeat = "no-repeat";
-                glitchContainer.style.height = parentHeight;
+                glitchContainer.style.height = containerHeight;
               }
 
               // 要素を完全に初期状態にリセット
