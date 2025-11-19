@@ -19,7 +19,6 @@ const menuItems: MenuItem[] = [
   <button
     class="navi-card__button"
     type="button"
-    value="Navigation"
     aria-label="メニューを開く"
     aria-expanded="false"
     aria-controls="navi-card"
@@ -65,10 +64,10 @@ const menuItems: MenuItem[] = [
       menuItems.forEach((item, index) => {
         if (isOpen) {
           item.classList.add("is-open");
-          item.style.transitionDelay = `${index * 0.08}s`;
+          item.style.transitionDelay = `${index * 0.8}s`;
         } else {
           item.classList.remove("is-open");
-          item.style.transitionDelay = `${(menuItems.length - index - 1) * 0.05}s`;
+          item.style.transitionDelay = `${(menuItems.length - index - 1) * 0.6}s`;
         }
       });
     });
@@ -102,23 +101,26 @@ const menuItems: MenuItem[] = [
   }
 
   .navi-card__button {
-    position: absolute;
-    top: 88px;
-    left: 32px;
-    width: 180px;
+    width: 160px;
     height: 80px;
-    background: linear-gradient(135deg, rgba(147, 51, 234, 0.95) 0%, rgba(168, 85, 247, 0.95) 100%);
-    border-radius: 1rem;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    cursor: pointer;
-    z-index: 1001;
     display: flex;
     align-items: center;
     justify-content: center;
-    pointer-events: auto;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* font-family: 'Playfair Display Variable', serif; */
+    /* font-family: 'Cinzel Decorative', serif; */
+    /* font-family: 'Marcellus', serif; */
+
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.95) 0%, rgba(168, 85, 247, 0.95) 100%);
+    border-radius: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4);
     backdrop-filter: blur(10px);
+    position: absolute;
+    top: 88px;
+    left: 136px;
+    z-index: 1001;
+    pointer-events: auto;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .navi-card__button:hover {
@@ -131,11 +133,13 @@ const menuItems: MenuItem[] = [
   }
 
   .navi-card__button_text {
+    font-family: 'Marcellus', serif;
     font-size: 1.25rem;
-    font-weight: 600;
+    letter-spacing: 0.12em;
     color: #ffffff;
+    /* text-transform: lowercase;
+    font-variant: small-caps; */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    letter-spacing: 0.05em;
   }
 
   .navi-card__menu {
@@ -162,7 +166,7 @@ const menuItems: MenuItem[] = [
 
   .navi-card__menu_item {
     width: 120px;
-    height: 150px;
+    height: 60px;
     background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
     border-radius: 1rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -185,28 +189,28 @@ const menuItems: MenuItem[] = [
 
   /* 各カードの展開位置 */
   .navi-card__menu_item[data-index="0"].is-open {
-    transform: translateY(-100px) translateX(-80px) rotateZ(-15deg) scale(1);
+    transform: translateY(-60px) translateX(-10px) rotateZ(-15deg) scale(1);
   }
 
   .navi-card__menu_item[data-index="1"].is-open {
-    transform: translateY(-80px) translateX(-40px) rotateZ(-8deg) scale(1);
+    transform: translateY(-40px) translateX(-10px) rotateZ(-8deg) scale(1);
   }
 
   .navi-card__menu_item[data-index="2"].is-open {
-    transform: translateY(-60px) translateX(0) rotateZ(0deg) scale(1);
+    transform: translateY(-20px) translateX(10px) rotateZ(-4deg) scale(1);
   }
 
   .navi-card__menu_item[data-index="3"].is-open {
-    transform: translateY(-40px) translateX(40px) rotateZ(8deg) scale(1);
+    transform: translateY(0px) translateX(50px) rotateZ(8deg) scale(1);
   }
 
   .navi-card__menu_item[data-index="4"].is-open {
-    transform: translateY(-20px) translateX(80px) rotateZ(15deg) scale(1);
+    transform: translateY(20px) translateX(90px) rotateZ(15deg) scale(1);
   }
 
   .navi-card__menu_item:hover {
     box-shadow: 0 12px 32px rgba(147, 51, 234, 0.4);
-    transform: translateY(-5px) scale(1.05) !important;
+    transform: translateY(40px) scale(1.05) !important;
     z-index: 10;
   }
 
@@ -216,6 +220,7 @@ const menuItems: MenuItem[] = [
     justify-content: center;
     width: 100%;
     height: 100%;
+    font-family: 'Marcellus', serif;
     text-decoration: none;
     padding: 1.5rem;
   }
