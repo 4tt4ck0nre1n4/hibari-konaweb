@@ -39,14 +39,119 @@ const menuItems: MenuItem[] = [
 </div>
 
 <script>
+  interface CardPosition {
+    x: number;
+    y: number;
+    rotation: number;
+  }
+
   function initNaviCard() {
     const button = document.querySelector(".navi-card__button") as HTMLButtonElement;
     const menu = document.querySelector(".navi-card__menu") as HTMLUListElement;
     const menuItems = document.querySelectorAll(".navi-card__menu_item") as NodeListOf<HTMLLIElement>;
+    const glitchContainer = document.querySelector(".glitch-container") as HTMLElement;
+    const glitchElement = document.querySelector(".glitch") as HTMLElement;
 
-    if (!button || !menu || !menuItems.length) return;
+    if (!button || !menu || !menuItems.length || !glitchContainer) return;
 
     let isOpen = false;
+
+    /**
+     * 2つの矩形が重なっているかチェック
+     */
+    function isOverlapping(
+      x1: number,
+      y1: number,
+      w1: number,
+      h1: number,
+      x2: number,
+      y2: number,
+      w2: number,
+      h2: number,
+      margin: number = 20
+    ): boolean {
+      return !(x1 + w1 + margin < x2 || x2 + w2 + margin < x1 || y1 + h1 + margin < y2 || y2 + h2 + margin < y1);
+    }
+
+    /**
+     * ランダムな位置を生成（重複チェック付き）
+     */
+    function generateRandomPositions(): CardPosition[] {
+      const containerRect = glitchContainer.getBoundingClientRect();
+      const isMobile = window.innerWidth <= 768;
+
+      // カードのサイズ
+      const cardWidth = isMobile ? 120 : 120;
+      const cardHeight = isMobile ? 160 : 160;
+
+      // パディング（コンテナの端からの余白）
+      const padding = 20;
+
+      // 除外領域の設定（中央のGlitch画像）
+      let excludeZones: Array<{ x: number; y: number; width: number; height: number }> = [];
+
+      if (!isMobile && glitchElement) {
+        const glitchRect = glitchElement.getBoundingClientRect();
+        excludeZones.push({
+          x: glitchRect.left - containerRect.left,
+          y: glitchRect.top - containerRect.top,
+          width: glitchRect.width,
+          height: glitchRect.height,
+        });
+      }
+
+      const positions: CardPosition[] = [];
+      const maxAttempts = 100; // 無限ループ防止
+
+      for (let i = 0; i < menuItems.length; i++) {
+        let validPosition = false;
+        let attempts = 0;
+        let position: CardPosition = { x: 0, y: 0, rotation: 0 };
+
+        while (!validPosition && attempts < maxAttempts) {
+          // ランダムな位置を生成
+          const x = padding + Math.random() * (containerRect.width - cardWidth - padding * 2);
+          const y = padding + Math.random() * (containerRect.height - cardHeight - padding * 2);
+          const rotation = Math.random() * 30 - 15; // -15度 ~ +15度
+
+          position = { x, y, rotation };
+
+          // 除外領域との重複チェック
+          let overlapsExcludeZone = false;
+          for (const zone of excludeZones) {
+            if (isOverlapping(x, y, cardWidth, cardHeight, zone.x, zone.y, zone.width, zone.height, 40)) {
+              overlapsExcludeZone = true;
+              break;
+            }
+          }
+
+          if (overlapsExcludeZone) {
+            attempts++;
+            continue;
+          }
+
+          // 既存のカードとの重複チェック
+          let overlapsCard = false;
+          for (const existingPos of positions) {
+            if (isOverlapping(x, y, cardWidth, cardHeight, existingPos.x, existingPos.y, cardWidth, cardHeight)) {
+              overlapsCard = true;
+              break;
+            }
+          }
+
+          if (!overlapsCard) {
+            validPosition = true;
+          }
+
+          attempts++;
+        }
+
+        // 最大試行回数に達した場合は、重複を許容して配置
+        positions.push(position);
+      }
+
+      return positions;
+    }
 
     button.addEventListener("click", () => {
       isOpen = !isOpen;
@@ -61,15 +166,23 @@ const menuItems: MenuItem[] = [
       menu.classList.toggle("is-open", isOpen);
 
       // 各アイテムのアニメーション
-      menuItems.forEach((item, index) => {
-        if (isOpen) {
-          item.classList.add("is-open");
-          item.style.transitionDelay = `${index * 0.8}s`;
-        } else {
+      if (isOpen) {
+        const positions = generateRandomPositions();
+        menuItems.forEach((item, index) => {
+          const pos = positions[index];
+          if (pos) {
+            item.classList.add("is-open");
+            item.style.transitionDelay = `${index * 0.08}s`;
+            item.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotation}deg) scale(1)`;
+          }
+        });
+      } else {
+        menuItems.forEach((item, index) => {
           item.classList.remove("is-open");
-          item.style.transitionDelay = `${(menuItems.length - index - 1) * 0.6}s`;
-        }
-      });
+          item.style.transitionDelay = `${(menuItems.length - index - 1) * 0.08}s`;
+          item.style.transform = "translateY(0) translateX(0) rotateZ(0deg) scale(0.8)";
+        });
+      }
     });
 
     // メニュー外クリックで閉じる
@@ -78,6 +191,28 @@ const menuItems: MenuItem[] = [
       if (isOpen && !button.contains(target) && !menu.contains(target)) {
         button.click();
       }
+    });
+
+    // リサイズ時に開いている場合は再配置
+    let resizeTimeout: number;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(() => {
+        if (isOpen) {
+          const positions = generateRandomPositions();
+          menuItems.forEach((item, index) => {
+            const pos = positions[index];
+            if (pos) {
+              item.style.transition = "none";
+              item.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotation}deg) scale(1)`;
+              // アニメーションを再度有効化
+              setTimeout(() => {
+                item.style.transition = "";
+              }, 50);
+            }
+          });
+        }
+      }, 200);
     });
   }
 
@@ -133,7 +268,7 @@ const menuItems: MenuItem[] = [
   }
 
   .navi-card__button_text {
-    font-family: 'Marcellus', serif;
+    font-family: "Marcellus", serif;
     font-size: 1.25rem;
     letter-spacing: 0.12em;
     color: #ffffff;
@@ -165,20 +300,22 @@ const menuItems: MenuItem[] = [
   }
 
   .navi-card__menu_item {
-    width: 120px;
-    height: 60px;
+    width: 100px;
+    height: 150px;
     background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
     border-radius: 1rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     overflow: hidden;
-    border: 2px solid rgba(147, 51, 234, 0.2);
-    transform-origin: bottom center;
+    border: 4px solid rgba(147, 51, 234, 0.2);
+    position: absolute;
+    top: 0;
+    left: 0;
     transform: translateY(0) translateX(0) rotateZ(0deg) scale(0.8);
     opacity: 0;
     pointer-events: none;
     transition:
-      transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-      opacity 0.6s ease,
+      transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.5s ease,
       box-shadow 0.3s ease;
   }
 
@@ -187,30 +324,9 @@ const menuItems: MenuItem[] = [
     pointer-events: auto;
   }
 
-  /* 各カードの展開位置 */
-  .navi-card__menu_item[data-index="0"].is-open {
-    transform: translateY(-60px) translateX(-10px) rotateZ(-15deg) scale(1);
-  }
-
-  .navi-card__menu_item[data-index="1"].is-open {
-    transform: translateY(-40px) translateX(-10px) rotateZ(-8deg) scale(1);
-  }
-
-  .navi-card__menu_item[data-index="2"].is-open {
-    transform: translateY(-20px) translateX(10px) rotateZ(-4deg) scale(1);
-  }
-
-  .navi-card__menu_item[data-index="3"].is-open {
-    transform: translateY(0px) translateX(50px) rotateZ(8deg) scale(1);
-  }
-
-  .navi-card__menu_item[data-index="4"].is-open {
-    transform: translateY(20px) translateX(90px) rotateZ(15deg) scale(1);
-  }
-
   .navi-card__menu_item:hover {
     box-shadow: 0 12px 32px rgba(147, 51, 234, 0.4);
-    transform: translateY(40px) scale(1.05) !important;
+    filter: brightness(1.1);
     z-index: 10;
   }
 
@@ -220,7 +336,7 @@ const menuItems: MenuItem[] = [
     justify-content: center;
     width: 100%;
     height: 100%;
-    font-family: 'Marcellus', serif;
+    font-family: "Marcellus", serif;
     text-decoration: none;
     padding: 1.5rem;
   }
@@ -271,28 +387,8 @@ const menuItems: MenuItem[] = [
     }
 
     .navi-card__menu_item {
-      width: 120px;
-      height: 160px;
-    }
-
-    .navi-card__menu_item[data-index="0"].is-open {
-      transform: translateY(-80px) translateX(-60px) rotateZ(-12deg) scale(1);
-    }
-
-    .navi-card__menu_item[data-index="1"].is-open {
-      transform: translateY(-60px) translateX(-30px) rotateZ(-6deg) scale(1);
-    }
-
-    .navi-card__menu_item[data-index="2"].is-open {
-      transform: translateY(-40px) translateX(0) rotateZ(0deg) scale(1);
-    }
-
-    .navi-card__menu_item[data-index="3"].is-open {
-      transform: translateY(-20px) translateX(30px) rotateZ(6deg) scale(1);
-    }
-
-    .navi-card__menu_item[data-index="4"].is-open {
-      transform: translateY(0px) translateX(60px) rotateZ(12deg) scale(1);
+      width: 80px;
+      height: 120px;
     }
 
     .navi-card__menu_text {
@@ -302,8 +398,6 @@ const menuItems: MenuItem[] = [
 
   @media screen and (max-width: 480px) {
     .navi-card__button {
-      width: 120px;
-      height: 50px;
     }
 
     .navi-card__button_text {
@@ -311,28 +405,8 @@ const menuItems: MenuItem[] = [
     }
 
     .navi-card__menu_item {
-      width: 100px;
-      height: 140px;
-    }
-
-    .navi-card__menu_item[data-index="0"].is-open {
-      transform: translateY(-70px) translateX(-50px) rotateZ(-10deg) scale(1);
-    }
-
-    .navi-card__menu_item[data-index="1"].is-open {
-      transform: translateY(-50px) translateX(-25px) rotateZ(-5deg) scale(1);
-    }
-
-    .navi-card__menu_item[data-index="2"].is-open {
-      transform: translateY(-30px) translateX(0) rotateZ(0deg) scale(1);
-    }
-
-    .navi-card__menu_item[data-index="3"].is-open {
-      transform: translateY(-10px) translateX(25px) rotateZ(5deg) scale(1);
-    }
-
-    .navi-card__menu_item[data-index="4"].is-open {
-      transform: translateY(10px) translateX(50px) rotateZ(10deg) scale(1);
+      width: 80px;
+      height: 120px;
     }
 
     .navi-card__menu_text {
