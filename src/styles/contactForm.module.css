@@ -9,36 +9,12 @@
   background: transparent;
   border: none;
   border: 1px solid #ffffff26;
-
-  /* filter: drop-shadow(30px 30px 30px #000); */
-
-  /* filter: blur(1px); */
   border-radius: 1rem;
-
-  /* box-shadow: 0px 10px 40px aqua; */
   box-shadow: 0 10px 40px rgb(0 0 0 / 0.66);
-
-  /* box-shadow: 0 25px 45px #0000000d; */
-
-  /* position: relative; */
-
-  /* transform-style: preserve-3d; */
-
-  /* transform: perspective(1000px) translateZ(20px); */
-
-  /* cursor: pointer; */
   margin-block: 1rem;
-  margin-inline: auto;
+  /* margin-inline: auto; */
   padding-block: 1rem;
   padding-inline: 3rem;
-
-  /* position: absolute; */
-
-  /* inset: 0; */
-
-  /* top: 48%; */
-
-  /* left: 30%; */
   z-index: 0;
 }
 
@@ -68,7 +44,6 @@
   color: var(--color-red);
   margin-inline-start: 0.25rem;
   appearance: none;
-  appearance: none;
   -webkit-text-fill-color: var(--color-red);
   -webkit-opacity: 1;
 }
@@ -86,8 +61,7 @@
   padding-inline: 0.5rem;
 }
 
-.input__name:is(:hover, :focus-within),
-.input__email:is(:hover, :focus-within) {
+.input__name:is(:hover, :focus-within) {
   background-color: transparent;
   box-shadow: 0 10px 10px rgb(0 255 255 / 0.6);
 }
@@ -110,6 +84,11 @@
   margin-block-start: 0.5rem;
   padding-block: 0.5rem;
   padding-inline: 0.5rem;
+}
+
+.input__email:is(:hover, :focus-within) {
+  background-color: transparent;
+  box-shadow: 0 10px 10px rgb(0 255 255 / 0.6);
 }
 
 .label__message {
@@ -201,10 +180,7 @@
   inset: 0;
   opacity: 0;
   mask-image: url("../assets/svg/check.svg");
-  mask-image: url("../assets/svg/check.svg");
   mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  mask-size: contain;
   mask-size: contain;
 }
 
@@ -272,7 +248,7 @@
 
 @media (width <= 480px) {
   .form__inner {
-    width: 96%;
+    width: 100%;
     min-height: 100%;
     padding-block: 2rem;
     padding-inline: 0.5rem;

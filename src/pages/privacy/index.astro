@@ -119,7 +119,16 @@ const googleAnalyticsTermsLinks = {
         </ul>
         <h2 class="privacy__header">個人情報の取得について</h2>
         <p class="privacy__body">
-          当サイトは、お問い合わせフォームからお問い合わせいただく際に、お名前、メールアドレス、その他お問い合わせ内容に関する個人情報を取得します。
+          当サイトは、
+          <a
+            class="privacy__body_link"
+            href={contactLinks.href}
+            aria-label={contactLinks.ariaLabel}
+            title={contactLinks.ariaTitle}
+          >
+            お問い合わせフォーム
+          </a>
+          からお問い合わせいただく際に、お名前、メールアドレス、その他お問い合わせ内容に関する個人情報を取得します。
         </p>
         <h2 class="privacy__header">個人情報の利用目的について</h2>
         <p class="privacy__body">
@@ -187,7 +196,7 @@ const googleAnalyticsTermsLinks = {
           >
             Google Analytics
           </a>
-          を利用しています。Google Analytics（以下、「Google アナリティクス」といいます。）によって収集されるデータには、Webページの閲覧数、訪問者の地理的位置、デバイスの種類などが含まれます。
+          を利用しています。Google Analytics（以下、「Google アナリティクス」といいます。）によって収集されるデータには、Webページの閲覧数、訪問者の地理的位置、モバイルデバイスの識別情報（Android の広告識別子、iOS の広告識別子など）が含まれます。
         </p>
         <p class="privacy__body">
           Googleアナリティクスは、トラフィックデータの収集のためにCookie（クッキー）を使用しています。トラフィックデータは、匿名で収集されており、名前、住所、メールアドレスなど個人を特定するような情報は含まれておらず、IPアドレス、ブラウザの種類、使用言語、アクセスしたページ、滞在時間などが含まれます。
@@ -196,7 +205,7 @@ const googleAnalyticsTermsLinks = {
           Cookieとは、WebサーバーからWebブラウザに送信されるデータのことです。WebサーバーがCookieを参照することでユーザーのパソコンを識別することができ、効率的に当サイトを利用することができます。
         </p>
         <p class="privacy__body">
-          Cookieの目的は、当サイトのアクセス状況に関する閲覧情報の把握に役立ち、サービス向上に資するものです。これにより、以前入力した情報を再度入力する必要がないなど当サイトを利用するユーザーの利便性が向上する機能が提供されています。この技術の使用により、個人情報を取得することはありません。
+          Cookieの目的は、当サイトのアクセス状況に関する閲覧情報の把握に役立ち、サービス向上に資するものです。これにより、以前入力した情報を再度入力する必要がないなど当サイトを利用するユーザーの利便性が向上する機能が提供されています。この技術の使用により、個人を特定するものではありません。
         </p>
         <p class="privacy__body">
           Cookieを無効にすることでトラフィックデータの収集を拒否することも可能です。お使いのWebブラウザの設定をご確認下さい。
@@ -240,8 +249,22 @@ const googleAnalyticsTermsLinks = {
         </p>
         <p class="privacy__body">修正された最新の本ポリシーは、常に当サイトの本ページにて開示されます。</p>
         <h2 class="privacy__header">本ポリシーの同意について</h2>
-        <p class="privacy__body">当サイトをご利用いただくことにより、本ポリシーに同意されたものとみなします。</p>
+        <p class="privacy__body">
+          当サイトをご利用いただくことにより、本ポリシーに同意されたものとみなします。また、プライバシーポリシーに同意することで
+          <a
+            class="privacy__body_link"
+            href={contactLinks.href}
+            aria-label={contactLinks.ariaLabel}
+            title={contactLinks.ariaTitle}
+          >
+            お問い合わせフォーム
+          </a>
+          は送信できる仕様となっています。
+        </p>
         <h2 class="privacy__header">免責事項</h2>
+        <p class="privacy__body">
+          当サイトからのリンクやバナーなどで移動したサイトで提供される情報、サービスなどについては、一切の責任を負いません。
+        </p>
         <p class="privacy__body">
           当サイトに掲載されているコンテンツ・情報について、可能な限り正確な情報を掲載するよう努めておりますが、必ずしもそれらの正確性や安全性等を保証するものではありません。誤情報や情報が古くなっている場合もございます。万が一、当サイトに掲載された内容によって発生したトラブルや損害等の一切の責任を負わないものとします。また、ユーザーが当サイトの情報を用いて行う一切の行為に関しても一切の責任を負わないものとします。あらかじめご了承くださいますようお願いいたします。
         </p>
@@ -251,10 +274,10 @@ const googleAnalyticsTermsLinks = {
         </p>
         <h2 class="privacy__header">著作権・肖像権</h2>
         <p class="privacy__body">
-          当サイト内の文章や画像、すべてのコンテンツは著作権・肖像権等により保護されています。無断での使用や転載することを禁止します。
+          当サイト内で掲載している文章や画像など、すべてのコンテンツにつきましては、無断転載することを禁止します。
         </p>
         <p class="privacy__body">
-          また、当サイトは著作権の侵害を目的とするものではありません。使用している版権物の知的所有権はそれぞれの著作者・団体に帰属しております。著作権や肖像権に関して問題がありましたら
+          また、当サイトは著作権や肖像権の侵害を目的とするものではありません。使用している版権物の知的所有権はそれぞれの著作者・団体に帰属しております。著作権や肖像権に関して問題がございましたら
           <a
             class="privacy__body_link"
             href={contactLinks.href}
@@ -263,11 +286,11 @@ const googleAnalyticsTermsLinks = {
           >
             お問い合わせフォーム
           </a>
-          よりご連絡下さい。著作権所有者様からの警告及び修正・撤去のご連絡があった場合は迅速に対処または削除致します。
+          よりご連絡ください。著作権所有者様からの警告及び修正・撤去のご連絡があった場合は迅速に対処または削除致します。
         </p>
         <h2 class="privacy__header">リンクについて</h2>
         <p class="privacy__body">
-          当サイトはリンクフリーです。リンクを行う場合の許可や連絡は不要です。ただし、インラインフレームの使用や画像の直リンクはご遠慮ください。
+          当サイトは基本的にリンクフリーです。リンクを行う場合の許可や連絡は不要です。ただし、インラインフレームの使用や画像などへの直リンクはご遠慮ください。
         </p>
       </div>
     </main>
@@ -371,13 +394,13 @@ const googleAnalyticsTermsLinks = {
   .privacy__body_link {
     font-size: 1rem;
     color: rebeccapurple;
-    text-decoration: none;
+    text-decoration: underline;
     transform: all 0.5s ease;
   }
 
   .privacy__body_link:is(:hover, :focus-visible) {
     color: rgba(0, 19, 172, 1);
-    text-decoration: underline;
+    text-decoration: none;
   }
   @media (max-width: 480px) {
     .privacy__header {
