@@ -6,7 +6,6 @@ import Logo from "../components/Logo.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import Aside from "../components/Aside.astro";
 import ResponsiveFv from "../components/ResponsiveFv.astro";
-import GridRive from "../components/GridRive.astro";
 import GridSvg from "../components/GridSvg.astro";
 import gridText from "../data/gridText.json";
 import SafeIcon from "../components/SafeIcon.astro";
@@ -15,27 +14,24 @@ import { hrefLink } from "../scripts/constLinks";
 import globalText from "../data/globalText.json";
 import SwiperDisplay from "../components/SwiperDisplay.astro";
 import { play, pause, reverse, restart } from "../scripts/constButton";
-import AboutCat from "../assets/svg/aboutCat.svg";
-import blogCat from "../assets/svg/blogCat.svg";
+import aboutCat from "../assets/svg/about-cat.svg";
+import blogCat from "../assets/svg/blog-cat.svg";
+import contactCat from "../assets/svg/contact-cat.svg";
+import worksCat from "../assets/svg/works-cat.svg";
+import homeCat from "../assets/svg/home-cat.svg";
+import andMoreCat from "../assets/svg/andMore-cat.svg";
 import sodenoura from "../assets/svg/sodenoura.svg";
 import gaura from "../assets/svg/gauraStudio.svg";
 import pikucha from "../assets/svg/pikucha.svg";
-import sodenoura2 from "../assets/image/sodenoura2.webp";
-import gauraStudio2 from "../assets/image/gauraStudio2.webp";
-import pikucha2 from "../assets/image/pikucha2.webp";
-import contactCat from "../assets/svg/contact_cat.svg";
+import sodenoura2 from "../assets/svg/sodenoura2.svg";
+import gauraStudio2 from "../assets/svg/gauraStudio2.svg";
+import pikucha2 from "../assets/svg/pikucha2.svg";
 import backgroundImageSrc from "../assets/background.webp";
 import { getImage } from "astro:assets";
 import NaviCard from "../components/NaviCard.astro";
-// import DepthAppearImage from "../components/DepthAppearImage.tsx";
 import Glitch from "../components/Glitch.astro";
-// import animeImageSrc from "../assets/anime.png";
-// const animeImage = await getImage({ src: animeImageSrc });
 
 const backgroundImage = await getImage({ src: backgroundImageSrc });
-const portfolioRiv = "/riv/my-portfolio.riv";
-const welcomeRiv = "/riv/working-office.riv";
-const webDesignerRiv = "/riv/designer-life.riv";
 ---
 
 <Layout
@@ -87,7 +83,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
                 href={hrefLink.about}
                 ariaLabel={gridText.gridItem1.ariaLabel}
                 ariaTitle={gridText.gridItem1.ariaTitle}
-                imageSrc={AboutCat}
+                imageSrc={aboutCat}
                 imageMeta={gridText.gridItem1.Alt}
                 tooltipText={gridText.gridItem1.tooltipText}
                 tooltipPosition={gridText.gridItem1.tooltipPosition}
@@ -113,32 +109,35 @@ const webDesignerRiv = "/riv/designer-life.riv";
                 tooltipText={gridText.gridItem3.tooltipText}
                 tooltipPosition={gridText.gridItem3.tooltipPosition}
               />
-              <GridRive
+              <GridSvg
                 className="item-4"
                 href={hrefLink.works}
                 ariaLabel={gridText.gridItem4.ariaLabel}
                 ariaTitle={gridText.gridItem4.ariaTitle}
-                src={portfolioRiv}
+                imageSrc={worksCat}
+                imageMeta={gridText.gridItem4.Alt}
                 stateMachines="State Machine 1"
                 tooltipText={gridText.gridItem4.tooltipText}
                 tooltipPosition={gridText.gridItem4.tooltipPosition}
               />
-              <GridRive
+              <GridSvg
                 className="item-5"
                 href={hrefLink.home}
                 ariaLabel={gridText.gridItem5.ariaLabel}
                 ariaTitle={gridText.gridItem5.ariaTitle}
-                src={welcomeRiv}
+                imageSrc={homeCat}
+                imageMeta={gridText.gridItem5.Alt}
                 stateMachines="State Machine 1"
                 tooltipText={gridText.gridItem5.tooltipText}
                 tooltipPosition={gridText.gridItem5.tooltipPosition}
               />
-              <GridRive
+              <GridSvg
                 className="item-6"
-                href={hrefLink.works}
+                href={hrefLink.home}
                 ariaLabel={gridText.gridItem6.ariaLabel}
                 ariaTitle={gridText.gridItem6.ariaTitle}
-                src={webDesignerRiv}
+                imageSrc={andMoreCat}
+                imageMeta={gridText.gridItem6.Alt}
                 stateMachines="State Machine 1"
                 tooltipText={gridText.gridItem6.tooltipText}
                 tooltipPosition={gridText.gridItem6.tooltipPosition}
@@ -154,7 +153,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
                 tooltipPosition={gridText.gridItem7.tooltipPosition}
               />
               <GridSvg
-                className="item-8  logoSvg-visible"
+                className="item-8 logoSvg-visible"
                 href={hrefLink.work2}
                 ariaLabel={gridText.gridItem8.ariaLabel}
                 ariaTitle={gridText.gridItem8.ariaTitle}
@@ -164,7 +163,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
                 tooltipPosition={gridText.gridItem8.tooltipPosition}
               />
               <GridSvg
-                className="item-9  logoSvg-visible"
+                className="item-9 logoSvg-visible"
                 href={hrefLink.work3}
                 ariaLabel={gridText.gridItem9.ariaLabel}
                 ariaTitle={gridText.gridItem9.ariaTitle}
@@ -795,7 +794,7 @@ const webDesignerRiv = "/riv/designer-life.riv";
   .item-1,
   .item-2,
   .item-3 {
-    background: #ffffff;
+    /* background: #ffffff; */
   }
   .item-7,
   .item-8,
