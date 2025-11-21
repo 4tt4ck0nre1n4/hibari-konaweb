@@ -80,15 +80,39 @@ export const getStaticPaths: GetStaticPaths = async () => {
 const { slug } = Astro.params;
 let post: Post | undefined;
 
+// リトライ機構付きのフェッチ関数
+async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<Response> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url);
+      
+      // 5xx エラーの場合はリトライ
+      if (response.status >= 500 && i < retries - 1) {
+        console.warn(`Server error ${response.status}, retrying... (${i + 1}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+        continue;
+      }
+      
+      return response;
+    } catch (error) {
+      if (i < retries - 1) {
+        console.warn(`Fetch failed, retrying... (${i + 1}/${retries})`, error);
+        await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw new Error("Max retries reached");
+}
+
 try {
   console.log(`Fetching blog post data for slug: ${slug}`);
 
-  const resPosts = await fetch(
-    // `${headlessCmsUrl}${headlessCmsApiPrefix}posts?context=embed&acf_format=standard&slug=${slug}`;
-    `${BLOG_SLUG_API}${slug}`
-  );
+  const resPosts = await fetchWithRetry(`${BLOG_SLUG_API}${slug}`);
 
   if (!resPosts.ok) {
+    console.error(`Failed to fetch post data for slug "${slug}": ${resPosts.status} ${resPosts.statusText}`);
     throw new Error(`Failed to fetch post data: ${resPosts.status}`);
   }
 
