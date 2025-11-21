@@ -49,6 +49,33 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
+## 📊 Google Analytics 導入
+
+このプロジェクトには Google Analytics 4 (GA4) が統合されています。
+
+### セットアップ手順
+
+1. Google Analytics で測定ID（`G-XXXXXXXXXX`）を取得
+2. `.env` ファイルに以下を追加：
+   ```bash
+   PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+   ```
+3. Netlify の環境変数にも同じ値を設定
+
+詳細な導入手順は [`GOOGLE_ANALYTICS_SETUP_GUIDE.md`](./GOOGLE_ANALYTICS_SETUP_GUIDE.md) を参照してください。
+
+### カスタムイベントの追跡
+
+```typescript
+import { trackEvent, trackFormSubmit } from './util/analytics';
+
+// イベントの追跡
+trackEvent('button_click', { button_name: 'contact' });
+
+// フォーム送信の追跡
+trackFormSubmit('contact_form', true);
+```
+
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
