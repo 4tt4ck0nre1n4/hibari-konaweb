@@ -1,5 +1,6 @@
 ---
 import Favicon from "../components/Favicon.astro";
+// import GoogleAnalytics from "../components/GoogleAnalytics.astro";
 // reset.css と global.css を通常通りインポート（Astroが最適化）
 import "../styles/reset.css";
 import "../styles/global.css";
@@ -23,14 +24,26 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
 const isDev = import.meta.env.DEV;
 const cspContent = isDev
   ? // 開発環境：localhostとWebSocketを許可
-    "default-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://cdn.jsdelivr.net https://unpkg.com https://hibari-konaweb.netlify.app https://hibari-konaweb.com; style-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: http://localhost:* http://127.0.0.1:* http://hibari-konaweb.local https://cdn.jsdelivr.net https://hibari-konaweb.com https://hibari-konaweb.netlify.app; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' blob: data: http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* https://unpkg.com https://cdn.jsdelivr.net https://api.iconify.design https://hibari-konaweb.com https://hibari-konaweb.netlify.app; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none';"
-  : // 本番環境：より厳格なCSP
-    "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://hibari-konaweb.netlify.app https://hibari-konaweb.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: http://hibari-konaweb.local https://cdn.jsdelivr.net https://hibari-konaweb.com https://hibari-konaweb.netlify.app; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' blob: data: https://unpkg.com https://cdn.jsdelivr.net https://api.iconify.design https://hibari-konaweb.com https://hibari-konaweb.netlify.app; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none';";
+    "default-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://cdn.jsdelivr.net https://unpkg.com https://hibari-konaweb.netlify.app https://hibari-konaweb.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' http://localhost:* http://127.0.0.1:* https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: http://localhost:* http://127.0.0.1:* http://hibari-konaweb.local https://cdn.jsdelivr.net https://hibari-konaweb.com https://hibari-konaweb.netlify.app https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' blob: data: http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* https://unpkg.com https://cdn.jsdelivr.net https://api.iconify.design https://hibari-konaweb.com https://hibari-konaweb.netlify.app https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none';"
+  : // 本番環境：より厳格なCSP（Google Analytics対応）
+    "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://hibari-konaweb.netlify.app https://hibari-konaweb.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: http://hibari-konaweb.local https://cdn.jsdelivr.net https://hibari-konaweb.com https://hibari-konaweb.netlify.app https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' blob: data: https://unpkg.com https://cdn.jsdelivr.net https://api.iconify.design https://hibari-konaweb.com https://hibari-konaweb.netlify.app https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none';";
 ---
 
 <!doctype html>
 <html lang="ja">
   <head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-B14S1K1KS2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-B14S1K1KS2');
+</script>
+    <!-- Google Analytics 4 (GA4) - できるだけ早く読み込む -->
+    <!-- <GoogleAnalytics /> -->
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Security-Policy" content={cspContent} />

@@ -55,9 +55,15 @@ const googleAnalyticsLinks = {
   targetBlank: "_blank",
 };
 const googleAnalyticsTermsLinks = {
-  href: "https://www.google.com/analytics/terms/",
+  href: "https://www.google.com/analytics/terms/jp.html",
   ariaLabel: "Googleアナリティクスの利用規約へ（新しいタブで開く）",
   ariaTitle: "Googleアナリティクスの利用規約へ（新しいタブで開く）",
+  targetBlank: "_blank",
+};
+const googlePrivacypolicyLinks = {
+  href: "https://policies.google.com/privacy?hl=ja",
+  ariaLabel: "Googleプライバシーポリシーへ（新しいタブで開く）",
+  ariaTitle: "Googleプライバシーポリシーへ（新しいタブで開く）",
   targetBlank: "_blank",
 };
 ---
@@ -82,7 +88,7 @@ const googleAnalyticsTermsLinks = {
           {privacyTitle}
         </h1>
         <p class="privacy__text">
-          当サイトは、個人情報保護の重要性について認識し、個人情報の保護に関する法律、個人情報に関するガイドライン等の指針、その他個人情報保護に関する関係法令を遵守するとともに、以下のプライバシーポリシー（以下、「本ポリシー」といいます。）を定めます。
+          当サイトは、個人情報保護の重要性について認識し、個人情報の保護に関する法律（以下、「個人情報保護法」といいます。）を遵守するとともに、以下のプライバシーポリシー（以下、「本ポリシー」といいます。）を定めます。
         </p>
         <p class="privacy__text">
           本ポリシーは、当サイトがどのような個人情報を取得し、どのように利用するか、ユーザーがどのようにご自身の個人情報を管理されるのかをご説明するものです。当サイトは本ポリシーに従い、個人情報の安全管理のために必要かつ適切な取り扱いと保護に努めます。
@@ -117,181 +123,271 @@ const googleAnalyticsTermsLinks = {
             </p>
           </li>
         </ul>
-        <h2 class="privacy__header">個人情報の取得について</h2>
-        <p class="privacy__body">
-          当サイトは、
-          <a
-            class="privacy__body_link"
-            href={contactLinks.href}
-            aria-label={contactLinks.ariaLabel}
-            title={contactLinks.ariaTitle}
-          >
-            お問い合わせフォーム
-          </a>
-          からお問い合わせいただく際に、お名前、メールアドレス、その他お問い合わせ内容に関する個人情報を取得します。
-        </p>
-        <h2 class="privacy__header">個人情報の利用目的について</h2>
-        <p class="privacy__body">
-          お問い合わせいただいた際に取得した個人情報は、以下の目的で利用させていただくものであり、これらの目的以外で利用することはありません。
-        </p>
-        <ul class="privacy__menu">
-          <li class="privacy__menu_item">
-            <p class="privacy__menu_text">お問い合わせ内容への対応</p>
-          </li>
-          <li class="privacy__menu_item">
-            <p class="privacy__menu_text">必要な情報をご連絡する場合</p>
-          </li>
-          <li class="privacy__menu_item">
-            <p class="privacy__menu_text">当サイトの運営の改善、開発に役立てるため</p>
-          </li>
-        </ul>
-        <h2 class="privacy__header">個人情報の開示について</h2>
-        <p class="privacy__body">
-          当サイトは、以下のいずれかに該当する場合を除き、第三者に個人情報を提供することは致しません。
-        </p>
-        <ul class="privacy__menu">
-          <li class="privacy__menu_item">
-            <p class="privacy__menu_text">ユーザーご本人から開示に対して同意がある場合</p>
-          </li>
-          <li class="privacy__menu_item">
-            <p class="privacy__menu_text">正当な代理人からの請求がある場合</p>
-          </li>
-          <li class="privacy__menu_item">
-            <p class="privacy__menu_text">各種法令に基づき、開示することが必要である場合</p>
-          </li>
-          <li class="privacy__menu_item">
-            <p class="privacy__menu_text">
-              人の生命、身体および財産などに対する差し迫った危険があり、<br /> 緊急の必要性がある場合であって、本人の同意を得ることが困難な場合
-            </p>
-          </li>
-        </ul>
-        <h2 class="privacy__header">個人情報の訂正および利用の停止等について</h2>
-        <p class="privacy__body">
-          当サイトは、ユーザーから、個人情報の内容が事実ではなく、訂正、追加、削除、利用の停止を求められた場合は、ユーザーご本人からの請求であることを確認させていただいたうえ、遅滞なく対応させていただきます。その結果に基づき個人情報の訂正等を行い、その旨をユーザーに通知します。
-        </p>
-        <p class="privacy__body">
-          当サイトは、ユーザーから、以下のいずれかの場合の理由に基づき、個人情報の利用の停止または消去をもとめられた場合には、ユーザーご本人からの請求であることを確認させていただいたうえ、遅滞なく対応させていただきます。その結果に基づき個人情報の利用の停止等を行い、その旨をユーザーに通知します。
-        </p>
-        <ul class="privacy__menu">
-          <li class="privacy__menu_item">
-            <p class="privacy__menu_text">
-              本ポリシーで公表されている利用目的の範囲を超えて、<br />個人情報が取り扱われているという理由
-            </p>
-          </li>
-          <li class="privacy__menu_item">
-            <p class="privacy__menu_text">
-              偽りや、その他の手段により、<br />個人情報が取得されたものであるという理由
-            </p>
-          </li>
-        </ul>
-        <h2 class="privacy__header">アクセス解析について</h2>
-        <p class="privacy__body">
-          当サイトは、アクセス状況などの統計的情報の解析ツールとして、Googleが提供する
-          <a
-            class="privacy__body_link"
-            href={googleAnalyticsLinks.href}
-            aria-label={googleAnalyticsLinks.ariaLabel}
-            title={googleAnalyticsLinks.ariaTitle}
-            target={googleAnalyticsLinks.targetBlank}
-          >
-            Google Analytics
-          </a>
-          を利用しています。Google Analytics（以下、「Google アナリティクス」といいます。）によって収集されるデータには、Webページの閲覧数、訪問者の地理的位置、モバイルデバイスの識別情報（Android の広告識別子、iOS の広告識別子など）が含まれます。
-        </p>
-        <p class="privacy__body">
-          Googleアナリティクスは、トラフィックデータの収集のためにCookie（クッキー）を使用しています。トラフィックデータは、匿名で収集されており、名前、住所、メールアドレスなど個人を特定するような情報は含まれておらず、IPアドレス、ブラウザの種類、使用言語、アクセスしたページ、滞在時間などが含まれます。
-        </p>
-        <p class="privacy__body">
-          Cookieとは、WebサーバーからWebブラウザに送信されるデータのことです。WebサーバーがCookieを参照することでユーザーのパソコンを識別することができ、効率的に当サイトを利用することができます。
-        </p>
-        <p class="privacy__body">
-          Cookieの目的は、当サイトのアクセス状況に関する閲覧情報の把握に役立ち、サービス向上に資するものです。これにより、以前入力した情報を再度入力する必要がないなど当サイトを利用するユーザーの利便性が向上する機能が提供されています。
-        </p>
-        <p class="privacy__body">
-          Cookieを無効にすることでトラフィックデータの収集を拒否することも可能です。お使いのWebブラウザの設定をご確認下さい。
-        </p>
-        <p class="privacy__body">
-          当サイトはSSL（Secure Socket
-          Layer）に対応しており、WebブラウザとWebサーバーとの通信を暗号化しています。ユーザーが入力する氏名や住所、電話番号などの個人情報は自動的に暗号化されます。
-        </p>
-        <p class="privacy__body">
-          Googleアナリティクスによって収集された情報は、サイトのパフォーマンスの分析と改善、ユーザーへのコンテンツやサービスの提供を目的として使用する場合がございます。
-        </p>
-        <p class="privacy__body">
-          詳しくはこちらの
-          <a
-            class="privacy__body_link"
-            href={googleAnalyticsTermsLinks.href}
-            aria-label={googleAnalyticsTermsLinks.ariaLabel}
-            title={googleAnalyticsTermsLinks.ariaTitle}
-            target={googleAnalyticsTermsLinks.targetBlank}
-          >
-            Googleアナリティクスの利用規約
-          </a>
-          をご覧ください。
-        </p>
-        <h2 class="privacy__header">個人情報の取り扱いに関するお問い合わせ</h2>
-        <p class="privacy__body">
-          当サイトの個人情報の取り扱いに関するお問い合わせは、
-          <a
-            class="privacy__body_link"
-            href={contactLinks.href}
-            aria-label={contactLinks.ariaLabel}
-            title={contactLinks.ariaTitle}
-          >
-            お問い合わせフォーム
-          </a>
-          よりご連絡ください。
-        </p>
-        <h2 class="privacy__header">法令、規範の遵守と継続的な見直し</h2>
-        <p class="privacy__body">
-          当サイトは、保有する個人情報に関して適用される日本の法令、その他の規範を遵守するとともに、必要に応じて本ポリシーの内容を適宜見直し、継続的な改善に努めます。
-        </p>
-        <p class="privacy__body">修正された最新の本ポリシーは、常に当サイトの本ページにて開示されます。</p>
-        <h2 class="privacy__header">本ポリシーの同意について</h2>
-        <p class="privacy__body">
-          当サイトをご利用いただくことにより、本ポリシーに同意されたものとみなします。また、プライバシーポリシーに同意することで
-          <a
-            class="privacy__body_link"
-            href={contactLinks.href}
-            aria-label={contactLinks.ariaLabel}
-            title={contactLinks.ariaTitle}
-          >
-            お問い合わせフォーム
-          </a>
-          は送信できる仕様となっています。
-        </p>
-        <h2 class="privacy__header">免責事項</h2>
-        <p class="privacy__body">
-          当サイトからのリンクやバナーなどで移動したサイトで提供される情報、サービスなどについては、一切の責任を負いません。
-        </p>
-        <p class="privacy__body">
-          当サイトに掲載されているコンテンツ・情報について、可能な限り正確な情報を掲載するよう努めておりますが、必ずしもそれらの正確性や安全性等を保証するものではありません。誤情報や情報が古くなっている場合もございます。万が一、当サイトに掲載された内容によって発生したトラブルや損害等の一切の責任を負わないものとします。また、ユーザーが当サイトの情報を用いて行う一切の行為に関しても一切の責任を負わないものとします。あらかじめご了承くださいますようお願いいたします。
-        </p>
-        <p class="privacy__body">
-          本免責事項、および当サイトに掲載しているコンテンツ・情報は、予告なしに変更・削除されることがあります。あらかじめご了承ください。修正された最新の本免責事項は、常に当サイトの本ページにて開示されます。
-          <!-- 当サイトは、ユーザーが当サイトを利用したことにより生じたユーザーの損害およびユーザーが第三者に与えた損害に関して、一切の責任を負わないものとします。 -->
-        </p>
-        <h2 class="privacy__header">著作権・肖像権</h2>
-        <p class="privacy__body">
-          当サイト内で掲載している文章や画像など、すべてのコンテンツにつきましては、無断転載することを禁止します。
-        </p>
-        <p class="privacy__body">
-          また、当サイトは著作権や肖像権の侵害を目的とするものではありません。使用している版権物の知的所有権はそれぞれの著作者・団体に帰属しております。著作権や肖像権に関して問題がございましたら
-          <a
-            class="privacy__body_link"
-            href={contactLinks.href}
-            aria-label={contactLinks.ariaLabel}
-            title={contactLinks.ariaTitle}
-          >
-            お問い合わせフォーム
-          </a>
-          よりご連絡ください。著作権所有者様からの警告及び修正・撤去のご連絡があった場合は迅速に対処または削除致します。
-        </p>
-        <h2 class="privacy__header">リンクについて</h2>
-        <p class="privacy__body">
-          当サイトは基本的にリンクフリーです。リンクを行う場合の許可や連絡は不要です。ただし、インラインフレームの使用や画像などへの直リンクはご遠慮ください。
-        </p>
+        <section>
+          <h2 class="privacy__header">個人情報の定義について</h2>
+          <p class="privacy__body">
+            本ポリシーにおいて、個人情報とは、個人情報保護法第２条第１項により定義された個人情報、すなわち生存する個人に関する情報であって、当該情報に含まれる氏名、生年月日、住所、電話番号、その他の記述等により特定の個人を識別することができるもの（他の情報と容易に照合することができ、それにより特定の個人を識別することができることとなるものを含みます。）、もしくは個人識別符号が含まれる情報を意味するものとします。
+          </p>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">個人情報の取得について</h2>
+          <p class="privacy__body">
+            当サイトは、
+            <a
+              class="privacy__body_link"
+              href={contactLinks.href}
+              aria-label={contactLinks.ariaLabel}
+              title={contactLinks.ariaTitle}
+            >
+              お問い合わせフォーム
+            </a>
+            からお問い合わせいただく際に、お名前、メールアドレス、その他お問い合わせ内容に関する個人情報を取得します。
+          </p>
+          <p class="privacy__body">
+            当サイトは、その他、適正に個人情報を取得し、偽りその他不正の手段により取得しません。
+          </p>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">個人情報の利用目的について</h2>
+          <p class="privacy__body">当サイトは、ユーザーの個人情報を、以下の目的で利用致します。</p>
+          <ul class="privacy__menu">
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">お問い合わせ内容などへの対応のため</p>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">必要な情報をご連絡するため</p>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">当ポリシーに違反する行為に対する対応のため</p>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">当サイトの運営の改善、開発に役立てるため</p>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">その他、上記利用目的に付随する目的のため</p>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">個人情報の第三者提供について</h2>
+          <p class="privacy__body">
+            当サイトは、個人情報保護法その他の法令に基づき開示が認められる場合を除くほか、あらかじめユーザーの同意を得ないで、個人情報を第三者に提供しません。ただし、以下のいずれかの場合は、上記に定める第三者への提供には該当しません。
+          </p>
+          <ul class="privacy__menu">
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">
+                当サイトが利用目的の達成に必要な範囲内において個人情報の取り扱いの全部または一部を委託することに伴って個人情報を提供する場合
+              </p>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">個人情報保護法の定めに基づき共同利用する場合</p>
+            </li>
+          </ul>
+        </section>
+        
+        <section>
+          <h2 class="privacy__header">個人情報の開示について</h2>
+          <p class="privacy__body">
+            当サイトは、個人情報保護法その他の法令により許容される場合を除き、ユーザーの同意を得ず、利用目的の達成に必要な範囲を超えて個人情報を取り扱いません。ただし、次のいずれかに該当する場合は、この限りではありません。
+          </p>
+          <ul class="privacy__menu">
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">法令に基づく場合</p>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">
+                人の生命、身体または財産の保護のために必要がある場合であって、<br /> ユーザーの同意を得ることが困難であるとき
+              </p>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">
+                公衆衛生の向上または児童の健全な育成の推進のために特に必要がある場合であって、ユーザーの同意を得ることが困難であるとき
+              </p>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">
+                国の機関もしくは地方公共団体またはその委託を受けた者が法令の定める事務を遂行することに対して協力する必要がある場合であって、ユーザーの同意を得ることにより当該事務の遂行に支障を及ぼす恐れがあるとき
+              </p>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">個人情報の訂正および利用の停止等について</h2>
+          <p class="privacy__body">
+            当サイトは、ユーザーから、個人情報が真実ではないという理由によって、個人情報保護法の定めに基づきその内容の訂正、追加、または削除を求められた場合には、ユーザーご本人からのご請求であることを確認のうえ、利用目的の達成に必要な範囲内において、遅滞なく対応させていただきます。その結果に基づき、個人情報の内容の訂正などを行い、その旨をユーザーに通知します（訂正などを行わない旨の決定をしたときは、ユーザーに対してその旨を通知します）。
+          </p>
+          <p class="privacy__body">
+            ただし、個人情報保護法その他の法令により、当サイトが訂正などの義務を負わない場合は、この限りではありません。
+          </p>
+          <p class="privacy__body">
+            当サイトは、ユーザーから、以下のいずれかの場合の理由に基づき、個人情報の利用の停止または消去をもとめられた場合には、ユーザーご本人からのご請求であることを確認のうえ、遅滞なく対応させていただきます。その結果に基づき個人情報の利用の停止などを行い、その旨をユーザーに通知します。
+          </p>
+          <ul class="privacy__menu">
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">
+                本ポリシーであらかじめ公表された利用目的の範囲を超えて、<br />個人情報が取り扱われているという理由
+              </p>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">
+                偽りや、その他の不正な手段により、<br />個人情報が取得されたものであるという理由
+              </p>
+            </li>
+          </ul>
+          <p class="privacy__body">
+            ただし、個人情報保護法その他の法令により、当サイトが訂正などの義務を負わない場合は、この限りではありません。
+          </p>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">アクセス解析について</h2>
+          <p class="privacy__body">
+            当サイトは、アクセス状況などを調査・分析するための統計的情報の解析ツールとして、Google LLCが提供する
+            <a
+              class="privacy__body_link"
+              href={googleAnalyticsLinks.href}
+              aria-label={googleAnalyticsLinks.ariaLabel}
+              title={googleAnalyticsLinks.ariaTitle}
+              target={googleAnalyticsLinks.targetBlank}
+            >
+              Google Analytics
+            </a>
+            を利用しています。Google Analytics（以下、「Google アナリティクス」といいます。）によって収集されるデータには、Webページの閲覧数、モバイルデバイスの識別情報（Android
+            の広告識別子、iOS の広告識別子など）が含まれます。
+          </p>
+          <p class="privacy__body">
+            Googleアナリティクスは、トラフィックデータの収集のためにCookie（クッキー）を使用しています。トラフィックデータは、匿名で収集されており、名前、住所、メールアドレスなど個人を特定するような情報は含まれておらず、IPアドレス、ブラウザの種類、使用言語、アクセスしたページ、滞在時間などが含まれます。
+          </p>
+          <p class="privacy__body">
+            Cookieとは、WebサーバーからWebブラウザに送信されるデータのことです。WebサーバーがCookieを参照することでユーザーのパソコンなどのデバイスを識別することができ、効率的に当サイトを利用することができます。
+          </p>
+          <p class="privacy__body">
+            Cookieの目的は、当サイトのアクセス状況に関する閲覧情報の把握に役立ち、サービス向上に資するものです。これにより、以前入力した情報を再度入力する必要がないなど当サイトを利用するユーザーの利便性が向上する機能が提供されています。
+          </p>
+          <p class="privacy__body">
+            Cookieを無効にすることでトラフィックデータの収集を拒否することも可能です。お使いのWebブラウザの設定をご確認下さい。
+          </p>
+          <p class="privacy__body">
+            当サイトはSSL（Secure Socket
+            Layer）に対応しており、WebブラウザとWebサーバーとの通信を暗号化しています。ユーザーが入力する氏名や住所、電話番号などの個人情報は自動的に暗号化されます。
+          </p>
+          <p class="privacy__body">
+            Googleアナリティクスによって収集された情報は、当サイトのパフォーマンスの分析と改善、ユーザーへのコンテンツやサービスの提供を目的として使用する場合がございます。
+          </p>
+          <p class="privacy__body">
+            Googleアナリティクスについて、データが収集、処理される仕組み、その他の詳しい情報は同社のサイトをご覧ください。
+          </p>
+          <ul class="privacy__menu">
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">Googleアナリティクスの利用規約</p>
+              <a
+                class="privacy__body_link"
+                href={googleAnalyticsTermsLinks.href}
+                aria-label={googleAnalyticsTermsLinks.ariaLabel}
+                title={googleAnalyticsTermsLinks.ariaTitle}
+                target={googleAnalyticsTermsLinks.targetBlank}
+              >
+                Googleアナリティクスの利用規約
+              </a>
+            </li>
+            <li class="privacy__menu_item">
+              <p class="privacy__menu_text">Googleプライバシーポリシー</p>
+              <a
+                class="privacy__body_link"
+                href={googlePrivacypolicyLinks.href}
+                aria-label={googlePrivacypolicyLinks.ariaLabel}
+                title={googlePrivacypolicyLinks.ariaTitle}
+                target={googlePrivacypolicyLinks.targetBlank}
+              >
+                Googleプライバシーポリシー
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">個人情報の取り扱いに関するお問い合わせ</h2>
+          <p class="privacy__body">
+            個人情報の開示などのお申し出、ご意見、ご質問、苦情のお申し出、その他個人情報の取り扱いに関するお問い合わせは、当サイトの
+            <a
+              class="privacy__body_link"
+              href={contactLinks.href}
+              aria-label={contactLinks.ariaLabel}
+              title={contactLinks.ariaTitle}
+            >
+              お問い合わせフォーム
+            </a>
+            よりご連絡ください。
+          </p>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">法令、規範の遵守と継続的な見直し</h2>
+          <p class="privacy__body">
+            当サイトは、個人情報の取り扱いに関する運用状況を適宜見直し、継続的な改善に努めるものとし、必要に応じて本ポリシーの内容を変更することがあります。
+          </p>
+          <p class="privacy__body">修正された最新の本ポリシーは、常に当サイトの本ページにて開示されます。</p>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">本ポリシーの同意について</h2>
+          <p class="privacy__body">
+            当サイトをご利用いただくことにより、本ポリシーに同意されたものとみなします。また、本ポリシーに同意することで
+            <a
+              class="privacy__body_link"
+              href={contactLinks.href}
+              aria-label={contactLinks.ariaLabel}
+              title={contactLinks.ariaTitle}
+            >
+              お問い合わせフォーム
+            </a>
+            は送信できる仕様となっています。
+          </p>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">免責事項</h2>
+          <p class="privacy__body">
+            当サイトからのリンクやバナーなどで移動したサイトで提供される情報、サービスなどについては、一切の責任を負いません。
+          </p>
+          <p class="privacy__body">
+            当サイトに掲載されているコンテンツ・情報について、可能な限り正確な情報を掲載するよう努めておりますが、必ずしもそれらの正確性や安全性等を保証するものではありません。誤情報や情報が古くなっている場合もございます。万が一、当サイトに掲載された内容によって発生したトラブルや損害等の一切の責任を負わないものとします。また、ユーザーが当サイトの情報を用いて行う一切の行為に関しても一切の責任を負わないものとします。あらかじめご了承くださいますようお願いいたします。
+          </p>
+          <p class="privacy__body">
+            本免責事項、および当サイトに掲載しているコンテンツ・情報は、予告なしに変更・削除されることがあります。あらかじめご了承ください。修正された最新の本免責事項は、常に当サイトの本ページにて開示されます。
+            <!-- 当サイトは、ユーザーが当サイトを利用したことにより生じたユーザーの損害およびユーザーが第三者に与えた損害に関して、一切の責任を負わないものとします。 -->
+          </p>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">著作権・肖像権</h2>
+          <p class="privacy__body">
+            当サイト内で掲載している文章や画像など、すべてのコンテンツにつきましては、無断転載することを禁止します。
+          </p>
+          <p class="privacy__body">
+            また、当サイトは著作権や肖像権の侵害を目的とするものではありません。使用している版権物の知的所有権はそれぞれの著作者・団体に帰属しております。著作権や肖像権に関して問題がございましたら
+            <a
+              class="privacy__body_link"
+              href={contactLinks.href}
+              aria-label={contactLinks.ariaLabel}
+              title={contactLinks.ariaTitle}
+            >
+              お問い合わせフォーム
+            </a>
+            よりご連絡ください。著作権所有者様からの警告及び修正・撤去のご連絡があった場合は迅速に対処または削除致します。
+          </p>
+        </section>
+
+        <section>
+          <h2 class="privacy__header">リンクについて</h2>
+          <p class="privacy__body">
+            当サイトは基本的にリンクフリーです。リンクを行う場合の許可や連絡は不要です。ただし、インラインフレームの使用や画像などへの直リンクはご遠慮ください。
+          </p>
+        </section>
       </div>
     </main>
     <Footer />
@@ -381,6 +477,7 @@ const googleAnalyticsTermsLinks = {
     list-style: disc;
     margin-block-start: 2rem;
     margin-inline: auto;
+    padding-inline-start: 1.5rem;
   }
 
   .privacy__menu_text {

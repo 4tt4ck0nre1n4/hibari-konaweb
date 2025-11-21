@@ -23,7 +23,7 @@ const menuItems: MenuItem[] = [
     aria-expanded="false"
     aria-controls="navi-card"
   >
-    <span class="navi-card__button_text">Navigation</span>
+    <span class="navi-card__button_text">Navigation Menu</span>
   </button>
   <ul id="navi-card" class="navi-card__menu" aria-hidden="true">
     {
@@ -302,6 +302,9 @@ const menuItems: MenuItem[] = [
   .navi-card__menu_item {
     width: 100px;
     height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
     border-radius: 1rem;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
