@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import hamburgerStyles from "../styles/hamburgerStyles.module.css";
 import ReactDOM from "react-dom";
 import { Icon } from "@iconify/react";
+import SnsLink from "./SnsLink";
+import { twitter, github_sns, contact, mail } from "../scripts/constSns";
 
 const menuItems = [
   {
@@ -313,6 +315,46 @@ const HamburgerMenu = () => {
           );
         })}
       </ul>
+      <div className={hamburgerStyles.hamburger__sns}>
+        <ul className={hamburgerStyles.hamburger__snsMenu}>
+          <SnsLink
+            itemClassName={hamburgerStyles.hamburger__snsItem}
+            linkClassName={hamburgerStyles.hamburger__snsLink}
+            href={twitter.href}
+            snsIconSvg={twitter.icon}
+            ariaLabel={twitter.ariaLabel}
+            ariaTitle={twitter.ariaTitle}
+            targetBlank={twitter.targetBlank}
+          />
+          <SnsLink
+            itemClassName={hamburgerStyles.hamburger__snsItem}
+            linkClassName={hamburgerStyles.hamburger__snsLink}
+            href={github_sns.href}
+            snsIconSvg={github_sns.icon}
+            ariaLabel={github_sns.ariaLabel}
+            ariaTitle={github_sns.ariaTitle}
+            targetBlank={github_sns.targetBlank}
+          />
+          <SnsLink
+            itemClassName={hamburgerStyles.hamburger__snsItem}
+            linkClassName={hamburgerStyles.hamburger__snsLink}
+            href={contact.href}
+            snsIconSvg={contact.icon}
+            ariaLabel={contact.ariaLabel}
+            ariaTitle={contact.ariaTitle}
+            targetBlank=""
+          />
+          <SnsLink
+            itemClassName={hamburgerStyles.hamburger__snsItem}
+            linkClassName={hamburgerStyles.hamburger__snsLink}
+            href={mail.href}
+            snsIconSvg={mail.icon}
+            ariaLabel={mail.ariaLabel}
+            ariaTitle={mail.ariaTitle}
+            targetBlank={mail.targetBlank}
+          />
+        </ul>
+      </div>
     </div>
   );
 
@@ -347,7 +389,6 @@ const HamburgerMenu = () => {
   );
 
   const buttonWithPortal = portalTarget && isOpen ? ReactDOM.createPortal(buttonNode, portalTarget) : buttonNode;
-
 
   return (
     <>

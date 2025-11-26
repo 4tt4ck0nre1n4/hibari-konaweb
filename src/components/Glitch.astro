@@ -1,5 +1,5 @@
 ---
-import glitchImageSrc from "../assets/glitch-anime.png";
+import glitchImageSrc from "../assets/glitchGirl.png";
 import { getImage } from "astro:assets";
 const glitchImage = await getImage({ src: glitchImageSrc });
 ---
@@ -336,8 +336,10 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   .glitch {
     width: 100%;
     max-width: 640px;
+    max-width: 600px;
     height: 100vh;
     background: #000000;
+    /* background: rgb(29, 31, 32); */
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover; /* 0 から cover に変更 */
@@ -415,7 +417,8 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   }
 
   .f::before {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(29, 31, 32, 0.1);
+    /* background: rgba(255, 255, 255, 0.1); */
     background-blend-mode: overlay;
     animation: glitchAnime-4 1.8s infinite linear;
   }
