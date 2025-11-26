@@ -26,12 +26,16 @@ import pikucha from "../assets/svg/pikucha.svg";
 import sodenoura2 from "../assets/svg/sodenoura2.svg";
 import gauraStudio2 from "../assets/svg/gauraStudio2.svg";
 import pikucha2 from "../assets/svg/pikucha2.svg";
-import backgroundImageSrc from "../assets/background.webp";
+import fvAnimeImageSrc from "../assets/design.png";
+import gridBackgroundImageSrc from "../assets/background.webp";
+import fvBackgroundImageSrc from "../assets/background3.png";
 import { getImage } from "astro:assets";
 import NaviCard from "../components/NaviCard.astro";
 import Glitch from "../components/Glitch.astro";
 
-const backgroundImage = await getImage({ src: backgroundImageSrc });
+const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
+const fvAnimeImage = await getImage({ src: fvAnimeImageSrc });
+const fvBackgroundImage = await getImage({ src: fvBackgroundImageSrc });
 ---
 
 <Layout
@@ -44,7 +48,9 @@ const backgroundImage = await getImage({ src: backgroundImageSrc });
   twitterDescription={globalText.top.description}
 >
   <!-- LCP背景画像のプリロード（PageSpeed Insights最適化） -->
-  <link slot="head" rel="preload" href={backgroundImage.src} as="image" fetchpriority="high" />
+  <link slot="head" rel="preload" href={fvBackgroundImage.src} as="image" fetchpriority="high" />
+  <link slot="head" rel="preload" href={fvAnimeImage.src} as="image" fetchpriority="high" />
+  <link slot="head" rel="preload" href={gridBackgroundImage.src} as="image" fetchpriority="high" />
 
   <div id="outer-container">
     <Header />
@@ -53,9 +59,18 @@ const backgroundImage = await getImage({ src: backgroundImageSrc });
       <div class="breadcrumbs__wrapper breadcrumbs__wrapper_top">
         <Breadcrumbs crumbs={[]} />
       </div>
-      <div class="glitch-container">
-        <NaviCard />
-        <Glitch />
+      <div class="fv">
+        <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImage.src})`}>
+          <div class="background-container">
+            <div class="background-rotated" style={`background-image: url(${fvAnimeImage.src})`}></div>
+            <div class="background"></div>
+          </div>
+          <div class="glitch-container">
+            <!-- <div class="glitch-container" style={`background-image: url(${fvImage.src})`} > -->
+            <NaviCard />
+            <Glitch />
+          </div>
+        </div>
       </div>
       <!-- <div class="animated-sprite-container">
         <DepthAppearImage src={animeImage.src} alt="アニメーション画像" client:load />
@@ -67,7 +82,7 @@ const backgroundImage = await getImage({ src: backgroundImageSrc });
       <div class="swiper-display-container swiper-display-container--mobile">
         <SwiperDisplay />
       </div>
-      <div id="main-container" style={`background-image: url(${backgroundImage.src})`}>
+      <div id="main-container" style={`background-image: url(${gridBackgroundImage.src})`}>
         <!-- デスクトップ用：ResponsiveFvは非表示 -->
         <div class="responsive-fv-wrapper responsive-fv-wrapper--desktop">
           <ResponsiveFv />
@@ -481,6 +496,82 @@ const backgroundImage = await getImage({ src: backgroundImageSrc });
     display: block; /* デスクトップでは表示 */
     width: 100%;
   }
+
+  .fv {
+    position: relative;
+  }
+
+  .fv__wrapper {
+    height: 100%;
+    background: #1d1f20;
+    /* 背景画像の設定（HTMLでインラインスタイルとして指定） */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    perspective: 1200px;
+    overflow: hidden;
+    position: relative;
+    margin-block: 0;
+    margin-inline: auto;
+  }
+
+  .fv__wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    box-shadow: inset 10px 100px 200px rgba(0 0 0 / 0.6);
+    pointer-events: none;
+  }
+  .background-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    /* 円形マスクでクリッピング（こちらは正面向き） */
+    -webkit-mask-image: radial-gradient(
+      circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      black 100%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%), black 100%, transparent 100%);
+  }
+
+  .background-rotated {
+    position: absolute;
+    top: -60%;
+    left: -10%;
+    width: 200%;
+    height: 300%;
+    /* アニメーションする背景画像（HTMLでインラインスタイルとして指定） */
+    background-size: 480px;
+    background-repeat: repeat;
+    background-position: 50% 50%;
+    /* 3D回転を適用（この要素だけ回転） */
+    transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg);
+    transform-style: preserve-3d;
+    animation: background-scroll-3d 20s linear infinite;
+  }
+
+  .background {
+    /* マスク位置を更新するためのダミー要素として保持 */
+    display: none;
+  }
+
+  @keyframes background-scroll-3d {
+    from {
+      background-position: 0% 0%;
+      transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg) translateZ(-500px) scale(1.5);
+    }
+    to {
+      background-position: 100% 100%;
+      transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg) translateZ(500px) scale(1);
+    }
+  }
   .glitch-container {
     width: 100%;
     height: 100vh;
@@ -488,13 +579,17 @@ const backgroundImage = await getImage({ src: backgroundImageSrc });
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #000000;
-    background-color: aliceblue;
+    /* background: #000000; */
+    /* background-color: aliceblue; */
     /* background-image: repeating-conic-gradient(#000000 0% 25%, #111111 0% 50%);
     background-size: 240px 80px;
     animation: noise 1s infinite linear; */
+    /* background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; */
     margin-inline: auto;
     position: relative;
+    z-index: 6;
     isolation: isolate;
   }
   @keyframes noise {
@@ -1447,5 +1542,25 @@ const backgroundImage = await getImage({ src: backgroundImageSrc });
   // DOMContentLoadedでボタンイベントを初期化（GSAPに依存しない）
   document.addEventListener("DOMContentLoaded", () => {
     initButtonEvents();
+    initBackgroundMouseFollow();
   });
+
+  // マウス追従背景の初期化
+  function initBackgroundMouseFollow(): void {
+    const backgroundContainer = document.querySelector<HTMLElement>(".background-container");
+    if (!backgroundContainer) return;
+
+    const fvWrapper = document.querySelector<HTMLElement>(".fv__wrapper");
+    if (!fvWrapper) return;
+
+    fvWrapper.addEventListener("mousemove", (e: MouseEvent) => {
+      const rect = fvWrapper.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // CSS変数を使ってマスクの位置を更新
+      backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
+      backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+    });
+  }
 </script>
