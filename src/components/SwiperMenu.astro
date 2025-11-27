@@ -139,7 +139,7 @@ const mouseItem = {
 
   .swiper::before {
     content: "";
-    width: 70%;
+    width: 60%;
     max-width: 240px;
     height: 100%;
     max-height: 112px;
@@ -149,24 +149,26 @@ const mouseItem = {
     top: 5%;
     right: 0;
     z-index: 1;
-    transform: translateX(-200px) skew(-16deg);
-    animation: shineDisplay 5s linear infinite;
+    transform: translateX(-140px), skew(-8deg);
+    transform-origin: center;
+    will-change: transform;
+    animation: shineDisplay 3s linear infinite;
   }
 
   @keyframes shineDisplay {
     0% {
-      transform: translateX(-200px) skew(-16deg);
+      transform: translateX(-140px) skew(-8deg);
       opacity: 0;
     }
     4% {
       opacity: 1;
     }
     16% {
-      transform: translateX(300px) skew(-16deg);
+      transform: translateX(0px) skew(-16deg);
       opacity: 0;
     }
     100% {
-      transform: translateX(-200px) skew(-16deg);
+      transform: translateX(-140px) skew(-16deg);
       opacity: 0;
     }
   }

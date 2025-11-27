@@ -834,6 +834,20 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       rgba(170, 244, 254, 1),
       transparent
     );
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.15) 10%,
+      rgba(255, 255, 255, 0.5) 20%,
+      var(--color-purple) 30%,
+      rgba(255, 255, 255, 0.8) 40%,
+      var(--color-purple) 50%,
+      rgba(255, 255, 255, 0.8) 60%,
+      var(--color-purple) 70%,
+      rgba(255, 255, 255, 0.5) 80%,
+      rgba(255, 255, 255, 0.15) 90%,
+      transparent 100%
+    );
     position: absolute;
     top: 0;
     left: 0;
@@ -864,9 +878,13 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   .grid__menu_item {
     width: 100px;
     height: 100px;
+    background-color: var(--color-white);
     border-radius: 0.625rem;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
     position: relative;
+    transition:
+      background 0.4s ease-in-out,
+      box-shadow 0.4s ease;
   }
   .grid__menu_item:is(:hover, :focus-visible) {
     background: transparent;
@@ -889,7 +907,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     height: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    /* perspective: 1000px; */
     transition: transform 0.4s ease;
   }
   .item-1,
@@ -903,7 +920,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     background: transparent;
   }
   .grid__menu_item .grid__menu_svg:is(:hover, :focus-visible) {
-    /* border-radius: 100%; */
     transform: scale(1.1);
   }
 
@@ -1049,13 +1065,17 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     display: block;
     background: linear-gradient(
       90deg,
-      transparent,
-      rgba(236, 159, 255, 1),
-      #ffffff71,
-      rgba(147, 183, 255, 1),
-      #ffffff71,
-      rgba(170, 244, 254, 1),
-      transparent
+      transparent 0%,
+      rgba(255, 255, 255, 0.15) 10%,
+      rgba(255, 255, 255, 0.5) 20%,
+      var(--color-purple) 30%,
+      rgba(255, 255, 255, 0.8) 40%,
+      var(--color-purple) 50%,
+      rgba(255, 255, 255, 0.8) 60%,
+      var(--color-purple) 70%,
+      rgba(255, 255, 255, 0.5) 80%,
+      rgba(255, 255, 255, 0.15) 90%,
+      transparent 100%
     );
     position: absolute;
     top: 0;
@@ -1089,12 +1109,14 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     display: block;
     width: 60px;
     height: 60px;
-    background: linear-gradient(180deg, rgba(0, 19, 172, 1) 0%, rgba(100, 255, 209, 1) 55%, rgba(43, 255, 152, 1) 100%);
     background: linear-gradient(
       135deg,
-      rgba(236, 159, 255, 1) 30%,
-      rgba(147, 183, 255, 1) 55%,
-      rgba(170, 244, 254, 1) 78%
+      rgba(255, 255, 255, 0.2) 0%,
+      var(--color-purple) 25%,
+      rgba(255, 255, 255, 0.6) 45%,
+      var(--color-purple) 65%,
+      rgba(255, 255, 255, 0.3) 85%,
+      var(--color-purple) 100%
     );
     box-shadow: 0 18px 20px rgba(0 0 0 / 0.6);
     border: #fff 1px solid;
@@ -1125,9 +1147,12 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   .button.is-rotating {
     background: linear-gradient(
       45deg,
-      rgba(236, 159, 255, 1) 30%,
-      rgba(147, 183, 255, 1) 55%,
-      rgba(170, 244, 254, 1) 78%
+      rgba(255, 255, 255, 0.3) 0%,
+      var(--color-purple) 20%,
+      rgba(255, 255, 255, 0.7) 40%,
+      var(--color-purple) 60%,
+      rgba(255, 255, 255, 0.5) 80%,
+      var(--color-purple) 100%
     );
     top: -10px;
     border-radius: 50%;

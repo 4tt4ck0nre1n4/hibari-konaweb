@@ -15,7 +15,7 @@
 }
 
 .particlesButton {
-  background-color: transparent;
+  background: var(--color-white);
   border: transparent 1px solid;
   box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
   border-radius: 1rem;
@@ -25,14 +25,17 @@
   padding-inline: 0.5rem;
   transition:
     transform 0.1s ease,
+    background 0.4s ease-in-out,
     box-shadow 0.4s ease;
 }
 
 .particlesButton:is(:hover, :focus-visible) {
+  background: transparent;
   box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
 }
 
 .particlesButton:active {
+  background: transparent;
   transform: scale(0.8);
   box-shadow: 0 4px 8px rgb(0 0 0 / 0.4);
 }
