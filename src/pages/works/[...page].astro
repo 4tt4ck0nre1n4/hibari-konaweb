@@ -198,42 +198,44 @@ const worksPagination = {
               works.length > 0 ? (
                 works.map((work: WorkObject) => (
                   <li class="worksCard__menu_item">
-                    <article class="worksCard__article" aria-labelledby={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`}>
-
-                    <h2 id={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`} class="worksCard__header">
+                    <article
+                      class="worksCard__article"
+                      aria-labelledby={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`}
+                    >
+                      <h2 id={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`} class="worksCard__header">
+                        <a
+                          class="worksCard__slug"
+                          href={`/works/${work.slug}`}
+                          aria-label={`${work?.title?.rendered}${worksItems.ariaLabel}`}
+                          title={`${work?.title?.rendered}${worksItems.ariaTitle}`}
+                          set:html={work?.title?.rendered}
+                        />
+                      </h2>
                       <a
                         class="worksCard__slug"
                         href={`/works/${work.slug}`}
-                        aria-label={`${work?.title?.rendered}${worksItems.ariaLabel}`}
-                        title={`${work?.title?.rendered}${worksItems.ariaTitle}`}
-                        set:html={work?.title?.rendered}
+                        aria-label={`${work.slug}(${work?.title?.rendered})${worksItems.ariaLabel}`}
+                        title={`${work.slug}(${work?.title?.rendered})${worksItems.ariaTitle}`}
+                      >
+                        <img
+                          class="worksCard__image"
+                          src={work?.acf?.screenshot_pc ?? ""}
+                          alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
+                          width={worksItems.width}
+                          height={worksItems.height}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </a>
+                      <a
+                        class="worksCard__link"
+                        href={work?.acf?.left_link ?? ""}
+                        aria-label={`${work?.title?.rendered}${worksItems.ariaLabelNewTab}`}
+                        title={`${work?.title?.rendered}${worksItems.ariaTitleNewTab}`}
+                        target="_blank"
+                        set:html={work?.acf?.left_link ?? ""}
                       />
-                    </h2>
-                    <a
-                      class="worksCard__slug"
-                      href={`/works/${work.slug}`}
-                      aria-label={`${work.slug}(${work?.title?.rendered})${worksItems.ariaLabel}`}
-                      title={`${work.slug}(${work?.title?.rendered})${worksItems.ariaTitle}`}
-                    >
-                      <img
-                        class="worksCard__image"
-                        src={work?.acf?.screenshot_pc ?? ""}
-                        alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
-                        width={worksItems.width}
-                        height={worksItems.height}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </a>
-                    <a
-                      class="worksCard__link"
-                      href={work?.acf?.left_link ?? ""}
-                      aria-label={`${work?.title?.rendered}${worksItems.ariaLabelNewTab}`}
-                      title={`${work?.title?.rendered}${worksItems.ariaTitleNewTab}`}
-                      target="_blank"
-                      set:html={work?.acf?.left_link ?? ""}
-                    />
-                    <p class="worksCard__body" set:html={work?.acf?.right_access ?? "No additional information"} />
+                      <p class="worksCard__body" set:html={work?.acf?.right_access ?? "No additional information"} />
                     </article>
                   </li>
                 ))
@@ -367,10 +369,11 @@ const worksPagination = {
     margin-block-start: 3rem;
     margin-inline: auto;
     animation: skew-scroll 24s linear infinite;
+    will-change: transform, opacity;
   }
   @keyframes skew-scroll {
-    0% {
-      transform: rotateX(8deg) rotate(-8deg) skew(8deg) translateZ(0) translateY(110%);
+    from {
+      transform: rotateX(8deg) rotate(-8deg) skew(8deg) translateY(110%);
       opacity: 0;
     }
     24% {
@@ -379,8 +382,8 @@ const worksPagination = {
     48% {
       opacity: 0.3;
     }
-    100% {
-      transform: rotateX(8deg) rotate(-8deg) skew(8deg) translateZ(0) translateY(-430%);
+    to {
+      transform: rotateX(8deg) rotate(-8deg) skew(8deg) translateY(-430%);
       opacity: 0;
     }
   }
@@ -388,9 +391,7 @@ const worksPagination = {
     width: 100%;
     display: grid;
     color: rebeccapurple;
-    background-color: whitesmoke;
     background-color: transparent;
-    /* overflow: hidden; */
   }
   .scrollImage__header {
     align-self: flex-start;
@@ -402,7 +403,6 @@ const worksPagination = {
   .scrollImage__figure {
     display: flex;
     flex-shrink: 0;
-    /* background-color: transparent; */
     aspect-ratio: 2 / 1;
     overflow: hidden;
     margin-block-start: 1rem;
@@ -410,13 +410,11 @@ const worksPagination = {
   .scrollImage__image {
     width: 100%;
     height: 100%;
-    filter: sepia(10%);
     object-fit: contain;
     overflow: hidden;
     padding-inline: 0.25rem;
   }
   .scrollImage__link {
-    /* align-self: center; */
     font-size: 0.875rem;
     color: white;
     text-align: center;
@@ -553,11 +551,9 @@ const worksPagination = {
   }
   .worksCard__link:is(:hover, :focus-visible) {
     color: #020202;
-    /* background-color: rebeccapurple; */
     border-bottom: 1px solid white;
     box-shadow: 0 6px 10px rgba(0 0 0 / 0.6);
     border-radius: 0.5rem;
-    /* transform: scale(1.1); */
     margin-inline: 0.5rem;
   }
   @media (prefers-color-scheme: dark) {
