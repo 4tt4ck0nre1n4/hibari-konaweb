@@ -26,7 +26,7 @@ import pikucha from "../assets/svg/pikucha.svg";
 import sodenoura2 from "../assets/svg/sodenoura2.svg";
 import gauraStudio2 from "../assets/svg/gauraStudio2.svg";
 import pikucha2 from "../assets/svg/pikucha2.svg";
-import fvAnimeImageSrc from "../assets/design.png";
+import fvAnimeImageSrc from "../assets/fvAnimeImage.webp";
 import fvBackgroundImageSrc from "../assets/fvBackgroundImage.webp";
 import gridBackgroundImageSrc from "../assets/gridBackground.webp";
 import { getImage } from "astro:assets";
@@ -84,9 +84,9 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       </div>
       <div id="main-container" style={`background-image: url(${gridBackgroundImage.src})`}>
         <!-- デスクトップ用：ResponsiveFvは非表示 -->
-        <div class="responsive-fv-wrapper responsive-fv-wrapper--desktop">
+        <!-- <div class="responsive-fv-wrapper responsive-fv-wrapper--desktop">
           <ResponsiveFv />
-        </div>
+        </div> -->
         <aside class="toolbar">
           <Aside />
         </aside>
