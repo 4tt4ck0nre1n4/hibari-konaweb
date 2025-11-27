@@ -88,7 +88,7 @@ const offIcon = "fluent-emoji-flat:man-technologist-medium-light";
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: transparent;
+    background: var(--color-white);
     border: transparent 1px solid;
     border-radius: 1rem;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
@@ -99,14 +99,17 @@ const offIcon = "fluent-emoji-flat:man-technologist-medium-light";
     min-height: 60px;
     transition:
       transform 0.1s ease,
+      background 0.4s ease-in-out,
       box-shadow 0.4s ease;
   }
   #toggleLogoSvgButton:is(:hover, :focus-visible) {
+    background: transparent;
     box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
   }
   #toggleLogoSvgButton:active {
-    transform: scale(0.8);
+    background: transparent;
     box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+    transform: scale(0.8);
   }
   #toggleLogoSvgButton svg {
     width: 50px;

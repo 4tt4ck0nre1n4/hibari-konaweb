@@ -74,7 +74,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: transparent;
+    background-color: var(--color-white);
     border: transparent 1px solid;
     border-radius: 1rem;
     box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
@@ -84,14 +84,17 @@
     min-height: 60px;
     transition:
       transform 0.1s ease,
+      background 0.4s ease-in-out,
       box-shadow 0.4s ease;
   }
   #clockIcon:is(:hover, :focus-visible) {
+    background: transparent;
     box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
   }
   #clockIcon:active {
-    transform: scale(0.8);
+    background: transparent;
     box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+    transform: scale(0.8);
   }
   #clockIcon svg {
     width: 40px;
