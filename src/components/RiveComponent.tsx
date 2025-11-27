@@ -1,9 +1,12 @@
 // RiveComponent.tsx
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useRive } from "@rive-app/react-canvas";
+import { useRive, RuntimeLoader } from "@rive-app/react-canvas";
 import type { Layout as RiveLayoutType } from "@rive-app/react-canvas";
 
 const riveWasmUrl = "/wasm/rive.wasm";
+
+// WASMのURLを最初に設定（useRiveフックの前に実行される必要がある）
+RuntimeLoader.setWasmUrl(riveWasmUrl);
 
 interface RiveComponentProps {
   src: string;
@@ -178,14 +181,15 @@ export default function RiveComponent({
           <div className="rive-loading-spinner"></div>
         </div>
       )}
-      {!isLoading && (
+      {isLoaded && (
         <InnerRive
           className="rive-component"
           style={{
-            opacity: isLoaded ? 1 : 0,
+            opacity: isLoading ? 0 : 1,
             transition: "opacity 0.3s ease-in-out",
             width: "100%",
             height: "100%",
+            minHeight: `${minHeight}px`,
           }}
         />
       )}
