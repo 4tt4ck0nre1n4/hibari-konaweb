@@ -27,15 +27,15 @@ import sodenoura2 from "../assets/svg/sodenoura2.svg";
 import gauraStudio2 from "../assets/svg/gauraStudio2.svg";
 import pikucha2 from "../assets/svg/pikucha2.svg";
 import fvAnimeImageSrc from "../assets/design.png";
-import gridBackgroundImageSrc from "../assets/background.webp";
-import fvBackgroundImageSrc from "../assets/background3.png";
+import fvBackgroundImageSrc from "../assets/fvBackgroundImage.webp";
+import gridBackgroundImageSrc from "../assets/gridBackground.webp";
 import { getImage } from "astro:assets";
 import NaviCard from "../components/NaviCard.astro";
 import Glitch from "../components/Glitch.astro";
 
-const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 const fvAnimeImage = await getImage({ src: fvAnimeImageSrc });
 const fvBackgroundImage = await getImage({ src: fvBackgroundImageSrc });
+const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 ---
 
 <Layout
@@ -545,16 +545,19 @@ const fvBackgroundImage = await getImage({ src: fvBackgroundImageSrc });
     position: absolute;
     top: -60%;
     left: -10%;
-    width: 200%;
-    height: 300%;
+    top: 0;
+    left: 0;
+    left: 22%;
+    width: 300%;
+    height: 200%;
     /* アニメーションする背景画像（HTMLでインラインスタイルとして指定） */
-    background-size: 480px;
+    background-size: 320px;
     background-repeat: repeat;
     background-position: 50% 50%;
     /* 3D回転を適用（この要素だけ回転） */
-    transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg);
+    /* transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg); */
     transform-style: preserve-3d;
-    animation: background-scroll-3d 20s linear infinite;
+    animation: background-scroll-3d 24s linear infinite;
   }
 
   .background {
@@ -565,11 +568,13 @@ const fvBackgroundImage = await getImage({ src: fvBackgroundImageSrc });
   @keyframes background-scroll-3d {
     from {
       background-position: 0% 0%;
-      transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg) translateZ(-500px) scale(1.5);
+      /* transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg) translateZ(-500px) scale(1.5); */
+      transform: rotateX(8deg) rotate(-8deg) skew(8deg) translateZ(0) translateY(110%);
     }
     to {
       background-position: 100% 100%;
-      transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg) translateZ(500px) scale(1);
+      /* transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg) translateZ(500px) scale(1); */
+      transform: rotateX(8deg) rotate(-8deg) skew(8deg) translateZ(0) translateY(-430%);
     }
   }
   .glitch-container {

@@ -3,17 +3,10 @@
   "global": {
     "themeColor": "",
     "colorScheme": "light dark",
-    "keywords": "Web制作,ウェブサイト制作,ホームページ制作,千葉",
-    "referrer": "origin",
-    "generator": "Astro v5.2.5",
-    "applicationName": "hibari-konaweb.com My Portfolio Site",
+    "keywords": "Web制作,ホームページ制作,ポートフォリオ,千葉",
     "author": "hibari-konaweb.com",
-    "creator": "hibari-konaweb.com",
-    "publisher": "hibari-konaweb.com",
     "robots": "index follow",
-    "formatDetection": "telephone=no, address=no",
-    "mobileWebAppCapable": "yes",
-    "appleMobileWebAppTitle": "hibari-konaweb.com My Portfolio Site"
+    "formatDetection": "telephone=no, address=no"
   },
   "link": {
     "sitemap": "/sitemap-index.xml",
@@ -22,7 +15,7 @@
   },
   "og": {
     "local": "ja_JP",
-    "title": "hibari-konaweb.com My Portfolio Site",
+    "title": "My Portfolio Site",
     "description": "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
     "type": "website",
     "url": "https://hibari-konaweb.netlify.app",
@@ -31,7 +24,7 @@
   },
   "twitter": {
     "card": "summary_large_image",
-    "title": "hibari-konaweb.com My Portfolio Site",
+    "title": "My Portfolio Site",
     "description": "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
     "site": "https://hibari-konaweb.netlify.app",
     "image": ""
@@ -49,7 +42,7 @@
   },
   "works": {
     "title": "Works | My Portfolio Site",
-    "description": "私の実績を紹介しています。"
+    "description": "私の活動の履歴、実績、作品を紹介しています。"
   },
   "blog": {
     "title": "Blog | My Portfolio Site",
