@@ -117,6 +117,10 @@ export default defineConfig({
       // dynamicImport() // pagefindと競合するため削除
     ],
     cacheDir: ".vite-cache", // node_modules外にキャッシュを配置
+    optimizeDeps: {
+      include: ["react", "react-dom", "@rive-app/react-canvas"],
+      exclude: [],
+    },
     build: {
       emptyOutDir: false, // Windowsのファイルロック問題を回避
       commonjsOptions: {
