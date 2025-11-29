@@ -499,6 +499,11 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
   .fv {
     position: relative;
+    pointer-events: none; /* カードへのクリックを通過させる */
+  }
+
+  .fv > * {
+    pointer-events: auto; /* 子要素は通常通りクリック可能 */
   }
 
   .fv__wrapper {
@@ -513,6 +518,12 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     position: relative;
     margin-block: 0;
     margin-inline: auto;
+    pointer-events: none; /* カードへのクリックを通過させる */
+    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+  }
+
+  .fv__wrapper > * {
+    pointer-events: auto; /* 子要素は通常通りクリック可能 */
   }
 
   .fv__wrapper::after {
@@ -521,7 +532,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     top: 0;
     width: 100%;
     height: 100%;
-    z-index: 10;
+    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
     box-shadow: inset 10px 100px 200px rgba(0 0 0 / 0.6);
     pointer-events: none;
   }
@@ -529,9 +540,10 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     position: absolute;
     width: 100%;
     height: 100%;
-    z-index: 5;
+    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
     overflow: hidden;
     transform-style: preserve-3d;
+    pointer-events: none; /* カードへのクリックを通過させる */
     /* 円形マスクでクリッピング（こちらは正面向き） */
     -webkit-mask-image: radial-gradient(
       circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
@@ -543,21 +555,23 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
   .background-rotated {
     position: absolute;
-    top: -60%;
-    left: -10%;
+    /* top: -60%; */
+    /* left: -10%; */
     top: 0;
     left: 0;
-    left: 22%;
-    width: 300%;
-    height: 200%;
+    /* left: 22%; */
+    width: 400%;
+    height: 300%;
     /* アニメーションする背景画像（HTMLでインラインスタイルとして指定） */
-    background-size: 320px;
+    background-size: 480px;
     background-repeat: repeat;
     background-position: 50% 50%;
     /* 3D回転を適用（この要素だけ回転） */
     /* transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg); */
     transform-style: preserve-3d;
     animation: background-scroll-3d 24s linear infinite;
+    pointer-events: none; /* カードへのクリックを通過させる */
+    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
   }
 
   .background {
@@ -567,14 +581,12 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
   @keyframes background-scroll-3d {
     from {
-      background-position: 0% 0%;
-      /* transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg) translateZ(-500px) scale(1.5); */
-      transform: rotateX(8deg) rotate(-8deg) skew(8deg) translateZ(0) translateY(110%);
+      background-position: 0% 50%;
+      transform: translateX(0);
     }
     to {
-      background-position: 100% 100%;
-      /* transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg) translateZ(500px) scale(1); */
-      transform: rotateX(8deg) rotate(-8deg) skew(8deg) translateZ(0) translateY(-430%);
+      background-position: 100% 50%;
+      transform: translateX(0);
     }
   }
   .glitch-container {
@@ -594,8 +606,17 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     background-repeat: no-repeat; */
     margin-inline: auto;
     position: relative;
-    z-index: 6;
-    isolation: isolate;
+    z-index: 0;
+    pointer-events: none; /* カードのクリックを通過させる */
+  }
+
+  .glitch-container > * {
+    pointer-events: auto; /* 子要素は通常通りクリック可能 */
+  }
+
+  /* NaviCardコンポーネント以外のglitch-containerの子要素は、カードより後ろに配置 */
+  .glitch-container > *:not(.navi-card__wrapper) {
+    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
   }
   @keyframes noise {
     0% {
@@ -1583,14 +1604,50 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     const fvWrapper = document.querySelector<HTMLElement>(".fv__wrapper");
     if (!fvWrapper) return;
 
-    fvWrapper.addEventListener("mousemove", (e: MouseEvent) => {
+    // パフォーマンス向上のため、requestAnimationFrameを使用
+    let rafId: number | null = null;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    const updateMaskPosition = () => {
       const rect = fvWrapper.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const x = mouseX - rect.left;
+      const y = mouseY - rect.top;
 
       // CSS変数を使ってマスクの位置を更新
       backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
       backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+      rafId = null;
+    };
+
+    // window全体でマウス移動を監視（画面全体を追従）
+    window.addEventListener(
+      "mousemove",
+      (e: MouseEvent) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        // requestAnimationFrameで更新を最適化
+        if (rafId === null) {
+          rafId = requestAnimationFrame(updateMaskPosition);
+        }
+      },
+      { passive: true }
+    );
+
+    // マウスが画面外に出た場合も追従（画面端でも反応するように）
+    window.addEventListener("mouseleave", () => {
+      // マウスが画面外に出た場合は最後の位置を保持
     });
+
+    // 初期位置を設定（画面中央）
+    const initialX = window.innerWidth / 2;
+    const initialY = window.innerHeight / 2;
+    const rect = fvWrapper.getBoundingClientRect();
+    const x = initialX - rect.left;
+    const y = initialY - rect.top;
+    backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
+    backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
   }
 </script>

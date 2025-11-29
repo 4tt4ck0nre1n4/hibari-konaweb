@@ -170,152 +170,168 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           glitchContainer.style.backgroundRepeat = "no-repeat";
         }
 
-        // 5. 3秒後（フェードアウト完了後）に3秒待機してから背景を黒にフェード、その後ループ
+        // 5. 3秒後（フェードアウト完了後）に背景をtransparentにフェード
         setTimeout(() => {
-          if (DEBUG) console.log("Waiting 3 seconds before fading to black...");
+          if (DEBUG) console.log("Fading background to transparent...");
+          const glitchContainer = document.querySelector(".glitch") as HTMLElement;
+          if (glitchContainer) {
+            // 背景画像とサイズを保持したまま背景色のみをtransparentに変更
+            const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
+            glitchContainer.style.transition = "background-color 3s ease-out";
+            glitchContainer.style.backgroundColor = "transparent";
+            glitchContainer.style.backgroundImage = bgImage;
+            glitchContainer.style.backgroundSize = "cover";
+            glitchContainer.style.backgroundPosition = "center";
+            glitchContainer.style.backgroundRepeat = "no-repeat";
+          }
 
-          // 3秒待機
+          // 6. 3秒後（transparentフェード完了後）に6秒待機してから背景を黒にフェード
           setTimeout(() => {
-            if (DEBUG) console.log("Fading background to black...");
-            const glitchContainer = document.querySelector(".glitch") as HTMLElement;
-            if (glitchContainer) {
-              // 背景画像とサイズを保持したまま背景色のみを変更
-              const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
-              glitchContainer.style.transition = "background-color 3s ease-out";
-              glitchContainer.style.backgroundColor = "#000000";
-              glitchContainer.style.backgroundImage = bgImage;
-              glitchContainer.style.backgroundSize = "cover";
-              glitchContainer.style.backgroundPosition = "center";
-              glitchContainer.style.backgroundRepeat = "no-repeat";
-            }
+            if (DEBUG) console.log("Waiting 6 seconds with transparent background...");
 
-            // 背景が黒にフェード完了後、アニメーションをリセットしてループ
+            // 6秒待機
             setTimeout(() => {
-              if (DEBUG) console.log("Resetting and looping animation...");
-
-              // 動的に追加されたスタイルタグを確実に削除
-              const stopStyleElement = document.getElementById("glitch-before-stop");
-              if (stopStyleElement) {
-                stopStyleElement.remove();
-                if (DEBUG) console.log("Removed stop style element");
-              }
-
-              // 親コンテナから背景画像を取得し、背景色もリセット
-              const containerBgImage = window.getComputedStyle(glitchContainer).backgroundImage;
-              if (DEBUG) console.log("Container background image:", containerBgImage);
-
-              // .glitchコンテナの背景色を黒に戻す（背景画像とサイズを保持）
+              if (DEBUG) console.log("Fading background to black...");
+              const glitchContainer = document.querySelector(".glitch") as HTMLElement;
               if (glitchContainer) {
-                // 画面サイズに応じて高さを設定
-                const isSmartphone = window.innerWidth <= 480;
-                const containerHeight = isSmartphone ? "560px" : "100vh";
-
-                glitchContainer.style.transition = "";
+                // 背景画像とサイズを保持したまま背景色のみを変更
+                const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
+                glitchContainer.style.transition = "background-color 3s ease-out";
                 glitchContainer.style.backgroundColor = "#000000";
-                glitchContainer.style.backgroundImage = containerBgImage;
+                glitchContainer.style.backgroundImage = bgImage;
                 glitchContainer.style.backgroundSize = "cover";
                 glitchContainer.style.backgroundPosition = "center";
                 glitchContainer.style.backgroundRepeat = "no-repeat";
-                glitchContainer.style.height = containerHeight;
               }
 
-              // 要素を完全に初期状態にリセット
-              // glitchLayer
-              if (glitchLayer) {
-                glitchLayer.removeAttribute("style");
-                glitchLayer.style.backgroundImage = containerBgImage;
-              }
-
-              // R, G, B, F要素のリセット（初期状態に確実に戻す）
-              if (glitchR) {
-                glitchR.style.backgroundImage = containerBgImage;
-                glitchR.style.backgroundSize = "cover";
-                glitchR.style.backgroundPosition = "center";
-                glitchR.style.backgroundRepeat = "no-repeat";
-                glitchR.style.position = "absolute";
-                glitchR.style.top = "0";
-                glitchR.style.right = "0";
-                glitchR.style.bottom = "0";
-                glitchR.style.left = "0";
-                glitchR.style.mixBlendMode = "screen";
-                glitchR.style.removeProperty("opacity");
-                glitchR.style.removeProperty("transition");
-                glitchR.style.removeProperty("transform");
-                glitchR.style.animation = "none";
-              }
-              if (glitchG) {
-                glitchG.style.backgroundImage = containerBgImage;
-                glitchG.style.backgroundSize = "cover";
-                glitchG.style.backgroundPosition = "center";
-                glitchG.style.backgroundRepeat = "no-repeat";
-                glitchG.style.position = "absolute";
-                glitchG.style.top = "0";
-                glitchG.style.right = "0";
-                glitchG.style.bottom = "0";
-                glitchG.style.left = "0";
-                glitchG.style.mixBlendMode = "screen";
-                glitchG.style.removeProperty("opacity");
-                glitchG.style.removeProperty("transition");
-                glitchG.style.removeProperty("transform");
-                glitchG.style.animation = "none";
-              }
-              if (glitchB) {
-                glitchB.style.backgroundImage = containerBgImage;
-                glitchB.style.backgroundSize = "cover";
-                glitchB.style.backgroundPosition = "center";
-                glitchB.style.backgroundRepeat = "no-repeat";
-                glitchB.style.position = "absolute";
-                glitchB.style.top = "0";
-                glitchB.style.right = "0";
-                glitchB.style.bottom = "0";
-                glitchB.style.left = "0";
-                glitchB.style.mixBlendMode = "screen";
-                glitchB.style.removeProperty("opacity");
-                glitchB.style.removeProperty("transition");
-                glitchB.style.removeProperty("transform");
-                glitchB.style.animation = "none";
-              }
-              if (glitchF) {
-                glitchF.style.backgroundImage = containerBgImage;
-                glitchF.style.backgroundSize = "cover";
-                glitchF.style.backgroundPosition = "center";
-                glitchF.style.backgroundRepeat = "no-repeat";
-                glitchF.style.position = "absolute";
-                glitchF.style.top = "0";
-                glitchF.style.right = "0";
-                glitchF.style.bottom = "0";
-                glitchF.style.left = "0";
-                glitchF.style.mixBlendMode = "screen";
-                glitchF.style.removeProperty("opacity");
-                glitchF.style.removeProperty("transition");
-                glitchF.style.removeProperty("transform");
-                glitchF.style.animation = "none";
-              }
-
-              // デバッグ情報：要素の状態を確認
-              if (DEBUG) {
-                console.log("Reset complete. Elements should be visible now.");
-                console.log("glitchF opacity:", window.getComputedStyle(glitchF).opacity);
-                console.log("glitchF display:", window.getComputedStyle(glitchF).display);
-                console.log("glitchF mix-blend-mode:", window.getComputedStyle(glitchF).mixBlendMode);
-                console.log(
-                  "glitchF backgroundImage:",
-                  window.getComputedStyle(glitchF).backgroundImage.substring(0, 50) + "..."
-                );
-                console.log("glitchF backgroundSize:", window.getComputedStyle(glitchF).backgroundSize);
-                console.log("glitchF position:", window.getComputedStyle(glitchF).position);
-                console.log(
-                  "glitchContainer backgroundColor:",
-                  window.getComputedStyle(glitchContainer).backgroundColor
-                );
-              }
-
-              // 少し待機してからアニメーションを再開
+              // 背景が黒にフェード完了後、アニメーションをリセットしてループ
               setTimeout(() => {
-                startGlitchSequence();
-              }, 100);
-            }, 3000); // 黒へのフェード完了まで3秒
-          }, 3000); // 3秒待機
+                if (DEBUG) console.log("Resetting and looping animation...");
+
+                // 動的に追加されたスタイルタグを確実に削除
+                const stopStyleElement = document.getElementById("glitch-before-stop");
+                if (stopStyleElement) {
+                  stopStyleElement.remove();
+                  if (DEBUG) console.log("Removed stop style element");
+                }
+
+                // 親コンテナから背景画像を取得し、背景色もリセット
+                const containerBgImage = window.getComputedStyle(glitchContainer).backgroundImage;
+                if (DEBUG) console.log("Container background image:", containerBgImage);
+
+                // .glitchコンテナの背景色を黒に戻す（背景画像とサイズを保持）
+                if (glitchContainer) {
+                  // 画面サイズに応じて高さを設定
+                  const isSmartphone = window.innerWidth <= 480;
+                  const containerHeight = isSmartphone ? "560px" : "100vh";
+
+                  glitchContainer.style.transition = "";
+                  glitchContainer.style.backgroundColor = "#000000";
+                  glitchContainer.style.backgroundImage = containerBgImage;
+                  glitchContainer.style.backgroundSize = "cover";
+                  glitchContainer.style.backgroundPosition = "center";
+                  glitchContainer.style.backgroundRepeat = "no-repeat";
+                  glitchContainer.style.height = containerHeight;
+                }
+
+                // 要素を完全に初期状態にリセット
+                // glitchLayer
+                if (glitchLayer) {
+                  glitchLayer.removeAttribute("style");
+                  glitchLayer.style.backgroundImage = containerBgImage;
+                }
+
+                // R, G, B, F要素のリセット（初期状態に確実に戻す）
+                if (glitchR) {
+                  glitchR.style.backgroundImage = containerBgImage;
+                  glitchR.style.backgroundSize = "cover";
+                  glitchR.style.backgroundPosition = "center";
+                  glitchR.style.backgroundRepeat = "no-repeat";
+                  glitchR.style.position = "absolute";
+                  glitchR.style.top = "0";
+                  glitchR.style.right = "0";
+                  glitchR.style.bottom = "0";
+                  glitchR.style.left = "0";
+                  glitchR.style.mixBlendMode = "screen";
+                  glitchR.style.removeProperty("opacity");
+                  glitchR.style.removeProperty("transition");
+                  glitchR.style.removeProperty("transform");
+                  glitchR.style.animation = "none";
+                }
+                if (glitchG) {
+                  glitchG.style.backgroundImage = containerBgImage;
+                  glitchG.style.backgroundSize = "cover";
+                  glitchG.style.backgroundPosition = "center";
+                  glitchG.style.backgroundRepeat = "no-repeat";
+                  glitchG.style.position = "absolute";
+                  glitchG.style.top = "0";
+                  glitchG.style.right = "0";
+                  glitchG.style.bottom = "0";
+                  glitchG.style.left = "0";
+                  glitchG.style.mixBlendMode = "screen";
+                  glitchG.style.removeProperty("opacity");
+                  glitchG.style.removeProperty("transition");
+                  glitchG.style.removeProperty("transform");
+                  glitchG.style.animation = "none";
+                }
+                if (glitchB) {
+                  glitchB.style.backgroundImage = containerBgImage;
+                  glitchB.style.backgroundSize = "cover";
+                  glitchB.style.backgroundPosition = "center";
+                  glitchB.style.backgroundRepeat = "no-repeat";
+                  glitchB.style.position = "absolute";
+                  glitchB.style.top = "0";
+                  glitchB.style.right = "0";
+                  glitchB.style.bottom = "0";
+                  glitchB.style.left = "0";
+                  glitchB.style.mixBlendMode = "screen";
+                  glitchB.style.removeProperty("opacity");
+                  glitchB.style.removeProperty("transition");
+                  glitchB.style.removeProperty("transform");
+                  glitchB.style.animation = "none";
+                }
+                if (glitchF) {
+                  glitchF.style.backgroundImage = containerBgImage;
+                  glitchF.style.backgroundSize = "cover";
+                  glitchF.style.backgroundPosition = "center";
+                  glitchF.style.backgroundRepeat = "no-repeat";
+                  glitchF.style.position = "absolute";
+                  glitchF.style.top = "0";
+                  glitchF.style.right = "0";
+                  glitchF.style.bottom = "0";
+                  glitchF.style.left = "0";
+                  glitchF.style.mixBlendMode = "screen";
+                  glitchF.style.removeProperty("opacity");
+                  glitchF.style.removeProperty("transition");
+                  glitchF.style.removeProperty("transform");
+                  glitchF.style.animation = "none";
+                }
+
+                // デバッグ情報：要素の状態を確認
+                if (DEBUG) {
+                  console.log("Reset complete. Elements should be visible now.");
+                  console.log("glitchF opacity:", window.getComputedStyle(glitchF).opacity);
+                  console.log("glitchF display:", window.getComputedStyle(glitchF).display);
+                  console.log("glitchF mix-blend-mode:", window.getComputedStyle(glitchF).mixBlendMode);
+                  console.log(
+                    "glitchF backgroundImage:",
+                    window.getComputedStyle(glitchF).backgroundImage.substring(0, 50) + "..."
+                  );
+                  console.log("glitchF backgroundSize:", window.getComputedStyle(glitchF).backgroundSize);
+                  console.log("glitchF position:", window.getComputedStyle(glitchF).position);
+                  console.log(
+                    "glitchContainer backgroundColor:",
+                    window.getComputedStyle(glitchContainer).backgroundColor
+                  );
+                }
+
+                // 少し待機してからアニメーションを再開
+                setTimeout(() => {
+                  startGlitchSequence();
+                }, 100);
+              }, 3000); // 黒へのフェード完了まで3秒
+            }, 6000); // 6秒待機
+          }, 3000); // transparentフェード完了まで3秒
         }, 3000); // フェードアウト完了まで3秒
       }, 24000); // 16秒 + 8秒 = 24秒後
     };
@@ -346,6 +362,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     position: relative;
     overflow: hidden;
     margin-inline: auto;
+    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
   }
 
   @media screen and (max-width: 480px) {
@@ -366,6 +383,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     mix-blend-mode: screen;
     /* アニメーションはJavaScriptで動的に制御 */
     animation: none;
+    z-index: 0; /* カードより後ろに配置（カードは100001） */
   }
 
   @keyframes shake {
@@ -399,6 +417,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     bottom: 0;
     left: 0;
     mix-blend-mode: color-dodge;
+    z-index: -1; /* カードより後ろに配置（カードは100001） */
   }
   .r::before {
     background: #ff0000;
@@ -436,6 +455,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     transform: translateX(-5%);
     /* アニメーションはJavaScriptで動的に制御 */
     animation: none;
+    z-index: 0; /* カードより後ろに配置（カードは100001） */
   }
 
   @keyframes noise {
