@@ -29,6 +29,8 @@ const SnsLink = ({
     snsIconSvg.trim() !== "" &&
     (snsIconSvg.endsWith(".svg") || snsIconSvg.startsWith("/") || snsIconSvg.startsWith("."));
 
+  const hasIconName = snsIconName != null && snsIconName.trim() !== "";
+
   return (
     <li className={itemClassName}>
       <a
@@ -40,20 +42,32 @@ const SnsLink = ({
         title={ariaTitle}
       >
         {isSvgAsset ? (
-          <img
-            src={snsIconSvg}
-            width={snsIconWidth}
-            height={snsIconHeight}
-            alt={snsIconName ?? ""}
-            loading="lazy"
-            decoding="async"
-            aria-hidden={snsIconName == null}
-            data-sns-icon={snsIconSvg}
-          />
+          hasIconName ? (
+            <img
+              src={snsIconSvg}
+              width={snsIconWidth}
+              height={snsIconHeight}
+              alt={snsIconName ?? ""}
+              loading="lazy"
+              decoding="async"
+              data-sns-icon={snsIconSvg}
+            />
+          ) : (
+            <img
+              src={snsIconSvg}
+              width={snsIconWidth}
+              height={snsIconHeight}
+              alt={snsIconName ?? ""}
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
+              data-sns-icon={snsIconSvg}
+            />
+          )
         ) : (
           <Icon icon={snsIconSvg ?? ""} width={snsIconWidth} height={snsIconHeight} />
         )}
-        {snsIconName && <span className="sns-icon__name">{snsIconName}</span>}
+        {hasIconName ? <span className="sns-icon__name">{snsIconName}</span> : null}
       </a>
     </li>
   );

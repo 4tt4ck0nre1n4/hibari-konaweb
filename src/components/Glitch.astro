@@ -64,6 +64,52 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     const startGlitchSequence = () => {
       if (DEBUG) console.log("Starting glitch sequence...");
 
+      // スマホサイズの判定
+      const isSmartphone = window.innerWidth <= 480;
+      const backgroundSize = isSmartphone ? "contain" : "cover";
+
+      // 親要素から背景画像を取得して、.glitch-image要素に設定
+      const glitchContainer = document.querySelector(".glitch") as HTMLElement;
+      const containerBgImage = glitchContainer ? window.getComputedStyle(glitchContainer).backgroundImage : "";
+
+      // .glitch-image要素に背景画像とサイズを設定（スマホサイズではcontain、パソコンサイズではcover）
+      // !importantを使用してCSSのinheritを上書き
+      if (glitchR && containerBgImage) {
+        glitchR.style.backgroundImage = containerBgImage;
+        glitchR.style.setProperty("background-size", backgroundSize, "important");
+        glitchR.style.backgroundPosition = "center";
+        glitchR.style.backgroundRepeat = "no-repeat";
+      }
+      if (glitchG && containerBgImage) {
+        glitchG.style.backgroundImage = containerBgImage;
+        glitchG.style.setProperty("background-size", backgroundSize, "important");
+        glitchG.style.backgroundPosition = "center";
+        glitchG.style.backgroundRepeat = "no-repeat";
+      }
+      if (glitchB && containerBgImage) {
+        glitchB.style.backgroundImage = containerBgImage;
+        glitchB.style.setProperty("background-size", backgroundSize, "important");
+        glitchB.style.backgroundPosition = "center";
+        glitchB.style.backgroundRepeat = "no-repeat";
+      }
+      if (glitchF && containerBgImage) {
+        glitchF.style.backgroundImage = containerBgImage;
+        glitchF.style.setProperty("background-size", backgroundSize, "important");
+        glitchF.style.backgroundPosition = "center";
+        glitchF.style.backgroundRepeat = "no-repeat";
+      }
+
+      // glitchLayerにも背景画像を設定（スマホサイズの場合のみbackgroundSizeを設定）
+      const glitchLayer = document.querySelector(".glitch-layer") as HTMLElement;
+      if (glitchLayer && containerBgImage) {
+        glitchLayer.style.backgroundImage = containerBgImage;
+        if (isSmartphone) {
+          glitchLayer.style.backgroundSize = "contain";
+          glitchLayer.style.backgroundPosition = "center";
+          glitchLayer.style.backgroundRepeat = "no-repeat";
+        }
+      }
+
       // 1. glitchAnimeアニメーションを8秒間実行
       if (glitchR) glitchR.style.animation = "glitchAnime-1 1.2s linear infinite alternate";
       if (glitchG) glitchG.style.animation = "glitchAnime-2 1.4s linear infinite alternate";
@@ -71,7 +117,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
       if (glitchF) glitchF.style.animation = "glitchAnime-4 1.8s linear infinite alternate";
 
       // ② glitchAnime-5を.glitch-layerに適用
-      const glitchLayer = document.querySelector(".glitch-layer") as HTMLElement;
+      // glitchLayerは上で既に取得済み
       if (glitchLayer) {
         glitchLayer.style.animation = "glitchAnime-5 2s linear infinite alternate";
       }
@@ -165,7 +211,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           glitchContainer.style.transition = "background-color 3s ease-out";
           glitchContainer.style.backgroundColor = "#ffffff";
           glitchContainer.style.backgroundImage = bgImage;
-          glitchContainer.style.backgroundSize = "cover";
+          glitchContainer.style.backgroundSize = backgroundSize;
           glitchContainer.style.backgroundPosition = "center";
           glitchContainer.style.backgroundRepeat = "no-repeat";
         }
@@ -180,7 +226,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
             glitchContainer.style.transition = "background-color 3s ease-out";
             glitchContainer.style.backgroundColor = "transparent";
             glitchContainer.style.backgroundImage = bgImage;
-            glitchContainer.style.backgroundSize = "cover";
+            glitchContainer.style.backgroundSize = backgroundSize;
             glitchContainer.style.backgroundPosition = "center";
             glitchContainer.style.backgroundRepeat = "no-repeat";
           }
@@ -199,7 +245,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 glitchContainer.style.transition = "background-color 3s ease-out";
                 glitchContainer.style.backgroundColor = "#000000";
                 glitchContainer.style.backgroundImage = bgImage;
-                glitchContainer.style.backgroundSize = "cover";
+                glitchContainer.style.backgroundSize = backgroundSize;
                 glitchContainer.style.backgroundPosition = "center";
                 glitchContainer.style.backgroundRepeat = "no-repeat";
               }
@@ -219,16 +265,19 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 const containerBgImage = window.getComputedStyle(glitchContainer).backgroundImage;
                 if (DEBUG) console.log("Container background image:", containerBgImage);
 
+                // リセット時点で画面サイズを再判定
+                const resetIsSmartphone = window.innerWidth <= 480;
+                const resetBackgroundSize = resetIsSmartphone ? "contain" : "cover";
+
                 // .glitchコンテナの背景色を黒に戻す（背景画像とサイズを保持）
                 if (glitchContainer) {
                   // 画面サイズに応じて高さを設定
-                  const isSmartphone = window.innerWidth <= 480;
-                  const containerHeight = isSmartphone ? "560px" : "100vh";
+                  const containerHeight = resetIsSmartphone ? "560px" : "100vh";
 
                   glitchContainer.style.transition = "";
                   glitchContainer.style.backgroundColor = "#000000";
                   glitchContainer.style.backgroundImage = containerBgImage;
-                  glitchContainer.style.backgroundSize = "cover";
+                  glitchContainer.style.backgroundSize = resetBackgroundSize;
                   glitchContainer.style.backgroundPosition = "center";
                   glitchContainer.style.backgroundRepeat = "no-repeat";
                   glitchContainer.style.height = containerHeight;
@@ -239,12 +288,19 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 if (glitchLayer) {
                   glitchLayer.removeAttribute("style");
                   glitchLayer.style.backgroundImage = containerBgImage;
+                  // スマホサイズの場合のみbackgroundSizeを設定（パソコンサイズではCSSのデフォルトに任せる）
+                  if (resetIsSmartphone) {
+                    glitchLayer.style.backgroundSize = "contain";
+                    // backgroundPositionはCSSのデフォルト（0 0）を維持
+                    glitchLayer.style.backgroundRepeat = "no-repeat";
+                  }
                 }
 
                 // R, G, B, F要素のリセット（初期状態に確実に戻す）
+
                 if (glitchR) {
                   glitchR.style.backgroundImage = containerBgImage;
-                  glitchR.style.backgroundSize = "cover";
+                  glitchR.style.setProperty("background-size", resetBackgroundSize, "important");
                   glitchR.style.backgroundPosition = "center";
                   glitchR.style.backgroundRepeat = "no-repeat";
                   glitchR.style.position = "absolute";
@@ -260,7 +316,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 }
                 if (glitchG) {
                   glitchG.style.backgroundImage = containerBgImage;
-                  glitchG.style.backgroundSize = "cover";
+                  glitchG.style.setProperty("background-size", resetBackgroundSize, "important");
                   glitchG.style.backgroundPosition = "center";
                   glitchG.style.backgroundRepeat = "no-repeat";
                   glitchG.style.position = "absolute";
@@ -276,7 +332,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 }
                 if (glitchB) {
                   glitchB.style.backgroundImage = containerBgImage;
-                  glitchB.style.backgroundSize = "cover";
+                  glitchB.style.setProperty("background-size", resetBackgroundSize, "important");
                   glitchB.style.backgroundPosition = "center";
                   glitchB.style.backgroundRepeat = "no-repeat";
                   glitchB.style.position = "absolute";
@@ -292,7 +348,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 }
                 if (glitchF) {
                   glitchF.style.backgroundImage = containerBgImage;
-                  glitchF.style.backgroundSize = "cover";
+                  glitchF.style.setProperty("background-size", resetBackgroundSize, "important");
                   glitchF.style.backgroundPosition = "center";
                   glitchF.style.backgroundRepeat = "no-repeat";
                   glitchF.style.position = "absolute";
@@ -369,7 +425,8 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     .glitch {
       max-width: 480px;
       height: 560px;
-      /* background-size: contain; */
+      height: 240px;
+      background-size: contain;
     }
   }
   .glitch-image {
@@ -386,6 +443,11 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     z-index: 0; /* カードより後ろに配置（カードは100001） */
   }
 
+  @media screen and (max-width: 480px) {
+    .glitch-image {
+      background-size: contain;
+    }
+  }
   @keyframes shake {
     0% {
       transform: translate3d(0, 0, 0);
@@ -395,11 +457,9 @@ const glitchImage = await getImage({ src: glitchImageSrc });
       opacity: 0.8;
     }
     50% {
-      /* transform: translate(16px, 0); */
       opacity: 0.5;
     }
     75% {
-      /* transform: translate(-2px, 0); */
       opacity: 0.25;
     }
     100% {
@@ -417,7 +477,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     bottom: 0;
     left: 0;
     mix-blend-mode: color-dodge;
-    z-index: -1; /* カードより後ろに配置（カードは100001） */
+    z-index: -1;
   }
   .r::before {
     background: #ff0000;
@@ -437,7 +497,6 @@ const glitchImage = await getImage({ src: glitchImageSrc });
 
   .f::before {
     background: rgba(29, 31, 32, 0.1);
-    /* background: rgba(255, 255, 255, 0.1); */
     background-blend-mode: overlay;
     animation: glitchAnime-4 1.8s infinite linear;
   }
@@ -498,43 +557,9 @@ const glitchImage = await getImage({ src: glitchImageSrc });
       opacity: 0.1;
     }
   }
-
-  /* @keyframes bodyLight {
-    10% {
-      filter: invert(0%);
-    }
-    20% {
-      filter: invert(0%);
-    }
-    30% {
-      filter: invert(14%);
-    }
-    40% {
-      filter: invert(10%);
-    }
-    50% {
-      filter: invert(7%);
-    }
-    60% {
-      filter: invert(10%);
-    }
-    70% {
-      filter: invert(12%);
-    }
-    80% {
-      filter: invert(9%);
-    }
-    90% {
-      filter: invert(14%);
-    }
-    100% {
-      filter: invert(11%);
-    }
-  } */
   @keyframes glitchAnime-1 {
     0% {
       clip-path: polygon(0 0, 100% 16%, 100% 24%, 0 40%);
-      /* opacity: 1; */
       transform: translate(16px, 0);
     }
     2% {
@@ -577,14 +602,12 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
 
     21.9% {
-      /* opacity: 1; */
       transform: translate(16px, 0);
     }
 
     22%,
     to {
       clip-path: polygon(0 0, 0 0, 0 0, 0 0);
-      /* opacity: 0; */
       transform: translate(0, 0);
     }
   }
@@ -592,7 +615,6 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   @keyframes glitchAnime-2 {
     0% {
       clip-path: polygon(0 24%, 100% 24%, 100% 32%, 0 32%);
-      /* opacity: 1; */
       transform: translate(8px, 0);
     }
 
@@ -637,14 +659,12 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
 
     21.9% {
-      /* opacity: 1; */
       transform: translate(8px, 0);
     }
 
     22%,
     to {
       clip-path: polygon(0 0, 0 0, 0 0, 0 0);
-      /* opacity: 0; */
       transform: translate(0, 0);
     }
   }
@@ -652,7 +672,6 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   @keyframes glitchAnime-3 {
     0% {
       clip-path: polygon(0 1%, 100% 1%, 100% 4%, 0 1%);
-      /* opacity: 1; */
       transform: translate(8px, 0);
     }
 
@@ -729,14 +748,12 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
 
     21.9% {
-      /* opacity: 1; */
       transform: translate(8px, 0);
     }
 
     22%,
     to {
       clip-path: polygon(0 0, 0 0, 0 0, 0 0);
-      /* opacity: 0; */
       transform: translate(0, 0);
     }
   }

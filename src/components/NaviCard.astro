@@ -17,53 +17,48 @@ const menuItems: MenuItem[] = [
 
 <div class="navi-card__wrapper">
   <button
-    class="navi-card__button"
+    class="navi-card__button is-open"
     type="button"
-    aria-label="メニューを開く"
-    aria-expanded="false"
-    aria-controls="navi-card"
+    aria-label="メニューを閉じる"
+    aria-expanded="true"
+    aria-controls="navi-card__menu"
   >
     <span class="navi-card__button_text">Navigation Menu</span>
   </button>
-  <ul id="navi-card" class="navi-card__menu" aria-hidden="true">
-    {
-      menuItems.map((item, index) => (
-        <li class="navi-card__menu_item" data-index={index}>
-          <a class="navi-card__menu_link" href={item.href} aria-label={item.ariaLabel} title={item.ariaTitle}>
-            <span class="navi-card__menu_text">{item.menuItem}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
+  <div class="navi-card__overlay">
+    <ul id="navi-card__menu" class="navi-card__menu is-open" aria-hidden="false">
+      {
+        menuItems.map((item, index) => (
+          <li class="navi-card__menu_item is-open" data-index={index}>
+            <a class="navi-card__menu_link" href={item.href} aria-label={item.ariaLabel} title={item.ariaTitle}>
+              <span class="navi-card__menu_text" data-index={index}>
+                {item.menuItem}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </div>
 
 <script>
   function initNaviCard() {
-    console.log("=== NaviCard initialization started ===");
     const button = document.querySelector(".navi-card__button") as HTMLButtonElement;
     const menu = document.querySelector(".navi-card__menu") as HTMLUListElement;
     const menuItems = document.querySelectorAll(".navi-card__menu_item") as NodeListOf<HTMLLIElement>;
     const glitchContainer = document.querySelector(".glitch-container") as HTMLElement;
-
-    console.log("Elements found:", {
-      button: !!button,
-      menu: !!menu,
-      menuItemsCount: menuItems.length,
-      glitchContainer: !!glitchContainer,
-    });
 
     if (!button || !menu || !menuItems.length) {
       console.error("NaviCard: Required elements not found!");
       return;
     }
 
-    console.log("NaviCard: All elements found, setting up listeners...");
-    let isOpen = false;
+    // 初期状態は開いている（カードが表示されている）
+    let isOpen = true;
 
     button.addEventListener("click", () => {
       isOpen = !isOpen;
-      console.log(`Button clicked! isOpen: ${isOpen}`);
 
       // ARIA属性の更新
       button.setAttribute("aria-expanded", String(isOpen));
@@ -73,7 +68,6 @@ const menuItems: MenuItem[] = [
       // クラスの切り替え
       button.classList.toggle("is-open", isOpen);
       menu.classList.toggle("is-open", isOpen);
-      console.log(`Menu classes:`, menu.classList.toString());
 
       // main要素内のglitch-container以外の要素のpointer-eventsを制御
       // ただし、カード要素とボタン要素は除外
@@ -87,14 +81,12 @@ const menuItems: MenuItem[] = [
             child.style.pointerEvents = "none";
           }
         });
-        console.log(`Main children pointer-events set to: none`);
       } else if (main && !isOpen) {
         // メニューが閉じている時は、すべての要素のpointer-eventsをリセット
         const mainChildren = Array.from(main.children) as HTMLElement[];
         mainChildren.forEach((child) => {
           child.style.pointerEvents = "";
         });
-        console.log(`Main children pointer-events reset`);
       }
 
       // glitch-containerとその子要素のpointer-eventsとz-indexを制御
@@ -127,204 +119,97 @@ const menuItems: MenuItem[] = [
             }
           }
         });
-        console.log(`Glitch children pointer-events set to: ${isOpen ? "none" : "auto"}`);
       }
 
       // 各アイテムのアニメーション
       if (isOpen) {
-        // 1枚ずつ時間差で表示
+        // 1枚ずつ時間差で表示（よりゆっくり、ふわっと）
         menuItems.forEach((item, index) => {
-          console.log(`Scheduling Card ${index} to add is-open in ${index * 400}ms`);
           setTimeout(() => {
-            console.log(`Adding is-open to Card ${index}...`);
             item.classList.add("is-open");
-
             // CSSのtransitionを待たずに、JavaScriptで直接opacityを強制設定
             (item as HTMLElement).style.setProperty("opacity", "1", "important");
-
-            console.log(`Card ${index} is-open added. Classes:`, item.classList.toString());
-
-            // 少し待ってから状態を確認（transitionが適用されるまで）
-            setTimeout(() => {
-              const hasIsOpen = item.classList.contains("is-open");
-              const computedStyle = window.getComputedStyle(item);
-              const rect = item.getBoundingClientRect();
-              console.log(`Card ${index} after add:`, {
-                hasIsOpen,
-                opacity: computedStyle.opacity,
-                pointerEvents: computedStyle.pointerEvents,
-                zIndex: computedStyle.zIndex,
-                marginLeft: computedStyle.marginLeft,
-                marginTop: computedStyle.marginTop,
-                left: computedStyle.left,
-                top: computedStyle.top,
-                transform: computedStyle.transform,
-                position: { x: Math.round(rect.x), y: Math.round(rect.y), width: rect.width, height: rect.height },
-              });
-
-              // カードの中央座標でelementFromPointをチェック
-              const centerX = rect.x + rect.width / 2;
-              const centerY = rect.y + rect.height / 2;
-              const elementAtCenter = document.elementFromPoint(centerX, centerY);
-              console.log(`Card ${index} center (${Math.round(centerX)}, ${Math.round(centerY)}):`, {
-                topElement: elementAtCenter?.className || elementAtCenter?.tagName,
-                isCard: elementAtCenter === item,
-                isInsideCard: item.contains(elementAtCenter),
-              });
-            }, 100);
-          }, index * 400);
+          }, index * 600);
         });
       } else {
+        // 閉じる時もゆっくり消えるように
         menuItems.forEach((item, index) => {
+          const delay = (menuItems.length - index - 1) * 0.2; // 0.08s → 0.2s に延長
+          item.style.transitionDelay = `${delay}s`;
           item.classList.remove("is-open");
-          item.style.transitionDelay = `${(menuItems.length - index - 1) * 0.08}s`;
+          // transition完了後にopacityを0に設定（念のため）
+          setTimeout(
+            () => {
+              (item as HTMLElement).style.setProperty("opacity", "0", "important");
+              item.style.transitionDelay = "";
+            },
+            (delay + 1.5) * 1000
+          ); // transition時間(1.5s) + delay 後にリセット
         });
       }
     });
-
-    // カード全体をクリック可能にする
-    menuItems.forEach((item, index) => {
-      const link = item.querySelector(".navi-card__menu_link") as HTMLAnchorElement;
-      if (link) {
-        console.log(`Setting up click listener for card ${index}, href: ${link.getAttribute("href")}`);
-
-        // マウスオーバーテスト
-        // カードの位置とスタイルをログ（全カード表示後）
-        setTimeout(() => {
-          const rect = item.getBoundingClientRect();
-          const computedStyle = window.getComputedStyle(item);
-          const hasIsOpen = item.classList.contains("is-open");
-          console.log(`Card ${index} position:`, {
-            hasIsOpen,
-            x: Math.round(rect.x),
-            y: Math.round(rect.y),
-            width: rect.width,
-            height: rect.height,
-            transform: computedStyle.transform,
-            pointerEvents: computedStyle.pointerEvents,
-            zIndex: computedStyle.zIndex,
-            opacity: computedStyle.opacity,
-          });
-        }, 2500); // 全カード表示完了後（5枚 × 400ms = 2000ms + 余裕）
-
-        item.addEventListener("mouseenter", () => {
-          console.log(`Card ${index} mouseenter`);
-        });
-
-        item.addEventListener("mouseover", () => {
-          console.log(`Card ${index} mouseover`);
-        });
-
-        // カード全体（li要素）にクリックイベント（キャプチャフェーズで最優先）
-        // 3D回転したカードの視覚的な領域全体をクリック可能にする
-        item.addEventListener(
-          "click",
-          (e) => {
-            console.log(`=== CARD ${index} CLICKED ===`);
-            e.stopPropagation(); // 親要素への伝播を止める
-            e.stopImmediatePropagation(); // 同じ要素の他のリスナーも停止
-            e.preventDefault(); // デフォルト動作も停止
-            const href = link.getAttribute("href");
-            console.log("Card clicked! Navigating to:", href);
-            if (href) {
-              // ページ遷移を強制実行
-              setTimeout(() => {
-                window.location.href = href;
-              }, 0);
-            }
-          },
-          { capture: true }
-        );
-
-        // カードの視覚的な領域全体をクリック可能にするため、
-        // カード要素全体にマウスイベントを設定（クリック可能領域を拡大）
-        item.addEventListener(
-          "mousedown",
-          (e) => {
-            // カード全体をクリック可能にする
-            e.stopPropagation();
-          },
-          { capture: true }
-        );
-
-        // カード全体にマウスオーバーイベントを設定（カーソル変化を確実にする）
-        item.addEventListener(
-          "mouseenter",
-          () => {
-            item.style.cursor = "pointer";
-            link.style.cursor = "pointer";
-          },
-          { capture: true }
-        );
-
-        // リンクにも直接イベント
-        link.addEventListener(
-          "click",
-          (e) => {
-            console.log(`=== LINK ${index} CLICKED ===`);
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            e.preventDefault();
-            const href = link.getAttribute("href");
-            console.log("Link clicked! Navigating to:", href);
-            if (href) {
-              setTimeout(() => {
-                window.location.href = href;
-              }, 0);
-            }
-          },
-          { capture: true }
-        );
-      } else {
-        console.error(`Card ${index}: Link not found!`);
-      }
-    });
-
-    console.log("NaviCard: All click listeners registered");
-
-    // デバッグ: カードエリアのクリックを全てログ
-    document.addEventListener(
-      "click",
-      (e) => {
-        const target = e.target as HTMLElement;
-        const clickX = (e as MouseEvent).clientX;
-        const clickY = (e as MouseEvent).clientY;
-
-        console.log("=== GLOBAL CLICK ===", {
-          x: Math.round(clickX),
-          y: Math.round(clickY),
-          target: target.className || target.tagName,
-          targetId: target.id,
-        });
-      },
-      true
-    ); // キャプチャフェーズで最初に捕捉
 
     // メニュー外クリックで閉じる（カードとボタンは除外）
     // バブリングフェーズで処理（カードのキャプチャより後）
     document.addEventListener(
       "click",
       (e) => {
+        // カードクリックイベントで既に処理済み（defaultPrevented またはカスタムプロパティ）の場合は何もしない
+        if ((e as any).__naviCardHandled || e.defaultPrevented) {
+          return;
+        }
+
         const target = e.target as HTMLElement;
 
         // カードまたはその子要素をクリックした場合は閉じない
+        // より広範囲にチェック（カードの全子孫要素を含む）
         const clickedCard = target.closest(".navi-card__menu_item");
-        const clickedButton = button.contains(target);
+        const clickedButton = button.contains(target) || target.closest(".navi-card__button");
         const clickedMenu = target.closest(".navi-card__menu");
         const clickedLink = target.closest(".navi-card__menu_link");
+        const clickedText = target.closest(".navi-card__menu_text");
+        const clickedWrapper = target.closest(".navi-card__wrapper");
 
-        console.log("Document click:", {
-          isOpen,
-          clickedCard: !!clickedCard,
-          clickedButton,
-          clickedMenu: !!clickedMenu,
-          clickedLink: !!clickedLink,
-          targetClass: target.className,
+        // カードの実際のクリック位置を確認（リンク要素の拡大領域も考慮）
+        let isWithinCardArea = false;
+        const allCards = document.querySelectorAll(".navi-card__menu_item");
+        const clickX = (e as MouseEvent).clientX;
+        const clickY = (e as MouseEvent).clientY;
+
+        allCards.forEach((card) => {
+          if (card.classList.contains("is-open")) {
+            const link = card.querySelector(".navi-card__menu_link") as HTMLElement;
+            if (link) {
+              const linkRect = link.getBoundingClientRect();
+              // リンク要素の拡大領域内かどうかを確認
+              if (
+                clickX >= linkRect.left &&
+                clickX <= linkRect.right &&
+                clickY >= linkRect.top &&
+                clickY <= linkRect.bottom
+              ) {
+                isWithinCardArea = true;
+              }
+            }
+          }
         });
 
-        // カード、リンク、ボタン、メニューをクリックした場合は閉じない
-        if (isOpen && !clickedCard && !clickedButton && !clickedMenu && !clickedLink) {
-          console.log("Closing menu (clicked outside)");
+        // カード関連の要素、ボタン、メニュー、またはカード領域内をクリックした場合は閉じない
+        if (
+          isOpen &&
+          (clickedCard ||
+            clickedLink ||
+            clickedText ||
+            clickedButton ||
+            clickedMenu ||
+            clickedWrapper ||
+            isWithinCardArea)
+        ) {
+          return;
+        }
+
+        // メニュー外クリックの場合のみ閉じる
+        if (isOpen) {
           button.click();
         }
       },
@@ -351,17 +236,23 @@ const menuItems: MenuItem[] = [
     z-index: 99999;
   }
 
-  .navi-card__wrapper * {
+  .navi-card__wrapper > * {
     pointer-events: auto; /* 子要素はクリック可能 */
   }
 
+  @property --angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+  }
+
   .navi-card__button {
-    width: 180px;
+    width: 200px;
     height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
+    /* position: relative; */
     overflow: hidden;
     /* 洗練されたグラデーション背景 - カードと調和 */
     background: linear-gradient(
@@ -370,13 +261,20 @@ const menuItems: MenuItem[] = [
       rgba(168, 85, 247, 0.85) 50%,
       rgba(192, 132, 252, 0.9) 100%
     );
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background-image: conic-gradient(
+      from var(--angle),
+      var(--color-white),
+      rgba(147, 51, 234, 0.7),
+      rgba(255, 255, 255, 0),
+      rgba(147, 51, 234, 0.7)
+    );
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-radius: 1.25rem;
     border: 2px solid rgba(255, 255, 255, 0.3);
     box-shadow:
       0 8px 32px rgba(147, 51, 234, 0.5),
-      0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+      inset 0 0 1px rgba(255, 255, 255, 0.1),
       0 0 40px rgba(147, 51, 234, 0.4),
       0 4px 16px rgba(0, 0, 0, 0.3);
     position: absolute;
@@ -385,34 +283,9 @@ const menuItems: MenuItem[] = [
     z-index: 10000;
     pointer-events: auto;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    animation: naviCardButtonAnimation 6s ease-in-out infinite;
-    cursor: pointer;
-  }
-
-  /* ボタン内の光るエフェクト */
-  .navi-card__button::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    animation: buttonShine 3s ease-in-out infinite;
-  }
-
-  @keyframes buttonShine {
-    0%,
-    100% {
-      opacity: 0;
-      transform: translate(-50%, -50%) rotate(0deg);
-    }
-    50% {
-      opacity: 0.3;
-      transform: translate(-50%, -50%) rotate(180deg);
-    }
+    animation:
+      naviCardButtonAnimation 6s ease-in-out infinite,
+      naviCardButtonGradientAnimation 3s linear infinite;
   }
 
   @keyframes naviCardButtonAnimation {
@@ -425,24 +298,57 @@ const menuItems: MenuItem[] = [
     }
   }
 
-  .navi-card__button:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow:
-      0 12px 48px rgba(147, 51, 234, 0.7),
-      0 0 0 1px rgba(255, 255, 255, 0.4) inset,
-      0 0 60px rgba(147, 51, 234, 0.6),
-      0 8px 24px rgba(0, 0, 0, 0.4);
-    background: linear-gradient(
-      135deg,
-      rgba(168, 85, 247, 0.95) 0%,
-      rgba(192, 132, 252, 0.9) 50%,
-      rgba(147, 51, 234, 0.95) 100%
-    );
-    border-color: rgba(255, 255, 255, 0.5);
+  @keyframes naviCardButtonGradientAnimation {
+    from {
+      --angle: 0deg;
+    }
+    to {
+      --angle: 360deg;
+    }
+  }
+  .navi-card__button::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 30%, transparent 40%, rgba(255, 255, 255, 0.1) 30%);
+    border-radius: 10%;
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation: buttonShine 10s ease-in-out infinite;
   }
 
-  .navi-card__button:hover::before {
-    opacity: 0.5;
+  @keyframes buttonShine {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.5);
+    }
+  }
+
+  .navi-card__button:is(:hover, :focus-visible) {
+    background: linear-gradient(
+      0 0 48px rgba(147, 51, 234, 0.7) 25%,
+      0 0 0 10px rgba(255, 255, 255, 0.4) inset 25%,
+      0 0 60px rgba(147, 51, 234, 0.6) 25%,
+      0 8px 24px rgba(0, 0, 0, 0.4) 25%
+    );
+    border: 2px solid rgba(255, 255, 255, 0.5);
+
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.4),
+      inset 0 0px 10px rgba(147, 51, 234, 0.7);
+    transform: translateY(-4px) scale(0.9);
+  }
+
+  .navi-card__button:is(:hover, :focus-visible)::before {
+    opacity: 0.7;
   }
 
   .navi-card__button:active {
@@ -450,318 +356,255 @@ const menuItems: MenuItem[] = [
     box-shadow:
       0 6px 24px rgba(147, 51, 234, 0.6),
       0 0 0 1px rgba(255, 255, 255, 0.3) inset,
-      0 0 40px rgba(147, 51, 234, 0.5);
+      0 0 40px rgba(147, 51, 234, 0.5),
+      0 8px 24px rgba(0, 0, 0, 0.4);
   }
 
   .navi-card__button.is-open {
-    background: linear-gradient(
-      135deg,
-      rgba(192, 132, 252, 0.95) 0%,
-      rgba(168, 85, 247, 0.9) 50%,
-      rgba(147, 51, 234, 0.95) 100%
+    background: conic-gradient(
+      from var(--angle),
+      rgba(147, 51, 234, 0.7),
+      var(--color-white),
+      rgba(255, 255, 255, 0),
+      var(--color-white),
+      rgba(147, 51, 234, 0.7)
     );
     box-shadow:
       0 8px 32px rgba(147, 51, 234, 0.6),
       0 0 0 1px rgba(255, 255, 255, 0.2) inset,
       0 0 50px rgba(147, 51, 234, 0.5),
       0 4px 16px rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.4);
   }
 
   .navi-card__button_text {
     font-family: "Marcellus", serif;
-    font-size: 1.3rem;
-    font-weight: 600;
+    font-size: 1.125rem;
+    font-weight: 700;
     letter-spacing: 0.15em;
-    color: #ffffff;
+    color: var(--color-white);
     text-shadow:
       0 2px 8px rgba(0, 0, 0, 0.4),
       0 0 12px rgba(255, 255, 255, 0.3),
       0 0 20px rgba(147, 51, 234, 0.5);
-    position: relative;
-    z-index: 1;
-    transition: all 0.3s ease;
     text-transform: uppercase;
+    transition: all 0.3s ease;
   }
 
-  .navi-card__button:hover .navi-card__button_text {
-    text-shadow:
-      0 2px 12px rgba(0, 0, 0, 0.5),
-      0 0 16px rgba(255, 255, 255, 0.4),
-      0 0 30px rgba(147, 51, 234, 0.7);
+  .navi-card__button:is(:hover, :focus-visible) .navi-card__button_text {
     transform: scale(1.05);
   }
 
   .navi-card__button:active .navi-card__button_text {
-    transform: scale(0.98);
+    transform: scale(1.05);
   }
 
-  .navi-card__menu {
+  .navi-card__overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    pointer-events: none !important;
-    z-index: 99998;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-items: flex-end;
+    padding-block-end: 28vh;
+  }
+
+  .navi-card__menu {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    column-gap: 2rem;
     transform-style: preserve-3d;
     perspective: 1600px;
   }
 
   .navi-card__menu.is-open {
     opacity: 1;
-    pointer-events: none !important;
   }
 
   .navi-card__menu_item {
-    width: 80px;
-    height: 120px;
+    width: 120px;
+    height: 180px;
     display: flex;
     justify-content: center;
     align-items: center;
     /* ガラスモーフィズム風のデザイン - 暗い背景に合わせた半透明 */
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: 1rem;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(255, 255, 255, 0.1) inset,
-      0 0 20px rgba(147, 51, 234, 0.3);
-    overflow: visible; /* カード全体をクリック可能にするため */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    margin-left: -40px; /* カード幅の半分（80px / 2） */
-    margin-top: -50px; /* カード高さの半分（120px / 2 + padding考慮） */
+    overflow: visible;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     transform-style: preserve-3d;
     backface-visibility: hidden;
     will-change: transform, opacity;
-    opacity: 0;
-    pointer-events: none;
+    opacity: 1;
+    transform: translateY(0);
     transition:
-      transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
-      opacity 0.8s ease,
+      transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      opacity 1s cubic-bezier(0.25, 0.94, 0.25, 0.94),
       box-shadow 0.3s ease,
-      background 0.3s ease;
-    cursor: pointer !important;
-    /* 全てのカードに同じpaddingを適用（サイズ統一） */
-    padding: 30px; /* 統一されたpadding */
-    box-sizing: content-box; /* paddingを含めたサイズ計算 */
+      background 0.4s cubic-bezier(0.25, 0.94, 0.25, 0.94);
+    cursor: pointer;
+    padding-block: 1rem;
+    padding-inline: 0.5rem;
   }
 
   .navi-card__menu_item.is-open {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    transition:
-      transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
-      opacity 0.8s ease,
-      box-shadow 0.3s ease;
-  }
-
-  /* 各カードの初期位置（閉じた状態） */
-  .navi-card__menu_item {
-    transform: rotateX(0deg) rotateY(0deg) translateZ(0px) scale(0);
-  }
-
-  /* 各カードの開いた状態 - 3D扇形配置（均一な間隔とサイズ、スペースを広げる） */
-  /* 背景に合わせた洗練されたデザイン - 各カードに微妙な色の違いを追加 */
-  .navi-card__menu_item[data-index="0"].is-open {
-    transform: translateX(-180px) rotateX(-24deg) rotateY(-25deg) translateZ(300px) scale(1);
     opacity: 1;
-    pointer-events: auto !important;
-    z-index: 100001 !important;
-    animation: cardFloat0 6s ease-in-out infinite;
+    pointer-events: auto;
+    cursor: pointer;
+    transition:
+      transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      opacity 0.8s cubic-bezier(0.25, 0.94, 0.25, 0.94),
+      box-shadow 0.4s cubic-bezier(0.25, 0.94, 0.25, 0.94),
+      background 0.4s cubic-bezier(0.24, 0.98, 0.24, 0.98);
+  }
+
+  /* 閉じる時のアニメーションを確実に適用 */
+  .navi-card__menu_item:not(.is-open) {
+    opacity: 0;
+    transition:
+      transform 0.8s cubic-bezier(0.24, 0.98, 0.24, 0.99),
+      opacity 0.8s cubic-bezier(0.46, 0.03, 0.52, 0.96),
+      box-shadow 0.4s cubic-bezier(0.24, 0.98, 0.24, 0.98),
+      background 0.4s cubic-bezier(0.24, 0.98, 0.24, 0.98);
+  }
+
+  /* 各カードの開いた状態 */
+  .navi-card__menu_item[data-index="0"].is-open {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.6);
+    pointer-events: auto;
+    animation: cardFloat 10s ease-in-out infinite;
     animation-delay: 0s;
-    background: linear-gradient(135deg, rgba(255, 182, 193, 0.2) 0%, rgba(255, 192, 203, 0.1) 100%) !important;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(255, 182, 193, 0.3) inset,
-      0 0 20px rgba(255, 182, 193, 0.2) !important;
+    transition: box-shadow 0.4s cubic-bezier(0.24, 0.98, 0.24, 0.98);
   }
 
   .navi-card__menu_item[data-index="1"].is-open {
-    transform: translateX(-90px) rotateY(-12deg) translateZ(300px) scale(1);
-    opacity: 1;
-    pointer-events: auto !important;
-    z-index: 100001 !important;
-    animation: cardFloat1 6s ease-in-out infinite;
-    animation-delay: 0.4s;
     background: linear-gradient(135deg, rgba(144, 238, 144, 0.2) 0%, rgba(152, 251, 152, 0.1) 100%) !important;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(144, 238, 144, 0.3) inset,
-      0 0 20px rgba(144, 238, 144, 0.2) !important;
+    box-shadow: 0 8px 16px rgba(144, 238, 144, 0.6);
+    pointer-events: auto;
+    animation: cardFloat 10s ease-in-out infinite;
+    animation-delay: 0.4s;
+    transition: box-shadow 0.4s cubic-bezier(0.24, 0.98, 0.24, 0.98);
   }
 
   .navi-card__menu_item[data-index="2"].is-open {
-    transform: translateX(0) rotateY(0deg) translateZ(300px) scale(1);
-    opacity: 1;
-    pointer-events: auto !important;
-    z-index: 100001 !important;
-    animation: cardFloat2 6s ease-in-out infinite;
-    animation-delay: 0.8s;
     background: linear-gradient(135deg, rgba(147, 112, 219, 0.25) 0%, rgba(186, 85, 211, 0.15) 100%) !important;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(147, 112, 219, 0.4) inset,
-      0 0 30px rgba(147, 112, 219, 0.3) !important;
+    box-shadow: 0 8px 16px rgba(147, 51, 234, 0.6);
+    pointer-events: auto;
+    animation: cardFloat 10s ease-in-out infinite;
+    animation-delay: 0.8s;
+    transition: box-shadow 0.4s cubic-bezier(0.24, 0.98, 0.24, 0.98);
   }
 
   .navi-card__menu_item[data-index="3"].is-open {
-    transform: translateX(90px) rotateY(12deg) translateZ(300px) scale(1);
-    opacity: 1;
-    pointer-events: auto !important;
-    z-index: 100001 !important;
-    animation: cardFloat3 6s ease-in-out infinite;
-    animation-delay: 1.2s;
     background: linear-gradient(135deg, rgba(255, 255, 153, 0.2) 0%, rgba(255, 255, 182, 0.1) 100%) !important;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(255, 255, 153, 0.3) inset,
-      0 0 20px rgba(255, 255, 153, 0.2) !important;
+    box-shadow: 0 8px 16px rgba(255, 255, 153, 0.6);
+    pointer-events: auto;
+    animation: cardFloat 10s ease-in-out infinite;
+    animation-delay: 1.2s;
+    transition: box-shadow 0.4s cubic-bezier(0.24, 0.98, 0.24, 0.98);
   }
 
   .navi-card__menu_item[data-index="4"].is-open {
-    transform: translateX(180px) rotateY(25deg) translateZ(300px) scale(1);
-    opacity: 1;
-    pointer-events: auto !important;
-    z-index: 100001 !important;
-    animation: cardFloat4 6s ease-in-out infinite;
-    animation-delay: 1.6s;
     background: linear-gradient(135deg, rgba(255, 182, 193, 0.2) 0%, rgba(255, 192, 203, 0.1) 100%) !important;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(255, 182, 193, 0.3) inset,
-      0 0 20px rgba(255, 182, 193, 0.2) !important;
+    box-shadow: 0 8px 16px rgba(255, 182, 193, 0.6);
+    pointer-events: auto;
+    animation: cardFloat 10s ease-in-out infinite;
+    animation-delay: 1.6s;
+    transition: box-shadow 0.4s cubic-bezier(0.24, 0.98, 0.24, 0.98);
   }
 
-  /* カードの上下揺れアニメーション - 各カード専用（ゆっくりした動き） */
-  @keyframes cardFloat0 {
+  /* カードの上下揺れアニメーション */
+  @keyframes cardFloat {
     0%,
     100% {
-      transform: translateX(-180px) rotateY(-25deg) translateZ(300px) translateY(0) scale(1);
+      transform: translateY(0);
     }
     50% {
-      transform: translateX(-180px) rotateY(-25deg) translateZ(300px) translateY(-15px) scale(1);
+      transform: translateY(16px);
     }
   }
 
-  @keyframes cardFloat1 {
-    0%,
-    100% {
-      transform: translateX(-90px) rotateY(-12deg) translateZ(300px) translateY(0) scale(1);
-    }
-    50% {
-      transform: translateX(-90px) rotateY(-12deg) translateZ(300px) translateY(-15px) scale(1);
-    }
-  }
-
-  @keyframes cardFloat2 {
-    0%,
-    100% {
-      transform: translateX(0) rotateY(0deg) translateZ(300px) translateY(0) scale(1);
-    }
-    50% {
-      transform: translateX(0) rotateY(0deg) translateZ(300px) translateY(-15px) scale(1);
-    }
-  }
-
-  @keyframes cardFloat3 {
-    0%,
-    100% {
-      transform: translateX(90px) rotateY(12deg) translateZ(300px) translateY(0) scale(1);
-    }
-    50% {
-      transform: translateX(90px) rotateY(12deg) translateZ(300px) translateY(-15px) scale(1);
-    }
-  }
-
-  @keyframes cardFloat4 {
-    0%,
-    100% {
-      transform: translateX(180px) rotateY(25deg) translateZ(300px) translateY(0) scale(1);
-    }
-    50% {
-      transform: translateX(180px) rotateY(25deg) translateZ(300px) translateY(-15px) scale(1);
-    }
-  }
-
-  .navi-card__menu_item:hover {
-    box-shadow:
-      0 16px 48px rgba(147, 51, 234, 0.6),
-      0 0 0 1px rgba(255, 255, 255, 0.3) inset,
-      0 0 40px rgba(147, 51, 234, 0.4) !important;
+  .navi-card__menu_item[data-index="0"].is-open:is(:hover, :focus-visible) {
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
     filter: brightness(1.2);
-    transform: scale(1.05) !important;
-    z-index: 100 !important;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+  }
+
+  .navi-card__menu_item[data-index="1"].is-open:is(:hover, :focus-visible) {
+    box-shadow: 0 0 8px rgba(144, 238, 144, 0.8);
+    filter: brightness(1.2);
+  }
+
+  .navi-card__menu_item[data-index="2"].is-open:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 24px rgba(147, 51, 234, 0.8);
+    filter: brightness(1.2);
+  }
+
+  .navi-card__menu_item[data-index="3"].is-open:is(:hover, :focus-visible) {
+    box-shadow: 0 0 8px rgba(255, 255, 153, 0.8);
+    filter: brightness(1.2);
+  }
+
+  .navi-card__menu_item[data-index="4"].is-open:is(:hover, :focus-visible) {
+    box-shadow: 0 0 8px rgba(255, 182, 193, 0.8);
+    filter: brightness(1.2);
   }
 
   .navi-card__menu_link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: calc(100% + 60px); /* padding分を追加（30px × 2） */
-    height: calc(100% + 60px); /* padding分を追加（30px × 2） */
-    font-family: "Marcellus", serif;
-    text-decoration: none;
-    padding: 0;
-    position: absolute;
-    top: -30px; /* padding分を調整 */
-    left: -30px; /* padding分を調整 */
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 10%;
+    position: relative;
+    z-index: 100001 !important;
+    overflow: visible;
     pointer-events: auto !important;
     cursor: pointer !important;
-    z-index: 1;
-    /* 3D回転したカードの視覚的な領域全体をカバー */
-    min-width: 200px; /* 回転したカードの視覚的な幅をカバー */
-    min-height: 260px; /* 回転したカードの視覚的な高さをカバー */
+    transition: all 0.6s cubic-bezier(0.25, 0.94, 0.25, 0.94);
   }
 
-  /* Card 0 と Card 4 は回転角度が大きいため、リンク要素のサイズをさらに拡大 */
-  .navi-card__menu_item[data-index="0"] .navi-card__menu_link,
-  .navi-card__menu_item[data-index="4"] .navi-card__menu_link {
-    width: calc(100% + 100px); /* padding分を追加（50px × 2） */
-    height: calc(100% + 100px); /* padding分を追加（50px × 2） */
-    top: -50px; /* padding分を調整 */
-    left: -50px; /* padding分を調整 */
-    min-width: 280px; /* 回転角度が大きいカードの視覚的な幅をカバー */
-    min-height: 340px; /* 回転角度が大きいカードの視覚的な高さをカバー */
+  .navi-card__menu_item[data-index="0"]:is(:hover, :focus-visible) .navi-card__menu_link {
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.8);
+  }
+
+  .navi-card__menu_item[data-index="1"]:is(:hover, :focus-visible) .navi-card__menu_link {
+    box-shadow: 0 8px 16px rgba(144, 238, 144, 0.8);
+  }
+
+  .navi-card__menu_item[data-index="2"]:is(:hover, :focus-visible) .navi-card__menu_link {
+    box-shadow: 0 8px 16px rgba(147, 112, 219, 0.8);
+  }
+  .navi-card__menu_item[data-index="3"]:is(:hover, :focus-visible) .navi-card__menu_link {
+    box-shadow: 0 8px 16px rgba(255, 255, 153, 0.8);
+  }
+
+  .navi-card__menu_item[data-index="4"]:is(:hover, :focus-visible) .navi-card__menu_link {
+    box-shadow: 0 8px 16px rgba(255, 182, 193, 0.8);
   }
 
   .navi-card__menu_text {
+    font-family: "Marcellus", serif;
     font-size: 1.2rem;
     font-weight: 700;
-    color: #ffffff;
-    text-align: center;
-    transition: all 0.3s ease;
+    color: var(--color-white);
     text-shadow:
       0 2px 8px rgba(0, 0, 0, 0.5),
       0 0 10px rgba(147, 51, 234, 0.5),
       0 0 20px rgba(147, 51, 234, 0.3);
     pointer-events: none !important;
-    line-height: 1;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 
-  .navi-card__menu_link:hover .navi-card__menu_text {
+  .navi-card__menu_link:is(:hover, :focus-visible) .navi-card__menu_text {
     color: #e9d5ff;
     transform: translate(-50%, -50%) scale(1.15);
     text-shadow:
@@ -776,17 +619,17 @@ const menuItems: MenuItem[] = [
   }
 
   html.dark .navi-card__menu_text {
-    color: #ffffff;
+    color: var(--color-white);
     text-shadow:
       0 2px 8px rgba(0, 0, 0, 0.5),
       0 0 10px rgba(168, 85, 247, 0.5),
       0 0 20px rgba(168, 85, 247, 0.3);
   }
 
-  html.dark .navi-card__menu_link:hover .navi-card__menu_text {
-    color: #e9d5ff;
+  html.dark .navi-card__menu_link:is(:hover, :focus-visible) .navi-card__menu_text {
+    color: var(--color-white);
     text-shadow:
-      0 2px 12px rgba(0, 0, 0, 0.6),
+      0 2px 12px rgba(0, 0, 0, 0.8),
       0 0 15px rgba(168, 85, 247, 0.7),
       0 0 30px rgba(168, 85, 247, 0.5);
   }
@@ -795,7 +638,16 @@ const menuItems: MenuItem[] = [
   @media screen and (max-width: 768px) {
     .navi-card__button {
       top: 40px;
-      left: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .navi-card__button:is(:hover, :focus-visible) {
+      transform: translateX(-50%) translateY(-4px) scale(0.9);
+    }
+
+    .navi-card__button:active {
+      transform: translateX(-50%) translateY(-2px) scale(1.02);
     }
 
     .navi-card__button_text {
@@ -804,49 +656,28 @@ const menuItems: MenuItem[] = [
 
     .navi-card__menu {
       perspective: 1200px;
+      column-gap: 1rem;
     }
 
     .navi-card__menu_item {
-      width: 100px;
-      height: 150px;
-      margin-left: -50px;
-      margin-top: -75px;
+      width: 90px;
+      height: 140px;
     }
 
     /* モバイル版 - 3D扇形配置 */
     .navi-card__menu_item[data-index="0"].is-open {
-      transform: translateX(-180px) rotateY(-35deg) translateZ(340px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_item[data-index="1"].is-open {
-      transform: translateX(-90px) rotateY(-25deg) translateZ(260px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_item[data-index="2"].is-open {
-      transform: translateX(0) rotateY(0deg) translateZ(320px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_item[data-index="3"].is-open {
-      transform: translateX(90px) rotateY(25deg) translateZ(260px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_item[data-index="4"].is-open {
-      transform: translateX(180px) rotateY(35deg) translateZ(340px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_text {
@@ -855,59 +686,53 @@ const menuItems: MenuItem[] = [
   }
 
   @media screen and (max-width: 480px) {
+    .navi-card__button {
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .navi-card__button:is(:hover, :focus-visible) {
+      transform: translateX(-50%) translateY(-4px) scale(0.9);
+    }
+
+    .navi-card__button:active {
+      transform: translateX(-50%) translateY(-2px) scale(1.02);
+    }
+
     .navi-card__button_text {
       font-size: 0.875rem;
     }
 
     .navi-card__menu {
       perspective: 1000px;
+      column-gap: 0.5rem;
+      grid-template-columns: repeat(5, 1fr);
     }
 
     .navi-card__menu_item {
-      width: 80px;
-      height: 120px;
-      margin-left: -40px;
-      margin-top: -60px;
+      width: 60px;
+      height: 100px;
     }
 
     /* 小画面版 - 3D配置 */
     .navi-card__menu_item[data-index="0"].is-open {
-      transform: translateX(-120px) rotateY(-30deg) translateZ(280px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_item[data-index="1"].is-open {
-      transform: translateX(-60px) rotateY(-20deg) translateZ(200px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_item[data-index="2"].is-open {
-      transform: translateX(0) rotateY(0deg) translateZ(240px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_item[data-index="3"].is-open {
-      transform: translateX(60px) rotateY(20deg) translateZ(200px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_item[data-index="4"].is-open {
-      transform: translateX(120px) rotateY(30deg) translateZ(280px) scale(1);
-      opacity: 1;
-      pointer-events: auto !important;
-      z-index: 100000;
     }
 
     .navi-card__menu_text {
-      font-size: 1rem;
+      font-size: 0.875rem;
     }
   }
 </style>

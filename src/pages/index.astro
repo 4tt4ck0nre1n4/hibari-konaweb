@@ -32,7 +32,7 @@ import gridBackgroundImageSrc from "../assets/gridBackground.webp";
 import { getImage } from "astro:assets";
 import NaviCard from "../components/NaviCard.astro";
 import Glitch from "../components/Glitch.astro";
-
+// import SampleNaviCard from "../components/SampleNaviCard.astro";
 const fvAnimeImage = await getImage({ src: fvAnimeImageSrc });
 const fvBackgroundImage = await getImage({ src: fvBackgroundImageSrc });
 const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
@@ -59,6 +59,23 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       <div class="breadcrumbs__wrapper breadcrumbs__wrapper_top">
         <Breadcrumbs crumbs={[]} />
       </div>
+
+      <!-- <SampleNaviCard /> -->
+
+      <!-- <div class="fv">
+        <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImage.src})`}>
+          <div class="background-container">
+            <div class="background-rotated" style={`background-image: url(${fvAnimeImage.src})`}></div>
+            <div class="background"></div>
+          </div>
+          <div class="glitch-container">
+            <SampleNaviCard />
+
+            <Glitch />
+          </div>
+        </div>
+      </div> -->
+
       <div class="fv">
         <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImage.src})`}>
           <div class="background-container">
@@ -66,12 +83,12 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
             <div class="background"></div>
           </div>
           <div class="glitch-container">
-            <!-- <div class="glitch-container" style={`background-image: url(${fvImage.src})`} > -->
             <NaviCard />
             <Glitch />
           </div>
         </div>
       </div>
+
       <!-- <div class="animated-sprite-container">
         <DepthAppearImage src={animeImage.src} alt="アニメーション画像" client:load />
       </div> -->
@@ -79,6 +96,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       <!-- <div class="responsive-fv-wrapper responsive-fv-wrapper--mobile">
         <ResponsiveFv />
       </div> -->
+
       <div class="swiper-display-container swiper-display-container--mobile">
         <SwiperDisplay />
       </div>
@@ -551,6 +569,18 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       transparent 100%
     );
     mask-image: radial-gradient(circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%), black 100%, transparent 100%);
+  }
+
+  /* スマホサイズでマウス追従の円を小さくする */
+  @media screen and (max-width: 480px) {
+    .background-container {
+      -webkit-mask-image: radial-gradient(
+        circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        black 100%,
+        transparent 100%
+      );
+      mask-image: radial-gradient(circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%), black 100%, transparent 100%);
+    }
   }
 
   .background-rotated {
