@@ -33,7 +33,6 @@ export default function RiveComponent({
   minHeight = 200,
 }: RiveComponentProps) {
   const [layout, setLayout] = useState<RiveLayoutType | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -132,7 +131,6 @@ export default function RiveComponent({
   useEffect(() => {
     if (rive) {
       debugLog("Rive loaded:", rive);
-      setIsLoaded(true);
       setIsLoading(false);
       setError(null);
     }
