@@ -64,50 +64,36 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     const startGlitchSequence = () => {
       if (DEBUG) console.log("Starting glitch sequence...");
 
-      // スマホサイズの判定
-      const isSmartphone = window.innerWidth <= 480;
-      const backgroundSize = isSmartphone ? "contain" : "cover";
-
       // 親要素から背景画像を取得して、.glitch-image要素に設定
       const glitchContainer = document.querySelector(".glitch") as HTMLElement;
       const containerBgImage = glitchContainer ? window.getComputedStyle(glitchContainer).backgroundImage : "";
 
-      // .glitch-image要素に背景画像とサイズを設定（スマホサイズではcontain、パソコンサイズではcover）
-      // !importantを使用してCSSのinheritを上書き
+      // .glitch-image要素に背景画像を設定
       if (glitchR && containerBgImage) {
         glitchR.style.backgroundImage = containerBgImage;
-        glitchR.style.setProperty("background-size", backgroundSize, "important");
         glitchR.style.backgroundPosition = "center";
         glitchR.style.backgroundRepeat = "no-repeat";
       }
       if (glitchG && containerBgImage) {
         glitchG.style.backgroundImage = containerBgImage;
-        glitchG.style.setProperty("background-size", backgroundSize, "important");
         glitchG.style.backgroundPosition = "center";
         glitchG.style.backgroundRepeat = "no-repeat";
       }
       if (glitchB && containerBgImage) {
         glitchB.style.backgroundImage = containerBgImage;
-        glitchB.style.setProperty("background-size", backgroundSize, "important");
         glitchB.style.backgroundPosition = "center";
         glitchB.style.backgroundRepeat = "no-repeat";
       }
       if (glitchF && containerBgImage) {
         glitchF.style.backgroundImage = containerBgImage;
-        glitchF.style.setProperty("background-size", backgroundSize, "important");
         glitchF.style.backgroundPosition = "center";
         glitchF.style.backgroundRepeat = "no-repeat";
       }
 
-      // glitchLayerにも背景画像を設定（スマホサイズの場合のみbackgroundSizeを設定）
+      // glitchLayerにも背景画像を設定
       const glitchLayer = document.querySelector(".glitch-layer") as HTMLElement;
       if (glitchLayer && containerBgImage) {
         glitchLayer.style.backgroundImage = containerBgImage;
-        if (isSmartphone) {
-          glitchLayer.style.backgroundSize = "contain";
-          glitchLayer.style.backgroundPosition = "center";
-          glitchLayer.style.backgroundRepeat = "no-repeat";
-        }
       }
 
       // 1. glitchAnimeアニメーションを8秒間実行
@@ -206,12 +192,11 @@ const glitchImage = await getImage({ src: glitchImageSrc });
         // ④ .glitchの背景色をふわっと#ffffffに変更
         const glitchContainer = document.querySelector(".glitch") as HTMLElement;
         if (glitchContainer) {
-          // 背景画像とサイズを保持したまま背景色のみを変更
+          // 背景画像を保持したまま背景色のみを変更
           const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
           glitchContainer.style.transition = "background-color 3s ease-out";
           glitchContainer.style.backgroundColor = "#ffffff";
           glitchContainer.style.backgroundImage = bgImage;
-          glitchContainer.style.backgroundSize = backgroundSize;
           glitchContainer.style.backgroundPosition = "center";
           glitchContainer.style.backgroundRepeat = "no-repeat";
         }
@@ -221,12 +206,11 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           if (DEBUG) console.log("Fading background to transparent...");
           const glitchContainer = document.querySelector(".glitch") as HTMLElement;
           if (glitchContainer) {
-            // 背景画像とサイズを保持したまま背景色のみをtransparentに変更
+            // 背景画像を保持したまま背景色のみをtransparentに変更
             const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
             glitchContainer.style.transition = "background-color 3s ease-out";
             glitchContainer.style.backgroundColor = "transparent";
             glitchContainer.style.backgroundImage = bgImage;
-            glitchContainer.style.backgroundSize = backgroundSize;
             glitchContainer.style.backgroundPosition = "center";
             glitchContainer.style.backgroundRepeat = "no-repeat";
           }
@@ -240,12 +224,11 @@ const glitchImage = await getImage({ src: glitchImageSrc });
               if (DEBUG) console.log("Fading background to black...");
               const glitchContainer = document.querySelector(".glitch") as HTMLElement;
               if (glitchContainer) {
-                // 背景画像とサイズを保持したまま背景色のみを変更
+                // 背景画像を保持したまま背景色のみを変更
                 const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
                 glitchContainer.style.transition = "background-color 3s ease-out";
                 glitchContainer.style.backgroundColor = "#000000";
                 glitchContainer.style.backgroundImage = bgImage;
-                glitchContainer.style.backgroundSize = backgroundSize;
                 glitchContainer.style.backgroundPosition = "center";
                 glitchContainer.style.backgroundRepeat = "no-repeat";
               }
@@ -265,22 +248,13 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 const containerBgImage = window.getComputedStyle(glitchContainer).backgroundImage;
                 if (DEBUG) console.log("Container background image:", containerBgImage);
 
-                // リセット時点で画面サイズを再判定
-                const resetIsSmartphone = window.innerWidth <= 480;
-                const resetBackgroundSize = resetIsSmartphone ? "contain" : "cover";
-
-                // .glitchコンテナの背景色を黒に戻す（背景画像とサイズを保持）
+                // .glitchコンテナの背景色を黒に戻す（背景画像を保持）
                 if (glitchContainer) {
-                  // 画面サイズに応じて高さを設定
-                  const containerHeight = resetIsSmartphone ? "560px" : "100vh";
-
                   glitchContainer.style.transition = "";
                   glitchContainer.style.backgroundColor = "#000000";
                   glitchContainer.style.backgroundImage = containerBgImage;
-                  glitchContainer.style.backgroundSize = resetBackgroundSize;
                   glitchContainer.style.backgroundPosition = "center";
                   glitchContainer.style.backgroundRepeat = "no-repeat";
-                  glitchContainer.style.height = containerHeight;
                 }
 
                 // 要素を完全に初期状態にリセット
@@ -288,19 +262,12 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 if (glitchLayer) {
                   glitchLayer.removeAttribute("style");
                   glitchLayer.style.backgroundImage = containerBgImage;
-                  // スマホサイズの場合のみbackgroundSizeを設定（パソコンサイズではCSSのデフォルトに任せる）
-                  if (resetIsSmartphone) {
-                    glitchLayer.style.backgroundSize = "contain";
-                    // backgroundPositionはCSSのデフォルト（0 0）を維持
-                    glitchLayer.style.backgroundRepeat = "no-repeat";
-                  }
                 }
 
                 // R, G, B, F要素のリセット（初期状態に確実に戻す）
 
                 if (glitchR) {
                   glitchR.style.backgroundImage = containerBgImage;
-                  glitchR.style.setProperty("background-size", resetBackgroundSize, "important");
                   glitchR.style.backgroundPosition = "center";
                   glitchR.style.backgroundRepeat = "no-repeat";
                   glitchR.style.position = "absolute";
@@ -316,7 +283,6 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 }
                 if (glitchG) {
                   glitchG.style.backgroundImage = containerBgImage;
-                  glitchG.style.setProperty("background-size", resetBackgroundSize, "important");
                   glitchG.style.backgroundPosition = "center";
                   glitchG.style.backgroundRepeat = "no-repeat";
                   glitchG.style.position = "absolute";
@@ -332,7 +298,6 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 }
                 if (glitchB) {
                   glitchB.style.backgroundImage = containerBgImage;
-                  glitchB.style.setProperty("background-size", resetBackgroundSize, "important");
                   glitchB.style.backgroundPosition = "center";
                   glitchB.style.backgroundRepeat = "no-repeat";
                   glitchB.style.position = "absolute";
@@ -348,7 +313,6 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 }
                 if (glitchF) {
                   glitchF.style.backgroundImage = containerBgImage;
-                  glitchF.style.setProperty("background-size", resetBackgroundSize, "important");
                   glitchF.style.backgroundPosition = "center";
                   glitchF.style.backgroundRepeat = "no-repeat";
                   glitchF.style.position = "absolute";
@@ -407,7 +371,6 @@ const glitchImage = await getImage({ src: glitchImageSrc });
 <style is:global>
   .glitch {
     width: 100%;
-    max-width: 640px;
     max-width: 600px;
     height: 100vh;
     background: #000000;
@@ -425,8 +388,8 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     .glitch {
       max-width: 480px;
       height: 560px;
-      height: 240px;
-      background-size: contain;
+      height: 400px;
+      /* background-size: contain; */
     }
   }
   .glitch-image {
@@ -445,7 +408,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
 
   @media screen and (max-width: 480px) {
     .glitch-image {
-      background-size: contain;
+      /* background-size: contain; */
     }
   }
   @keyframes shake {
