@@ -6,7 +6,14 @@ import type { Layout as RiveLayoutType } from "@rive-app/react-canvas";
 const riveWasmUrl = "/wasm/rive.wasm";
 
 // 開発環境でのデバッグログを有効化
-const DEBUG = import.meta.env.DEV || true; // 一時的に常に有効
+const DEBUG = import.meta.env.DEV;
+
+// デバッグ用ユーティリティ関数（開発環境でのみログを出力）
+const debugLog = (...args: unknown[]): void => {
+  if (DEBUG) {
+    console.log(...args);
+  }
+};
 
 interface RiveComponentProps {
   src: string;
@@ -25,10 +32,6 @@ export default function RiveComponent({
   minWidth = 300,
   minHeight = 200,
 }: RiveComponentProps) {
-  if (DEBUG) {
-    console.log("RiveComponent mounted with src:", src);
-  }
-
   const [layout, setLayout] = useState<RiveLayoutType | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,35 +75,25 @@ export default function RiveComponent({
 
   // Riveランタイムとレイアウトの初期化
   useEffect(() => {
-    if (DEBUG) {
-      console.log("RiveComponent: Initializing Rive runtime...");
-    }
+    debugLog("RiveComponent: Initializing Rive runtime...");
     const loadRive = async () => {
       try {
         setIsLoading(true);
-        if (DEBUG) {
-          console.log("RiveComponent: Loading riveClient...");
-        }
+        debugLog("RiveComponent: Loading riveClient...");
         const { Fit, Layout, Alignment, RuntimeLoader } = await import("../scripts/riveClient");
 
-        if (DEBUG) {
-          console.log("RiveComponent: Setting WASM URL...");
-        }
+        debugLog("RiveComponent: Setting WASM URL...");
         RuntimeLoader.setWasmUrl(riveWasmUrl);
 
         const loader = RuntimeLoader as unknown as {
           load?: () => Promise<void>;
         };
         if (typeof loader.load === "function") {
-          if (DEBUG) {
-            console.log("RiveComponent: Loading Rive runtime...");
-          }
+          debugLog("RiveComponent: Loading Rive runtime...");
           await loader.load();
         }
 
-        if (DEBUG) {
-          console.log("RiveComponent: Creating layout instance...");
-        }
+        debugLog("RiveComponent: Creating layout instance...");
         const layoutInstance = new Layout({
           fit: Fit.Contain,
           alignment: Alignment.Center,
@@ -108,9 +101,7 @@ export default function RiveComponent({
 
         setLayout(layoutInstance);
         setIsLoading(false);
-        if (DEBUG) {
-          console.log("RiveComponent: Rive runtime initialized successfully");
-        }
+        debugLog("RiveComponent: Rive runtime initialized successfully");
       } catch (err) {
         console.error("RiveComponent: Failed to load Rive runtime:", err);
         const errorMessage = err instanceof Error ? err.message : "Unknown error";
@@ -133,20 +124,14 @@ export default function RiveComponent({
     ...(layout ? { layout } : {}),
   };
 
-  if (DEBUG) {
-    console.log("RiveComponent: Calling useRive with options:", { src, hasLayout: Boolean(layout) });
-  }
+  debugLog("RiveComponent: Calling useRive with options:", { src, hasLayout: Boolean(layout) });
   const { RiveComponent: InnerRive, rive } = useRive(riveOptions);
-  if (DEBUG) {
-    console.log("RiveComponent: useRive returned:", { hasInnerRive: Boolean(InnerRive), hasRive: Boolean(rive) });
-  }
+  debugLog("RiveComponent: useRive returned:", { hasInnerRive: Boolean(InnerRive), hasRive: Boolean(rive) });
 
   // Riveが読み込まれたかどうかを確認
   useEffect(() => {
     if (rive) {
-      if (DEBUG) {
-        console.log("Rive loaded:", rive);
-      }
+      debugLog("Rive loaded:", rive);
       setIsLoaded(true);
       setIsLoading(false);
       setError(null);
@@ -155,9 +140,7 @@ export default function RiveComponent({
 
   // srcが変更されたときにログを出力
   useEffect(() => {
-    if (DEBUG) {
-      console.log("RiveComponent src changed:", src);
-    }
+    debugLog("RiveComponent src changed:", src);
   }, [src]);
 
   // 高DPI対応のためのスタイル設定
@@ -204,24 +187,17 @@ export default function RiveComponent({
           <div className="rive-loading-spinner"></div>
         </div>
       )}
-      {InnerRive && (
-        <InnerRive
-          className="rive-component"
-          style={{
-            opacity: 1,
-            width: "100%",
-            height: "100%",
-            minWidth: `${minWidth}px`,
-            minHeight: `${minHeight}px`,
-            display: "block",
-          }}
-        />
-      )}
-      {!InnerRive && DEBUG && (
-        <div style={{ padding: "1rem", textAlign: "center", color: "orange" }}>
-          <p>RiveComponent: InnerRive is not available</p>
-        </div>
-      )}
+      <InnerRive
+        className="rive-component"
+        style={{
+          opacity: 1,
+          width: "100%",
+          height: "100%",
+          minWidth: `${minWidth}px`,
+          minHeight: `${minHeight}px`,
+          display: "block",
+        }}
+      />
       {error !== null && error !== "" && (
         <div className="rive-error" style={{ padding: "1rem", textAlign: "center", color: "red" }}>
           <p>Rive animation failed to load</p>

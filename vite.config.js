@@ -34,7 +34,16 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
   },
   optimizeDeps: {
-    include: ["@rive-app/react-canvas"],
+    include: [
+      "@rive-app/react-canvas",
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+    ],
+    exclude: [],
+  },
+  resolve: {
+    dedupe: ["react", "react-dom"], // Reactの重複を防ぐ
   },
   server: {
     watch: {
