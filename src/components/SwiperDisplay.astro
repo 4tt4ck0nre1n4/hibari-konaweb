@@ -47,7 +47,6 @@ try {
 
 const swiperHeader = "Works Menu";
 const swiperText1 = "私の活動の履歴をご覧ください。";
-// const swiperText1 = "Hello, this is hibari-konaweb.com's Portfolio Site.";
 const swiperText2 = "Thank you for viewing my site.";
 ---
 
@@ -145,9 +144,8 @@ const swiperText2 = "Thank you for viewing my site.";
     left: calc(50% - 160px);
     transform-style: preserve-3d;
     transform: perspective(1600px);
-    will-change: transform;
     backface-visibility: hidden;
-    animation: rotation 32s linear infinite;
+    /* パフォーマンス最適化: will-changeはJavaScriptで動的に管理 */
     animation: rotation 32s ease-in-out infinite;
   }
   @keyframes rotation {
@@ -177,8 +175,9 @@ const swiperText2 = "Thank you for viewing my site.";
     top: 0%;
     left: 0%;
     z-index: 20;
+    /* パフォーマンス最適化: GPUアクセラレーションを有効化 */
     transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(600px) scale(-1, 1);
-    will-change: transform;
+    /* パフォーマンス最適化: will-changeはJavaScriptで動的に管理 */
   }
   .swipers-slide::before {
     content: "";
@@ -263,7 +262,7 @@ const swiperText2 = "Thank you for viewing my site.";
     background: linear-gradient(180deg, #ffffff71 10%, transparent 32%, #ffffff 72%);
     background-size: 600% 100%;
     box-shadow: 0 16px 32px 0 rgba(0 0 0 / 0.6);
-    filter: blur(2px);
+    /* パフォーマンス最適化: blurを削除（視覚的影響を最小限に） */
     border-radius: 0.5rem;
     position: absolute;
     top: 104%;
@@ -293,7 +292,8 @@ const swiperText2 = "Thank you for viewing my site.";
     padding: 1rem;
     /* 透明度とぼかし効果 */
     opacity: 0.65;
-    filter: blur(0.5px) brightness(1.1);
+    /* パフォーマンス最適化: blurを削除、brightnessのみ使用 */
+    filter: brightness(1.1);
     /* 下部に向かってフェードアウトするグラデーションマスク */
     mask-image: linear-gradient(
       to bottom,
@@ -360,14 +360,12 @@ const swiperText2 = "Thank you for viewing my site.";
       left: calc(50% - 75px);
       transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(280px);
       animation: reflection-mobile 32s ease-in-out infinite;
-      will-change: transform, background-position;
     }
 
     .swipers-slide::after {
       left: calc(50% - 75px);
       transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(280px);
       animation: reflection-mobile 32s ease-in-out infinite;
-      will-change: transform;
     }
 
     .swipers__image {
@@ -380,4 +378,81 @@ const swiperText2 = "Thank you for viewing my site.";
       transform: scale(1, -1);
     }
   }
+
+  /* パフォーマンス最適化: アニメーション一時停止用のクラス */
+  .swipers-wrapper.paused {
+    animation-play-state: paused;
+  }
+
+  .swipers-slide.paused::before,
+  .swipers-slide.paused::after {
+    animation-play-state: paused;
+  }
 </style>
+
+<script>
+  // パフォーマンス最適化: ビューポート外ではアニメーションを一時停止
+  (function () {
+    const swiperSection = document.getElementById("swiper");
+    const swiperWrapper = swiperSection?.querySelector<HTMLElement>(".swipers-wrapper");
+    const swiperSlides = swiperSection?.querySelectorAll<HTMLElement>(".swipers-slide");
+
+    if (!swiperSection || !swiperWrapper || !swiperSlides) return;
+
+    // Intersection Observerでビューポート内かどうかを監視
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const isVisible = entry.isIntersecting && entry.intersectionRatio > 0.1;
+
+          if (isVisible) {
+            // ビューポート内: アニメーションを再開
+            swiperWrapper.classList.remove("paused");
+            swiperWrapper.style.willChange = "transform";
+            swiperSlides.forEach((slide) => {
+              slide.classList.remove("paused");
+            });
+          } else {
+            // ビューポート外: アニメーションを一時停止
+            swiperWrapper.classList.add("paused");
+            swiperWrapper.style.willChange = "auto";
+            swiperSlides.forEach((slide) => {
+              slide.classList.add("paused");
+            });
+          }
+        });
+      },
+      {
+        threshold: [0, 0.1, 0.5, 1],
+        rootMargin: "50px", // 少し余裕を持たせる
+      }
+    );
+
+    observer.observe(swiperSection);
+
+    // ページが非表示になった時（別タブに切り替え等）も一時停止
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        swiperWrapper.classList.add("paused");
+        swiperWrapper.style.willChange = "auto";
+        swiperSlides.forEach((slide) => {
+          slide.classList.add("paused");
+        });
+      } else {
+        // ページが再表示された時、Intersection Observerが自動的に処理
+        // 念のため、ビューポート内か確認して再開
+        const rect = swiperSection.getBoundingClientRect();
+        const isInViewport =
+          rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0;
+
+        if (isInViewport) {
+          swiperWrapper.classList.remove("paused");
+          swiperWrapper.style.willChange = "transform";
+          swiperSlides.forEach((slide) => {
+            slide.classList.remove("paused");
+          });
+        }
+      }
+    });
+  })();
+</script>

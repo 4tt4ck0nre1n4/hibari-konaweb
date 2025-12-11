@@ -5,6 +5,9 @@ import type { Layout as RiveLayoutType } from "@rive-app/react-canvas";
 
 const riveWasmUrl = "/wasm/rive.wasm";
 
+// 開発環境でのデバッグログを有効化
+const DEBUG = import.meta.env.DEV || true; // 一時的に常に有効
+
 interface RiveComponentProps {
   src: string;
   artboard?: string;
@@ -22,9 +25,14 @@ export default function RiveComponent({
   minWidth = 300,
   minHeight = 200,
 }: RiveComponentProps) {
+  if (DEBUG) {
+    console.log("RiveComponent mounted with src:", src);
+  }
+
   const [layout, setLayout] = useState<RiveLayoutType | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 高品質レンダリング設定の関数
@@ -62,73 +70,99 @@ export default function RiveComponent({
     [minWidth, minHeight]
   );
 
-  // rivファイルのプリロード
+  // Riveランタイムとレイアウトの初期化
   useEffect(() => {
-    const preloadRive = async () => {
-      try {
-        setIsLoading(true);
-        // rivファイルをプリロード
-        const response = await fetch(src, {
-          method: "GET",
-          headers: {
-            Accept: "application/octet-stream",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to load Rive file: ${response.status} ${response.statusText}`);
-        }
-        const arrayBuffer = await response.arrayBuffer();
-        if (arrayBuffer.byteLength === 0) {
-          throw new Error("Rive file is empty");
-        }
-        setIsLoaded(true);
-      } catch (error) {
-        console.error("Rive preload failed:", error);
-        console.error("Rive file path:", src);
-        setIsLoaded(true); // エラーでも続行
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (src !== undefined && src !== null && src.length > 0) {
-      void preloadRive();
+    if (DEBUG) {
+      console.log("RiveComponent: Initializing Rive runtime...");
     }
-  }, [src]);
-
-  useEffect(() => {
     const loadRive = async () => {
       try {
+        setIsLoading(true);
+        if (DEBUG) {
+          console.log("RiveComponent: Loading riveClient...");
+        }
         const { Fit, Layout, Alignment, RuntimeLoader } = await import("../scripts/riveClient");
 
+        if (DEBUG) {
+          console.log("RiveComponent: Setting WASM URL...");
+        }
         RuntimeLoader.setWasmUrl(riveWasmUrl);
 
         const loader = RuntimeLoader as unknown as {
           load?: () => Promise<void>;
         };
         if (typeof loader.load === "function") {
+          if (DEBUG) {
+            console.log("RiveComponent: Loading Rive runtime...");
+          }
           await loader.load();
         }
 
+        if (DEBUG) {
+          console.log("RiveComponent: Creating layout instance...");
+        }
         const layoutInstance = new Layout({
           fit: Fit.Contain,
           alignment: Alignment.Center,
         });
 
         setLayout(layoutInstance);
-      } catch (error) {
-        console.error("Failed to load Rive runtime:", error);
+        setIsLoading(false);
+        if (DEBUG) {
+          console.log("RiveComponent: Rive runtime initialized successfully");
+        }
+      } catch (err) {
+        console.error("RiveComponent: Failed to load Rive runtime:", err);
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        setError(errorMessage);
         // フォールバック: レイアウトなしで続行
         setLayout(null);
+        setIsLoading(false);
       }
     };
 
     void loadRive();
   }, []);
 
+  // useRiveフックの設定 - layoutが初期化されるまで待つ
+  const riveOptions = {
+    src,
+    artboard,
+    stateMachines,
+    autoplay,
+    ...(layout ? { layout } : {}),
+  };
+
+  if (DEBUG) {
+    console.log("RiveComponent: Calling useRive with options:", { src, hasLayout: Boolean(layout) });
+  }
+  const { RiveComponent: InnerRive, rive } = useRive(riveOptions);
+  if (DEBUG) {
+    console.log("RiveComponent: useRive returned:", { hasInnerRive: Boolean(InnerRive), hasRive: Boolean(rive) });
+  }
+
+  // Riveが読み込まれたかどうかを確認
+  useEffect(() => {
+    if (rive) {
+      if (DEBUG) {
+        console.log("Rive loaded:", rive);
+      }
+      setIsLoaded(true);
+      setIsLoading(false);
+      setError(null);
+    }
+  }, [rive]);
+
+  // srcが変更されたときにログを出力
+  useEffect(() => {
+    if (DEBUG) {
+      console.log("RiveComponent src changed:", src);
+    }
+  }, [src]);
+
   // 高DPI対応のためのスタイル設定
   useEffect(() => {
-    if (!containerRef.current || !isLoaded) {
+    if (!containerRef.current || !rive) {
       return undefined;
     }
 
@@ -161,15 +195,7 @@ export default function RiveComponent({
 
     const cleanup = waitForCanvas();
     return cleanup;
-  }, [layout, isLoaded, setupHighQualityRendering, minWidth, minHeight]);
-
-  const { RiveComponent: InnerRive } = useRive({
-    src,
-    artboard,
-    stateMachines,
-    autoplay,
-    layout: layout ?? undefined,
-  });
+  }, [rive, setupHighQualityRendering, minWidth, minHeight]);
 
   return (
     <div ref={containerRef} className="rive-container">
@@ -178,16 +204,29 @@ export default function RiveComponent({
           <div className="rive-loading-spinner"></div>
         </div>
       )}
-      {!isLoading && (
+      {InnerRive && (
         <InnerRive
           className="rive-component"
           style={{
-            opacity: isLoaded ? 1 : 0,
-            transition: "opacity 0.3s ease-in-out",
+            opacity: 1,
             width: "100%",
             height: "100%",
+            minWidth: `${minWidth}px`,
+            minHeight: `${minHeight}px`,
+            display: "block",
           }}
         />
+      )}
+      {!InnerRive && DEBUG && (
+        <div style={{ padding: "1rem", textAlign: "center", color: "orange" }}>
+          <p>RiveComponent: InnerRive is not available</p>
+        </div>
+      )}
+      {error !== null && error !== "" && (
+        <div className="rive-error" style={{ padding: "1rem", textAlign: "center", color: "red" }}>
+          <p>Rive animation failed to load</p>
+          <p style={{ fontSize: "0.875rem", opacity: 0.7 }}>{error}</p>
+        </div>
       )}
     </div>
   );

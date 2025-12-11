@@ -19,7 +19,7 @@
     "description": "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
     "type": "website",
     "url": "https://hibari-konaweb.netlify.app",
-    "image": "",
+    "image": "https://hibari-konaweb.netlify.app/assets/screenshot.webp",
     "site_name": "My Portfolio Site"
   },
   "twitter": {
@@ -27,7 +27,7 @@
     "title": "My Portfolio Site",
     "description": "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
     "site": "https://hibari-konaweb.netlify.app",
-    "image": ""
+    "image": "https://hibari-konaweb.netlify.app/assets/screenshot.webp"
   },
   "local": {
     "type": "article"

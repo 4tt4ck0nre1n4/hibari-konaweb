@@ -30,7 +30,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
             {cardBody}
           </p>
           <div class="card__item_image">
-            <RiveComponent src={src} stateMachines={stateMachines} minWidth={300} minHeight={200} client:only="react" />
+            <RiveComponent src={src} stateMachines={stateMachines} minWidth={300} minHeight={200} client:load />
           </div>
           <button class="card__flip_arrow" type="button" aria-label="詳細を見る" title="詳細を見る">
             <svg
@@ -334,6 +334,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     width: 100%;
     max-width: 300px;
     height: auto;
+    min-height: 200px;
     max-height: 200px;
     object-fit: contain;
     margin-block-start: auto;
@@ -344,6 +345,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     width: 100%;
     max-width: 300px;
     height: auto;
+    min-height: 200px;
     max-height: 200px;
     display: flex;
     align-items: center;
@@ -354,12 +356,14 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   .rive-component {
     width: 100%;
     height: 100%;
+    min-height: 200px;
     max-height: 200px;
   }
 
   .rive-component canvas {
     width: 100% !important;
     height: 100% !important;
+    min-height: 200px !important;
     max-height: 200px !important;
     max-width: 300px !important;
     object-fit: contain !important;
@@ -373,8 +377,8 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     width: 100%;
     max-width: 300px;
     height: auto;
+    min-height: 200px;
     max-height: 200px;
-    min-height: 150px;
   }
 
   .rive-loading-spinner {
