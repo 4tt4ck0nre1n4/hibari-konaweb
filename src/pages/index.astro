@@ -1651,25 +1651,132 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       rafId = null;
     };
 
-    // window全体でマウス移動を監視（画面全体を追従）
-    window.addEventListener(
-      "mousemove",
-      (e: MouseEvent) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+    // デバイスがタッチデバイスかどうかを判定
+    const isTouchDevice =
+      window.matchMedia("(any-hover: none)").matches ||
+      window.matchMedia("(pointer: coarse)").matches ||
+      "ontouchstart" in window;
 
-        // requestAnimationFrameで更新を最適化
-        if (rafId === null) {
-          rafId = requestAnimationFrame(updateMaskPosition);
-        }
-      },
-      { passive: true }
-    );
+    // デスクトップ: マウス追従
+    if (!isTouchDevice) {
+      // window全体でマウス移動を監視（画面全体を追従）
+      window.addEventListener(
+        "mousemove",
+        (e: MouseEvent) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
 
-    // マウスが画面外に出た場合も追従（画面端でも反応するように）
-    window.addEventListener("mouseleave", () => {
-      // マウスが画面外に出た場合は最後の位置を保持
-    });
+          // requestAnimationFrameで更新を最適化
+          if (rafId === null) {
+            rafId = requestAnimationFrame(updateMaskPosition);
+          }
+        },
+        { passive: true }
+      );
+
+      // マウスが画面外に出た場合も追従（画面端でも反応するように）
+      window.addEventListener("mouseleave", () => {
+        // マウスが画面外に出た場合は最後の位置を保持
+      });
+    } else {
+      // スマホ/タブレット: タッチイベントと自動アニメーションの組み合わせ
+
+      // 1. タッチイベント対応（タッチ位置を追従）
+      let touchX = 0;
+      let touchY = 0;
+      let isTouching = false;
+
+      window.addEventListener(
+        "touchstart",
+        (e: TouchEvent) => {
+          if (e.touches.length > 0) {
+            isTouching = true;
+            touchX = e.touches[0].clientX;
+            touchY = e.touches[0].clientY;
+            mouseX = touchX;
+            mouseY = touchY;
+
+            if (rafId === null) {
+              rafId = requestAnimationFrame(updateMaskPosition);
+            }
+          }
+        },
+        { passive: true }
+      );
+
+      window.addEventListener(
+        "touchmove",
+        (e: TouchEvent) => {
+          if (e.touches.length > 0 && isTouching) {
+            touchX = e.touches[0].clientX;
+            touchY = e.touches[0].clientY;
+            mouseX = touchX;
+            mouseY = touchY;
+
+            if (rafId === null) {
+              rafId = requestAnimationFrame(updateMaskPosition);
+            }
+          }
+        },
+        { passive: true }
+      );
+
+      window.addEventListener(
+        "touchend",
+        () => {
+          isTouching = false;
+        },
+        { passive: true }
+      );
+
+      // 2. 自動アニメーション（タッチ操作がない場合の代替）
+      // パルスアニメーション: 定期的に位置を変更して視覚的な動きを提供
+      let autoAnimationId: number | null = null;
+      let animationPhase = 0;
+      const animationDuration = 4000; // 4秒周期
+      const animationRadius = 100; // 移動半径（px）
+
+      const startAutoAnimation = () => {
+        if (autoAnimationId !== null) return; // 既に実行中
+
+        const startTime = Date.now();
+        const rect = fvWrapper.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const animate = () => {
+          if (isTouching) {
+            // タッチ中は自動アニメーションを一時停止
+            autoAnimationId = requestAnimationFrame(animate);
+            return;
+          }
+
+          const elapsed = Date.now() - startTime;
+          const progress = (elapsed % animationDuration) / animationDuration;
+
+          // 円形パスで移動（スムーズな動き）
+          const angle = progress * Math.PI * 2;
+          const offsetX = Math.cos(angle) * animationRadius;
+          const offsetY = Math.sin(angle) * animationRadius;
+
+          mouseX = centerX + rect.left + offsetX;
+          mouseY = centerY + rect.top + offsetY;
+
+          if (rafId === null) {
+            rafId = requestAnimationFrame(updateMaskPosition);
+          }
+
+          autoAnimationId = requestAnimationFrame(animate);
+        };
+
+        autoAnimationId = requestAnimationFrame(animate);
+      };
+
+      // 自動アニメーションを開始（少し遅延させて自然な動きに）
+      setTimeout(() => {
+        startAutoAnimation();
+      }, 500);
+    }
 
     // 初期位置を設定（画面中央）
     const initialX = window.innerWidth / 2;
