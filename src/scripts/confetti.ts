@@ -64,17 +64,9 @@ function initConfetti() {
 
         // より安全なフォント設定
         context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-        // ダークモード対応
-        const isDarkMode = document.documentElement.classList.contains("dark");
-        context.fillStyle = isDarkMode ? "#f1f5f9" : "#020202";
+        context.fillStyle = "#00FFFF"; // aquaカラー
         context.textAlign = "center";
         context.textBaseline = "middle";
-
-        // テキストの影を追加して視認性を向上（ダークモード対応）
-        context.shadowColor = isDarkMode ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.8)";
-        context.shadowBlur = 2;
-        context.shadowOffsetX = 1;
-        context.shadowOffsetY = 1;
 
         const text = "Thank you for viewing my portfolio site!";
 
@@ -90,13 +82,11 @@ function initConfetti() {
           context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
         }
 
-        context.fillText(text, textCanvasElement.width / 2, textCanvasElement.height / 2);
-
-        // 影をリセット
-        context.shadowColor = "transparent";
-        context.shadowBlur = 0;
-        context.shadowOffsetX = 0;
-        context.shadowOffsetY = 0;
+        // テキストを描画（fillStyleを再設定して確実にaquaカラーを適用）
+        context.fillStyle = "#00FFFF"; // aquaカラー
+        const centerX = textCanvasElement.width / 2;
+        const centerY = textCanvasElement.height / 2;
+        context.fillText(text, centerX, centerY);
         // globalAlphaはリセットしない（アニメーション中に干渉を防ぐため）
       };
 

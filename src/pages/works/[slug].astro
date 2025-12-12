@@ -966,11 +966,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       position: sticky;
       top: 0;
       width: 100%;
-      height: 100%;
-      min-height: 900px;
+      height: auto;
+      min-height: 100vh;
       order: 1;
       overflow: visible;
       z-index: 1;
+      padding-block-end: 8rem;
     }
 
     /* 左サイドを下に配置（.rightの上を被さる） */
@@ -1128,9 +1129,10 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       justify-content: flex-start;
       align-items: center;
       gap: 0.5rem;
+      position: absolute;
       top: auto;
-      top: 58%;
       bottom: 2rem;
+      left: 0;
       margin-block-start: 1rem;
       margin-block-end: 0;
       padding-block: 1.5rem;
@@ -1162,7 +1164,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   /* より小さい画面向けの調整 */
   @media (max-width: 480px) {
     .split.right {
-      padding-block-end: 5rem;
+      padding-block-end: 10rem;
     }
     .split.right .right__spImage {
       right: 15%;
@@ -1206,7 +1208,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
     .right__iconMenu {
       min-height: 200px;
-      top: 56%;
+      top: auto;
+      bottom: 2rem;
       margin-block-start: 0;
       padding-block-start: 1rem;
     }

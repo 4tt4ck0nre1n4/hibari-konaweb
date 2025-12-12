@@ -43,6 +43,11 @@ const menuItems = [
   },
 ];
 
+const startYear = 2025;
+const currentYear = new Date().getFullYear();
+const displayYear = currentYear > startYear ? `${startYear} - ${currentYear}` : `${startYear}`;
+const copyright = "hibari-konaweb.com All Rights Reserved.";
+
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const HamburgerMenu = () => {
@@ -292,6 +297,9 @@ const HamburgerMenu = () => {
       className={`${hamburgerStyles.hamburger__menu} ${isOpen ? hamburgerStyles.open : ""}`}
       aria-hidden="true"
     >
+      <div className={hamburgerStyles.hamburger__title}>
+        <h2 className={hamburgerStyles.hamburger__title_text}>My Portfolio Site</h2>
+      </div>
       <ul>
         {menuItems.map(({ label, href, icon, ariaLabel, ariaTitle }, index) => {
           const isActive = currentPath === href || (href !== "/" && currentPath.startsWith(href));
@@ -354,6 +362,12 @@ const HamburgerMenu = () => {
             targetBlank={mail.targetBlank}
           />
         </ul>
+      </div>
+      <div className={hamburgerStyles.hamburger__copyright}>
+        <small className={hamburgerStyles.hamburger__copyright_text}>
+          <span className={hamburgerStyles.hamburger__copyright_year}>Copyright &copy; {displayYear}</span>
+          <span className={hamburgerStyles.hamburger__copyright_text}>{copyright}</span>
+        </small>
       </div>
     </div>
   );
