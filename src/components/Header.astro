@@ -47,6 +47,7 @@ const logo = {
 <style is:global>
   .header {
     width: 100%;
+    max-width: 100%;
     height: 70px;
     display: grid;
     font-family: "Poppins", sans-serif;
@@ -58,10 +59,13 @@ const logo = {
     position: fixed;
     top: 0;
     left: 0;
+    right: 0;
     z-index: 800;
     transition: all 1s ease;
     margin-inline: auto;
     padding: 0.5rem;
+    box-sizing: border-box;
+    overflow: hidden;
   }
   .header.is-scroll {
     background-color: rgba(255, 255, 255, 0.6);
@@ -76,6 +80,61 @@ const logo = {
     width: 100%;
     max-width: 700px;
     margin-inline: auto;
+    box-sizing: border-box;
+  }
+
+  /* タブレットサイズの調整 */
+  @media screen and (min-width: 481px) and (max-width: 1024px) {
+    .header {
+      height: 128px;
+      padding: 0;
+      box-sizing: border-box;
+      width: 100%;
+      left: 0;
+      right: 0;
+    }
+
+    .header__wrapper {
+      width: 100%;
+      max-width: 100%;
+      padding-inline: 0.5rem;
+      box-sizing: border-box;
+      margin-inline: 0;
+    }
+
+    .header__inner {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding-inline: 0;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    .header__logo_text,
+    .header__logo_whiteText {
+      max-width: 200px;
+      width: auto;
+      height: 24px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .header {
+      height: 128px;
+      padding: 0.5rem;
+      box-sizing: border-box;
+    }
+
+    .header__wrapper {
+      max-width: 100%;
+      padding-inline: 0;
+      box-sizing: border-box;
+    }
+
+    .header__inner {
+      padding-inline: 0.5rem;
+      box-sizing: border-box;
+    }
   }
 
   /* 480px以下でのスマホ最適化 */
@@ -83,17 +142,21 @@ const logo = {
     .header {
       height: 128px;
       padding: 0.5rem;
+      box-sizing: border-box;
     }
 
     .header__wrapper {
       max-width: 100%;
-      padding-inline: 0.5rem;
+      padding-inline: 0;
+      box-sizing: border-box;
     }
 
     .header__inner {
       flex-direction: column;
       gap: 0.75rem;
       align-items: center;
+      padding-inline: 0.5rem;
+      box-sizing: border-box;
     }
 
     .header__logo {

@@ -384,10 +384,16 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
   }
 
+  @media screen and (max-width: 1280px) {
+    .glitch {
+      max-width: 520px;
+      height: 500px;
+    }
+  }
+
   @media screen and (max-width: 480px) {
     .glitch {
       max-width: 480px;
-      height: 560px;
       height: 400px;
       /* background-size: contain; */
     }

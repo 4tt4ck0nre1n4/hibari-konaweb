@@ -25,6 +25,17 @@ html {
   color: #020202;
   background-color: var(--color-white);
   transition: background-color 1.2s ease;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 html.dark {
@@ -42,6 +53,10 @@ html.dark footer {
 
 #outer-container {
   height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 #page-wrap {
