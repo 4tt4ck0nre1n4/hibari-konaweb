@@ -570,12 +570,10 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     --gradient: linear-gradient(150deg, rgba(0, 19, 172, 1) 0%, rgba(100, 255, 209, 1) 55%, rgba(43, 255, 152, 1) 100%);
   }
   .work {
-    color: white;
+    color: var(--color-white);
     position: relative;
     z-index: 1;
     height: 100vh;
-    /* margin-block-start: 1rem; */
-    /* padding-block-start: 3rem; */
   }
   .split__container {
     width: 100%;
@@ -661,12 +659,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     width: 95%;
     height: 100%;
     max-height: 100vh;
+    color: var(--color-black);
     background-color: transparent;
     -webkit-backdrop-filter: blur(50px);
     backdrop-filter: blur(50px);
     background-image: linear-gradient(135deg, rgba(255 255 255 / 0.9), rgba(255 255 255 / 0.3));
     background-size: 100vw 100vh;
-    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
     box-shadow: 0px 4px 60px 0 rgba(56, 74, 244, 0.75);
     border-radius: 1rem;
     position: absolute;
@@ -691,14 +689,14 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   .left__title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #010101;
+    /* color: var(--color-black); */
     white-space: nowrap;
     margin-block-start: 1rem;
   }
   /* 左サイド サイトテキスト */
   .left__text {
     font-size: 1rem;
-    color: #010101;
+    /* color: var(--color-black); */
   }
   .left__leadMenu {
     list-style: none;
@@ -710,8 +708,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     font-size: 1rem;
     line-height: 1;
     letter-spacing: 0.04em;
-    color: #010101;
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-align: justify;
     margin-block-start: 2rem;
   }
@@ -719,7 +716,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     font-size: 0.875rem;
     line-height: 1.6;
     letter-spacing: 0.16em;
-    color: #010101;
+    /* color: #010101; */
     text-align: justify;
     margin-block-start: 0.5rem;
   }
@@ -730,7 +727,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     align-items: flex-start;
     font-size: 0.875rem;
     line-height: 1.5;
-    color: #010101;
+    color: var(--color-black);
     text-decoration: none;
     margin-block-start: 1rem;
   }
@@ -738,7 +735,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     line-height: 2;
   }
   .left__link span:nth-child(4) {
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-decoration: underline;
   }
   /* 右サイド ロゴアイコン */
@@ -1210,7 +1207,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     }
 
     .right__iconMenu_text {
-      font-size: 0.625rem;
+      /* font-size: 0.625rem; */
+      font-size: 0.875rem;
       margin-top: -12px;
     }
 
@@ -1222,13 +1220,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   /* より小さい画面向けの調整 */
   @media (max-width: 480px) {
     .split.right {
-      padding-block-end: 7rem;
-      min-height: calc(100vh + 7rem);
+      padding-block-end: 3.5rem;
+      min-height: calc(100vh + 3.5rem);
     }
     .split.left {
-      margin-block-start: calc(100vh + 7rem);
+      margin-block-start: calc(100vh + 3.5rem);
       padding-block-start: 3rem;
-      padding-block-end: 4.5rem;
+      padding-block-end: 3rem;
     }
     .split.right .right__spImage {
       right: 10%;
@@ -1284,7 +1282,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     }
 
     .right__iconMenu_text {
-      font-size: 0.75rem;
+      font-size: 0.875rem;
+      color: var(--color-black);
     }
   }
 </style>

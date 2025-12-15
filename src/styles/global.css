@@ -1,8 +1,10 @@
 :root {
-  --gradient: linear-gradient(90deg, rgb(238 161 255 / 1) 0%, rgb(147 183 255 / 1) 55%, rgb(170 244 254 / 1) 100%);
   --color-white: #f1f5f9;
+  --color-black: #010101;
   --color-purple: rgb(102 51 153);
   --color-red: #ff4f48;
+  --color-blue: #0d0950;
+  --gradient: linear-gradient(90deg, rgb(238 161 255 / 1) 0%, rgb(147 183 255 / 1) 55%, rgb(170 244 254 / 1) 100%);
 
   /* --gradient: linear-gradient(
     90deg,
@@ -22,7 +24,7 @@
 
 html {
   font-family: Poppins, system-ui, sans-serif;
-  color: #020202;
+  color: var(--color-black);
   background-color: var(--color-white);
   transition: background-color 1.2s ease;
   width: 100%;
@@ -332,6 +334,6 @@ html.dark .nav-links a {
 }
 
 .sorry__link:is(:hover, :focus-within) {
-  color: #ff4f48;
+  color: var(--color-red);
   text-decoration: none;
 }
