@@ -4,7 +4,9 @@ import ReactDOM from "react-dom";
 import { Icon } from "@iconify/react";
 import SnsLink from "./SnsLink";
 import { twitter, github_sns, contact, mail } from "../scripts/constSns";
+import HamburgerMenuLogo from "./HamburgerMenuLogo";
 
+const title = "My Portfolio Site";
 const menuItems = [
   {
     label: "Home",
@@ -297,8 +299,11 @@ const HamburgerMenu = () => {
       className={`${hamburgerStyles.hamburger__menu} ${isOpen ? hamburgerStyles.open : ""}`}
       aria-hidden="true"
     >
+      <div className={hamburgerStyles.hamburger__logo_wrapper}>
+        <HamburgerMenuLogo />
+      </div>
       <div className={hamburgerStyles.hamburger__title}>
-        <h2 className={hamburgerStyles.hamburger__title_text}>My Portfolio Site</h2>
+        <h2 className={hamburgerStyles.hamburger__title_text}>{title}</h2>
       </div>
       <ul>
         {menuItems.map(({ label, href, icon, ariaLabel, ariaTitle }, index) => {

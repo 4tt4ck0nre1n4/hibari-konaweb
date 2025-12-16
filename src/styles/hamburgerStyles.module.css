@@ -165,12 +165,18 @@
 }
 
 .hamburger__button.open .hamburger__line::before {
+  width: 24px;
+  height: 3px;
+  left: -2px;
   transform: rotate(45deg);
   top: 0;
   background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
 }
 
 .hamburger__button.open .hamburger__line::after {
+  width: 24px;
+  height: 3px;
+  left: -2px;
   transform: rotate(-45deg);
   bottom: 0;
   background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
@@ -218,6 +224,86 @@
   }
 }
 
+/* ロゴセクション */
+.hamburger__logo_wrapper {
+  width: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  margin-block-end: 1rem;
+  opacity: 0;
+  transform: translateX(32px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* タブレットサイズとスマホサイズでのみ表示 */
+/* stylelint-disable-next-line media-feature-range-notation */
+@media screen and (max-width: 1024px) {
+  .hamburger__logo_wrapper {
+    display: flex;
+  }
+}
+
+.hamburger__menu.open .hamburger__logo_wrapper {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 1.2s;
+}
+
+.hamburger__logo_link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  text-decoration: none;
+  color: inherit;
+  gap: 0.5rem;
+}
+
+.hamburger__logo_container {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.hamburger__logo_image {
+  width: 40px;
+  height: 40px;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+.hamburger__clock_animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hamburger__clock_circle {
+  stroke: #4ecdc4;
+  transform-origin: center;
+  transform: rotate(-90deg);
+  transition: stroke-dashoffset 1s ease-in-out;
+}
+
+:global(html.dark) .hamburger__clock_circle {
+  stroke: #ffeaa7;
+}
+
+.hamburger__logo_text {
+  width: auto;
+  max-width: 200px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .hamburger__title {
   width: 100%;
   opacity: 0;
@@ -258,6 +344,10 @@
   .hamburger__title {
     padding-inline: 1rem;
   }
+
+  .hamburger__logo_wrapper {
+    padding-inline: 1rem;
+  }
 }
 
 .hamburger__menu ul {
@@ -271,6 +361,14 @@
   margin-block-start: 1rem;
   padding-block-start: 1.5rem;
   padding-block-end: 1rem;
+}
+
+/* タブレット・スマホサイズでロゴが表示される場合の調整 */
+/* stylelint-disable-next-line media-feature-range-notation */
+@media screen and (max-width: 1024px) {
+  .hamburger__menu ul {
+    margin-block-start: 0.75rem;
+  }
 }
 
 /* PCサイズでよりコンパクトに */
@@ -343,7 +441,8 @@
     max-height: 100vh;
     border-left: none;
     margin: 0;
-    padding-block: 3.5rem 2rem;
+    padding-block-start: 1.5rem;
+    padding-block-end: 2rem;
     padding-inline: 0;
     top: 0;
     transform: none;

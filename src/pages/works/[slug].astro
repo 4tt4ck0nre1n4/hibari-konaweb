@@ -1219,11 +1219,11 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   /* より小さい画面向けの調整 */
   @media (max-width: 480px) {
     .split.right {
-      padding-block-end: 2rem;
       min-height: calc(100vh + 2rem);
+      padding-block-end: 2rem;
     }
     .split.left {
-      margin-block-start: calc(100vh + 2rem);
+      margin-block-start: calc(20vh + 2rem);
       padding-block-start: 2rem;
       padding-block-end: 2rem;
     }
@@ -1274,10 +1274,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       bottom: auto;
       margin-block-start: auto;
       margin-block-end: 2rem;
-      margin-top: auto;
-      margin-bottom: 2rem;
       padding-block-start: 1rem;
       flex-shrink: 0;
+      border: 1px solid red;
     }
 
     .right__iconMenu_text {
