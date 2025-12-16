@@ -1009,12 +1009,11 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       top: 0;
       width: 100%;
       height: auto;
-      min-height: calc(100vh + 30rem);
+      min-height: calc(100vh + 2rem);
       order: 1;
       overflow: visible;
       z-index: 3;
-      padding-bottom: 30rem;
-      padding-block-end: 30rem;
+      padding-block-end: 2rem;
     }
 
     /* 左サイドを下に配置（.rightの上を被さる） */
@@ -1028,9 +1027,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       top: auto;
       left: auto;
       z-index: 2;
-      margin-block-start: calc(100vh + 30rem);
-      padding-block-start: 8rem;
-      padding-block-end: 20rem;
+      margin-block-start: calc(100vh + 2rem);
+      padding-block-start: 2rem;
+      padding-block-end: 2rem;
     }
 
     /* スマホでのホバーエフェクト無効化 */
@@ -1120,7 +1119,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       max-width: 30%;
       height: auto;
       max-height: 50%;
-      top: 12%;
+      top: 11%;
       right: 16%;
       transform: translateX(50%);
       object-fit: contain;
@@ -1220,16 +1219,16 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   /* より小さい画面向けの調整 */
   @media (max-width: 480px) {
     .split.right {
-      padding-block-end: 3.5rem;
-      min-height: calc(100vh + 3.5rem);
+      padding-block-end: 2rem;
+      min-height: calc(100vh + 2rem);
     }
     .split.left {
-      margin-block-start: calc(100vh + 3.5rem);
-      padding-block-start: 3rem;
-      padding-block-end: 3rem;
+      margin-block-start: calc(100vh + 2rem);
+      padding-block-start: 2rem;
+      padding-block-end: 2rem;
     }
     .split.right .right__spImage {
-      right: 10%;
+      right: 11%;
     }
     .right__header {
       font-size: 1.125rem;
