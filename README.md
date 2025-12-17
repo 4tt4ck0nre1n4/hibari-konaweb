@@ -1,81 +1,233 @@
-# Astro Starter Kit: Basics
+# My Portfolio Site
 
-```sh
-npm create astro@latest -- --template basics
+ポートフォリオサイトです。Astro + React + TypeScriptで構築され、WordPressをヘッドレスCMSとして使用しています。
+
+## 🌐 デモ
+
+- **本番環境**: [https://hibari-konaweb.netlify.app](https://hibari-konaweb.netlify.app)
+
+## ✨ 主な機能
+
+- 📝 **ブログ機能**: WordPress REST APIから取得した記事を表示
+- 🎨 **Works紹介**: 作品一覧と詳細ページ
+- 📧 **お問い合わせフォーム**: Contact Form 7との連携
+- 🔍 **サイト内検索**: Pagefindによる全文検索機能
+- 📊 **Google Analytics 4**: アクセス解析の統合
+- 🎬 **アニメーション**: GSAP、Rive、Particles.jsを使用したリッチなUI
+- 📱 **レスポンシブデザイン**: モバイルファーストのデザイン
+- ⚡ **パフォーマンス最適化**: LCP、CLS、FCPなどのCore Web Vitalsを最適化
+
+## 🛠️ 技術スタック
+
+### フロントエンド
+
+- **[Astro](https://astro.build/)** - 静的サイトジェネレーター
+- **[React](https://react.dev/)** - UIライブラリ
+- **[TypeScript](https://www.typescriptlang.org/)** - 型安全性
+- **[GSAP](https://gsap.com/)** - アニメーションライブラリ
+- **[Rive](https://rive.app/)** - インタラクティブアニメーション
+- **[Particles.js](https://particles.js.org/)** - パーティクルエフェクト
+- **[Swiper](https://swiperjs.com/)** - スライダーコンポーネント
+- **[Pagefind](https://pagefind.app/)** - サイト内検索
+
+### バックエンド・CMS
+
+- **[WordPress](https://wordpress.org/)** - ヘッドレスCMS（REST API）
+- **[Contact Form 7](https://contactform7.com/)** - お問い合わせフォーム
+
+### デプロイ・ホスティング
+
+- **[Netlify](https://www.netlify.com/)** - ホスティング・CI/CD
+- **[GitHub Actions](https://github.com/features/actions)** - 自動デプロイ（オプション）
+
+### 開発ツール
+
+- **ESLint** - コード品質チェック
+- **Stylelint** - CSS品質チェック
+- **Prettier** - コードフォーマッター
+- **Sass** - CSSプリプロセッサ
+
+## 📋 前提条件
+
+- **Node.js**: v20以上
+- **npm**: v9以上（またはyarn、pnpm）
+- **WordPress**: ローカル開発環境（Local by Flywheel推奨）または本番環境
+
+## 🚀 セットアップ
+
+### 1. リポジトリのクローン
+
+```bash
+git clone https://github.com/your-username/hibari-konaweb.git
+cd hibari-konaweb
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+### 2. 依存関係のインストール
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+```bash
+npm install
+```
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
+### 3. 環境変数の設定
 
-## 🚀 Project Structure
+`.env`ファイルを作成し、必要な環境変数を設定します：
 
-Inside of your Astro project, you'll see the following folders and files:
+```bash
+cp env.example.txt .env
+```
+
+`.env`ファイルを編集：
+
+```env
+# WordPress REST API設定
+PUBLIC_API_URL=http://hibari-konaweb.local
+PUBLIC_API_PREFIX=/wp-json/wp/v2/
+
+# Contact Form 7設定（オプション）
+PUBLIC_WPCF7_API_PREFIX=contact-form-7/v1/contact-forms/
+PUBLIC_WPCF7_API_ID=123
+PUBLIC_WPCF7_ID=123
+PUBLIC_WPCF7_UNIT_TAG=wpcf7-f123-p456-o1
+PUBLIC_WPCF7_POST_ID=456
+
+# Google Analytics 4設定（オプション）
+PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+詳細は [`env.example.txt`](./env.example.txt) を参照してください。
+
+### 4. WordPressの起動
+
+ローカル開発環境の場合、WordPressを起動してください：
+
+- **Local by Flywheel**: サイトを起動
+- または、本番環境のWordPress URLを使用
+
+### 5. 開発サーバーの起動
+
+```bash
+npm run dev
+```
+
+ブラウザで `http://localhost:4321` にアクセスします。
+
+## 📜 利用可能なコマンド
+
+| コマンド             | 説明                                   |
+| -------------------- | -------------------------------------- |
+| `npm run dev`        | 開発サーバーを起動（`localhost:4321`） |
+| `npm run build`      | 本番用ビルドを実行                     |
+| `npm run build:safe` | 環境変数チェック付きビルド（推奨）     |
+| `npm run preview`    | ビルド結果をローカルでプレビュー       |
+| `npm run check-env`  | 環境変数の設定を確認                   |
+| `npm run lint`       | ESLintとStylelintを実行                |
+| `npm run format`     | Prettierでコードをフォーマット         |
+| `npm run clean`      | ビルドキャッシュとdistを削除           |
+
+## 📁 プロジェクト構造
 
 ```text
-/
-├── public/
-│   └── favicon.svg
+hibari-konaweb/
+├── public/              # 静的ファイル（画像、ファビコンなど）
 ├── src/
-│   ├── components/
-│   │   └── Card.astro
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+│   ├── api/            # API関連のユーティリティ
+│   ├── assets/         # 画像、SVG、フォントなど
+│   ├── components/     # Astro/Reactコンポーネント
+│   ├── data/           # JSONデータファイル
+│   ├── layouts/        # レイアウトコンポーネント
+│   ├── pages/          # ページファイル（ルーティング）
+│   ├── scripts/        # クライアントサイドスクリプト
+│   ├── styles/         # グローバルスタイル
+│   ├── types/          # TypeScript型定義
+│   └── util/           # ユーティリティ関数
+├── docs/               # ドキュメント
+│   ├── guides/         # セットアップ・デプロイガイド
+│   ├── optimization/   # 最適化ガイド
+│   ├── troubleshooting/# トラブルシューティング
+│   └── features/       # 機能・使用方法ガイド
+├── astro.config.mjs    # Astro設定ファイル
+├── netlify.toml        # Netlify設定ファイル
+└── package.json        # 依存関係とスクリプト
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🌍 環境変数
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+### 必須環境変数
 
-Any static assets, like images, can be placed in the `public/` directory.
+| 変数名              | 説明                     | 例                           |
+| ------------------- | ------------------------ | ---------------------------- |
+| `PUBLIC_API_URL`    | WordPressのURL           | `https://hibari-konaweb.com` |
+| `PUBLIC_API_PREFIX` | REST APIのプレフィックス | `/wp-json/wp/v2/`            |
 
-## 🧞 Commands
+### オプション環境変数
 
-All commands are run from the root of the project, from a terminal:
+| 変数名                     | 説明                       |
+| -------------------------- | -------------------------- |
+| `PUBLIC_WPCF7_*`           | Contact Form 7の設定       |
+| `PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4の測定ID |
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+詳細は [`docs/guides/NETLIFY_ENV_SETUP.md`](./docs/guides/NETLIFY_ENV_SETUP.md) を参照してください。
 
-## 📊 Google Analytics 導入
+## 🚢 デプロイ
 
-このプロジェクトには Google Analytics 4 (GA4) が統合されています。
+### Netlifyへのデプロイ
 
-### セットアップ手順
+1. **環境変数の設定**
 
-1. Google Analytics で測定ID（`G-XXXXXXXXXX`）を取得
-2. `.env` ファイルに以下を追加：
+   - Netlifyダッシュボード → Site Settings → Environment Variables
+   - 必須環境変数を設定
+
+2. **GitHubにプッシュ**
+
    ```bash
-   PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+   git push origin main
    ```
-3. Netlify の環境変数にも同じ値を設定
 
-詳細な導入手順は [`GOOGLE_ANALYTICS_SETUP_GUIDE.md`](./GOOGLE_ANALYTICS_SETUP_GUIDE.md) を参照してください。
+   Netlifyが自動的にビルド・デプロイを実行します。
 
-### カスタムイベントの追跡
+詳細は [`docs/guides/NETLIFY_SETUP_GUIDE.md`](./docs/guides/NETLIFY_SETUP_GUIDE.md) を参照してください。
 
-```typescript
-import { trackEvent, trackFormSubmit } from './util/analytics';
+### ローカルビルド + Netlify CLI
 
-// イベントの追跡
-trackEvent('button_click', { button_name: 'contact' });
-
-// フォーム送信の追跡
-trackFormSubmit('contact_form', true);
+```bash
+npm run build:safe
+npx netlify deploy --prod --dir=dist
 ```
 
-## 👀 Want to learn more?
+詳細は [`docs/guides/QUICK_DEPLOY_GUIDE.md`](./docs/guides/QUICK_DEPLOY_GUIDE.md) を参照してください。
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## 📚 ドキュメント
+
+プロジェクトの詳細なドキュメントは [`docs/`](./docs/) ディレクトリにあります。
+
+- 📖 [セットアップ・デプロイガイド](./docs/guides/)
+- ⚡ [最適化ガイド](./docs/optimization/)
+- 🔧 [トラブルシューティング](./docs/troubleshooting/)
+- 🎨 [機能・使用方法ガイド](./docs/features/)
+
+## 🔧 トラブルシューティング
+
+よくある問題と解決方法は [`docs/troubleshooting/`](./docs/troubleshooting/) を参照してください。
+
+- [404エラーの解決方法](./docs/troubleshooting/TROUBLESHOOTING_404_ERRORS.md)
+- [環境変数の設定](./docs/guides/NETLIFY_ENV_SETUP.md)
+- [WordPressビルド手順](./docs/guides/BUILD_WITH_WORDPRESS_GUIDE.md)
+
+## 🤝 コントリビューション
+
+バグ報告や機能要望は、GitHubのIssueでお知らせください。
+
+## 📄 ライセンス
+
+このプロジェクトは個人のポートフォリオサイトです。
+
+## 👤 作成者
+
+### hibari-konaweb
+
+- ポートフォリオ: [https://hibari-konaweb.netlify.app](https://hibari-konaweb.netlify.app)
+- 拠点: 千葉県袖ケ浦市
+
+---
+
+**「納期厳守」「迅速・丁寧なコミュニケーション」「細部までの品質のこだわり」を大切にしています。**

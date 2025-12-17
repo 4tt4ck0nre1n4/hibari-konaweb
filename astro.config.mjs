@@ -16,6 +16,10 @@ export default defineConfig({
     format: "file",
     inlineStylesheets: "auto", // 自動的に小さなCSSをインライン化
   },
+  // docs/ディレクトリをビルドから除外（ドキュメントは本番環境には不要）
+  publicDir: "public",
+  // src/pages/以外の.mdファイルはビルド対象外
+  // docs/ディレクトリはGitHubリポジトリには含まれるが、本番ビルドには含まれない
   integrations: [
     react(),
     pagefind(),

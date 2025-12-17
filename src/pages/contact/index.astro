@@ -7,10 +7,10 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import globalText from "../../data/globalText.json";
 import contactText from "../../data/contactText.json";
-import backgroundImage2Src from "../../assets/background2.webp";
+import contactBackgroundImageSrc from "../../assets/contactBackground.webp";
 import { getImage } from "astro:assets";
 
-const backgroundImage2 = await getImage({ src: backgroundImage2Src });
+const contactBackgroundImage = await getImage({ src: contactBackgroundImageSrc });
 interface Props {
   pageTitle: string;
 }
@@ -41,13 +41,16 @@ export const prerender = true;
   twitterDescription={globalText.contact.description}
   jsonLd={jsonLd}
 >
+
+<link slot="head" rel="preload" href={contactBackgroundImage.src} as="image" fetchpriority="high" />
+
   <div id="outer-container">
     <Header />
     <main id="page-wrap">
       <div class="breadcrumbs__wrapper">
         <Breadcrumbs {crumbs} />
       </div>
-      <div class="contact" style={`background-image: url(${backgroundImage2.src})`}>
+      <div class="contact" style={`background-image: url(${contactBackgroundImage.src})`}>
         <div class="contact__wrapper">
           <h1 class="contact__title" id="contact-form-title">
             {pageTitle}
