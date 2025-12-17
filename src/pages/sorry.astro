@@ -4,9 +4,6 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { Image } from "astro:assets";
 import sorryImage from "/public/assets/sorry.webp";
-// import { Breadcrumbs } from "astro-breadcrumbs";
-// import "astro-breadcrumbs/breadcrumbs.css";
-// import "../styles/astro-breadcrumbs-config.scss";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import globalText from "../data/globalText.json";
 import errorText from "../data/errorText.json";
@@ -32,6 +29,9 @@ const sorryImageMeta = {
   twitterTitle={globalText.sorry.title}
   twitterDescription={globalText.sorry.description}
 >
+
+<link slot="head" rel="preload" href={sorryImage.src} as="image" fetchpriority="high" />
+
   <div id="outer-container">
     <Header />
     <main id="page-wrap">

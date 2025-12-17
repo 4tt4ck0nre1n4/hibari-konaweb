@@ -40,6 +40,9 @@ const notFoundLinks = {
   twitterTitle={globalText.notFound404.title}
   twitterDescription={globalText.notFound404.description}
 >
+
+<link slot="head" rel="preload" href={NotfoundImage.src} as="image" fetchpriority="high" />
+
   <div id="outer-container">
     <Header />
     <main id="page-wrap">

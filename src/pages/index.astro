@@ -5,7 +5,6 @@ import Footer from "../components/Footer.astro";
 import Logo from "../components/Logo.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import Aside from "../components/Aside.astro";
-// import ResponsiveFv from "../components/ResponsiveFv.astro";
 import GridSvg from "../components/GridSvg.astro";
 import gridText from "../data/gridText.json";
 import SafeIcon from "../components/SafeIcon.astro";
@@ -32,7 +31,6 @@ import gridBackgroundImageSrc from "../assets/gridBackground.webp";
 import { getImage } from "astro:assets";
 import NaviCard from "../components/NaviCard.astro";
 import Glitch from "../components/Glitch.astro";
-// import SampleNaviCard from "../components/SampleNaviCard.astro";
 const fvAnimeImage = await getImage({ src: fvAnimeImageSrc });
 const fvBackgroundImage = await getImage({ src: fvBackgroundImageSrc });
 const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
@@ -60,21 +58,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
         <Breadcrumbs crumbs={[]} />
       </div>
 
-      <!-- <SampleNaviCard /> -->
 
-      <!-- <div class="fv">
-        <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImage.src})`}>
-          <div class="background-container">
-            <div class="background-rotated" style={`background-image: url(${fvAnimeImage.src})`}></div>
-            <div class="background"></div>
-          </div>
-          <div class="glitch-container">
-            <SampleNaviCard />
-
-            <Glitch />
-          </div>
-        </div>
-      </div> -->
 
       <div class="fv">
         <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImage.src})`}>
@@ -88,14 +72,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
           </div>
         </div>
       </div>
-
-      <!-- <div class="animated-sprite-container">
-        <DepthAppearImage src={animeImage.src} alt="アニメーション画像" client:load />
-      </div> -->
-      <!-- タブレット・スマホ用：#main-containerの直上に配置 -->
-      <!-- <div class="responsive-fv-wrapper responsive-fv-wrapper--mobile">
-        <ResponsiveFv />
-      </div> -->
 
       <div class="swiper-display-container swiper-display-container--mobile">
         <SwiperDisplay />

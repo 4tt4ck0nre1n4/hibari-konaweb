@@ -40,6 +40,9 @@ const serverErrorImageMeta = {
   twitterTitle={globalText.serverError500.title}
   twitterDescription={globalText.serverError500.description}
 >
+
+<link slot="head" rel="preload" href={serverErrorImage.src} as="image" fetchpriority="high" />
+
   <div id="outer-container">
     <Header />
     <main id="page-wrap">
