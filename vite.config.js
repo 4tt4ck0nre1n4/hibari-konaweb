@@ -18,9 +18,6 @@ export default defineConfig({
           if (id.includes("swiper")) {
             return "swiper";
           }
-          if (id.includes("react") || id.includes("react-dom")) {
-            return "react-vendor";
-          }
           if (id.includes("node_modules")) {
             return "vendor";
           }

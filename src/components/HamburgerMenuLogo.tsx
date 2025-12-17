@@ -66,6 +66,8 @@ const HamburgerMenuLogo = () => {
           className={hamburgerStyles.hamburger__logo_image}
           src="/favicon.svg"
           alt="ロゴ画像"
+          width="40"
+          height="40"
           loading="lazy"
           decoding="async"
         />
@@ -91,6 +93,8 @@ const HamburgerMenuLogo = () => {
         className={hamburgerStyles.hamburger__logo_text}
         src="/logo_text.svg"
         alt="ロゴテキスト"
+        width="280"
+        height="50"
         loading="lazy"
         decoding="async"
       />
