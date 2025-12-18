@@ -75,10 +75,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
         <SwiperDisplay />
       </div>
       <div id="main-container" style={`background-image: url(${gridBackgroundImage.src})`}>
-        <!-- デスクトップ用：ResponsiveFvは非表示 -->
-        <!-- <div class="responsive-fv-wrapper responsive-fv-wrapper--desktop">
-          <ResponsiveFv />
-        </div> -->
         <aside class="toolbar">
           <Aside />
         </aside>
@@ -276,9 +272,9 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   </div>
 </Layout>
 
-<script>
+<script is:inline>
   // @ts-nocheck
-  import JSConfetti from "js-confetti";
+  // JSConfettiはグローバルスコープで利用可能であることを前提としています
 
   function initConfetti() {
     const confetti = document.getElementById("confettiButton");
@@ -442,7 +438,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   .responsive-fv {
     display: none;
   }
-
   #main-container {
     display: grid;
     grid-template-columns: 24% 50% 24%;
@@ -593,14 +588,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     display: flex;
     justify-content: center;
     align-items: center;
-    /* background: #000000; */
-    /* background-color: aliceblue; */
-    /* background-image: repeating-conic-gradient(#000000 0% 25%, #111111 0% 50%);
-    background-size: 240px 80px;
-    animation: noise 1s infinite linear; */
-    /* background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat; */
     margin-inline: auto;
     position: relative;
     z-index: 0;
@@ -1258,12 +1245,12 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   }
 </style>
 
-<script>
+<script is:inline>
   // @ts-nocheck
-  import { gsap } from "gsap";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-  gsap.registerPlugin(ScrollTrigger);
+  // gsapとScrollTriggerはグローバルスコープで利用可能であることを前提としています
+  if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+  }
 
   const buttonSound = new Audio("/sounds/buttonSound.mp3");
 
@@ -1280,9 +1267,9 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     }
   }
 
-  const tweens: any[] = [];
+  const tweens = [];
 
-  function createTween(gsap: any, selector: any, props: any) {
+  function createTween(gsap, selector, props) {
     tweens.push(
       gsap.to(selector, {
         ...props,
@@ -1290,24 +1277,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       })
     );
   }
-
-  // 初期アニメーションを削除（CLS対策）
-  // gsap
-  //   .timeline()
-  //   .from(grid, {
-  //     scale: 0.4,
-  //     duration: 1,
-  //     ease: "power1.in",
-  //   })
-  //   .from(
-  //     gridMenu,
-  //     {
-  //       y: -200,
-  //       duration: 1,
-  //       ease: "power1.inOut",
-  //     },
-  //     "-=0.3"
-  //   );
 
   // Astro要素のスクロールアニメーション
   const pageContainer = document.getElementById("page-wrap");
@@ -1328,8 +1297,8 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
   // Tooltipのアニメーション
   document.querySelectorAll(".grid__menu_item").forEach((item) => {
-    const tooltipRight = item.querySelector(".item__tooltip_right") as HTMLElement;
-    const tooltipLeft = item.querySelector(".item__tooltip_left") as HTMLElement;
+    const tooltipRight = item.querySelector(".item__tooltip_right");
+    const tooltipLeft = item.querySelector(".item__tooltip_left");
 
     item.addEventListener("mouseenter", () => {
       [tooltipRight, tooltipLeft].forEach((tooltip) => {
@@ -1445,7 +1414,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     );
   };
 
-  let lastTriggeredSecond: any = null;
+  let lastTriggeredSecond = null;
 
   const rotateRestartButtonTimeInterval = () => {
     setInterval(() => {
@@ -1594,15 +1563,15 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   });
 
   // マウス追従背景の初期化
-  function initBackgroundMouseFollow(): void {
-    const backgroundContainer = document.querySelector<HTMLElement>(".background-container");
+  function initBackgroundMouseFollow() {
+    const backgroundContainer = document.querySelector(".background-container");
     if (!backgroundContainer) return;
 
-    const fvWrapper = document.querySelector<HTMLElement>(".fv__wrapper");
+    const fvWrapper = document.querySelector(".fv__wrapper");
     if (!fvWrapper) return;
 
     // パフォーマンス向上のため、requestAnimationFrameを使用
-    let rafId: number | null = null;
+    let rafId = null;
     let mouseX = 0;
     let mouseY = 0;
 
@@ -1629,7 +1598,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       // window全体でマウス移動を監視（画面全体を追従）
       window.addEventListener(
         "mousemove",
-        (e: MouseEvent) => {
+        (e) => {
           mouseX = e.clientX;
           mouseY = e.clientY;
 
@@ -1655,7 +1624,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
       window.addEventListener(
         "touchstart",
-        (e: TouchEvent) => {
+        (e) => {
           if (e.touches.length > 0) {
             isTouching = true;
             touchX = e.touches[0].clientX;
@@ -1673,7 +1642,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
       window.addEventListener(
         "touchmove",
-        (e: TouchEvent) => {
+        (e) => {
           if (e.touches.length > 0 && isTouching) {
             touchX = e.touches[0].clientX;
             touchY = e.touches[0].clientY;
@@ -1698,7 +1667,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
       // 2. 自動アニメーション（タッチ操作がない場合の代替）
       // パルスアニメーション: 定期的に位置を変更して視覚的な動きを提供
-      let autoAnimationId: number | null = null;
+      let autoAnimationId = null;
       let animationPhase = 0;
       const animationDuration = 4000; // 4秒周期
       const animationRadius = 100; // 移動半径（px）
