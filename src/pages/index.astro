@@ -1564,11 +1564,48 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
   // マウス追従背景の初期化
   function initBackgroundMouseFollow() {
-    const backgroundContainer = document.querySelector(".background-container");
-    if (!backgroundContainer) return;
+    // 要素が見つかるまで待機（ローディングスクリーンの終了を考慮）
+    const checkAndInit = () => {
+      const backgroundContainer = document.querySelector(".background-container");
+      const fvWrapper = document.querySelector(".fv__wrapper");
 
-    const fvWrapper = document.querySelector(".fv__wrapper");
-    if (!fvWrapper) return;
+      if (!backgroundContainer || !fvWrapper) {
+        // 要素が見つからない場合は再試行
+        setTimeout(checkAndInit, 100);
+        return;
+      }
+
+      // ローディングスクリーンの終了を待つ
+      const loadingScreen = document.getElementById("loading-screen");
+      if (loadingScreen) {
+        const checkLoadingComplete = () => {
+          const computedStyle = window.getComputedStyle(loadingScreen);
+          const isVisible =
+            loadingScreen.style.display !== "none" &&
+            loadingScreen.style.visibility !== "hidden" &&
+            computedStyle.display !== "none" &&
+            computedStyle.visibility !== "hidden";
+
+          if (isVisible) {
+            // まだローディング中なので再チェック
+            setTimeout(checkLoadingComplete, 100);
+          } else {
+            // ローディング終了後に初期化
+            initializeMouseFollow(backgroundContainer, fvWrapper);
+          }
+        };
+        checkLoadingComplete();
+      } else {
+        // ローディングスクリーンが存在しない場合は即座に初期化
+        initializeMouseFollow(backgroundContainer, fvWrapper);
+      }
+    };
+
+    checkAndInit();
+  }
+
+  // マウス追従の実際の初期化処理
+  function initializeMouseFollow(backgroundContainer: HTMLElement, fvWrapper: HTMLElement) {
 
     // パフォーマンス向上のため、requestAnimationFrameを使用
     let rafId = null;
