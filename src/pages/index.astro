@@ -424,13 +424,28 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     }
   }
 
-  // より確実な初期化方法
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initConfetti);
-  } else {
-    // DOM既にロード済みの場合は即座に実行
-    initConfetti();
+  // JSConfettiが読み込まれたことを確認してから初期化
+  function waitForJSConfettiAndInit() {
+    if (typeof JSConfetti !== "undefined") {
+      console.log("✅ JSConfetti is ready, initializing confetti...");
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initConfetti);
+      } else {
+        initConfetti();
+      }
+    } else {
+      console.log("⏳ Waiting for JSConfetti to load...");
+      setTimeout(waitForJSConfettiAndInit, 100);
+    }
   }
+
+  // window.onloadイベントでも初期化を試みる（フォールバック）
+  window.addEventListener("load", () => {
+    waitForJSConfettiAndInit();
+  });
+
+  // 即座にも試行（既に読み込まれている場合）
+  waitForJSConfettiAndInit();
 </script>
 
 <style is:global>
@@ -1253,262 +1268,319 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
 <script is:inline>
   // @ts-nocheck
-  // gsapとScrollTriggerはグローバルスコープで利用可能であることを前提としています
-  if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger);
-  }
+  // GSAPとScrollTriggerの読み込みを待つ
+  function initializeApp() {
+    console.log("🔍 Initializing app...");
 
-  const buttonSound = new Audio("/sounds/buttonSound.mp3");
-
-  function playSound() {
-    const isSoundOn = localStorage.getItem("sound-enabled") === "true";
-
-    if (isSoundOn) {
-      try {
-        buttonSound.currentTime = 0;
-        void buttonSound.play();
-      } catch (error) {
-        console.error("Sound playback failed:", error);
-      }
-    }
-  }
-
-  const tweens = [];
-
-  function createTween(gsap, selector, props) {
-    tweens.push(
-      gsap.to(selector, {
-        ...props,
-        paused: true,
-      })
-    );
-  }
-
-  // Astro要素のスクロールアニメーション
-  const pageContainer = document.getElementById("page-wrap");
-  const astroElement = document.querySelector(".astro-a");
-
-  if (astroElement && pageContainer) {
-    gsap.to(astroElement, {
-      y: () => pageContainer.offsetHeight * 0.2,
-      ease: "power1.out",
-      scrollTrigger: {
-        trigger: pageContainer,
-        start: "top top",
-        end: "center end",
-        scrub: true,
-      },
-    });
-  }
-
-  // Tooltipのアニメーション
-  document.querySelectorAll(".grid__menu_item").forEach((item) => {
-    const tooltipRight = item.querySelector(".item__tooltip_right");
-    const tooltipLeft = item.querySelector(".item__tooltip_left");
-
-    item.addEventListener("mouseenter", () => {
-      [tooltipRight, tooltipLeft].forEach((tooltip) => {
-        if (tooltip) {
-          gsap.to(tooltip, {
-            opacity: 1,
-            y: -10,
-            duration: 0.3,
-            ease: "power1.out",
-          });
-        }
-      });
-    });
-
-    item.addEventListener("mouseleave", () => {
-      [tooltipRight, tooltipLeft].forEach((tooltip) => {
-        if (tooltip) {
-          gsap.to(tooltip, {
-            opacity: 0,
-            y: 0,
-            duration: 0.3,
-            ease: "power1.in",
-          });
-        }
-      });
-    });
-  });
-
-  // 画面サイズとデバイスに応じたアニメーション設定
-  const getAnimationSettings = () => {
-    const screenWidth = window.innerWidth;
-    const isMobile = screenWidth <= 768;
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isAndroid = /Android/.test(navigator.userAgent);
-
-    let item4X;
-    let item6X;
-
-    if (isMobile) {
-      if (isIOS) {
-        // iPhone: はみ出しを防ぐため少し小さめに調整
-        item4X = 250;
-        item6X = -250;
-      } else if (isAndroid) {
-        // Android: 足りない分を補うため少し大きめに調整
-        item4X = 264;
-        item6X = -264;
-      } else {
-        // その他のデバイス
-        item4X = 254;
-        item6X = -254;
-      }
-    } else {
-      // デスクトップ
-      item4X = 440;
-      item6X = -440;
+    // gsapとScrollTriggerはグローバルスコープで利用可能であることを前提としています
+    if (typeof gsap === "undefined") {
+      console.warn("⚠️ GSAP not loaded yet, retrying in 100ms...");
+      setTimeout(initializeApp, 100);
+      return;
     }
 
-    return [
-      [".item-1", { y: 230, rotation: 720, duration: 1.2 }],
-      [".item-2", { y: 230, rotation: 360, duration: 1.6 }],
-      [".item-3", { y: 230, rotation: 720, duration: 2 }],
-      [".item-4", { x: item4X, rotation: 360, duration: 2.3 }],
-      [".item-5", { x: 0, rotation: 1080, duration: 2.6 }],
-      [".item-6", { x: item6X, rotation: 360, duration: 2.3 }],
-      [".item-7", { y: -230, rotation: 720, duration: 1.4 }],
-      [".item-8", { y: -230, rotation: 360, duration: 1.8 }],
-      [".item-9", { y: -230, rotation: 720, duration: 2.2 }],
-      [".item-10", { y: -230, rotation: 720, duration: 1.4 }],
-      [".item-11", { y: -230, rotation: 360, duration: 1.8 }],
-      [".item-12", { y: -230, rotation: 720, duration: 2.2 }],
-    ];
-  };
+    console.log("✅ GSAP loaded successfully");
 
-  const animationSettings = getAnimationSettings();
+    if (typeof ScrollTrigger !== "undefined") {
+      gsap.registerPlugin(ScrollTrigger);
+      console.log("✅ ScrollTrigger registered");
+    }
 
-  // アニメーション設定を適用
-  animationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
+    const buttonSound = new Audio("/sounds/buttonSound.mp3");
 
-  // ウィンドウリサイズ時にアニメーション設定を再生成
-  window.addEventListener("resize", () => {
-    // 既存のtweenをクリア
-    tweens.forEach((tween) => tween.kill());
-    tweens.length = 0;
+    function playSound() {
+      const isSoundOn = localStorage.getItem("sound-enabled") === "true";
 
-    // 新しい設定でtweenを作成
-    const newAnimationSettings = getAnimationSettings();
-    newAnimationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
-  });
+      if (isSoundOn) {
+        try {
+          buttonSound.currentTime = 0;
+          void buttonSound.play();
+        } catch (error) {
+          console.error("Sound playback failed:", error);
+        }
+      }
+    }
 
-  // restartボタンの回転アニメーション（GSAPを使用）
-  const rotateRestartButton = () => {
-    const restartButton = document.getElementById("restart");
-    if (!restartButton) return;
+    const tweens = [];
 
-    gsap.fromTo(
-      restartButton,
-      {
-        rotation: 0,
-        scale: 1,
-      },
-      {
-        rotation: 720,
-        scale: 1.3,
-        duration: 1.5,
-        ease: "power2.inOut",
-        onComplete: () => {
-          gsap.set(restartButton, {
-            clearProps: "rotation, scale",
-          });
+    function createTween(gsap, selector, props) {
+      tweens.push(
+        gsap.to(selector, {
+          ...props,
+          paused: true,
+        })
+      );
+    }
+
+    // Astro要素のスクロールアニメーション
+    const pageContainer = document.getElementById("page-wrap");
+    const astroElement = document.querySelector(".astro-a");
+
+    if (astroElement && pageContainer) {
+      gsap.to(astroElement, {
+        y: () => pageContainer.offsetHeight * 0.2,
+        ease: "power1.out",
+        scrollTrigger: {
+          trigger: pageContainer,
+          start: "top top",
+          end: "center end",
+          scrub: true,
         },
+      });
+    }
+
+    // Tooltipのアニメーション
+    document.querySelectorAll(".grid__menu_item").forEach((item) => {
+      const tooltipRight = item.querySelector(".item__tooltip_right");
+      const tooltipLeft = item.querySelector(".item__tooltip_left");
+
+      item.addEventListener("mouseenter", () => {
+        [tooltipRight, tooltipLeft].forEach((tooltip) => {
+          if (tooltip) {
+            gsap.to(tooltip, {
+              opacity: 1,
+              y: -10,
+              duration: 0.3,
+              ease: "power1.out",
+            });
+          }
+        });
+      });
+
+      item.addEventListener("mouseleave", () => {
+        [tooltipRight, tooltipLeft].forEach((tooltip) => {
+          if (tooltip) {
+            gsap.to(tooltip, {
+              opacity: 0,
+              y: 0,
+              duration: 0.3,
+              ease: "power1.in",
+            });
+          }
+        });
+      });
+    });
+
+    // 画面サイズとデバイスに応じたアニメーション設定
+    const getAnimationSettings = () => {
+      const screenWidth = window.innerWidth;
+      const isMobile = screenWidth <= 768;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isAndroid = /Android/.test(navigator.userAgent);
+
+      let item4X;
+      let item6X;
+
+      if (isMobile) {
+        if (isIOS) {
+          // iPhone: はみ出しを防ぐため少し小さめに調整
+          item4X = 250;
+          item6X = -250;
+        } else if (isAndroid) {
+          // Android: 足りない分を補うため少し大きめに調整
+          item4X = 264;
+          item6X = -264;
+        } else {
+          // その他のデバイス
+          item4X = 254;
+          item6X = -254;
+        }
+      } else {
+        // デスクトップ
+        item4X = 440;
+        item6X = -440;
       }
-    );
-  };
 
-  let lastTriggeredSecond = null;
+      return [
+        [".item-1", { y: 230, rotation: 720, duration: 1.2 }],
+        [".item-2", { y: 230, rotation: 360, duration: 1.6 }],
+        [".item-3", { y: 230, rotation: 720, duration: 2 }],
+        [".item-4", { x: item4X, rotation: 360, duration: 2.3 }],
+        [".item-5", { x: 0, rotation: 1080, duration: 2.6 }],
+        [".item-6", { x: item6X, rotation: 360, duration: 2.3 }],
+        [".item-7", { y: -230, rotation: 720, duration: 1.4 }],
+        [".item-8", { y: -230, rotation: 360, duration: 1.8 }],
+        [".item-9", { y: -230, rotation: 720, duration: 2.2 }],
+        [".item-10", { y: -230, rotation: 720, duration: 1.4 }],
+        [".item-11", { y: -230, rotation: 360, duration: 1.8 }],
+        [".item-12", { y: -230, rotation: 720, duration: 2.2 }],
+      ];
+    };
 
-  const rotateRestartButtonTimeInterval = () => {
-    setInterval(() => {
-      const now = new Date();
-      const seconds = now.getSeconds();
+    const animationSettings = getAnimationSettings();
 
-      if ((seconds === 0 || seconds === 30) && seconds !== lastTriggeredSecond) {
-        rotateRestartButton();
+    // アニメーション設定を適用
+    animationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
 
-        lastTriggeredSecond = seconds;
-      } else if (seconds !== 0 && seconds !== 30) {
-        lastTriggeredSecond = null;
-      }
-    }, 1000);
-  };
+    // ウィンドウリサイズ時にアニメーション設定を再生成
+    window.addEventListener("resize", () => {
+      // 既存のtweenをクリア
+      tweens.forEach((tween) => tween.kill());
+      tweens.length = 0;
 
-  // 時刻アニメーションを開始
-  rotateRestartButtonTimeInterval();
+      // 新しい設定でtweenを作成
+      const newAnimationSettings = getAnimationSettings();
+      newAnimationSettings.forEach(([selector, props]) => createTween(gsap, selector, props));
+    });
 
-  function initButtonEvents() {
-    function updateTooltipClassByPosition() {
-      const item4 = document.querySelector(".item-4");
-      const item6 = document.querySelector(".item-6");
-      if (!item4 || !item6) return;
+    // restartボタンの回転アニメーション（GSAPを使用）
+    const rotateRestartButton = () => {
+      const restartButton = document.getElementById("restart");
+      if (!restartButton) return;
 
-      const rect4 = item4.getBoundingClientRect();
-      const rect6 = item6.getBoundingClientRect();
+      gsap.fromTo(
+        restartButton,
+        {
+          rotation: 0,
+          scale: 1,
+        },
+        {
+          rotation: 720,
+          scale: 1.3,
+          duration: 1.5,
+          ease: "power2.inOut",
+          onComplete: () => {
+            gsap.set(restartButton, {
+              clearProps: "rotation, scale",
+            });
+          },
+        }
+      );
+    };
 
-      const tooltip4 = item4.querySelector(".item__tooltip_left, .item__tooltip_right");
-      const tooltip6 = item6.querySelector(".item__tooltip_left, .item__tooltip_right");
+    let lastTriggeredSecond = null;
 
-      if (tooltip4) {
-        tooltip4.classList.remove("item__tooltip_left", "item__tooltip_right");
-        tooltip4.classList.add(rect4.left < rect6.left ? "item__tooltip_left" : "item__tooltip_right");
-      }
+    const rotateRestartButtonTimeInterval = () => {
+      setInterval(() => {
+        const now = new Date();
+        const seconds = now.getSeconds();
 
-      if (tooltip6) {
-        tooltip6.classList.remove("item__tooltip_left", "item__tooltip_right");
-        tooltip6.classList.add(rect6.left < rect4.left ? "item__tooltip_left" : "item__tooltip_right");
-      }
-    }
+        if ((seconds === 0 || seconds === 30) && seconds !== lastTriggeredSecond) {
+          rotateRestartButton();
 
-    function playAll() {
-      tweens.forEach((tween) => tween.play());
-      updateTooltipClassByPosition();
-      playSound();
-    }
-    function pauseAll() {
-      tweens.forEach((tween) => tween.pause());
-      updateTooltipClassByPosition();
-      playSound();
-    }
-    function reverseAll() {
-      tweens.forEach((tween) => tween.reverse());
-      updateTooltipClassByPosition();
-      playSound();
-    }
-    function restartAll() {
-      tweens.forEach((tween) => tween.restart());
-      updateTooltipClassByPosition();
-      playSound();
-    }
+          lastTriggeredSecond = seconds;
+        } else if (seconds !== 0 && seconds !== 30) {
+          lastTriggeredSecond = null;
+        }
+      }, 1000);
+    };
 
-    document.getElementById("play")?.addEventListener("click", playAll);
-    document.getElementById("pause")?.addEventListener("click", pauseAll);
-    document.getElementById("reverse")?.addEventListener("click", reverseAll);
-    document.getElementById("restart")?.addEventListener("click", restartAll);
+    // 時刻アニメーションを開始
+    rotateRestartButtonTimeInterval();
 
-    const controlMenu = document.querySelector(".control__menu");
-    const buttons = document.querySelectorAll(".button");
+    function initButtonEvents() {
+      function updateTooltipClassByPosition() {
+        const item4 = document.querySelector(".item-4");
+        const item6 = document.querySelector(".item-6");
+        if (!item4 || !item6) return;
 
-    // 各ボタンの回転タイムアウトを管理するMap
-    const buttonRotationTimeouts = new Map();
+        const rect4 = item4.getBoundingClientRect();
+        const rect6 = item6.getBoundingClientRect();
 
-    buttons.forEach((button) => {
-      button.addEventListener("mouseenter", () => {
-        // 既存のタイムアウトをクリア
-        const existingTimeout = buttonRotationTimeouts.get(button);
-        if (existingTimeout) {
-          clearTimeout(existingTimeout);
-          buttonRotationTimeouts.delete(button);
+        const tooltip4 = item4.querySelector(".item__tooltip_left, .item__tooltip_right");
+        const tooltip6 = item6.querySelector(".item__tooltip_left, .item__tooltip_right");
+
+        if (tooltip4) {
+          tooltip4.classList.remove("item__tooltip_left", "item__tooltip_right");
+          tooltip4.classList.add(rect4.left < rect6.left ? "item__tooltip_left" : "item__tooltip_right");
         }
 
-        button.classList.remove("reset-rotation");
-        button.classList.add("is-rotating");
+        if (tooltip6) {
+          tooltip6.classList.remove("item__tooltip_left", "item__tooltip_right");
+          tooltip6.classList.add(rect6.left < rect4.left ? "item__tooltip_left" : "item__tooltip_right");
+        }
+      }
 
-        // 3秒後に自動的に回転を停止
-        const timeoutId = setTimeout(() => {
+      function playAll() {
+        tweens.forEach((tween) => tween.play());
+        updateTooltipClassByPosition();
+        playSound();
+      }
+      function pauseAll() {
+        tweens.forEach((tween) => tween.pause());
+        updateTooltipClassByPosition();
+        playSound();
+      }
+      function reverseAll() {
+        tweens.forEach((tween) => tween.reverse());
+        updateTooltipClassByPosition();
+        playSound();
+      }
+      function restartAll() {
+        tweens.forEach((tween) => tween.restart());
+        updateTooltipClassByPosition();
+        playSound();
+      }
+
+      // グローバルスコープに公開（HTMLのonclick属性から呼び出すため）
+      window.playAll = playAll;
+      window.pauseAll = pauseAll;
+      window.reverseAll = reverseAll;
+      window.restartAll = restartAll;
+
+      document.getElementById("play")?.addEventListener("click", playAll);
+      document.getElementById("pause")?.addEventListener("click", pauseAll);
+      document.getElementById("reverse")?.addEventListener("click", reverseAll);
+      document.getElementById("restart")?.addEventListener("click", restartAll);
+
+      const controlMenu = document.querySelector(".control__menu");
+      const buttons = document.querySelectorAll(".button");
+
+      // 各ボタンの回転タイムアウトを管理するMap
+      const buttonRotationTimeouts = new Map();
+
+      buttons.forEach((button) => {
+        button.addEventListener("mouseenter", () => {
+          // 既存のタイムアウトをクリア
+          const existingTimeout = buttonRotationTimeouts.get(button);
+          if (existingTimeout) {
+            clearTimeout(existingTimeout);
+            buttonRotationTimeouts.delete(button);
+          }
+
+          button.classList.remove("reset-rotation");
+          button.classList.add("is-rotating");
+
+          // 3秒後に自動的に回転を停止
+          const timeoutId = setTimeout(() => {
+            button.classList.remove("is-rotating");
+            button.classList.add("reset-rotation");
+            button.addEventListener(
+              "transitionend",
+              () => {
+                button.classList.remove("reset-rotation");
+              },
+              {
+                once: true,
+              }
+            );
+            buttonRotationTimeouts.delete(button);
+          }, 3000);
+
+          buttonRotationTimeouts.set(button, timeoutId);
+        });
+
+        button.addEventListener("mouseleave", () => {
+          // タイムアウトをクリア
+          const timeoutId = buttonRotationTimeouts.get(button);
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+            buttonRotationTimeouts.delete(button);
+          }
+
+          button.classList.remove("is-rotating");
+        });
+      });
+
+      controlMenu?.addEventListener("mouseleave", () => {
+        buttons.forEach((button) => {
+          // タイムアウトをクリア
+          const timeoutId = buttonRotationTimeouts.get(button);
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+            buttonRotationTimeouts.delete(button);
+          }
+
           button.classList.remove("is-rotating");
           button.classList.add("reset-rotation");
           button.addEventListener(
@@ -1520,306 +1592,279 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
               once: true,
             }
           );
-          buttonRotationTimeouts.delete(button);
-        }, 3000);
-
-        buttonRotationTimeouts.set(button, timeoutId);
+        });
       });
+    }
 
-      button.addEventListener("mouseleave", () => {
-        // タイムアウトをクリア
-        const timeoutId = buttonRotationTimeouts.get(button);
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-          buttonRotationTimeouts.delete(button);
+    // マウス追従背景の初期化
+    function initBackgroundMouseFollow() {
+      console.log("🔍 initBackgroundMouseFollow called");
+
+      // 要素が見つかるまで待機（ローディングスクリーンの終了を考慮）
+      const checkAndInit = () => {
+        console.log("🔍 Checking for elements...");
+        const backgroundContainer = document.querySelector(".background-container");
+        const fvWrapper = document.querySelector(".fv__wrapper");
+
+        console.log("🔍 Elements found:", { backgroundContainer, fvWrapper });
+
+        if (!backgroundContainer || !fvWrapper) {
+          // 要素が見つからない場合は再試行
+          console.log("⚠️ Elements not found, retrying in 100ms...");
+          setTimeout(checkAndInit, 100);
+          return;
         }
 
-        button.classList.remove("is-rotating");
-      });
-    });
+        // ローディングスクリーンの終了を待つ
+        const loadingScreen = document.getElementById("loading-screen");
+        console.log("🔍 Loading screen:", loadingScreen);
 
-    controlMenu?.addEventListener("mouseleave", () => {
-      buttons.forEach((button) => {
-        // タイムアウトをクリア
-        const timeoutId = buttonRotationTimeouts.get(button);
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-          buttonRotationTimeouts.delete(button);
+        if (loadingScreen) {
+          const checkLoadingComplete = () => {
+            const computedStyle = window.getComputedStyle(loadingScreen);
+            const isVisible =
+              loadingScreen.style.display !== "none" &&
+              loadingScreen.style.visibility !== "hidden" &&
+              computedStyle.display !== "none" &&
+              computedStyle.visibility !== "hidden";
+
+            console.log("🔍 Loading screen visible:", isVisible);
+
+            if (isVisible) {
+              // まだローディング中なので再チェック
+              console.log("⏳ Loading screen still visible, rechecking in 100ms...");
+              setTimeout(checkLoadingComplete, 100);
+            } else {
+              // ローディング終了後に初期化
+              console.log("✅ Loading complete, initializing mouse follow...");
+              initializeMouseFollow(backgroundContainer, fvWrapper);
+            }
+          };
+          checkLoadingComplete();
+        } else {
+          // ローディングスクリーンが存在しない場合は即座に初期化
+          console.log("ℹ️ No loading screen, initializing immediately...");
+          initializeMouseFollow(backgroundContainer, fvWrapper);
         }
+      };
 
-        button.classList.remove("is-rotating");
-        button.classList.add("reset-rotation");
-        button.addEventListener(
-          "transitionend",
-          () => {
-            button.classList.remove("reset-rotation");
-          },
-          {
-            once: true,
-          }
-        );
+      checkAndInit();
+    }
+
+    // マウス追従の実際の初期化処理
+    function initializeMouseFollow(backgroundContainer, fvWrapper) {
+      // デバッグログ追加（常に表示）
+      console.log("✅ Initializing mouse follow...", {
+        backgroundContainer,
+        fvWrapper,
+        maskImage: window.getComputedStyle(backgroundContainer).maskImage,
+        webkitMaskImage: window.getComputedStyle(backgroundContainer).webkitMaskImage,
+        mouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
+        mouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
       });
-    });
-  }
 
-  // DOMContentLoadedでボタンイベントを初期化（GSAPに依存しない）
-  if (document.readyState === "loading") {
-    console.log("🔍 Document still loading, adding DOMContentLoaded listener");
-    document.addEventListener("DOMContentLoaded", () => {
-      console.log("🔍 DOMContentLoaded fired");
-      initButtonEvents();
-      // グリッチアニメーションの初期化完了を待ってからマウス追従を初期化
-      setTimeout(() => {
-        console.log("🔍 Calling initBackgroundMouseFollow after 200ms delay");
-        initBackgroundMouseFollow();
-      }, 200);
-    });
-  } else {
-    // DOM既にロード済みの場合は即座に実行
-    console.log("🔍 Document already loaded, initializing immediately");
-    initButtonEvents();
-    setTimeout(() => {
-      console.log("🔍 Calling initBackgroundMouseFollow after 200ms delay");
-      initBackgroundMouseFollow();
-    }, 200);
-  }
+      // パフォーマンス向上のため、requestAnimationFrameを使用
+      let rafId = null;
+      let mouseX = 0;
+      let mouseY = 0;
 
-  // マウス追従背景の初期化
-  function initBackgroundMouseFollow() {
-    console.log("🔍 initBackgroundMouseFollow called");
-
-    // 要素が見つかるまで待機（ローディングスクリーンの終了を考慮）
-    const checkAndInit = () => {
-      console.log("🔍 Checking for elements...");
-      const backgroundContainer = document.querySelector(".background-container");
-      const fvWrapper = document.querySelector(".fv__wrapper");
-
-      console.log("🔍 Elements found:", { backgroundContainer, fvWrapper });
-
-      if (!backgroundContainer || !fvWrapper) {
-        // 要素が見つからない場合は再試行
-        console.log("⚠️ Elements not found, retrying in 100ms...");
-        setTimeout(checkAndInit, 100);
-        return;
-      }
-
-      // ローディングスクリーンの終了を待つ
-      const loadingScreen = document.getElementById("loading-screen");
-      console.log("🔍 Loading screen:", loadingScreen);
-
-      if (loadingScreen) {
-        const checkLoadingComplete = () => {
-          const computedStyle = window.getComputedStyle(loadingScreen);
-          const isVisible =
-            loadingScreen.style.display !== "none" &&
-            loadingScreen.style.visibility !== "hidden" &&
-            computedStyle.display !== "none" &&
-            computedStyle.visibility !== "hidden";
-
-          console.log("🔍 Loading screen visible:", isVisible);
-
-          if (isVisible) {
-            // まだローディング中なので再チェック
-            console.log("⏳ Loading screen still visible, rechecking in 100ms...");
-            setTimeout(checkLoadingComplete, 100);
-          } else {
-            // ローディング終了後に初期化
-            console.log("✅ Loading complete, initializing mouse follow...");
-            initializeMouseFollow(backgroundContainer, fvWrapper);
-          }
-        };
-        checkLoadingComplete();
-      } else {
-        // ローディングスクリーンが存在しない場合は即座に初期化
-        console.log("ℹ️ No loading screen, initializing immediately...");
-        initializeMouseFollow(backgroundContainer, fvWrapper);
-      }
-    };
-
-    checkAndInit();
-  }
-
-  // マウス追従の実際の初期化処理
-  function initializeMouseFollow(backgroundContainer, fvWrapper) {
-    // デバッグログ追加（常に表示）
-    console.log("✅ Initializing mouse follow...", {
-      backgroundContainer,
-      fvWrapper,
-      maskImage: window.getComputedStyle(backgroundContainer).maskImage,
-      webkitMaskImage: window.getComputedStyle(backgroundContainer).webkitMaskImage,
-      mouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
-      mouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
-    });
-
-    // パフォーマンス向上のため、requestAnimationFrameを使用
-    let rafId = null;
-    let mouseX = 0;
-    let mouseY = 0;
-
-    const updateMaskPosition = () => {
-      const rect = fvWrapper.getBoundingClientRect();
-      const x = mouseX - rect.left;
-      const y = mouseY - rect.top;
-
-      // CSS変数を使ってマスクの位置を更新（より確実に設定）
-      backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
-      backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
-
-      console.log("🖱️ Mask position updated:", { x, y, mouseX, mouseY });
-
-      rafId = null;
-    };
-
-    // デバイスがタッチデバイスかどうかを判定
-    const isTouchDevice =
-      window.matchMedia("(any-hover: none)").matches ||
-      window.matchMedia("(pointer: coarse)").matches ||
-      "ontouchstart" in window;
-
-    console.log("📱 Device type:", isTouchDevice ? "Touch device" : "Desktop");
-
-    // デスクトップ: マウス追従
-    if (!isTouchDevice) {
-      console.log("🖱️ Setting up desktop mouse tracking...");
-      // window全体でマウス移動を監視（画面全体を追従）
-      window.addEventListener(
-        "mousemove",
-        (e) => {
-          mouseX = e.clientX;
-          mouseY = e.clientY;
-
-          // requestAnimationFrameで更新を最適化
-          if (rafId === null) {
-            rafId = requestAnimationFrame(updateMaskPosition);
-          }
-        },
-        { passive: true }
-      );
-
-      console.log("✅ Desktop mouse tracking event listener attached");
-
-      // マウスが画面外に出た場合も追従（画面端でも反応するように）
-      window.addEventListener("mouseleave", () => {
-        // マウスが画面外に出た場合は最後の位置を保持
-      });
-    } else {
-      // スマホ/タブレット: タッチイベントと自動アニメーションの組み合わせ
-
-      // 1. タッチイベント対応（タッチ位置を追従）
-      let touchX = 0;
-      let touchY = 0;
-      let isTouching = false;
-
-      window.addEventListener(
-        "touchstart",
-        (e) => {
-          if (e.touches.length > 0) {
-            isTouching = true;
-            touchX = e.touches[0].clientX;
-            touchY = e.touches[0].clientY;
-            mouseX = touchX;
-            mouseY = touchY;
-
-            if (rafId === null) {
-              rafId = requestAnimationFrame(updateMaskPosition);
-            }
-          }
-        },
-        { passive: true }
-      );
-
-      window.addEventListener(
-        "touchmove",
-        (e) => {
-          if (e.touches.length > 0 && isTouching) {
-            touchX = e.touches[0].clientX;
-            touchY = e.touches[0].clientY;
-            mouseX = touchX;
-            mouseY = touchY;
-
-            if (rafId === null) {
-              rafId = requestAnimationFrame(updateMaskPosition);
-            }
-          }
-        },
-        { passive: true }
-      );
-
-      window.addEventListener(
-        "touchend",
-        () => {
-          isTouching = false;
-        },
-        { passive: true }
-      );
-
-      // 2. 自動アニメーション（タッチ操作がない場合の代替）
-      // パルスアニメーション: 定期的に位置を変更して視覚的な動きを提供
-      let autoAnimationId = null;
-      let animationPhase = 0;
-      const animationDuration = 4000; // 4秒周期
-      const animationRadius = 100; // 移動半径（px）
-
-      const startAutoAnimation = () => {
-        if (autoAnimationId !== null) return; // 既に実行中
-
-        const startTime = Date.now();
+      const updateMaskPosition = () => {
         const rect = fvWrapper.getBoundingClientRect();
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+        const x = mouseX - rect.left;
+        const y = mouseY - rect.top;
 
-        const animate = () => {
-          if (isTouching) {
-            // タッチ中は自動アニメーションを一時停止
+        // CSS変数を使ってマスクの位置を更新（より確実に設定）
+        backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
+        backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+        rafId = null;
+      };
+
+      // デバイスがタッチデバイスかどうかを判定
+      const isTouchDevice =
+        window.matchMedia("(any-hover: none)").matches ||
+        window.matchMedia("(pointer: coarse)").matches ||
+        "ontouchstart" in window;
+
+      console.log("📱 Device type:", isTouchDevice ? "Touch device" : "Desktop");
+
+      // デスクトップ: マウス追従
+      if (!isTouchDevice) {
+        console.log("🖱️ Setting up desktop mouse tracking...");
+        // window全体でマウス移動を監視（画面全体を追従）
+        window.addEventListener(
+          "mousemove",
+          (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // requestAnimationFrameで更新を最適化
+            if (rafId === null) {
+              rafId = requestAnimationFrame(updateMaskPosition);
+            }
+          },
+          { passive: true }
+        );
+
+        console.log("✅ Desktop mouse tracking event listener attached");
+
+        // マウスが画面外に出た場合も追従（画面端でも反応するように）
+        window.addEventListener("mouseleave", () => {
+          // マウスが画面外に出た場合は最後の位置を保持
+        });
+      } else {
+        // スマホ/タブレット: タッチイベントと自動アニメーションの組み合わせ
+
+        // 1. タッチイベント対応（タッチ位置を追従）
+        let touchX = 0;
+        let touchY = 0;
+        let isTouching = false;
+
+        window.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.touches.length > 0) {
+              isTouching = true;
+              touchX = e.touches[0].clientX;
+              touchY = e.touches[0].clientY;
+              mouseX = touchX;
+              mouseY = touchY;
+
+              if (rafId === null) {
+                rafId = requestAnimationFrame(updateMaskPosition);
+              }
+            }
+          },
+          { passive: true }
+        );
+
+        window.addEventListener(
+          "touchmove",
+          (e) => {
+            if (e.touches.length > 0 && isTouching) {
+              touchX = e.touches[0].clientX;
+              touchY = e.touches[0].clientY;
+              mouseX = touchX;
+              mouseY = touchY;
+
+              if (rafId === null) {
+                rafId = requestAnimationFrame(updateMaskPosition);
+              }
+            }
+          },
+          { passive: true }
+        );
+
+        window.addEventListener(
+          "touchend",
+          () => {
+            isTouching = false;
+          },
+          { passive: true }
+        );
+
+        // 2. 自動アニメーション（タッチ操作がない場合の代替）
+        // パルスアニメーション: 定期的に位置を変更して視覚的な動きを提供
+        let autoAnimationId = null;
+        let animationPhase = 0;
+        const animationDuration = 4000; // 4秒周期
+        const animationRadius = 100; // 移動半径（px）
+
+        const startAutoAnimation = () => {
+          if (autoAnimationId !== null) return; // 既に実行中
+
+          const startTime = Date.now();
+          const rect = fvWrapper.getBoundingClientRect();
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+
+          const animate = () => {
+            if (isTouching) {
+              // タッチ中は自動アニメーションを一時停止
+              autoAnimationId = requestAnimationFrame(animate);
+              return;
+            }
+
+            const elapsed = Date.now() - startTime;
+            const progress = (elapsed % animationDuration) / animationDuration;
+
+            // 円形パスで移動（スムーズな動き）
+            const angle = progress * Math.PI * 2;
+            const offsetX = Math.cos(angle) * animationRadius;
+            const offsetY = Math.sin(angle) * animationRadius;
+
+            mouseX = centerX + rect.left + offsetX;
+            mouseY = centerY + rect.top + offsetY;
+
+            if (rafId === null) {
+              rafId = requestAnimationFrame(updateMaskPosition);
+            }
+
             autoAnimationId = requestAnimationFrame(animate);
-            return;
-          }
-
-          const elapsed = Date.now() - startTime;
-          const progress = (elapsed % animationDuration) / animationDuration;
-
-          // 円形パスで移動（スムーズな動き）
-          const angle = progress * Math.PI * 2;
-          const offsetX = Math.cos(angle) * animationRadius;
-          const offsetY = Math.sin(angle) * animationRadius;
-
-          mouseX = centerX + rect.left + offsetX;
-          mouseY = centerY + rect.top + offsetY;
-
-          if (rafId === null) {
-            rafId = requestAnimationFrame(updateMaskPosition);
-          }
+          };
 
           autoAnimationId = requestAnimationFrame(animate);
         };
 
-        autoAnimationId = requestAnimationFrame(animate);
-      };
+        // 自動アニメーションを開始（少し遅延させて自然な動きに）
+        setTimeout(() => {
+          startAutoAnimation();
+        }, 500);
+      }
 
-      // 自動アニメーションを開始（少し遅延させて自然な動きに）
-      setTimeout(() => {
-        startAutoAnimation();
-      }, 500);
+      // 初期位置を設定（画面中央）
+      const initialX = window.innerWidth / 2;
+      const initialY = window.innerHeight / 2;
+      const rect = fvWrapper.getBoundingClientRect();
+      const x = initialX - rect.left;
+      const y = initialY - rect.top;
+      backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
+      backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+      // 初期化完了のログ
+      console.log("✅ Mouse follow initialized successfully", {
+        initialX,
+        initialY,
+        x,
+        y,
+        rect,
+        finalMouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
+        finalMouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
+      });
     }
 
-    // 初期位置を設定（画面中央）
-    const initialX = window.innerWidth / 2;
-    const initialY = window.innerHeight / 2;
-    const rect = fvWrapper.getBoundingClientRect();
-    const x = initialX - rect.left;
-    const y = initialY - rect.top;
-    backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
-    backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+    // ボタンイベントの初期化
+    initButtonEvents();
 
-    // 初期化完了のログ
-    console.log("✅ Mouse follow initialized successfully", {
-      initialX,
-      initialY,
-      x,
-      y,
-      rect,
-      finalMouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
-      finalMouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
-    });
+    // マウス追従の初期化（200ms遅延させてグリッチアニメーションの初期化を待つ）
+    setTimeout(() => {
+      initBackgroundMouseFollow();
+    }, 200);
+  } // initializeApp() の終わり
+
+  // GSAPが読み込まれたことを確認してから初期化を開始
+  function waitForGSAPAndInit() {
+    if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+      console.log("✅ GSAP and ScrollTrigger are ready, initializing app...");
+      if (document.readyState === "loading") {
+        console.log("🔍 Document still loading, waiting for DOMContentLoaded...");
+        document.addEventListener("DOMContentLoaded", initializeApp);
+      } else {
+        console.log("🔍 Document already loaded, initializing immediately...");
+        initializeApp();
+      }
+    } else {
+      console.log("⏳ Waiting for GSAP to load...");
+      setTimeout(waitForGSAPAndInit, 100);
+    }
   }
+
+  // window.onloadイベントでも初期化を試みる（フォールバック）
+  window.addEventListener("load", () => {
+    console.log("🔍 Window load event fired");
+    waitForGSAPAndInit();
+  });
+
+  // 即座にも試行（既に読み込まれている場合）
+  waitForGSAPAndInit();
 </script>

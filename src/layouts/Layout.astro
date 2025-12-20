@@ -6,8 +6,8 @@ import "@fontsource/poppins/700.css";
 import "@fontsource/cinzel-decorative/400.css";
 import "@fontsource/cinzel-decorative/700.css";
 // Supports weights 400-900
-import '@fontsource-variable/playfair-display/wght-italic.css';
-import '@fontsource/marcellus';
+import "@fontsource-variable/playfair-display/wght-italic.css";
+import "@fontsource/marcellus";
 
 interface Props {
   title: string;
@@ -40,6 +40,13 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
   <body>
     <div id="overlay-root"></div>
     <slot />
+
+    <!-- GSAP と ScrollTrigger をunpkg CDNから読み込み（defer属性付き） -->
+    <script defer src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script defer src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+    <!-- JSConfetti をunpkg CDNから読み込み -->
+    <script defer src="https://unpkg.com/js-confetti@0.12.0/dist/js-confetti.browser.js"></script>
   </body>
 </html>
 
