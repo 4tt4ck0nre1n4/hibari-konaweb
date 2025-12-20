@@ -524,6 +524,9 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     overflow: hidden;
     transform-style: preserve-3d;
     pointer-events: none; /* カードへのクリックを通過させる */
+    /* CSS変数の初期値を明示的に設定 */
+    --mouse-x: 50%;
+    --mouse-y: 50%;
     /* 円形マスクでクリッピング（こちらは正面向き） */
     -webkit-mask-image: radial-gradient(
       circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
@@ -536,6 +539,9 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   /* スマホサイズでマウス追従の円を小さくする */
   @media screen and (max-width: 480px) {
     .background-container {
+      /* CSS変数の初期値を維持 */
+      --mouse-x: 50%;
+      --mouse-y: 50%;
       -webkit-mask-image: radial-gradient(
         circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
         black 100%,
@@ -1557,26 +1563,50 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   }
 
   // DOMContentLoadedでボタンイベントを初期化（GSAPに依存しない）
-  document.addEventListener("DOMContentLoaded", () => {
+  if (document.readyState === "loading") {
+    console.log("🔍 Document still loading, adding DOMContentLoaded listener");
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("🔍 DOMContentLoaded fired");
+      initButtonEvents();
+      // グリッチアニメーションの初期化完了を待ってからマウス追従を初期化
+      setTimeout(() => {
+        console.log("🔍 Calling initBackgroundMouseFollow after 200ms delay");
+        initBackgroundMouseFollow();
+      }, 200);
+    });
+  } else {
+    // DOM既にロード済みの場合は即座に実行
+    console.log("🔍 Document already loaded, initializing immediately");
     initButtonEvents();
-    initBackgroundMouseFollow();
-  });
+    setTimeout(() => {
+      console.log("🔍 Calling initBackgroundMouseFollow after 200ms delay");
+      initBackgroundMouseFollow();
+    }, 200);
+  }
 
   // マウス追従背景の初期化
   function initBackgroundMouseFollow() {
+    console.log("🔍 initBackgroundMouseFollow called");
+
     // 要素が見つかるまで待機（ローディングスクリーンの終了を考慮）
     const checkAndInit = () => {
+      console.log("🔍 Checking for elements...");
       const backgroundContainer = document.querySelector(".background-container");
       const fvWrapper = document.querySelector(".fv__wrapper");
 
+      console.log("🔍 Elements found:", { backgroundContainer, fvWrapper });
+
       if (!backgroundContainer || !fvWrapper) {
         // 要素が見つからない場合は再試行
+        console.log("⚠️ Elements not found, retrying in 100ms...");
         setTimeout(checkAndInit, 100);
         return;
       }
 
       // ローディングスクリーンの終了を待つ
       const loadingScreen = document.getElementById("loading-screen");
+      console.log("🔍 Loading screen:", loadingScreen);
+
       if (loadingScreen) {
         const checkLoadingComplete = () => {
           const computedStyle = window.getComputedStyle(loadingScreen);
@@ -1586,17 +1616,22 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
             computedStyle.display !== "none" &&
             computedStyle.visibility !== "hidden";
 
+          console.log("🔍 Loading screen visible:", isVisible);
+
           if (isVisible) {
             // まだローディング中なので再チェック
+            console.log("⏳ Loading screen still visible, rechecking in 100ms...");
             setTimeout(checkLoadingComplete, 100);
           } else {
             // ローディング終了後に初期化
+            console.log("✅ Loading complete, initializing mouse follow...");
             initializeMouseFollow(backgroundContainer, fvWrapper);
           }
         };
         checkLoadingComplete();
       } else {
         // ローディングスクリーンが存在しない場合は即座に初期化
+        console.log("ℹ️ No loading screen, initializing immediately...");
         initializeMouseFollow(backgroundContainer, fvWrapper);
       }
     };
@@ -1605,7 +1640,16 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   }
 
   // マウス追従の実際の初期化処理
-  function initializeMouseFollow(backgroundContainer: HTMLElement, fvWrapper: HTMLElement) {
+  function initializeMouseFollow(backgroundContainer, fvWrapper) {
+    // デバッグログ追加（常に表示）
+    console.log("✅ Initializing mouse follow...", {
+      backgroundContainer,
+      fvWrapper,
+      maskImage: window.getComputedStyle(backgroundContainer).maskImage,
+      webkitMaskImage: window.getComputedStyle(backgroundContainer).webkitMaskImage,
+      mouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
+      mouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
+    });
 
     // パフォーマンス向上のため、requestAnimationFrameを使用
     let rafId = null;
@@ -1617,9 +1661,11 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       const x = mouseX - rect.left;
       const y = mouseY - rect.top;
 
-      // CSS変数を使ってマスクの位置を更新
+      // CSS変数を使ってマスクの位置を更新（より確実に設定）
       backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
       backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+      console.log("🖱️ Mask position updated:", { x, y, mouseX, mouseY });
 
       rafId = null;
     };
@@ -1630,8 +1676,11 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       window.matchMedia("(pointer: coarse)").matches ||
       "ontouchstart" in window;
 
+    console.log("📱 Device type:", isTouchDevice ? "Touch device" : "Desktop");
+
     // デスクトップ: マウス追従
     if (!isTouchDevice) {
+      console.log("🖱️ Setting up desktop mouse tracking...");
       // window全体でマウス移動を監視（画面全体を追従）
       window.addEventListener(
         "mousemove",
@@ -1646,6 +1695,8 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
         },
         { passive: true }
       );
+
+      console.log("✅ Desktop mouse tracking event listener attached");
 
       // マウスが画面外に出た場合も追従（画面端でも反応するように）
       window.addEventListener("mouseleave", () => {
@@ -1759,5 +1810,16 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     const y = initialY - rect.top;
     backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
     backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+    // 初期化完了のログ
+    console.log("✅ Mouse follow initialized successfully", {
+      initialX,
+      initialY,
+      x,
+      y,
+      rect,
+      finalMouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
+      finalMouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
+    });
   }
 </script>
