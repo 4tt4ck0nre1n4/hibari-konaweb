@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
 import type { IParticlesProps } from "@tsparticles/react";
 import { tsparticlesOptions } from "../scripts/tsparticlesOptions";
-import { Icon } from "@iconify/react";
+import { Icon, addCollection, iconLoaded } from "@iconify/react";
 import particlesStyles from "../styles/particlesStyles.module.css";
 import type React from "react";
 
@@ -31,6 +31,34 @@ export default function ParticlesComponent() {
       pauseSound = new Audio("/sounds/pauseSound.mp3");
       stopSound = new Audio("/sounds/stopSound.mp3");
     }
+
+    // アイコンをローカルレジストリに登録（外部APIリクエストを回避）
+    // ビルド時にバンドルされるため、実行時の外部APIリクエストが不要
+    void (async () => {
+      try {
+        const [{ icons: fluentEmojiIcons }, { icons: fluentEmojiHighContrastIcons }] = await Promise.all([
+          import("@iconify-json/fluent-emoji"),
+          import("@iconify-json/fluent-emoji-high-contrast"),
+        ]);
+
+        // コレクション全体を登録（必要なアイコンを含む）
+        addCollection(fluentEmojiIcons);
+        addCollection(fluentEmojiHighContrastIcons);
+
+        // アイコンが正しく登録されているか確認
+        const partyPopperLoaded = iconLoaded(playIconButton);
+        const magicWandLoaded = iconLoaded(stopIconButton);
+        const partyPopperHCLoaded = iconLoaded(pauseIconButton);
+
+        console.log("Icon collections registered:", {
+          partyPopper: partyPopperLoaded,
+          magicWand: magicWandLoaded,
+          partyPopperHC: partyPopperHCLoaded,
+        });
+      } catch (error) {
+        console.error("Failed to load icon data:", error);
+      }
+    })();
 
     // Load tsparticles dynamically
     void (async () => {
