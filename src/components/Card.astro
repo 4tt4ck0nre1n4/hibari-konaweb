@@ -158,7 +158,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   }
 
   /* モバイルデバイス用のシンプルなアプローチ */
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .card__flip-container {
       transform-style: preserve-3d;
       -webkit-transform-style: preserve-3d;
@@ -548,7 +548,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   }
 
   /* モバイルデバイスでのオーバーレイ最適化 */
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .card__back_overlay {
       /* タッチ操作を確実にする */
       touch-action: manipulation;

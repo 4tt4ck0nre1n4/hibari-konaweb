@@ -78,7 +78,7 @@ import "@pagefind/default-ui/css/ui.css";
     box-sizing: border-box; /* Clock.astroと同じボックスサイズ */
   }
 
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     #search {
       display: flex;
       flex-direction: column;
@@ -91,7 +91,7 @@ import "@pagefind/default-ui/css/ui.css";
   }
 
   /* iPhone特有の調整 */
-  @media screen and (max-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+  @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
     #search {
       display: flex;
       flex-direction: column;
@@ -111,7 +111,7 @@ import "@pagefind/default-ui/css/ui.css";
     max-width: 400px; /* 最大幅を制限 */
   }
 
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     #search .pagefind-ui__search-input {
       font-size: 0.9rem; /* モバイルでは少し小さく */
       max-width: 100%; /* モバイルでは全幅使用 */

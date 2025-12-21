@@ -285,7 +285,7 @@ const stateMachine = "State Machine 1";
     margin-inline: auto;
   }
 
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .about__wrapper {
       width: 90%;
     }
@@ -302,7 +302,7 @@ const stateMachine = "State Machine 1";
     padding-inline: 1rem;
     transform: perspective(1000px) translateZ(20px);
   }
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .about__inner {
       grid-template-columns: 1fr;
     }
@@ -454,7 +454,7 @@ const stateMachine = "State Machine 1";
     margin-block-start: 4rem;
     margin-inline: auto;
   }
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .skills__wrapper {
       width: 90%;
     }
@@ -482,7 +482,7 @@ const stateMachine = "State Machine 1";
   }
 
   /* スマホサイズでの3列表示を確実にする */
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .skills__menu {
       grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
@@ -492,7 +492,7 @@ const stateMachine = "State Machine 1";
   }
 
   /* より小さい画面での調整 */
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     .skills__menu {
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
@@ -503,7 +503,7 @@ const stateMachine = "State Machine 1";
 
   /* iPhone Safari専用の設定 - より具体的なセレクタで詳細度を上げる */
   @supports (-webkit-touch-callout: none) {
-    @media screen and (max-width: 768px) {
+    @media (width <= 768px) {
       .skills .skills__wrapper .skills__menu {
         grid-template-columns: repeat(3, 1fr);
         gap: 1.5rem;
@@ -512,7 +512,7 @@ const stateMachine = "State Machine 1";
       }
     }
 
-    @media screen and (max-width: 480px) {
+    @media (width <= 480px) {
       .skills .skills__wrapper .skills__menu {
         grid-template-columns: repeat(3, 1fr);
         gap: 1rem;
@@ -589,7 +589,7 @@ const stateMachine = "State Machine 1";
     margin-block-start: 4rem;
     margin-inline: auto;
   }
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .service__wrapper {
       width: 90%;
     }
@@ -603,13 +603,13 @@ const stateMachine = "State Machine 1";
     align-items: stretch;
   }
 
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .service__menu {
       gap: 4rem;
     }
   }
 
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     .service__menu {
       gap: 5rem;
       margin-block-end: 5rem;

@@ -114,7 +114,7 @@
     font-size: 2.25rem;
     letter-spacing: 0.05em;
   }
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     .clock__inner {
       height: 12vh; /* 高さを少し増やす */
       min-height: 80px; /* 最小高さを設定 */
@@ -139,7 +139,7 @@
   }
 
   /* iPhone特有の調整 */
-  @media screen and (max-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+  @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
     .clock__inner {
       height: 14vh; /* iPhoneではさらに高さを増やす */
       min-height: 90px;

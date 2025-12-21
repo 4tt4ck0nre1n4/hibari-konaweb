@@ -65,7 +65,7 @@ const cspContent = isDev
     <meta name="twitter:image" content={globalText.twitter.image} />
 
     <!-- Critical CSS インライン化 -->
-    <style>
+    <style is:global>
       /* 最小限のクリティカルCSS */
       *,
       *::before,
@@ -75,7 +75,16 @@ const cspContent = isDev
         box-sizing: border-box;
       }
       html {
-        font-family: system-ui, sans-serif;
+        font-family:
+      "Poppins",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      Arial,
+      system-ui,
+      sans-serif;
         color: #020202;
         background-color: #f1f5f9;
         text-size-adjust: none;
@@ -110,6 +119,10 @@ const cspContent = isDev
         text-decoration: none;
       }
 
+      button {
+        text-align: center;
+      }
+
       a[href],
       button,
       button[type],
@@ -125,6 +138,13 @@ const cspContent = isDev
         position: relative;
         z-index: 1;
       }
+
+      @media (width <= 480px) {
+  #page-wrap {
+    margin-block-start: 7rem;
+  }
+}
+
     </style>
 
     {

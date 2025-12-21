@@ -52,7 +52,7 @@
 }
 
 /* スマホサイズでのレスポンシブ対応 */
-@media screen and (width <= 768px) {
+@media (width <= 768px) {
   .particles__inner {
     height: 100px;
   }

@@ -294,7 +294,7 @@ const mouseItem = {
   }
 
   /* スマホサイズでのレスポンシブ対応 */
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .swiper__wrapper {
       width: 100%;
       max-width: 100%;
@@ -333,7 +333,7 @@ const mouseItem = {
   }
 
   /* 480px以下での超小型スマホ最適化 */
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     .swiper__wrapper {
       display: none;
       width: 100%;

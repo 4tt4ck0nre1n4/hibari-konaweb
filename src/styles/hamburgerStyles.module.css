@@ -212,8 +212,7 @@
 }
 
 /* PCサイズでの調整 */
-/* stylelint-disable-next-line media-feature-range-notation */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .hamburger__menu {
     top: 50%;
     transform: translateY(-50%);
@@ -237,8 +236,7 @@
 }
 
 /* タブレットサイズとスマホサイズでのみ表示 */
-/* stylelint-disable-next-line media-feature-range-notation */
-@media screen and (max-width: 1024px) {
+@media (width <= 1024px) {
   .hamburger__logo_wrapper {
     display: flex;
   }
@@ -331,16 +329,14 @@
 }
 
 /* PCサイズでの調整 */
-/* stylelint-disable-next-line media-feature-range-notation */
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .hamburger__title_text {
     font-size: 1.25rem;
   }
 }
 
 /* モバイルサイズでの調整 */
-/* stylelint-disable-next-line media-feature-range-notation */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .hamburger__title {
     padding-inline: 1rem;
   }
@@ -364,16 +360,14 @@
 }
 
 /* タブレット・スマホサイズでロゴが表示される場合の調整 */
-/* stylelint-disable-next-line media-feature-range-notation */
-@media screen and (max-width: 1024px) {
+@media (width <= 1024px) {
   .hamburger__menu ul {
     margin-block-start: 0.75rem;
   }
 }
 
 /* PCサイズでよりコンパクトに */
-/* stylelint-disable-next-line media-feature-range-notation */
-@media (min-width: 769px) {
+@media (width >= 769px) {
   .hamburger__menu ul {
     gap: 1rem;
   }
@@ -430,9 +424,8 @@
   transition-delay: 0.6s;
 }
 
-/* stylelint-disable-next-line media-feature-range-notation */
-@media (max-width: 768px) {
-  .hamburger__menu {
+@media (width <= 768px) {
+    .hamburger__menu {
     inset: 0;
     width: 100vw;
     max-width: none;

@@ -425,14 +425,14 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
   }
 
-  @media screen and (max-width: 1280px) {
+  @media (width <= 1280px) {
     .glitch {
       max-width: 520px;
       height: 500px;
     }
   }
 
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     .glitch {
       max-width: 480px;
       height: 400px;
@@ -455,7 +455,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     overflow: hidden; /* RGBの色が枠外にはみ出さないように */
   }
 
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     .glitch-image {
       /* background-size: contain; */
     }

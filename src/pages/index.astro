@@ -449,10 +449,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 </script>
 
 <style is:global>
-  /* ResponsiveFvコンポーネントの表示制御 */
-  .responsive-fv {
-    display: none;
-  }
   #main-container {
     display: grid;
     grid-template-columns: 24% 50% 24%;
@@ -472,17 +468,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   .sidebar {
     min-height: 400px; /* CLSを防ぐために最小高さを設定 */
   }
-
-  /* デスクトップサイズでのswiper-display-containerの配置 */
-  /* デスクトップではfooter直上に配置 */
-  .responsive-fv-wrapper--mobile {
-    display: none; /* デスクトップでは非表示 */
-  }
-
-  .responsive-fv-wrapper--desktop {
-    display: none; /* デスクトップではResponsiveFvは非表示 */
-  }
-
   .swiper-display-container--mobile {
     display: none; /* デスクトップでは非表示 */
   }
@@ -552,7 +537,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   }
 
   /* スマホサイズでマウス追従の円を小さくする */
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     .background-container {
       /* CSS変数の初期値を維持 */
       --mouse-x: 50%;
@@ -631,7 +616,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       background-position: 100% 100%;
     }
   }
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     .glitch-container {
       width: 96%;
     }
@@ -651,14 +636,14 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   }
 
   /* スマホサイズでのアニメーション画像コンテナ調整 */
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     .animated-sprite-container {
       min-height: 100vh;
       padding-inline: 1rem;
     }
   }
 
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     .animated-sprite-container {
       min-height: 100vh;
       padding-inline: 0.5rem;
@@ -672,18 +657,8 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   }
 
   /* タブレット・スマホサイズでのレスポンシブ対応 */
-  @media screen and (max-width: 768px) {
+  @media (width <= 768px) {
     /* タブレット・スマホでは#main-containerの直上に配置 */
-    .responsive-fv-wrapper--mobile {
-      display: block; /* タブレット・スマホでは表示 */
-      width: 100%;
-      margin-bottom: 0.5rem;
-    }
-
-    .responsive-fv-wrapper--desktop {
-      display: none; /* タブレット・スマホでは非表示 */
-    }
-
     .swiper-display-container--mobile {
       display: block; /* タブレット・スマホでは表示 */
       width: 100%;
@@ -740,7 +715,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   }
 
   /* 480px以下での超小型スマホ最適化 */
-  @media screen and (max-width: 480px) {
+  @media (width <= 480px) {
     #main-container {
       padding-inline: 0.5rem;
       gap: 0.5rem;
@@ -1159,7 +1134,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     margin-inline: 1rem;
     padding: 0.5rem;
   }
-  @media screen and (max-width: 480px) and (-webkit-min-device-pixel-ratio: 2) {
+  @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
     .grid {
       margin-block-start: 3rem;
     }

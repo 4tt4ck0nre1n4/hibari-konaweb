@@ -38,7 +38,7 @@ const gradientTitle = "My Portfolio";
   </div>
 </div>
 
-<style>
+<style is:global>
   .logo__wrapper {
     width: 100vw;
     height: 100vh;
@@ -187,7 +187,7 @@ const gradientTitle = "My Portfolio";
   }
 
   /* レスポンシブデザイン */
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     .text-stroke,
     .text-gradient {
       font-size: 2.5rem;
@@ -202,7 +202,7 @@ const gradientTitle = "My Portfolio";
     }
   }
 
-  @media (max-width: 480px) {
+  @media (width <= 480px) {
     .text-stroke,
     .text-gradient {
       font-size: 2rem;

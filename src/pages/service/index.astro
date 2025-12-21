@@ -66,12 +66,12 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     max-width: 700px;
     margin-inline: auto;
   }
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     .pricePage__wrapper {
       width: 90%;
     }
   }
-  @media (max-width: 480px) {
+  @media (width <= 480px) {
     .pricePage__wrapper {
       width: 80%;
     }
@@ -84,7 +84,7 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     text-align: center;
     margin-block-start: 1rem;
   }
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     .price__body {
       font-size: 0.9375rem;
       line-height: 1.8;
