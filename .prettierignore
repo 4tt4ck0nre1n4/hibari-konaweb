@@ -4,3 +4,4 @@ dist/
 .astro
 public/
 package-lock.json
+src/components/GoogleAnalytics.astro

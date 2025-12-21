@@ -13,94 +13,99 @@
  * - Performance と SEO への影響を最小化
  */
 
-const GA_MEASUREMENT_ID = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
-const isDev = import.meta.env.DEV;
+const GA_MEASUREMENT_ID: string | undefined =
+  typeof import.meta.env.PUBLIC_GA_MEASUREMENT_ID === "string"
+    ? import.meta.env.PUBLIC_GA_MEASUREMENT_ID
+    : undefined;
+const isDev: boolean = typeof import.meta.env.DEV === "boolean" ? import.meta.env.DEV : false;
 
 // 開発環境またはMeasurement IDが未設定の場合は何も出力しない
-const shouldLoadGA = !isDev && GA_MEASUREMENT_ID && GA_MEASUREMENT_ID !== "G-XXXXXXXXXX";
+const shouldLoadGA: boolean =
+  !isDev &&
+  typeof GA_MEASUREMENT_ID === "string" &&
+  GA_MEASUREMENT_ID !== "" &&
+  GA_MEASUREMENT_ID !== "G-XXXXXXXXXX";
 ---
 
-{
-  shouldLoadGA ? (
-    <>
-      <!-- Google Analytics 4 with Consent Mode v2 -->
-      <!--
-        Consent Mode v2: GDPR対応のため、ユーザーの同意前はデフォルトで拒否設定
-        必要に応じて Cookie 同意バナーと連携してください
-      -->
-      <script is:inline define:vars={{ GA_MEASUREMENT_ID }}>
-        // Consent Mode v2 のデフォルト設定
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-          dataLayer.push(arguments);
-        }
+{shouldLoadGA && typeof GA_MEASUREMENT_ID === "string" && (
+  <script is:inline define:vars={{ GA_MEASUREMENT_ID: GA_MEASUREMENT_ID }}>
+    // Consent Mode v2: GDPR対応のため、ユーザーの同意前はデフォルトで拒否設定
+    // 必要に応じて Cookie 同意バナーと連携してください
+    // Consent Mode v2 のデフォルト設定
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
 
-        // デフォルトで全ての同意を拒否（GDPR対応）
-        gtag("consent", "default", {
-          ad_storage: "denied",
-          ad_user_data: "denied",
-          ad_personalization: "denied",
-          analytics_storage: "denied",
-          functionality_storage: "denied",
-          personalization_storage: "denied",
-          security_storage: "granted", // セキュリティは常に許可
-          wait_for_update: 500,
-        });
+    // デフォルトで全ての同意を拒否（GDPR対応）
+    gtag("consent", "default", {
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+      analytics_storage: "denied",
+      functionality_storage: "denied",
+      personalization_storage: "denied",
+      security_storage: "granted", // セキュリティは常に許可
+      wait_for_update: 500,
+    });
 
-        // 日本国内向けの場合は analytics_storage を自動許可（オプション）
-        // プライバシーポリシーに応じて調整してください
-        gtag("consent", "update", {
-          analytics_storage: "granted",
-        });
-      </script>
+    // 日本国内向けの場合は analytics_storage を自動許可（オプション）
+    // プライバシーポリシーに応じて調整してください
+    gtag("consent", "update", {
+      analytics_storage: "granted",
+    });
+  </script>
+)}
 
-      <!-- Google Analytics 4 Main Script -->
-      <script
-        is:inline
-        async
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-      ></script>
+{shouldLoadGA && typeof GA_MEASUREMENT_ID === "string" && (
+  <script
+    is:inline
+    async
+    src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+  ></script>
+)}
 
-      <script is:inline define:vars={{ GA_MEASUREMENT_ID }}>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-          dataLayer.push(arguments);
-        }
-        gtag("js", new Date());
+{shouldLoadGA && typeof GA_MEASUREMENT_ID === "string" && (
+  <script is:inline define:vars={{ GA_MEASUREMENT_ID: GA_MEASUREMENT_ID }}>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
 
-        // GA4 設定
-        gtag("config", GA_MEASUREMENT_ID, {
-          // ページビューの自動送信
-          send_page_view: true,
-          // IPアドレスの匿名化（プライバシー保護）
-          anonymize_ip: true,
-          // デバッグモードの無効化
-          debug_mode: false,
-        });
-      </script>
-    </>
-  ) : isDev ? (
-    <!-- 開発環境: Google Analytics は無効化されています -->
-    <script is:inline>
-      console.info(
-        "%c[Google Analytics] 開発環境のため無効化されています",
-        "color: #4CAF50; font-weight: bold;"
-      );
-      // 開発環境用のモックgtag関数（エラー防止）
-      window.dataLayer = window.dataLayer || [];
-      window.gtag =
-        window.gtag ||
-        function () {
-          console.log("[GA Mock]", ...arguments);
-        };
-    </script>
-  ) : (
-    <!-- GA Measurement ID が未設定です -->
-    <script is:inline>
-      console.warn(
-        "%c[Google Analytics] PUBLIC_GA_MEASUREMENT_ID が設定されていません",
-        "color: #FF9800; font-weight: bold;"
-      );
-    </script>
-  )
-}
+    // GA4 設定
+    gtag("config", GA_MEASUREMENT_ID, {
+      // ページビューの自動送信
+      send_page_view: true,
+      // IPアドレスの匿名化（プライバシー保護）
+      anonymize_ip: true,
+      // デバッグモードの無効化
+      debug_mode: false,
+    });
+  </script>
+)}
+
+{typeof isDev === "boolean" && isDev && !shouldLoadGA && (
+  <script is:inline>
+    console.info(
+      "%c[Google Analytics] 開発環境のため無効化されています",
+      "color: #4CAF50; font-weight: bold;"
+    );
+    // 開発環境用のモックgtag関数（エラー防止）
+    window.dataLayer = window.dataLayer || [];
+    window.gtag =
+      window.gtag ||
+      function () {
+        console.log("[GA Mock]", ...arguments);
+      };
+  </script>
+)}
+
+{typeof isDev === "boolean" && !isDev && !shouldLoadGA && (
+  <script is:inline>
+    console.warn(
+      "%c[Google Analytics] PUBLIC_GA_MEASUREMENT_ID が設定されていません",
+      "color: #FF9800; font-weight: bold;"
+    );
+  </script>
+)}

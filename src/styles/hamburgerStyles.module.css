@@ -425,7 +425,7 @@
 }
 
 @media (width <= 768px) {
-    .hamburger__menu {
+  .hamburger__menu {
     inset: 0;
     width: 100vw;
     max-width: none;

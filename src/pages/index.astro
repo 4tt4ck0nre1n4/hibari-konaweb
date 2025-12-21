@@ -272,184 +272,9 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   </div>
 </Layout>
 
-<script is:inline>
-  // @ts-nocheck
-  // JSConfettiはグローバルスコープで利用可能であることを前提としています
-
-  function initConfetti() {
-    const confetti = document.getElementById("confettiButton");
-    const canvasElement = document.getElementById("canvas");
-    const textCanvasElement = document.getElementById("confetti-text-canvas");
-
-    if (canvasElement instanceof HTMLCanvasElement && textCanvasElement instanceof HTMLCanvasElement) {
-      const devicePixelRatio = window.devicePixelRatio ?? 1;
-
-      const rect = canvasElement.getBoundingClientRect();
-      canvasElement.width = rect.width * devicePixelRatio;
-      canvasElement.height = rect.height * devicePixelRatio;
-
-      const textRect = textCanvasElement.getBoundingClientRect();
-      textCanvasElement.width = textRect.width * devicePixelRatio;
-      textCanvasElement.height = textRect.height * devicePixelRatio;
-
-      const jsConfetti = new JSConfetti({ canvas: canvasElement });
-      const context = textCanvasElement.getContext("2d");
-
-      if (context) {
-        let isAnimating = false;
-        let currentOpacity = 0;
-
-        const drawText = (opacity = 1) => {
-          context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
-          context.globalAlpha = opacity;
-          currentOpacity = opacity;
-
-          const screenWidth = window.innerWidth;
-          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-          const isAndroid = /Android/.test(navigator.userAgent);
-
-          let fontSize;
-
-          if (screenWidth <= 480) {
-            if (isIOS) {
-              fontSize = 44;
-            } else if (isAndroid) {
-              fontSize = 44;
-            } else {
-              fontSize = 40;
-            }
-          } else if (screenWidth <= 768) {
-            fontSize = 48;
-          } else {
-            fontSize = 20;
-          }
-
-          context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-          context.fillStyle = "#00FFFF"; // aquaカラー
-          context.textAlign = "center";
-          context.textBaseline = "middle";
-
-          const text = "Thank you for viewing my portfolio site!";
-          const maxWidth = textCanvasElement.width * 0.9;
-          const textMetrics = context.measureText(text);
-
-          if (textMetrics.width > maxWidth) {
-            const ratio = maxWidth / textMetrics.width;
-            const minFontSize = screenWidth > 768 ? 28 : 28;
-            fontSize = Math.max(minFontSize, fontSize * ratio);
-            context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-          }
-
-          // テキストを描画（fillStyleを再設定して確実にaquaカラーを適用）
-          context.fillStyle = "#00FFFF"; // aquaカラー
-          const centerX = textCanvasElement.width / 2;
-          const centerY = textCanvasElement.height / 2;
-          context.fillText(text, centerX, centerY);
-        };
-
-        window.addEventListener("resize", () => {
-          const newDevicePixelRatio = window.devicePixelRatio ?? 1;
-
-          const rect = canvasElement.getBoundingClientRect();
-          canvasElement.width = rect.width * newDevicePixelRatio;
-          canvasElement.height = rect.height * newDevicePixelRatio;
-
-          const textRect = textCanvasElement.getBoundingClientRect();
-          textCanvasElement.width = textRect.width * newDevicePixelRatio;
-          textCanvasElement.height = textRect.height * newDevicePixelRatio;
-
-          if (isAnimating && currentOpacity > 0) {
-            drawText(currentOpacity);
-          } else if (!isAnimating && currentOpacity > 0) {
-            drawText();
-          }
-        });
-
-        if (confetti) {
-          // console.log("Adding click listener to confetti button");
-          confetti.addEventListener("click", () => {
-            // console.log("Confetti button clicked!");
-
-            context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
-            currentOpacity = 0;
-            isAnimating = true;
-
-            jsConfetti
-              .addConfetti({
-                emojis: ["💜", "💖", "🌈", "✨", "💫", "🌸", "thanks", "💛", "💗", "💘", "🌟", "happy"],
-              })
-              .then(() => jsConfetti.addConfetti({ confettiRadius: 3 }))
-              .then(() => {
-                let opacity = 0;
-                const fadeIn = setInterval(() => {
-                  if (opacity < 1) {
-                    opacity += 0.05;
-                    drawText(opacity);
-                  } else {
-                    clearInterval(fadeIn);
-
-                    setTimeout(() => {
-                      let fadeOpacity = 1;
-                      const fadeOut = setInterval(() => {
-                        if (fadeOpacity > 0) {
-                          fadeOpacity -= 0.05;
-                          drawText(fadeOpacity);
-                        } else {
-                          clearInterval(fadeOut);
-                          context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
-                          currentOpacity = 0;
-                          isAnimating = false;
-                        }
-                      }, 50);
-                    }, 3000);
-                  }
-                }, 50);
-              })
-              .catch((error) => {
-                console.error("Confetti animation failed:", error);
-                isAnimating = false;
-              });
-          });
-        } else {
-          console.error("confettiButton element not found!");
-        }
-      }
-    } else {
-      if (!canvasElement) {
-        console.error("Full-screen canvas element (#canvas) not found!");
-      }
-      if (!textCanvasElement) {
-        console.error("Text canvas element (#confetti-text-canvas) not found!");
-      }
-    }
-  }
-
-  // JSConfettiが読み込まれたことを確認してから初期化
-  function waitForJSConfettiAndInit() {
-    if (typeof JSConfetti !== "undefined") {
-      console.log("✅ JSConfetti is ready, initializing confetti...");
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initConfetti);
-      } else {
-        initConfetti();
-      }
-    } else {
-      console.log("⏳ Waiting for JSConfetti to load...");
-      setTimeout(waitForJSConfettiAndInit, 100);
-    }
-  }
-
-  // window.onloadイベントでも初期化を試みる（フォールバック）
-  window.addEventListener("load", () => {
-    waitForJSConfettiAndInit();
-  });
-
-  // 即座にも試行（既に読み込まれている場合）
-  waitForJSConfettiAndInit();
-</script>
-
 <style is:global>
   #main-container {
+    min-height: 600px; /* CLSを防ぐために最小高さを設定 */
     display: grid;
     grid-template-columns: 24% 50% 24%;
     gap: 1%;
@@ -458,7 +283,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     background-repeat: no-repeat;
     position: relative;
     padding-block: 1.5rem;
-    min-height: 600px; /* CLSを防ぐために最小高さを設定 */
+    z-index: 1;
   }
 
   .toolbar {
@@ -475,185 +300,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   .swiper-display-container--desktop {
     display: block; /* デスクトップでは表示 */
     width: 100%;
-  }
-
-  .fv {
-    position: relative;
-    pointer-events: none; /* カードへのクリックを通過させる */
-  }
-
-  .fv > * {
-    pointer-events: auto; /* 子要素は通常通りクリック可能 */
-  }
-
-  .fv__wrapper {
-    height: 100%;
-    background: #1d1f20;
-    /* 背景画像の設定（HTMLでインラインスタイルとして指定） */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    perspective: 1200px;
-    overflow: hidden;
-    position: relative;
-    margin-block: 0;
-    margin-inline: auto;
-    pointer-events: none; /* カードへのクリックを通過させる */
-    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
-  }
-
-  .fv__wrapper > * {
-    pointer-events: auto; /* 子要素は通常通りクリック可能 */
-  }
-
-  .fv__wrapper::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
-    box-shadow: inset 10px 100px 200px rgba(0 0 0 / 0.6);
-    pointer-events: none;
-  }
-  .background-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
-    overflow: hidden;
-    transform-style: preserve-3d;
-    pointer-events: none; /* カードへのクリックを通過させる */
-    /* CSS変数の初期値を明示的に設定 */
-    --mouse-x: 50%;
-    --mouse-y: 50%;
-    /* 円形マスクでクリッピング（こちらは正面向き） */
-    -webkit-mask-image: radial-gradient(
-      circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      black 100%,
-      transparent 100%
-    );
-    mask-image: radial-gradient(circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%), black 100%, transparent 100%);
-  }
-
-  /* スマホサイズでマウス追従の円を小さくする */
-  @media (width <= 480px) {
-    .background-container {
-      /* CSS変数の初期値を維持 */
-      --mouse-x: 50%;
-      --mouse-y: 50%;
-      -webkit-mask-image: radial-gradient(
-        circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
-        black 100%,
-        transparent 100%
-      );
-      mask-image: radial-gradient(circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%), black 100%, transparent 100%);
-    }
-  }
-
-  .background-rotated {
-    position: absolute;
-    /* top: -60%; */
-    /* left: -10%; */
-    top: 0;
-    left: 0;
-    /* left: 22%; */
-    width: 400%;
-    height: 300%;
-    /* アニメーションする背景画像（HTMLでインラインスタイルとして指定） */
-    background-size: 480px;
-    background-repeat: repeat;
-    background-position: 50% 50%;
-    /* 3D回転を適用（この要素だけ回転） */
-    /* transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg); */
-    transform-style: preserve-3d;
-    animation: background-scroll-3d 24s linear infinite;
-    pointer-events: none; /* カードへのクリックを通過させる */
-    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
-  }
-
-  .background {
-    /* マスク位置を更新するためのダミー要素として保持 */
-    display: none;
-  }
-
-  @keyframes background-scroll-3d {
-    from {
-      background-position: 0% 50%;
-      transform: translateX(0);
-    }
-    to {
-      background-position: 100% 50%;
-      transform: translateX(0);
-    }
-  }
-  .glitch-container {
-    width: 100%;
-    height: 100vh;
-    max-width: 1400px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-inline: auto;
-    position: relative;
-    z-index: 0;
-    pointer-events: none; /* カードのクリックを通過させる */
-  }
-
-  .glitch-container > * {
-    pointer-events: auto; /* 子要素は通常通りクリック可能 */
-  }
-
-  /* NaviCardコンポーネント以外のglitch-containerの子要素は、カードより後ろに配置 */
-  .glitch-container > *:not(.navi-card__wrapper) {
-    z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
-  }
-  @keyframes noise {
-    0% {
-      background-position: 0 0;
-    }
-    100% {
-      background-position: 100% 100%;
-    }
-  }
-  @media (width <= 480px) {
-    .glitch-container {
-      width: 96%;
-    }
-  }
-
-  /* アニメーション画像コンテナ */
-  .animated-sprite-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 1400px;
-    min-height: 100vh;
-    margin-block-start: -2rem;
-    margin-inline: auto;
-    padding-inline: 2rem;
-  }
-
-  /* スマホサイズでのアニメーション画像コンテナ調整 */
-  @media (width <= 768px) {
-    .animated-sprite-container {
-      min-height: 100vh;
-      padding-inline: 1rem;
-    }
-  }
-
-  @media (width <= 480px) {
-    .animated-sprite-container {
-      min-height: 100vh;
-      padding-inline: 0.5rem;
-    }
-  }
-
-  /* tsParticlesが#main-containerの上に表示されるようにz-indexを調整 */
-  #main-container {
-    position: relative;
-    z-index: 1; /* tsParticles（z-index: 2）より下に表示 */
   }
 
   /* タブレット・スマホサイズでのレスポンシブ対応 */
@@ -1842,4 +1488,180 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
   // 即座にも試行（既に読み込まれている場合）
   waitForGSAPAndInit();
+</script>
+
+<script is:inline>
+  // @ts-nocheck
+  // JSConfettiはグローバルスコープで利用可能であることを前提としています
+
+  function initConfetti() {
+    const confetti = document.getElementById("confettiButton");
+    const canvasElement = document.getElementById("canvas");
+    const textCanvasElement = document.getElementById("confetti-text-canvas");
+
+    if (canvasElement instanceof HTMLCanvasElement && textCanvasElement instanceof HTMLCanvasElement) {
+      const devicePixelRatio = window.devicePixelRatio ?? 1;
+
+      const rect = canvasElement.getBoundingClientRect();
+      canvasElement.width = rect.width * devicePixelRatio;
+      canvasElement.height = rect.height * devicePixelRatio;
+
+      const textRect = textCanvasElement.getBoundingClientRect();
+      textCanvasElement.width = textRect.width * devicePixelRatio;
+      textCanvasElement.height = textRect.height * devicePixelRatio;
+
+      const jsConfetti = new JSConfetti({ canvas: canvasElement });
+      const context = textCanvasElement.getContext("2d");
+
+      if (context) {
+        let isAnimating = false;
+        let currentOpacity = 0;
+
+        const drawText = (opacity = 1) => {
+          context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
+          context.globalAlpha = opacity;
+          currentOpacity = opacity;
+
+          const screenWidth = window.innerWidth;
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+          const isAndroid = /Android/.test(navigator.userAgent);
+
+          let fontSize;
+
+          if (screenWidth <= 480) {
+            if (isIOS) {
+              fontSize = 44;
+            } else if (isAndroid) {
+              fontSize = 44;
+            } else {
+              fontSize = 40;
+            }
+          } else if (screenWidth <= 768) {
+            fontSize = 48;
+          } else {
+            fontSize = 20;
+          }
+
+          context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+          context.fillStyle = "#00FFFF"; // aquaカラー
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+
+          const text = "Thank you for viewing my portfolio site!";
+          const maxWidth = textCanvasElement.width * 0.9;
+          const textMetrics = context.measureText(text);
+
+          if (textMetrics.width > maxWidth) {
+            const ratio = maxWidth / textMetrics.width;
+            const minFontSize = screenWidth > 768 ? 28 : 28;
+            fontSize = Math.max(minFontSize, fontSize * ratio);
+            context.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+          }
+
+          // テキストを描画（fillStyleを再設定して確実にaquaカラーを適用）
+          context.fillStyle = "#00FFFF"; // aquaカラー
+          const centerX = textCanvasElement.width / 2;
+          const centerY = textCanvasElement.height / 2;
+          context.fillText(text, centerX, centerY);
+        };
+
+        window.addEventListener("resize", () => {
+          const newDevicePixelRatio = window.devicePixelRatio ?? 1;
+
+          const rect = canvasElement.getBoundingClientRect();
+          canvasElement.width = rect.width * newDevicePixelRatio;
+          canvasElement.height = rect.height * newDevicePixelRatio;
+
+          const textRect = textCanvasElement.getBoundingClientRect();
+          textCanvasElement.width = textRect.width * newDevicePixelRatio;
+          textCanvasElement.height = textRect.height * newDevicePixelRatio;
+
+          if (isAnimating && currentOpacity > 0) {
+            drawText(currentOpacity);
+          } else if (!isAnimating && currentOpacity > 0) {
+            drawText();
+          }
+        });
+
+        if (confetti) {
+          // console.log("Adding click listener to confetti button");
+          confetti.addEventListener("click", () => {
+            // console.log("Confetti button clicked!");
+
+            context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
+            currentOpacity = 0;
+            isAnimating = true;
+
+            jsConfetti
+              .addConfetti({
+                emojis: ["💜", "💖", "🌈", "✨", "💫", "🌸", "thanks", "💛", "💗", "💘", "🌟", "happy"],
+              })
+              .then(() => jsConfetti.addConfetti({ confettiRadius: 3 }))
+              .then(() => {
+                let opacity = 0;
+                const fadeIn = setInterval(() => {
+                  if (opacity < 1) {
+                    opacity += 0.05;
+                    drawText(opacity);
+                  } else {
+                    clearInterval(fadeIn);
+
+                    setTimeout(() => {
+                      let fadeOpacity = 1;
+                      const fadeOut = setInterval(() => {
+                        if (fadeOpacity > 0) {
+                          fadeOpacity -= 0.05;
+                          drawText(fadeOpacity);
+                        } else {
+                          clearInterval(fadeOut);
+                          context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
+                          currentOpacity = 0;
+                          isAnimating = false;
+                        }
+                      }, 50);
+                    }, 3000);
+                  }
+                }, 50);
+              })
+              .catch((error) => {
+                console.error("Confetti animation failed:", error);
+                isAnimating = false;
+              });
+          });
+        } else {
+          console.error("confettiButton element not found!");
+        }
+      }
+    } else {
+      if (!canvasElement) {
+        console.error("Full-screen canvas element (#canvas) not found!");
+      }
+      if (!textCanvasElement) {
+        console.error("Text canvas element (#confetti-text-canvas) not found!");
+      }
+    }
+  }
+
+  // JSConfettiが読み込まれたことを確認してから初期化
+  function waitForJSConfettiAndInit() {
+    if (typeof JSConfetti !== "undefined") {
+      console.log("✅ JSConfetti is ready, initializing confetti...");
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initConfetti);
+      } else {
+        initConfetti();
+      }
+    } else {
+      console.log("⏳ Waiting for JSConfetti to load...");
+      setTimeout(waitForJSConfettiAndInit, 100);
+    }
+  }
+
+  // window.onloadイベントでも初期化を試みる（フォールバック）
+  window.addEventListener("load", () => {
+    waitForJSConfettiAndInit();
+  });
+
+  // 即座にも試行（既に読み込まれている場合）
+  waitForJSConfettiAndInit();
 </script>

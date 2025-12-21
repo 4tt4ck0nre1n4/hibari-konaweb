@@ -67,6 +67,19 @@ const cspContent = isDev
     <!-- Critical CSS インライン化 -->
     <style is:global>
       /* 最小限のクリティカルCSS */
+      :root {
+        --color-white: #f1f5f9;
+        --color-black: #010101;
+        --color-purple: rgb(102 51 153);
+        --color-red: #ff4f48;
+        --color-blue: #0d0950;
+        --gradient: linear-gradient(
+          90deg,
+          rgb(238 161 255 / 1) 0%,
+          rgb(147 183 255 / 1) 55%,
+          rgb(170 244 254 / 1) 100%
+        );
+      }
       *,
       *::before,
       *::after {
@@ -75,34 +88,50 @@ const cspContent = isDev
         box-sizing: border-box;
       }
       html {
+        width: 100%;
+        max-width: 100%;
         font-family:
-      "Poppins",
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      Roboto,
-      "Helvetica Neue",
-      Arial,
-      system-ui,
-      sans-serif;
-        color: #020202;
-        background-color: #f1f5f9;
+          "Poppins",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          "Helvetica Neue",
+          Arial,
+          system-ui,
+          sans-serif;
+        color: var(--color-black);
+        background-color: var(--color-white);
         text-size-adjust: none;
         scrollbar-gutter: stable;
         block-size: 100%;
         color-scheme: dark light;
         tab-size: 2;
+        overflow-x: hidden;
+        transition: background-color 1.2s ease;
       }
       html.dark {
-        color: #f1f5f9;
-        background-color: #0d0950;
+        color: var(--color-white);
+        background-color: var(--color-blue);
       }
+
+      html.dark header {
+        background-color: transparent;
+      }
+
+      html.dark footer {
+        background-color: transparent;
+      }
+
       body {
+        width: 100%;
+        max-width: 100%;
         min-height: 100vh;
         line-height: 1.5;
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizespeed;
         min-block-size: 100%;
+        overflow-x: hidden;
       }
       img,
       svg {
@@ -131,7 +160,10 @@ const cspContent = isDev
         touch-action: manipulation;
       }
       #outer-container {
+        width: 100%;
+        max-width: 100%;
         height: 100%;
+        overflow-x: hidden;
       }
       #page-wrap {
         margin-block-start: 3rem;
@@ -140,11 +172,165 @@ const cspContent = isDev
       }
 
       @media (width <= 480px) {
-  #page-wrap {
-    margin-block-start: 7rem;
-  }
-}
+        #page-wrap {
+          margin-block-start: 7rem;
+        }
+      }
 
+      .fv {
+        position: relative;
+        pointer-events: none; /* カードへのクリックを通過させる */
+      }
+
+      .fv > * {
+        pointer-events: auto; /* 子要素は通常通りクリック可能 */
+      }
+
+      .fv__wrapper {
+        height: 100%;
+        background: #1d1f20;
+        /* 背景画像の設定（HTMLでインラインスタイルとして指定） */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        perspective: 1200px;
+        overflow: hidden;
+        position: relative;
+        margin-block: 0;
+        margin-inline: auto;
+        pointer-events: none; /* カードへのクリックを通過させる */
+        z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+      }
+
+      .fv__wrapper > * {
+        pointer-events: auto; /* 子要素は通常通りクリック可能 */
+      }
+
+      .fv__wrapper::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+        box-shadow: inset 10px 100px 200px rgba(0 0 0 / 0.6);
+        pointer-events: none;
+      }
+
+      /* 背景画像コンテナ */
+      .background-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 0 !important; /* カードより後ろに配置 */
+        overflow: hidden;
+        transform-style: preserve-3d;
+        pointer-events: none; /* カードへのクリックを通過させる */
+        /* CSS変数の初期値を明示的に設定 */
+        --mouse-x: 50%;
+        --mouse-y: 50%;
+        /* 円形マスクでクリッピング（こちらは正面向き） */
+        -webkit-mask-image: radial-gradient(
+          circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+          black 100%,
+          transparent 100%
+        );
+        mask-image: radial-gradient(
+          circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+          black 100%,
+          transparent 100%
+        );
+      }
+
+      /* スマホサイズでマウス追従の円を小さくする */
+      @media (width <= 480px) {
+        .background-container {
+          /* CSS変数の初期値を維持 */
+          --mouse-x: 50%;
+          --mouse-y: 50%;
+          -webkit-mask-image: radial-gradient(
+            circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            black 100%,
+            transparent 100%
+          );
+          mask-image: radial-gradient(
+            circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            black 100%,
+            transparent 100%
+          );
+        }
+      }
+
+      .background-rotated {
+        position: absolute;
+        top: 0;
+        left: 0;
+        /* left: 22%; */
+        width: 400%;
+        height: 300%;
+        /* アニメーションする背景画像（HTMLでインラインスタイルとして指定） */
+        background-size: 480px;
+        background-repeat: repeat;
+        background-position: 50% 50%;
+        /* 3D回転を適用（この要素だけ回転） */
+        /* transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg); */
+        transform-style: preserve-3d;
+        animation: background-scroll-3d 24s linear infinite;
+        pointer-events: none; /* カードへのクリックを通過させる */
+        z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+      }
+
+      .background {
+        /* マスク位置を更新するためのダミー要素として保持 */
+        display: none;
+      }
+
+      @keyframes background-scroll-3d {
+        from {
+          background-position: 0% 50%;
+          transform: translateX(0);
+        }
+        to {
+          background-position: 100% 50%;
+          transform: translateX(0);
+        }
+      }
+
+      .glitch-container {
+        width: 100%;
+        height: 100vh;
+        max-width: 1400px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-inline: auto;
+        position: relative;
+        z-index: 0;
+        pointer-events: none; /* カードのクリックを通過させる */
+      }
+
+      .glitch-container > * {
+        pointer-events: auto; /* 子要素は通常通りクリック可能 */
+      }
+
+      /* NaviCardコンポーネント以外のglitch-containerの子要素は、カードより後ろに配置 */
+      .glitch-container > *:not(.navi-card__wrapper) {
+        z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+      }
+
+      @keyframes noise {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 100% 100%;
+        }
+      }
+      @media (width <= 480px) {
+        .glitch-container {
+          width: 96%;
+        }
+      }
     </style>
 
     {

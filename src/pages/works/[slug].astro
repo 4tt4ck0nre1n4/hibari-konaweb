@@ -73,39 +73,48 @@ interface WorksTextData {
 const typedWorksText: WorksTextData = worksText as unknown as WorksTextData;
 
 const { slug } = Astro.params as { slug: string };
-let work: Works | null = null;
+// getStaticPaths()で取得したデータを優先的に使用
+// Astro.propsの型安全性を確保
+const props = Astro.props as { work?: Works } | undefined;
+const workFromProps = props?.work;
+let work: Works | null = workFromProps || null;
 
 const workTextData =
   slug in typedWorksText && typedWorksText[slug] !== null && typeof typedWorksText[slug] === "object"
     ? typedWorksText[slug]
     : null;
 
-try {
-  const resWorks = await fetch(
-    // `${import.meta.env.PUBLIC_API_URL}works?_fields=acf,slug,title&acf_format=standard&slug=${slug}`,
-    `${WORKS_SLUG_API}${slug}`
-  );
+// propsにデータがない場合のみ、個別にAPIリクエストを試行（フォールバック）
+if (!work) {
+  try {
+    const resWorks = await fetch(`${WORKS_SLUG_API}${slug}`);
 
-  console.log("Fetching data WORKS_SLUG_API:", WORKS_SLUG_API);
+    console.log("Fetching data WORKS_SLUG_API:", `${WORKS_SLUG_API}${slug}`);
 
-  if (!resWorks.ok) {
-    console.error("Failed to fetch work data. Status:", resWorks.status);
-    throw new Error("Failed to fetch work data");
-  }
+    if (!resWorks.ok) {
+      console.error("Failed to fetch work data. Status:", resWorks.status);
+      // 507エラーなどの一時的なエラーの場合は警告のみ
+      if (resWorks.status === 507) {
+        console.warn(`⚠️ [Works Slug] Server returned 507 (Insufficient Storage) for slug: ${slug}`);
+        console.warn(`⚠️ [Works Slug] This may be a temporary server issue. Skipping this page.`);
+      }
+      throw new Error(`Failed to fetch work data: ${resWorks.status}`);
+    }
 
-  const data = (await resWorks.json()) as Works[];
+    const data = (await resWorks.json()) as Works[];
 
-  console.log("API Response:", data);
+    console.log("API Response:", data);
 
-  if (Array.isArray(data) && data.length > 0 && data[0] !== undefined) {
-    work = data[0];
-  } else {
-    console.warn(`No data found for slug: ${slug}`);
+    if (Array.isArray(data) && data.length > 0 && data[0] !== undefined) {
+      work = data[0];
+    } else {
+      console.warn(`No data found for slug: ${slug}`);
+      work = null;
+    }
+  } catch (error) {
+    console.error(`Error fetching work data for slug ${slug}:`, error);
     work = null;
   }
-} catch (error) {
-  console.error("Error fetching work data:", error);
-  work = null;
 }
 
 export async function getStaticPaths() {
@@ -116,6 +125,12 @@ export async function getStaticPaths() {
     if (!res.ok) {
       console.error(`❌ [Works Slug] Failed to fetch works: ${res.status} ${res.statusText}`);
       console.error(`❌ [Works Slug] API URL: ${WORKS_PATH_API}`);
+      // 507エラーの場合は警告のみ（一時的なサーバー問題の可能性）
+      if (res.status === 507) {
+        console.warn(`⚠️ [Works Slug] Server returned 507 (Insufficient Storage). This may be a temporary issue.`);
+        console.warn(`⚠️ [Works Slug] Returning empty paths to prevent build failure.`);
+        return [];
+      }
       throw new Error(`Failed to fetch works data: ${res.status} ${res.statusText}`);
     }
 
@@ -128,6 +143,7 @@ export async function getStaticPaths() {
       return [];
     }
 
+    // 各workデータをpropsとして渡す（個別のAPIリクエストを避けるため）
     const paths = dataWorks.map((work) => ({
       params: { slug: work.slug },
       props: { work },
@@ -144,13 +160,24 @@ export async function getStaticPaths() {
       console.error("❌ [Works Slug] Error message:", error.message);
       console.error("❌ [Works Slug] Error stack:", error.stack);
     }
+    // エラー時も空配列を返してビルドを継続（ビルド全体を停止しない）
+    console.warn("⚠️ [Works Slug] Returning empty paths to prevent build failure.");
     return [];
   }
 }
 
+// データが見つからない場合は、エラーページを生成する（ビルドを停止しない）
 if (!work) {
-  console.error(`No matching data found for slug: ${slug}`);
-  throw new Error("404: Not Found");
+  console.error(`❌ [Works Slug] No matching data found for slug: ${slug}`);
+  console.error(`❌ [Works Slug] This page will be generated as an error page.`);
+  // ビルドを停止せず、エラーページを生成するために空のデータ構造を作成
+  work = {
+    id: 0,
+    date: 0,
+    title: { rendered: "Work Not Found" },
+    slug: slug,
+    acf: undefined,
+  } as Works;
 }
 
 const icons = work?.acf
@@ -215,7 +242,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       </div>
       <div>
         {
-          work !== null ? (
+          work !== null && work.id !== 0 ? (
             <article class="work">
               <div class="split__container">
                 <div class="split left left1">
