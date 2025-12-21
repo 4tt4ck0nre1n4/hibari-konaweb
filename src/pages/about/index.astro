@@ -116,7 +116,11 @@ const stateMachine = "State Machine 1";
       <section class="about" aria-labelledby={`${aboutMeTitle} ${aboutMeSubTitle}`}>
         <div class="about__wrapper">
           <FlowingLinesWrapper>
-            <AboutHeading id={`${aboutMeTitle} ${aboutMeSubTitle}`} aboutTitle={aboutMeTitle} aboutSubTitle={aboutMeSubTitle} />
+            <AboutHeading
+              id={`${aboutMeTitle} ${aboutMeSubTitle}`}
+              aboutTitle={aboutMeTitle}
+              aboutSubTitle={aboutMeSubTitle}
+            />
           </FlowingLinesWrapper>
           <div class="about__inner">
             <div class="about__textInner">
@@ -185,7 +189,11 @@ const stateMachine = "State Machine 1";
       <section class="skills" aria-labelledby={`${skillsTitle} ${skillsSubTitle}`}>
         <div class="skills__wrapper">
           <FlowingLinesWrapper>
-            <AboutHeading id={`${skillsTitle} ${skillsSubTitle}`} aboutTitle={skillsTitle} aboutSubTitle={skillsSubTitle} />
+            <AboutHeading
+              id={`${skillsTitle} ${skillsSubTitle}`}
+              aboutTitle={skillsTitle}
+              aboutSubTitle={skillsSubTitle}
+            />
           </FlowingLinesWrapper>
           <div class="skills__inner">
             <ul class="skills__menu">
@@ -216,7 +224,11 @@ const stateMachine = "State Machine 1";
       <section class="service" aria-labelledby={`${serviceTitle} ${serviceSubTitle}`}>
         <div class="service__wrapper">
           <FlowingLinesWrapper>
-            <AboutHeading id={`${serviceTitle} ${serviceSubTitle}`} aboutTitle={serviceTitle} aboutSubTitle={serviceSubTitle} />
+            <AboutHeading
+              id={`${serviceTitle} ${serviceSubTitle}`}
+              aboutTitle={serviceTitle}
+              aboutSubTitle={serviceSubTitle}
+            />
           </FlowingLinesWrapper>
           <div class="service__inner">
             <ul class="service__menu">
@@ -456,7 +468,6 @@ const stateMachine = "State Machine 1";
     padding-block: 2rem;
     padding-inline: 1rem;
   }
-
 
   html.dark .skills__inner {
     box-shadow: 0 10px 40px rgb(255 255 255 / 0.6);

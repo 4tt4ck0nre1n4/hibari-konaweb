@@ -1,26 +1,10 @@
 /* リセットcss */
 
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 * {
   border-width: 0;
   border-style: solid;
   background-origin: border-box;
   background-repeat: no-repeat;
-}
-
-:where(html) {
-  block-size: 100%;
-  text-size-adjust: none;
-  color-scheme: dark light;
-  tab-size: 2;
-  scrollbar-gutter: stable; /* スクロールバーのスペースを常に確保してCLSを防止 */
 }
 
 :where(html:has(dialog:modal[open])) {
@@ -33,32 +17,17 @@
   }
 }
 
-:where(body) {
-  min-height: 100vh;
-  font-family: system-ui, sans-serif;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizespeed;
-  min-block-size: 100%;
-}
-
 :where(h1, h2, h3, h4, h5, h6, p) {
   overflow-wrap: break-word;
 }
 
-/* :where(h1, h2, h3) {
-  text-wrap: balance;
-} */
-
-:where(ul, ol),
+:where(ol),
 [role="list"] {
   list-style: none;
 }
 
 :where(a) {
-  color: inherit;
   background-color: transparent;
-  text-decoration: none;
   text-underline-offset: 0.2ex;
 }
 
@@ -67,7 +36,7 @@
   text-decoration-skip-ink: auto;
 }
 
-:where(a[href], button, input, textarea, select, label[for], summary, [tabindex]:not([tabindex*="-"])) {
+:where(input, textarea, select, label[for]) {
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -86,7 +55,9 @@
   appearance: none;
 }
 
-:where(button, button[type], input[type="button"], input[type="submit"], input[type="reset"]) {
+:where(input[type="button"], input[type="submit"], input[type="reset"]) {
+  cursor: pointer;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   user-select: none;
@@ -130,23 +101,6 @@ button:-moz-focusring,
   appearance: auto;
 }
 
-:where(input[type="file"]) {
-  cursor: auto;
-}
-
-:where(input[type="file"])::-webkit-file-upload-button {
-  font-family: inherit;
-  font-size: inherit;
-  letter-spacing: inherit;
-  color: inherit;
-  word-spacing: inherit;
-}
-
-:where(input[type="file"])::-webkit-file-upload-button,
-:where(input[type="file"])::file-selector-button {
-  cursor: pointer;
-}
-
 :where(textarea) {
   resize: vertical;
 }
@@ -161,7 +115,7 @@ button:-moz-focusring,
   cursor: not-allowed;
 }
 
-:where(img, svg, canvas, iframe, video, audio, embed, object) {
+:where(canvas, iframe, video, audio, embed, object) {
   display: block;
   vertical-align: middle;
   max-width: 100%;
@@ -169,8 +123,6 @@ button:-moz-focusring,
 
 :where(img, svg, video) {
   max-inline-size: 100%;
-
-  /* block-size: auto; */
 }
 
 :where(svg) {
@@ -179,9 +131,6 @@ button:-moz-focusring,
 }
 
 :where(svg):where(:not([fill])) {
-  /* stroke: currentColor; */
-
-  /* fill: none; */
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -215,10 +164,6 @@ button:-moz-focusring,
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* :focus-visible {
-    transition: outline-offset 145ms cubic-bezier(0.25, 0, 0.4, 1);
-  } */
-
   :where(:not(:active)):focus-visible {
     transition-duration: 0.25s;
   }

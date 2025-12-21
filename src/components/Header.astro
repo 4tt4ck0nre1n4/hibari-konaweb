@@ -20,7 +20,15 @@ const logo = {
       <h1 class="header__logo">
         <a class="header__logo_link" href={logo.href} aria-label={logo.ariaLabel} title={logo.ariaTitle}>
           <div class="header__logo_container">
-            <Image class="header__logo_image" src={LogoSvg} alt="ロゴ画像" width="40" height="40" loading="lazy" decoding="async" />
+            <Image
+              class="header__logo_image"
+              src={LogoSvg}
+              alt="ロゴ画像"
+              width="40"
+              height="40"
+              loading="lazy"
+              decoding="async"
+            />
             <svg class="header__clock_animation" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
               <circle
                 class="clock-circle"
@@ -33,8 +41,24 @@ const logo = {
                 stroke-dashoffset="176"></circle>
             </svg>
           </div>
-          <Image class="header__logo_text" src={TextSvg} alt="ロゴ画像" width="280" height="50" loading="lazy" decoding="async" />
-          <Image class="header__logo_whiteText" src={WhiteTextSvg} alt="ロゴ画像" width="280" height="50" loading="lazy" decoding="async" />
+          <Image
+            class="header__logo_text"
+            src={TextSvg}
+            alt="ロゴ画像"
+            width="280"
+            height="50"
+            loading="lazy"
+            decoding="async"
+          />
+          <Image
+            class="header__logo_whiteText"
+            src={WhiteTextSvg}
+            alt="ロゴ画像"
+            width="280"
+            height="50"
+            loading="lazy"
+            decoding="async"
+          />
         </a>
       </h1>
       <nav class="header__nav">

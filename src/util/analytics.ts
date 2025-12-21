@@ -8,7 +8,7 @@
 declare global {
   interface Window {
     gtag?: (
-      command: 'event' | 'config' | 'set' | 'consent',
+      command: "event" | "config" | "set" | "consent",
       targetOrAction: string,
       params?: Record<string, unknown>
     ) => void;
@@ -33,14 +33,11 @@ declare global {
  *   file_extension: 'pdf'
  * });
  */
-export function trackEvent(
-  eventName: string,
-  eventParams?: Record<string, unknown>
-): void {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, eventParams);
+export function trackEvent(eventName: string, eventParams?: Record<string, unknown>): void {
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("event", eventName, eventParams);
   } else if (import.meta.env.DEV) {
-    console.log('[GA Mock Event]', eventName, eventParams);
+    console.log("[GA Mock Event]", eventName, eventParams);
   }
 }
 
@@ -51,18 +48,15 @@ export function trackEvent(
  * // ルート変更時にページビューを送信
  * trackPageView('/about');
  */
-export function trackPageView(
-  pagePath: string,
-  pageTitle?: string
-): void {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'page_view', {
+export function trackPageView(pagePath: string, pageTitle?: string): void {
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("event", "page_view", {
       page_path: pagePath,
       page_title: pageTitle || document.title,
       page_location: window.location.href,
     });
   } else if (import.meta.env.DEV) {
-    console.log('[GA Mock PageView]', pagePath, pageTitle);
+    console.log("[GA Mock PageView]", pagePath, pageTitle);
   }
 }
 
@@ -76,13 +70,11 @@ export function trackPageView(
  *   language: 'ja'
  * });
  */
-export function setUserProperties(
-  properties: Record<string, unknown>
-): void {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('set', 'user_properties', properties);
+export function setUserProperties(properties: Record<string, unknown>): void {
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("set", "user_properties", properties);
   } else if (import.meta.env.DEV) {
-    console.log('[GA Mock UserProperties]', properties);
+    console.log("[GA Mock UserProperties]", properties);
   }
 }
 
@@ -92,11 +84,8 @@ export function setUserProperties(
  * @example
  * trackFormSubmit('contact_form', true);
  */
-export function trackFormSubmit(
-  formName: string,
-  success: boolean
-): void {
-  trackEvent('form_submit', {
+export function trackFormSubmit(formName: string, success: boolean): void {
+  trackEvent("form_submit", {
     form_name: formName,
     success: success,
   });
@@ -110,9 +99,9 @@ export function trackFormSubmit(
  */
 export function trackLinkClick(
   url: string,
-  linkType: 'external_link' | 'internal_link' | 'download' = 'external_link'
+  linkType: "external_link" | "internal_link" | "download" = "external_link"
 ): void {
-  trackEvent('link_click', {
+  trackEvent("link_click", {
     link_url: url,
     link_type: linkType,
   });
@@ -125,7 +114,7 @@ export function trackLinkClick(
  * trackScrollDepth(75); // 75%までスクロール
  */
 export function trackScrollDepth(percentage: number): void {
-  trackEvent('scroll', {
+  trackEvent("scroll", {
     percent_scrolled: percentage,
   });
 }
@@ -136,11 +125,8 @@ export function trackScrollDepth(percentage: number): void {
  * @example
  * trackVideoPlay('intro_video', 120);
  */
-export function trackVideoPlay(
-  videoName: string,
-  videoDuration?: number
-): void {
-  trackEvent('video_play', {
+export function trackVideoPlay(videoName: string, videoDuration?: number): void {
+  trackEvent("video_play", {
     video_name: videoName,
     video_duration: videoDuration,
   });
@@ -152,11 +138,8 @@ export function trackVideoPlay(
  * @example
  * trackSearch('astro tutorial', 42);
  */
-export function trackSearch(
-  searchTerm: string,
-  resultCount?: number
-): void {
-  trackEvent('search', {
+export function trackSearch(searchTerm: string, resultCount?: number): void {
+  trackEvent("search", {
     search_term: searchTerm,
     result_count: resultCount,
   });
@@ -168,11 +151,8 @@ export function trackSearch(
  * @example
  * trackError('api_error', 'Failed to fetch posts');
  */
-export function trackError(
-  errorType: string,
-  errorMessage?: string
-): void {
-  trackEvent('error', {
+export function trackError(errorType: string, errorMessage?: string): void {
+  trackEvent("error", {
     error_type: errorType,
     error_message: errorMessage,
   });
@@ -184,16 +164,10 @@ export function trackError(
  * @example
  * trackTiming('page_load', 'content_loaded', 1234);
  */
-export function trackTiming(
-  category: string,
-  variable: string,
-  value: number
-): void {
-  trackEvent('timing_complete', {
+export function trackTiming(category: string, variable: string, value: number): void {
+  trackEvent("timing_complete", {
     name: variable,
     value: value,
     event_category: category,
   });
 }
-
-

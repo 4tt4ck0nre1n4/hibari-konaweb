@@ -89,7 +89,7 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<R
       // 5xx エラーの場合はリトライ
       if (response.status >= 500 && i < retries - 1) {
         console.warn(`Server error ${response.status}, retrying... (${i + 1}/${retries})`);
-        await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+        await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
         continue;
       }
 
@@ -97,7 +97,7 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<R
     } catch (error) {
       if (i < retries - 1) {
         console.warn(`Fetch failed, retrying... (${i + 1}/${retries})`, error);
-        await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+        await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
         continue;
       }
       throw error;
