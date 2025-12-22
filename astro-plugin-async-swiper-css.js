@@ -18,7 +18,34 @@ export function asyncSwiperCssPlugin() {
       "astro:build:done": async ({ dir }) => {
         try {
           // ビルド後のHTMLファイルを処理
-          const buildDir = typeof dir === "string" ? dir : dir.pathname || dir.href || "./dist";
+          // dir は URL オブジェクトの場合があるので、fileURLToPath で変換
+          let buildDir = "./dist";
+          if (typeof dir === "string") {
+            buildDir = dir;
+          } else if (dir && typeof dir === "object") {
+            // URL オブジェクトの場合
+            try {
+              if (dir.href) {
+                buildDir = fileURLToPath(dir.href);
+              } else if (dir.pathname) {
+                // pathname が URL オブジェクトの場合
+                if (typeof dir.pathname === "string" && dir.pathname.startsWith("file://")) {
+                  buildDir = fileURLToPath(dir.pathname);
+                } else {
+                  buildDir = dir.pathname;
+                }
+              }
+            } catch (e) {
+              // fileURLToPath が失敗した場合は文字列として使用
+              buildDir = dir.pathname || dir.href || "./dist";
+            }
+          }
+
+          // パスの正規化
+          buildDir = path.resolve(buildDir);
+
+          console.log(`[async-css-optimizer] Build directory: ${buildDir}`);
+
           const htmlFiles = findHtmlFiles(buildDir);
 
           console.log(`[async-css-optimizer] Processing ${htmlFiles.length} HTML files...`);
