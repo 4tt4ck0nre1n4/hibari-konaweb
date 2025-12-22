@@ -1,7 +1,8 @@
 /**
- * Astroプラグイン: Swiper CSSのみを非同期読み込みにする
+ * Astroプラグイン: CSSの非同期読み込み最適化
  * レンダリングブロックを削減してLCPを改善
- * Swiper CSSのみを対象とし、他のCSSは通常通り読み込み
+ * - reset.css と global.css を含むCSSファイル: preload + onload パターン
+ * - Swiper CSS: media="print" hack
  */
 import fs from "fs";
 import path from "path";
@@ -12,7 +13,7 @@ const __dirname = path.dirname(__filename);
 
 export function asyncSwiperCssPlugin() {
   return {
-    name: "async-swiper-css",
+    name: "async-css-optimizer",
     hooks: {
       "astro:build:done": async ({ dir }) => {
         try {
@@ -20,55 +21,86 @@ export function asyncSwiperCssPlugin() {
           const buildDir = typeof dir === "string" ? dir : dir.pathname || dir.href || "./dist";
           const htmlFiles = findHtmlFiles(buildDir);
 
-          console.log(`[async-swiper-css] Processing ${htmlFiles.length} HTML files...`);
+          console.log(`[async-css-optimizer] Processing ${htmlFiles.length} HTML files...`);
 
           for (const htmlFile of htmlFiles) {
             let html = fs.readFileSync(htmlFile, "utf-8");
             let modified = false;
 
-            // Swiper CSSのみを非同期読み込みに変換
-            html = html.replace(/<link([^>]*?)rel=["']stylesheet["']([^>]*?)>/gi, (match, before, after) => {
-              // すでにpreloadやその他の特別な属性がある場合はスキップ
-              if (match.includes('rel="preload"') || match.includes('media="print"')) {
-                return match;
-              }
+            // すべてのstylesheetリンクを収集して処理
+            const stylesheetRegex = /<link([^>]*?)rel=["']stylesheet["']([^>]*?)>/gi;
+            const stylesheetMatches = [];
+            let match;
 
-              // href属性を抽出
-              const hrefMatch = match.match(/href=["']([^"']+)["']/);
-              if (!hrefMatch) {
-                return match;
-              }
+            // すべてのマッチを収集
+            while ((match = stylesheetRegex.exec(html)) !== null) {
+              const hrefMatch = match[0].match(/href=["']([^"']+)["']/);
+              if (!hrefMatch) continue;
 
               const href = hrefMatch[1];
 
-              // インライン化されたCSSはスキップ
-              if (href.startsWith("data:")) {
-                return match;
+              // インライン化されたCSSや既に処理済みのCSSはスキップ
+              if (
+                href.startsWith("data:") ||
+                match[0].includes('rel="preload"') ||
+                match[0].includes('media="print"') ||
+                match[0].includes("onload=")
+              ) {
+                continue;
               }
 
-              // Swiper CSSのみを対象とする
-              if (!href.includes("swiper")) {
-                return match; // Swiper以外のCSSは変更しない
-              }
+              stylesheetMatches.push({
+                fullMatch: match[0],
+                index: match.index,
+                href: href,
+              });
+            }
 
-              modified = true;
+            // 置換内容を収集（まず正順でカウント、その後逆順で置換）
+            const replacements = [];
+            let nonSwiperCssIndex = 0;
 
-              // media="print" hack を使用して非同期読み込み
-              // より確実に動作し、CSPにも対応
+            // 正順で処理して、nonSwiperCssIndexをカウント
+            for (let i = 0; i < stylesheetMatches.length; i++) {
+              const { fullMatch, index, href } = stylesheetMatches[i];
               const normalizedHref = href.startsWith("/") ? href : `/${href}`;
+              let replacement = null;
 
-              return `<link rel="stylesheet" href="${normalizedHref}" media="print" onload="this.media='all'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
-            });
+              // Swiper CSS: media="print" hack を使用
+              if (href.includes("swiper")) {
+                modified = true;
+                replacement = `<link rel="stylesheet" href="${normalizedHref}" media="print" onload="this.media='all'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                replacements.push({ index, fullMatch, replacement });
+              }
+              // reset.css と global.css を含むCSSファイル: preload + onload パターン
+              // HeadLayout.astroから読み込まれるCSSは通常、最初の2つ（または最初の1つにバンドルされる）
+              // Swiper CSSを除外した最初の2つを処理
+              else {
+                nonSwiperCssIndex++;
+                // 最初の2つのCSSファイルを preload + onload パターンに変換
+                if (nonSwiperCssIndex <= 2) {
+                  modified = true;
+                  replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                  replacements.push({ index, fullMatch, replacement });
+                }
+              }
+            }
+
+            // 逆順で置換（インデックスがずれないようにするため）
+            for (let i = replacements.length - 1; i >= 0; i--) {
+              const { index, fullMatch, replacement } = replacements[i];
+              html = html.substring(0, index) + replacement + html.substring(index + fullMatch.length);
+            }
 
             if (modified) {
               fs.writeFileSync(htmlFile, html, "utf-8");
-              console.log(`[async-swiper-css] ✅ Optimized: ${path.relative(buildDir, htmlFile)}`);
+              console.log(`[async-css-optimizer] ✅ Optimized: ${path.relative(buildDir, htmlFile)}`);
             }
           }
 
-          console.log(`[async-swiper-css] ✅ Swiper CSS optimization complete!`);
+          console.log(`[async-css-optimizer] ✅ CSS optimization complete!`);
         } catch (error) {
-          console.error("[async-swiper-css] ❌ Error:", error);
+          console.error("[async-css-optimizer] ❌ Error:", error);
         }
       },
     },

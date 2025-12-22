@@ -345,12 +345,32 @@ const cspContent = isDev
     <!-- ページ固有の追加head要素（LCP最適化など） -->
     <slot name="head" />
 
-    <!-- Swiper CSS非同期読み込みのフォールバックスクリプト -->
+    <!-- CSS非同期読み込みのフォールバックスクリプト -->
     <script is:inline>
-      // media="print" hack のフォールバック（Swiper CSS用）
+      // preload + onload パターンと media="print" hack のフォールバック
       (function () {
-        const links = document.querySelectorAll('link[rel="stylesheet"][media="print"]');
-        links.forEach(function (link) {
+        // preload + onload パターンのフォールバック（reset.css, global.css用）
+        const preloadLinks = document.querySelectorAll('link[rel="preload"][as="style"]');
+        preloadLinks.forEach(function (link) {
+          // onloadがサポートされていない場合は、即座にstylesheetに変換
+          if (!("onload" in link)) {
+            link.rel = "stylesheet";
+          } else {
+            // onloadがサポートされている場合は、onloadイベントを設定
+            link.onload = function () {
+              this.onload = null;
+              this.rel = "stylesheet";
+            };
+            // フォールバック: 読み込みが完了している場合に備えて即座にチェック
+            if (link.sheet || (link.href && document.styleSheets.length > 0)) {
+              link.rel = "stylesheet";
+            }
+          }
+        });
+
+        // media="print" hack のフォールバック（Swiper CSS用）
+        const printLinks = document.querySelectorAll('link[rel="stylesheet"][media="print"]');
+        printLinks.forEach(function (link) {
           const href = link.getAttribute("href");
           // Swiper CSSのみを処理
           if (href && href.includes("swiper")) {
