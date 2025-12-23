@@ -120,7 +120,6 @@ console.log("Astro props:", JSON.stringify(page, null, 2));
 const posts = Array.isArray(page.data) ? page.data : [];
 
 const hasNextPage = page.size < page.total ? true : false;
-// const headingId = `blog-post-${post.id ?? post.slug}-title`;
 const blogTitle = "Blog";
 const blogText = "ブログ記事の一覧です。";
 const errorBlogText = "ブログ記事が見つかりませんでした。";
@@ -208,8 +207,8 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
                             class="blog__menu_image"
                             src={typeof post.acf?.blog_image === "string" ? post.acf.blog_image : ""}
                             alt={post.title.rendered}
-                            loading="lazy"
                             decoding="async"
+                            loading="lazy"
                           />
                         </div>
                       </a>

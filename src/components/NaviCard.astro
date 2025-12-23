@@ -42,189 +42,6 @@ const menuItems: MenuItem[] = [
   </div>
 </div>
 
-<script>
-  function initNaviCard() {
-    const button = document.querySelector(".navi-card__button") as HTMLButtonElement;
-    const menu = document.querySelector(".navi-card__menu") as HTMLUListElement;
-    const menuItems = document.querySelectorAll(".navi-card__menu_item") as NodeListOf<HTMLLIElement>;
-    const glitchContainer = document.querySelector(".glitch-container") as HTMLElement;
-
-    if (!button || !menu || !menuItems.length) {
-      console.error("NaviCard: Required elements not found!");
-      return;
-    }
-
-    // 初期状態は開いている（カードが表示されている）
-    let isOpen = true;
-
-    button.addEventListener("click", () => {
-      isOpen = !isOpen;
-
-      // ARIA属性の更新
-      button.setAttribute("aria-expanded", String(isOpen));
-      button.setAttribute("aria-label", isOpen ? "メニューを閉じる" : "メニューを開く");
-      menu.setAttribute("aria-hidden", String(!isOpen));
-
-      // クラスの切り替え
-      button.classList.toggle("is-open", isOpen);
-      menu.classList.toggle("is-open", isOpen);
-
-      // main要素内のglitch-container以外の要素のpointer-eventsを制御
-      // ただし、カード要素とボタン要素は除外
-      const main = document.querySelector("main") as HTMLElement;
-      if (main && isOpen) {
-        // main要素内の直接の子要素のみを制御（再帰的にはしない）
-        const mainChildren = Array.from(main.children) as HTMLElement[];
-        mainChildren.forEach((child) => {
-          // glitch-containerは除外
-          if (!child.classList.contains("glitch-container") && !child.querySelector(".glitch-container")) {
-            child.style.pointerEvents = "none";
-          }
-        });
-      } else if (main && !isOpen) {
-        // メニューが閉じている時は、すべての要素のpointer-eventsをリセット
-        const mainChildren = Array.from(main.children) as HTMLElement[];
-        mainChildren.forEach((child) => {
-          child.style.pointerEvents = "";
-        });
-      }
-
-      // glitch-containerとその子要素のpointer-eventsとz-indexを制御
-      // 画像は表示し続けるが、pointer-eventsをnoneにしてカードのクリックを可能にする
-      if (glitchContainer) {
-        // glitch-container自体のpointer-eventsを制御
-        glitchContainer.style.pointerEvents = "none"; // 常にnone（元々none）
-
-        // .glitch要素を取得
-        const glitchElement = glitchContainer.querySelector(".glitch") as HTMLElement;
-        if (glitchElement) {
-          // .glitch要素のz-indexを0に設定（カードより後ろに配置）
-          glitchElement.style.setProperty("z-index", "0", "important");
-        }
-
-        // glitch-containerの子要素のpointer-eventsとz-indexを制御
-        // NaviCardとGlitchコンポーネントを区別
-        const glitchChildren = glitchContainer.querySelectorAll("*") as NodeListOf<HTMLElement>;
-        glitchChildren.forEach((child) => {
-          // NaviCardコンポーネント（navi-card__wrapper）は除外
-          const isNaviCard = child.classList.contains("navi-card__wrapper") || child.closest(".navi-card__wrapper");
-          if (!isNaviCard) {
-            // メニューが開いている時はpointer-eventsをnoneにする（画像は表示し続ける）
-            child.style.pointerEvents = isOpen ? "none" : "auto";
-            // z-indexを明示的に設定してカードより後ろに配置
-            if (child.classList.contains("glitch") || child.closest(".glitch")) {
-              child.style.setProperty("z-index", "0", "important");
-            } else {
-              child.style.setProperty("z-index", "0", "important");
-            }
-          }
-        });
-      }
-
-      // 各アイテムのアニメーション
-      if (isOpen) {
-        // 1枚ずつ時間差で表示（よりゆっくり、ふわっと）
-        menuItems.forEach((item, index) => {
-          setTimeout(() => {
-            item.classList.add("is-open");
-            // CSSのtransitionを待たずに、JavaScriptで直接opacityを強制設定
-            (item as HTMLElement).style.setProperty("opacity", "1", "important");
-          }, index * 600);
-        });
-      } else {
-        // 閉じる時もゆっくり消えるように
-        menuItems.forEach((item, index) => {
-          const delay = (menuItems.length - index - 1) * 0.2; // 0.08s → 0.2s に延長
-          item.style.transitionDelay = `${delay}s`;
-          item.classList.remove("is-open");
-          // transition完了後にopacityを0に設定（念のため）
-          setTimeout(
-            () => {
-              (item as HTMLElement).style.setProperty("opacity", "0", "important");
-              item.style.transitionDelay = "";
-            },
-            (delay + 1.5) * 1000
-          ); // transition時間(1.5s) + delay 後にリセット
-        });
-      }
-    });
-
-    // メニュー外クリックで閉じる（カードとボタンは除外）
-    // バブリングフェーズで処理（カードのキャプチャより後）
-    document.addEventListener(
-      "click",
-      (e) => {
-        // カードクリックイベントで既に処理済み（defaultPrevented またはカスタムプロパティ）の場合は何もしない
-        if ((e as any).__naviCardHandled || e.defaultPrevented) {
-          return;
-        }
-
-        const target = e.target as HTMLElement;
-
-        // カードまたはその子要素をクリックした場合は閉じない
-        // より広範囲にチェック（カードの全子孫要素を含む）
-        const clickedCard = target.closest(".navi-card__menu_item");
-        const clickedButton = button.contains(target) || target.closest(".navi-card__button");
-        const clickedMenu = target.closest(".navi-card__menu");
-        const clickedLink = target.closest(".navi-card__menu_link");
-        const clickedText = target.closest(".navi-card__menu_text");
-        const clickedWrapper = target.closest(".navi-card__wrapper");
-
-        // カードの実際のクリック位置を確認（リンク要素の拡大領域も考慮）
-        let isWithinCardArea = false;
-        const allCards = document.querySelectorAll(".navi-card__menu_item");
-        const clickX = (e as MouseEvent).clientX;
-        const clickY = (e as MouseEvent).clientY;
-
-        allCards.forEach((card) => {
-          if (card.classList.contains("is-open")) {
-            const link = card.querySelector(".navi-card__menu_link") as HTMLElement;
-            if (link) {
-              const linkRect = link.getBoundingClientRect();
-              // リンク要素の拡大領域内かどうかを確認
-              if (
-                clickX >= linkRect.left &&
-                clickX <= linkRect.right &&
-                clickY >= linkRect.top &&
-                clickY <= linkRect.bottom
-              ) {
-                isWithinCardArea = true;
-              }
-            }
-          }
-        });
-
-        // カード関連の要素、ボタン、メニュー、またはカード領域内をクリックした場合は閉じない
-        if (
-          isOpen &&
-          (clickedCard ||
-            clickedLink ||
-            clickedText ||
-            clickedButton ||
-            clickedMenu ||
-            clickedWrapper ||
-            isWithinCardArea)
-        ) {
-          return;
-        }
-
-        // メニュー外クリックの場合のみ閉じる
-        if (isOpen) {
-          button.click();
-        }
-      },
-      false
-    ); // バブリングフェーズで処理
-  }
-
-  // 初期化
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initNaviCard);
-  } else {
-    initNaviCard();
-  }
-</script>
-
 <style is:global>
   .navi-card__wrapper {
     position: fixed;
@@ -737,3 +554,186 @@ const menuItems: MenuItem[] = [
     }
   }
 </style>
+
+<script>
+  function initNaviCard() {
+    const button = document.querySelector(".navi-card__button") as HTMLButtonElement;
+    const menu = document.querySelector(".navi-card__menu") as HTMLUListElement;
+    const menuItems = document.querySelectorAll(".navi-card__menu_item") as NodeListOf<HTMLLIElement>;
+    const glitchContainer = document.querySelector(".glitch-container") as HTMLElement;
+
+    if (!button || !menu || !menuItems.length) {
+      console.error("NaviCard: Required elements not found!");
+      return;
+    }
+
+    // 初期状態は開いている（カードが表示されている）
+    let isOpen = true;
+
+    button.addEventListener("click", () => {
+      isOpen = !isOpen;
+
+      // ARIA属性の更新
+      button.setAttribute("aria-expanded", String(isOpen));
+      button.setAttribute("aria-label", isOpen ? "メニューを閉じる" : "メニューを開く");
+      menu.setAttribute("aria-hidden", String(!isOpen));
+
+      // クラスの切り替え
+      button.classList.toggle("is-open", isOpen);
+      menu.classList.toggle("is-open", isOpen);
+
+      // main要素内のglitch-container以外の要素のpointer-eventsを制御
+      // ただし、カード要素とボタン要素は除外
+      const main = document.querySelector("main") as HTMLElement;
+      if (main && isOpen) {
+        // main要素内の直接の子要素のみを制御（再帰的にはしない）
+        const mainChildren = Array.from(main.children) as HTMLElement[];
+        mainChildren.forEach((child) => {
+          // glitch-containerは除外
+          if (!child.classList.contains("glitch-container") && !child.querySelector(".glitch-container")) {
+            child.style.pointerEvents = "none";
+          }
+        });
+      } else if (main && !isOpen) {
+        // メニューが閉じている時は、すべての要素のpointer-eventsをリセット
+        const mainChildren = Array.from(main.children) as HTMLElement[];
+        mainChildren.forEach((child) => {
+          child.style.pointerEvents = "";
+        });
+      }
+
+      // glitch-containerとその子要素のpointer-eventsとz-indexを制御
+      // 画像は表示し続けるが、pointer-eventsをnoneにしてカードのクリックを可能にする
+      if (glitchContainer) {
+        // glitch-container自体のpointer-eventsを制御
+        glitchContainer.style.pointerEvents = "none"; // 常にnone（元々none）
+
+        // .glitch要素を取得
+        const glitchElement = glitchContainer.querySelector(".glitch") as HTMLElement;
+        if (glitchElement) {
+          // .glitch要素のz-indexを0に設定（カードより後ろに配置）
+          glitchElement.style.setProperty("z-index", "0", "important");
+        }
+
+        // glitch-containerの子要素のpointer-eventsとz-indexを制御
+        // NaviCardとGlitchコンポーネントを区別
+        const glitchChildren = glitchContainer.querySelectorAll("*") as NodeListOf<HTMLElement>;
+        glitchChildren.forEach((child) => {
+          // NaviCardコンポーネント（navi-card__wrapper）は除外
+          const isNaviCard = child.classList.contains("navi-card__wrapper") || child.closest(".navi-card__wrapper");
+          if (!isNaviCard) {
+            // メニューが開いている時はpointer-eventsをnoneにする（画像は表示し続ける）
+            child.style.pointerEvents = isOpen ? "none" : "auto";
+            // z-indexを明示的に設定してカードより後ろに配置
+            if (child.classList.contains("glitch") || child.closest(".glitch")) {
+              child.style.setProperty("z-index", "0", "important");
+            } else {
+              child.style.setProperty("z-index", "0", "important");
+            }
+          }
+        });
+      }
+
+      // 各アイテムのアニメーション
+      if (isOpen) {
+        // 1枚ずつ時間差で表示（よりゆっくり、ふわっと）
+        menuItems.forEach((item, index) => {
+          setTimeout(() => {
+            item.classList.add("is-open");
+            // CSSのtransitionを待たずに、JavaScriptで直接opacityを強制設定
+            (item as HTMLElement).style.setProperty("opacity", "1", "important");
+          }, index * 600);
+        });
+      } else {
+        // 閉じる時もゆっくり消えるように
+        menuItems.forEach((item, index) => {
+          const delay = (menuItems.length - index - 1) * 0.2; // 0.08s → 0.2s に延長
+          item.style.transitionDelay = `${delay}s`;
+          item.classList.remove("is-open");
+          // transition完了後にopacityを0に設定（念のため）
+          setTimeout(
+            () => {
+              (item as HTMLElement).style.setProperty("opacity", "0", "important");
+              item.style.transitionDelay = "";
+            },
+            (delay + 1.5) * 1000
+          ); // transition時間(1.5s) + delay 後にリセット
+        });
+      }
+    });
+
+    // メニュー外クリックで閉じる（カードとボタンは除外）
+    // バブリングフェーズで処理（カードのキャプチャより後）
+    document.addEventListener(
+      "click",
+      (e) => {
+        // カードクリックイベントで既に処理済み（defaultPrevented またはカスタムプロパティ）の場合は何もしない
+        if ((e as any).__naviCardHandled || e.defaultPrevented) {
+          return;
+        }
+
+        const target = e.target as HTMLElement;
+
+        // カードまたはその子要素をクリックした場合は閉じない
+        // より広範囲にチェック（カードの全子孫要素を含む）
+        const clickedCard = target.closest(".navi-card__menu_item");
+        const clickedButton = button.contains(target) || target.closest(".navi-card__button");
+        const clickedMenu = target.closest(".navi-card__menu");
+        const clickedLink = target.closest(".navi-card__menu_link");
+        const clickedText = target.closest(".navi-card__menu_text");
+        const clickedWrapper = target.closest(".navi-card__wrapper");
+
+        // カードの実際のクリック位置を確認（リンク要素の拡大領域も考慮）
+        let isWithinCardArea = false;
+        const allCards = document.querySelectorAll(".navi-card__menu_item");
+        const clickX = (e as MouseEvent).clientX;
+        const clickY = (e as MouseEvent).clientY;
+
+        allCards.forEach((card) => {
+          if (card.classList.contains("is-open")) {
+            const link = card.querySelector(".navi-card__menu_link") as HTMLElement;
+            if (link) {
+              const linkRect = link.getBoundingClientRect();
+              // リンク要素の拡大領域内かどうかを確認
+              if (
+                clickX >= linkRect.left &&
+                clickX <= linkRect.right &&
+                clickY >= linkRect.top &&
+                clickY <= linkRect.bottom
+              ) {
+                isWithinCardArea = true;
+              }
+            }
+          }
+        });
+
+        // カード関連の要素、ボタン、メニュー、またはカード領域内をクリックした場合は閉じない
+        if (
+          isOpen &&
+          (clickedCard ||
+            clickedLink ||
+            clickedText ||
+            clickedButton ||
+            clickedMenu ||
+            clickedWrapper ||
+            isWithinCardArea)
+        ) {
+          return;
+        }
+
+        // メニュー外クリックの場合のみ閉じる
+        if (isOpen) {
+          button.click();
+        }
+      },
+      false
+    ); // バブリングフェーズで処理
+  }
+
+  // 初期化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initNaviCard);
+  } else {
+    initNaviCard();
+  }
+</script>

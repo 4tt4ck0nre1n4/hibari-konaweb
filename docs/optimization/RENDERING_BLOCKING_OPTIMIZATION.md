@@ -28,7 +28,6 @@ PageSpeed Insightsで検出されたレンダリングブロッキングリソ�
 **変更ファイル：**
 
 - `src/components/SwiperMenu.astro`
-- `src/components/SwiperEffect.astro`
 - `src/pages/service/index.astro`
 - `src/pages/service/index copy.astro`
 

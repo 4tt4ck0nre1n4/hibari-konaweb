@@ -2,23 +2,17 @@
 import Layout from "../../../layouts/Layout.astro";
 import Header from "../../../components/Header.astro";
 import Footer from "../../../components/Footer.astro";
-// import { Breadcrumbs } from "astro-breadcrumbs";
-// import "astro-breadcrumbs/breadcrumbs.css";
-// import "../../../styles/astro-breadcrumbs-config.scss";
 import { generateBreadcrumbs } from "../../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import globalText from "../../../data/globalText.json";
 import { CATEGORY_PAGE_API } from "../../../api/headlessCms";
 import SafeIcon from "../../../components/SafeIcon.astro";
-// import { headlessCmsUrl, headlessCmsApiPrefix } from "../../../api/headlessCms";
 
 interface Category {
   id: number;
   name: string;
   slug: string;
 }
-
-// const CATEGORY_API = `${headlessCmsUrl}${headlessCmsApiPrefix}/categories?_fields=id,name,slug`;
 
 let categories: Category[] = [];
 
@@ -133,13 +127,8 @@ const categoryIcon = {
     margin-block-start: 1rem;
   }
   .category__menu {
-    /* display: flex; */
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    /* align-items: center; */
-    /* flex-wrap: wrap; */
-    /* flex-direction: column; */
-    /* justify-content: center; */
     row-gap: 2rem;
     column-gap: 0.5rem;
     list-style: none;
@@ -210,7 +199,6 @@ const categoryIcon = {
   }
   .category__menu_link {
     display: flex;
-    /* justify-content: flex-start; */
     justify-content: flex-start;
     align-items: center;
     font-size: 1rem;

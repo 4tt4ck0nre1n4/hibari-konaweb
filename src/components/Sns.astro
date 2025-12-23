@@ -32,6 +32,7 @@ const isSvgAsset =
           alt={snsIconName ?? ""}
           loading="lazy"
           decoding="async"
+          fetchpriority="low"
           aria-hidden={snsIconName == null}
           data-sns-icon={snsIconSvg}
         />
@@ -39,6 +40,6 @@ const isSvgAsset =
         <SafeIcon name={snsIconSvg} width={snsIconWidth} height={snsIconHeight} />
       )
     }
-    {snsIconName && <span class="sns-icon__name">{snsIconName}</span>}
+    {snsIconName != null && snsIconName.trim() !== "" && <span class="sns-icon__name">{snsIconName}</span>}
   </a>
 </li>

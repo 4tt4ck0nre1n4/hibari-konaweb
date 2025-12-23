@@ -251,8 +251,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                       class="left__image"
                       src={worksScreenshotPc}
                       alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
-                      loading="lazy"
                       decoding="async"
+                      loading="lazy"
                     />
                   </div>
                   <div class="left__inner">
@@ -299,8 +299,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                       class="right__pcImage"
                       src={worksPcImage ?? ""}
                       alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                      loading="lazy"
                       decoding="async"
+                      loading="lazy"
                     />
                   </div>
                   {/* サイトタイトル */}
@@ -310,8 +310,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                     class="right__logoIcon"
                     src={worksIconImage ?? ""}
                     alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                    loading="lazy"
                     decoding="async"
+                    loading="lazy"
                   />
                   {/* Basic認証テキスト */}
                   <p class="right__text" set:html={worksRightAccess ?? ""} />

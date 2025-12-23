@@ -47,8 +47,8 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 >
   <!-- LCP背景画像のプリロード（PageSpeed Insights最適化） -->
   <link slot="head" rel="preload" href={fvBackgroundImage.src} as="image" fetchpriority="high" />
-  <link slot="head" rel="preload" href={fvAnimeImage.src} as="image" fetchpriority="high" />
-  <link slot="head" rel="preload" href={gridBackgroundImage.src} as="image" fetchpriority="high" />
+  <link slot="head" rel="preload" href={fvAnimeImage.src} as="image" fetchpriority="low" />
+  <link slot="head" rel="preload" href={gridBackgroundImage.src} as="image" fetchpriority="low" />
 
   <div id="outer-container">
     <Header />

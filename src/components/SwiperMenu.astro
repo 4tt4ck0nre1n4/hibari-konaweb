@@ -79,8 +79,8 @@ const mouseItem = {
                 class="swiper__image"
                 width={sliderItem.width}
                 height={sliderItem.height}
-                loading="lazy"
                 decoding="async"
+                loading="lazy"
               />
             </a>
           </li>
@@ -97,7 +97,7 @@ const mouseItem = {
       aria-label={mouseItem.ariaLabel}
       title={mouseItem.ariaTitle}
     >
-      <Image id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" />
+      <Image id="js-mouse" src={mouse} alt={mouseItem.alt} loading="lazy" decoding="async" fetchpriority="low" />
     </button>
   </div>
 </div>

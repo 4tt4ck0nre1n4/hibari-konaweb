@@ -1,59 +1,10 @@
 ---
-import "@pagefind/default-ui/css/ui.css";
+
 ---
 
+<link rel="stylesheet" href="/css/pagefind-ui.css" media="print" />
+
 <div id="search"></div>
-
-<script>
-  import { PagefindUI } from "@pagefind/default-ui";
-
-  // DOMContentLoadedで初期化
-  document.addEventListener("DOMContentLoaded", () => {
-    new PagefindUI({
-      element: "#search",
-      showImages: true,
-    });
-
-    // スマホサイズでのみ検索ボックスのborderを強制的に設定
-    const applyBorderStyle = () => {
-      const searchInput = document.querySelector("#search .pagefind-ui__search-input") as HTMLInputElement;
-      if (searchInput) {
-        // スマホサイズかどうかをチェック
-        if (window.innerWidth <= 480) {
-          searchInput.style.border = "1px solid aqua";
-          searchInput.style.borderColor = "aqua";
-          searchInput.style.setProperty("border", "1px solid aqua", "important");
-        } else {
-          // パソコンサイズではborderをリセット
-          searchInput.style.border = "";
-          searchInput.style.borderColor = "";
-          searchInput.style.removeProperty("border");
-        }
-      }
-    };
-
-    // 複数のタイミングでスタイルを適用
-    setTimeout(applyBorderStyle, 100);
-    setTimeout(applyBorderStyle, 500);
-    setTimeout(applyBorderStyle, 1000);
-
-    // ウィンドウリサイズ時にスタイルを再適用
-    window.addEventListener("resize", applyBorderStyle);
-
-    // MutationObserverでDOMの変更を監視
-    const searchContainer = document.querySelector("#search");
-    if (searchContainer) {
-      const observer = new MutationObserver(() => {
-        applyBorderStyle();
-      });
-
-      observer.observe(searchContainer, {
-        childList: true,
-        subtree: true,
-      });
-    }
-  });
-</script>
 
 <style>
   #search {
@@ -131,3 +82,70 @@ import "@pagefind/default-ui/css/ui.css";
     }
   }
 </style>
+
+<script>
+  import { PagefindUI } from "@pagefind/default-ui";
+
+  // CSSの遅延読み込み: requestIdleCallbackが利用可能な場合はそれを使用、そうでなければsetTimeout
+  const loadPagefindCSS = () => {
+    const link = document.querySelector('link[href="/css/pagefind-ui.css"]') as HTMLLinkElement;
+    if (link && link.media === "print") {
+      // まだ読み込まれていない場合のみ読み込む
+      link.media = "all";
+    }
+  };
+
+  // 遅延読み込み: requestIdleCallbackが利用可能な場合はそれを使用、そうでなければsetTimeout
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(loadPagefindCSS, { timeout: 2000 });
+  } else {
+    setTimeout(loadPagefindCSS, 1000);
+  }
+
+  // DOMContentLoadedで初期化
+  document.addEventListener("DOMContentLoaded", () => {
+    new PagefindUI({
+      element: "#search",
+      showImages: true,
+    });
+
+    // スマホサイズでのみ検索ボックスのborderを強制的に設定
+    const applyBorderStyle = () => {
+      const searchInput = document.querySelector("#search .pagefind-ui__search-input") as HTMLInputElement;
+      if (searchInput) {
+        // スマホサイズかどうかをチェック
+        if (window.innerWidth <= 480) {
+          searchInput.style.border = "1px solid aqua";
+          searchInput.style.borderColor = "aqua";
+          searchInput.style.setProperty("border", "1px solid aqua", "important");
+        } else {
+          // パソコンサイズではborderをリセット
+          searchInput.style.border = "";
+          searchInput.style.borderColor = "";
+          searchInput.style.removeProperty("border");
+        }
+      }
+    };
+
+    // 複数のタイミングでスタイルを適用
+    setTimeout(applyBorderStyle, 100);
+    setTimeout(applyBorderStyle, 500);
+    setTimeout(applyBorderStyle, 1000);
+
+    // ウィンドウリサイズ時にスタイルを再適用
+    window.addEventListener("resize", applyBorderStyle);
+
+    // MutationObserverでDOMの変更を監視
+    const searchContainer = document.querySelector("#search");
+    if (searchContainer) {
+      const observer = new MutationObserver(() => {
+        applyBorderStyle();
+      });
+
+      observer.observe(searchContainer, {
+        childList: true,
+        subtree: true,
+      });
+    }
+  });
+</script>

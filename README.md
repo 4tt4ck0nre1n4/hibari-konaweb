@@ -76,23 +76,7 @@ npm install
 cp env.example.txt .env
 ```
 
-`.env`ファイルを編集：
-
-```env
-# WordPress REST API設定
-PUBLIC_API_URL=http://hibari-konaweb.local
-PUBLIC_API_PREFIX=/wp-json/wp/v2/
-
-# Contact Form 7設定（オプション）
-PUBLIC_WPCF7_API_PREFIX=contact-form-7/v1/contact-forms/
-PUBLIC_WPCF7_API_ID=123
-PUBLIC_WPCF7_ID=123
-PUBLIC_WPCF7_UNIT_TAG=wpcf7-f123-p456-o1
-PUBLIC_WPCF7_POST_ID=456
-
-# Google Analytics 4設定（オプション）
-PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-```
+`.env`ファイルを編集し、実際の値に置き換えてください。
 
 詳細は [`env.example.txt`](./env.example.txt) を参照してください。
 
@@ -154,10 +138,10 @@ hibari-konaweb/
 
 ### 必須環境変数
 
-| 変数名              | 説明                     | 例                           |
-| ------------------- | ------------------------ | ---------------------------- |
-| `PUBLIC_API_URL`    | WordPressのURL           | `https://hibari-konaweb.com` |
-| `PUBLIC_API_PREFIX` | REST APIのプレフィックス | `/wp-json/wp/v2/`            |
+| 変数名              | 説明                     |
+| ------------------- | ------------------------ |
+| `PUBLIC_API_URL`    | WordPressのURL           |
+| `PUBLIC_API_PREFIX` | REST APIのプレフィックス |
 
 ### オプション環境変数
 

@@ -95,8 +95,8 @@ const HamburgerMenuLogo = () => {
         alt="ロゴテキスト"
         width="280"
         height="50"
-        loading="lazy"
         decoding="async"
+        loading="lazy"
       />
     </a>
   );

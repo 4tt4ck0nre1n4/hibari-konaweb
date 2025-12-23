@@ -16,73 +16,6 @@ const offIcon = "fluent-emoji-flat:man-technologist-medium-light";
 </button>
 <p id="ariaLiveStatus__logoSvg" class="screenReader-only" role="status" aria-live="polite"></p>
 
-<script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const logoSvgButton = document.getElementById("toggleLogoSvgButton") as HTMLButtonElement;
-    const onWomanIcon = document.querySelector(".onWomanIcon") as HTMLElement | null;
-    const offManIcon = document.querySelector(".offManIcon") as HTMLElement | null;
-    const gridSvg = document.querySelectorAll<HTMLElement>(".item-7, .item-8, .item-9");
-    const gridSvg2 = document.querySelectorAll<HTMLElement>(".item-10, .item-11, .item-12");
-    const ariaLiveStatusLogoSvg = document.getElementById("ariaLiveStatus__logoSvg") as HTMLElement;
-
-    if (!logoSvgButton || !onWomanIcon || !offManIcon || !ariaLiveStatusLogoSvg) return;
-
-    const initializeDisplay = () => {
-      gridSvg.forEach((element) => ((element as HTMLElement).style.display = "block"));
-      gridSvg2.forEach((element) => ((element as HTMLElement).style.display = "none"));
-      onWomanIcon.style.opacity = "1";
-      offManIcon.style.opacity = "0";
-    };
-
-    const toggleDisplay = (isShowingFirstLogoSvg: boolean) => {
-      if (isShowingFirstLogoSvg) {
-        gridSvg.forEach((element) => ((element as HTMLElement).style.display = "none"));
-        gridSvg2.forEach((element) => ((element as HTMLElement).style.display = "block"));
-        onWomanIcon.style.opacity = "0";
-        offManIcon.style.opacity = "1";
-        logoSvgButton.setAttribute("aria-label", "ポートフォリオサイトの画像を切り替える（イメージ画像）");
-        logoSvgButton.setAttribute("title", "ポートフォリオサイトの画像を切り替える（イメージ画像）");
-        ariaLiveStatusLogoSvg.textContent = "イメージ画像に切り替えました";
-      } else {
-        gridSvg2.forEach((element) => ((element as HTMLElement).style.display = "none"));
-        gridSvg.forEach((element) => ((element as HTMLElement).style.display = "block"));
-        onWomanIcon.style.opacity = "1";
-        offManIcon.style.opacity = "0";
-        logoSvgButton.setAttribute("aria-label", "ポートフォリオサイトの画像を切り替える（ロゴ画像）");
-        logoSvgButton.setAttribute("title", "ポートフォリオサイトの画像を切り替える（ロゴ画像）");
-        ariaLiveStatusLogoSvg.textContent = "ロゴ画像に切り替えました";
-      }
-    };
-
-    initializeDisplay();
-
-    logoSvgButton.addEventListener("click", () => {
-      const isShowingFirstLogoSvg = (gridSvg[0] as HTMLElement)?.style.display !== "none";
-      toggleDisplay(isShowingFirstLogoSvg);
-    });
-
-    const checkTimeAndFlashIcon = () => {
-      setInterval(() => {
-        const now = new Date();
-        const seconds = now.getSeconds();
-        const isWomanVisible = onWomanIcon.style.opacity === "1";
-
-        if ((seconds === 0 || seconds === 15 || seconds === 30 || seconds === 45) && isWomanVisible) {
-          onWomanIcon.style.opacity = "0";
-          offManIcon.style.opacity = "1";
-
-          setTimeout(() => {
-            onWomanIcon.style.opacity = "1";
-            offManIcon.style.opacity = "0";
-          }, 1000);
-        }
-      }, 1000);
-    };
-
-    checkTimeAndFlashIcon();
-  });
-</script>
-
 <style>
   #toggleLogoSvgButton {
     display: flex;
@@ -154,3 +87,70 @@ const offIcon = "fluent-emoji-flat:man-technologist-medium-light";
     transform: translate(-50%, -50%) scale(1.1);
   }
 </style>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const logoSvgButton = document.getElementById("toggleLogoSvgButton") as HTMLButtonElement;
+    const onWomanIcon = document.querySelector(".onWomanIcon") as HTMLElement | null;
+    const offManIcon = document.querySelector(".offManIcon") as HTMLElement | null;
+    const gridSvg = document.querySelectorAll<HTMLElement>(".item-7, .item-8, .item-9");
+    const gridSvg2 = document.querySelectorAll<HTMLElement>(".item-10, .item-11, .item-12");
+    const ariaLiveStatusLogoSvg = document.getElementById("ariaLiveStatus__logoSvg") as HTMLElement;
+
+    if (!logoSvgButton || !onWomanIcon || !offManIcon || !ariaLiveStatusLogoSvg) return;
+
+    const initializeDisplay = () => {
+      gridSvg.forEach((element) => ((element as HTMLElement).style.display = "block"));
+      gridSvg2.forEach((element) => ((element as HTMLElement).style.display = "none"));
+      onWomanIcon.style.opacity = "1";
+      offManIcon.style.opacity = "0";
+    };
+
+    const toggleDisplay = (isShowingFirstLogoSvg: boolean) => {
+      if (isShowingFirstLogoSvg) {
+        gridSvg.forEach((element) => ((element as HTMLElement).style.display = "none"));
+        gridSvg2.forEach((element) => ((element as HTMLElement).style.display = "block"));
+        onWomanIcon.style.opacity = "0";
+        offManIcon.style.opacity = "1";
+        logoSvgButton.setAttribute("aria-label", "ポートフォリオサイトの画像を切り替える（イメージ画像）");
+        logoSvgButton.setAttribute("title", "ポートフォリオサイトの画像を切り替える（イメージ画像）");
+        ariaLiveStatusLogoSvg.textContent = "イメージ画像に切り替えました";
+      } else {
+        gridSvg2.forEach((element) => ((element as HTMLElement).style.display = "none"));
+        gridSvg.forEach((element) => ((element as HTMLElement).style.display = "block"));
+        onWomanIcon.style.opacity = "1";
+        offManIcon.style.opacity = "0";
+        logoSvgButton.setAttribute("aria-label", "ポートフォリオサイトの画像を切り替える（ロゴ画像）");
+        logoSvgButton.setAttribute("title", "ポートフォリオサイトの画像を切り替える（ロゴ画像）");
+        ariaLiveStatusLogoSvg.textContent = "ロゴ画像に切り替えました";
+      }
+    };
+
+    initializeDisplay();
+
+    logoSvgButton.addEventListener("click", () => {
+      const isShowingFirstLogoSvg = (gridSvg[0] as HTMLElement)?.style.display !== "none";
+      toggleDisplay(isShowingFirstLogoSvg);
+    });
+
+    const checkTimeAndFlashIcon = () => {
+      setInterval(() => {
+        const now = new Date();
+        const seconds = now.getSeconds();
+        const isWomanVisible = onWomanIcon.style.opacity === "1";
+
+        if ((seconds === 0 || seconds === 15 || seconds === 30 || seconds === 45) && isWomanVisible) {
+          onWomanIcon.style.opacity = "0";
+          offManIcon.style.opacity = "1";
+
+          setTimeout(() => {
+            onWomanIcon.style.opacity = "1";
+            offManIcon.style.opacity = "0";
+          }, 1000);
+        }
+      }, 1000);
+    };
+
+    checkTimeAndFlashIcon();
+  });
+</script>

@@ -20,7 +20,7 @@ const { className, href, ariaLabel, ariaTitle, imageSrc, imageMeta, tooltipText,
 <li class={`grid__menu_item ${className}`}>
   <a class="grid__menu_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
     <div class="grid__menu_svg">
-      <Image src={imageSrc} alt={imageMeta} width="100" height="100" loading="lazy" decoding="async" />
+      <Image src={imageSrc} alt={imageMeta} width="100" height="100" decoding="async" loading="lazy" />
     </div>
     <span class={`item__tooltip_${tooltipPosition}`}>
       {tooltipText}

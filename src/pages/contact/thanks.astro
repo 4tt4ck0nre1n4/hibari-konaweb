@@ -12,11 +12,6 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 export const prerender = true;
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
-// const crumbs = [
-//   { name: "Home", path: "/"},
-//   { name: "Contact", path: "/contact" },
-//   { name: "Thanks" }
-// ];
 
 const thanksPageImage = {
   alt: "お問い合わせありがとうございます。感謝の猫の画像",
