@@ -58,15 +58,10 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     mix-blend-mode: screen;
     /* アニメーションはJavaScriptで動的に制御 */
     animation: none;
-    z-index: 0; /* カードより後ろに配置（カードは100001） */
-    overflow: hidden; /* RGBの色が枠外にはみ出さないように */
+    z-index: 0;
+    overflow: hidden;
   }
 
-  @media (width <= 480px) {
-    .glitch-image {
-      /* background-size: contain; */
-    }
-  }
   @keyframes shake {
     0% {
       transform: translate3d(0, 0, 0);
@@ -101,17 +96,14 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   }
   .r::before {
     background: #ff0000;
-    /* filter: drop-shadowは枠外にはみ出すため削除 */
     animation: glitchAnime-1 1.2s infinite linear;
   }
   .g::before {
     background: #00ff00;
-    /* filter: drop-shadowは枠外にはみ出すため削除 */
     animation: glitchAnime-2 1.4s infinite linear;
   }
   .b::before {
     background: #0000ff;
-    /* filter: drop-shadowは枠外にはみ出すため削除 */
     animation: glitchAnime-3 1.6s infinite linear;
   }
 
@@ -122,7 +114,6 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   }
 
   .glitch-layer {
-    /* background: inherit; */
     background-repeat: no-repeat;
     background-position: 0 0;
     position: absolute;
@@ -131,11 +122,10 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     bottom: 0;
     left: 0;
     border-radius: 50%;
-    /* mix-blend-mode: screen; */
     transform: translateX(-5%);
     /* アニメーションはJavaScriptで動的に制御 */
     animation: none;
-    z-index: 0; /* カードより後ろに配置（カードは100001） */
+    z-index: 0;
   }
 
   @keyframes noise {
@@ -388,7 +378,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     8% {
       opacity: 0;
     }
-    to {
+    100% {
       opacity: 0;
     }
   }
