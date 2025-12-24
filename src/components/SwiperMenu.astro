@@ -2,7 +2,6 @@
 import { Image } from "astro:assets";
 import mouse from "/public/assets/mouse.png";
 import { SLIDER_PATH_API } from "../api/headlessCms";
-import { getOptimizedWordPressImage, getWordPressImageUrl } from "../util/optimizeWordPressImage";
 
 interface Slider {
   id: number;
@@ -56,24 +55,6 @@ const sliderItem = {
   height: 90,
 };
 
-// WordPress画像を最適化（ビルド時に処理）
-const optimizedSliders = await Promise.all(
-  sliders.map(async (slider) => {
-    const optimizedImage = await getOptimizedWordPressImage(slider.acf?.slider_image, {
-      width: sliderItem.width,
-      height: sliderItem.height,
-      quality: 85,
-      format: "webp",
-    });
-    const fallbackUrl = getWordPressImageUrl(slider.acf?.slider_image) ?? "";
-    return {
-      ...slider,
-      optimizedImage,
-      fallbackUrl,
-    };
-  })
-);
-
 const mouseItem = {
   alt: "マウスの画像",
   ariaLabel: "マウスでスライド画像を切り替える",
@@ -87,30 +68,18 @@ const mouseItem = {
   <div id="swiper1" class="swiper">
     <ul class="swiper-wrapper">
       {
-        optimizedSliders.map((sliderData) => (
+        sliders.map((slider) => (
           <li class="swiper-slide">
             <a href={sliderItem.href} aria-label={sliderItem.ariaLabel} title={sliderItem.ariaTitle}>
-              {sliderData.optimizedImage ? (
-                <Image
-                  src={sliderData.optimizedImage.src}
-                  alt={sliderData.acf?.slider_title ?? ""}
-                  class="swiper__image"
-                  width={sliderItem.width}
-                  height={sliderItem.height}
-                  loading="lazy"
-                  decoding="async"
-                />
-              ) : (
-                <img
-                  src={sliderData.fallbackUrl}
-                  alt={sliderData.acf?.slider_title ?? ""}
-                  class="swiper__image"
-                  width={sliderItem.width}
-                  height={sliderItem.height}
-                  decoding="async"
-                  loading="lazy"
-                />
-              )}
+              <img
+                src={slider.acf?.slider_image ?? ""}
+                alt={slider.acf?.slider_title ?? ""}
+                class="swiper__image"
+                width={sliderItem.width}
+                height={sliderItem.height}
+                decoding="async"
+                loading="lazy"
+              />
             </a>
           </li>
         ))
