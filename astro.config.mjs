@@ -10,6 +10,29 @@ import sitemap from "@astrojs/sitemap";
 import netlify from "@astrojs/netlify";
 import { asyncSwiperCssPlugin } from "./astro-plugin-async-swiper-css.js";
 
+// WordPressドメインを環境変数から取得（リモート画像最適化用）
+function getWordPressDomain() {
+  const apiUrl = process.env.PUBLIC_API_URL;
+  if (!apiUrl) {
+    return undefined;
+  }
+  try {
+    const url = new URL(apiUrl);
+    return url.hostname;
+  } catch {
+    return undefined;
+  }
+}
+
+const wordPressDomain = getWordPressDomain();
+const imageDomains = ["astro.build"];
+if (wordPressDomain) {
+  imageDomains.push(wordPressDomain);
+  console.log(`✅ [Image Config] WordPress domain added for image optimization: ${wordPressDomain}`);
+} else {
+  console.warn("⚠️ [Image Config] WordPress domain not found. Remote image optimization may not work.");
+}
+
 export default defineConfig({
   site: "https://hibari-konaweb.netlify.app",
   build: {
@@ -100,7 +123,13 @@ export default defineConfig({
     asyncSwiperCssPlugin(), // Swiper CSSのみを非同期読み込み
   ],
   image: {
-    domains: ["astro.build"],
+    // リモート画像最適化を許可するドメイン
+    // WordPressのドメインは環境変数から動的に取得（ビルド時に解決）
+    domains: imageDomains,
+    // リモート画像のサービス設定
+    service: {
+      entrypoint: "astro/assets/services/sharp",
+    },
   },
   base: "/",
   trailingSlash: "ignore",

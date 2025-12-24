@@ -265,19 +265,15 @@ const cspContent = isDev
         position: absolute;
         top: 0;
         left: 0;
-        /* left: 22%; */
         width: 400%;
         height: 300%;
-        /* アニメーションする背景画像（HTMLでインラインスタイルとして指定） */
         background-size: 480px;
         background-repeat: repeat;
         background-position: 50% 50%;
-        /* 3D回転を適用（この要素だけ回転） */
-        /* transform: rotateX(20deg) rotateY(40deg) rotateZ(-20deg); */
         transform-style: preserve-3d;
         animation: background-scroll-3d 24s linear infinite;
-        pointer-events: none; /* カードへのクリックを通過させる */
-        z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+        pointer-events: none;
+        z-index: 0 !important;
       }
 
       .background {
@@ -306,7 +302,7 @@ const cspContent = isDev
         margin-inline: auto;
         position: relative;
         z-index: 0;
-        pointer-events: none; /* カードのクリックを通過させる */
+        pointer-events: none;
       }
 
       .glitch-container > * {
@@ -338,7 +334,6 @@ const cspContent = isDev
         <script is:inline type="application/ld+json" set:html={jsonLd} />
       )
     }
-    <!-- <link rel="preload" href="/wasm/rive.wasm" as="fetch" type="application/wasm" crossorigin="anonymous" /> -->
 
     <!-- フォントは@fontsource/poppinsをLayout.astroでインポート済み -->
 

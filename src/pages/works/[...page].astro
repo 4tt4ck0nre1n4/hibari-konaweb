@@ -8,6 +8,8 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import globalText from "../../data/globalText.json";
 import worksText from "../../data/worksText.json";
 import { WORKS_PAGE_API } from "../../api/headlessCms";
+import { Image } from "astro:assets";
+import { getOptimizedWordPressImage, getWordPressImageUrl } from "../../util/optimizeWordPressImage";
 
 interface WorkObject {
   id: string;
@@ -106,9 +108,28 @@ const isShowPagination = page.lastPage > 1;
 
 const works = Array.isArray(page.data) ? page.data : [];
 
+// WordPress画像を最適化（ビルド時に処理）
+const optimizedWorks = await Promise.all(
+  works.map(async (work) => {
+    const optimizedImage = await getOptimizedWordPressImage(work.acf?.screenshot_pc, {
+      width: worksItems.width,
+      height: worksItems.height,
+      quality: 85,
+      format: "webp",
+    });
+    const fallbackUrl = getWordPressImageUrl(work.acf?.screenshot_pc) ?? "";
+    return {
+      ...work,
+      optimizedImage,
+      fallbackUrl,
+    };
+  })
+);
+
 const repeatTimes = 3;
 
-const repeatedWorks = Array.from({ length: works.length * repeatTimes }, (_, i) => works[i % works.length]);
+// 最適化された画像を含むworks配列を繰り返し
+const repeatedWorks = Array.from({ length: optimizedWorks.length * repeatTimes }, (_, i) => optimizedWorks[i % optimizedWorks.length]);
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
@@ -156,20 +177,32 @@ const worksPagination = {
               {
                 repeatedWorks.length > 0 ? (
                   repeatedWorks
-                    .filter((work): work is WorkObject => typeof work !== "undefined")
-                    .map((work: WorkObject) => (
+                    .filter((work) => typeof work !== "undefined")
+                    .map((work) => (
                       <li class="scrollImage__menu_item">
                         <h2 class="scrollImage__header">{work?.title?.rendered}</h2>
                         <figure class="scrollImage__figure">
-                          <img
-                            class="scrollImage__image"
-                            src={work?.acf?.screenshot_pc ?? ""}
-                            alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
-                            width={worksItems.width}
-                            height={worksItems.height}
-                            decoding="async"
-                            loading="lazy"
-                          />
+                          {work?.optimizedImage ? (
+                            <Image
+                              src={work.optimizedImage}
+                              alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
+                              class="scrollImage__image"
+                              width={worksItems.width}
+                              height={worksItems.height}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <img
+                              class="scrollImage__image"
+                              src={work?.fallbackUrl ?? ""}
+                              alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
+                              width={worksItems.width}
+                              height={worksItems.height}
+                              decoding="async"
+                              loading="lazy"
+                            />
+                          )}
                         </figure>
                         <a
                           class="scrollImage__link"

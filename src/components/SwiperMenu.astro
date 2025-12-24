@@ -496,26 +496,24 @@ const mouseItem = {
       mouseImage.addEventListener("load", handleMouseImageLoad);
       mouseImage.addEventListener("error", handleMouseImageError);
     }
-  });
-</script>
 
-<script is:inline>
-  const mouseButton = document.getElementById("js-mouseButton");
+    // マウスボタンのクリック音処理
+    const mouseButton = document.getElementById("js-mouseButton");
+    if (mouseButton) {
+      const mouseSound = new Audio("/sounds/mouseSound.mp3");
 
-  if (mouseButton) {
-    const mouseSound = new Audio("/sounds/mouseSound.mp3");
+      mouseButton.addEventListener("click", () => {
+        const isSoundOn = localStorage.getItem("sound-enabled") === "true";
 
-    mouseButton.addEventListener("click", () => {
-      const isSoundOn = localStorage.getItem("sound-enabled") === "true";
-
-      if (isSoundOn) {
-        try {
-          mouseSound.currentTime = 0;
-          void mouseSound.play();
-        } catch (error) {
-          console.error("Sound playback failed:", error);
+        if (isSoundOn) {
+          try {
+            mouseSound.currentTime = 0;
+            void mouseSound.play();
+          } catch (error) {
+            console.error("Sound playback failed:", error);
+          }
         }
-      }
-    });
-  }
+      });
+    }
+  });
 </script>

@@ -887,24 +887,47 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   }
 </style>
 
+<!-- 開発環境フラグを設定（ビルド時に置換される） -->
+<script is:inline define:vars={{ isDev: import.meta.env.DEV }}>
+  // @ts-nocheck
+  // 開発環境判定（Astroのビルド時に置換される）
+  window.__DEV__ = isDev;
+</script>
+
 <script is:inline>
   // @ts-nocheck
+  // 開発環境でのみログを出力する関数
+  const devLog = (...args) => {
+    if (window.__DEV__) {
+      console.log(...args);
+    }
+  };
+  const devWarn = (...args) => {
+    if (window.__DEV__) {
+      console.warn(...args);
+    }
+  };
+  const devError = (...args) => {
+    // エラーは常に出力（本番環境でも必要）
+    console.error(...args);
+  };
+
   // GSAPとScrollTriggerの読み込みを待つ
   function initializeApp() {
-    console.log("🔍 Initializing app...");
+    devLog("🔍 Initializing app...");
 
     // gsapとScrollTriggerはグローバルスコープで利用可能であることを前提としています
     if (typeof gsap === "undefined") {
-      console.warn("⚠️ GSAP not loaded yet, retrying in 100ms...");
+      devWarn("⚠️ GSAP not loaded yet, retrying in 100ms...");
       setTimeout(initializeApp, 100);
       return;
     }
 
-    console.log("✅ GSAP loaded successfully");
+    devLog("✅ GSAP loaded successfully");
 
     if (typeof ScrollTrigger !== "undefined") {
       gsap.registerPlugin(ScrollTrigger);
-      console.log("✅ ScrollTrigger registered");
+      devLog("✅ ScrollTrigger registered");
     }
 
     const buttonSound = new Audio("/sounds/buttonSound.mp3");
@@ -917,7 +940,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
           buttonSound.currentTime = 0;
           void buttonSound.play();
         } catch (error) {
-          console.error("Sound playback failed:", error);
+          devError("Sound playback failed:", error);
         }
       }
     }
@@ -1219,26 +1242,26 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
     // マウス追従背景の初期化
     function initBackgroundMouseFollow() {
-      console.log("🔍 initBackgroundMouseFollow called");
+      devLog("🔍 initBackgroundMouseFollow called");
 
       // 要素が見つかるまで待機（ローディングスクリーンの終了を考慮）
       const checkAndInit = () => {
-        console.log("🔍 Checking for elements...");
+        devLog("🔍 Checking for elements...");
         const backgroundContainer = document.querySelector(".background-container");
         const fvWrapper = document.querySelector(".fv__wrapper");
 
-        console.log("🔍 Elements found:", { backgroundContainer, fvWrapper });
+        devLog("🔍 Elements found:", { backgroundContainer, fvWrapper });
 
         if (!backgroundContainer || !fvWrapper) {
           // 要素が見つからない場合は再試行
-          console.log("⚠️ Elements not found, retrying in 100ms...");
+          devWarn("⚠️ Elements not found, retrying in 100ms...");
           setTimeout(checkAndInit, 100);
           return;
         }
 
         // ローディングスクリーンの終了を待つ
         const loadingScreen = document.getElementById("loading-screen");
-        console.log("🔍 Loading screen:", loadingScreen);
+        devLog("🔍 Loading screen:", loadingScreen);
 
         if (loadingScreen) {
           const checkLoadingComplete = () => {
@@ -1249,22 +1272,22 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
               computedStyle.display !== "none" &&
               computedStyle.visibility !== "hidden";
 
-            console.log("🔍 Loading screen visible:", isVisible);
+            devLog("🔍 Loading screen visible:", isVisible);
 
             if (isVisible) {
               // まだローディング中なので再チェック
-              console.log("⏳ Loading screen still visible, rechecking in 100ms...");
+              devLog("⏳ Loading screen still visible, rechecking in 100ms...");
               setTimeout(checkLoadingComplete, 100);
             } else {
               // ローディング終了後に初期化
-              console.log("✅ Loading complete, initializing mouse follow...");
+              devLog("✅ Loading complete, initializing mouse follow...");
               initializeMouseFollow(backgroundContainer, fvWrapper);
             }
           };
           checkLoadingComplete();
         } else {
           // ローディングスクリーンが存在しない場合は即座に初期化
-          console.log("ℹ️ No loading screen, initializing immediately...");
+          devLog("ℹ️ No loading screen, initializing immediately...");
           initializeMouseFollow(backgroundContainer, fvWrapper);
         }
       };
@@ -1274,8 +1297,8 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
     // マウス追従の実際の初期化処理
     function initializeMouseFollow(backgroundContainer, fvWrapper) {
-      // デバッグログ追加（常に表示）
-      console.log("✅ Initializing mouse follow...", {
+      // デバッグログ追加（開発環境のみ）
+      devLog("✅ Initializing mouse follow...", {
         backgroundContainer,
         fvWrapper,
         maskImage: window.getComputedStyle(backgroundContainer).maskImage,
@@ -1307,11 +1330,11 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
         window.matchMedia("(pointer: coarse)").matches ||
         "ontouchstart" in window;
 
-      console.log("📱 Device type:", isTouchDevice ? "Touch device" : "Desktop");
+      devLog("📱 Device type:", isTouchDevice ? "Touch device" : "Desktop");
 
       // デスクトップ: マウス追従
       if (!isTouchDevice) {
-        console.log("🖱️ Setting up desktop mouse tracking...");
+        devLog("🖱️ Setting up desktop mouse tracking...");
         // window全体でマウス移動を監視（画面全体を追従）
         window.addEventListener(
           "mousemove",
@@ -1327,7 +1350,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
           { passive: true }
         );
 
-        console.log("✅ Desktop mouse tracking event listener attached");
+        devLog("✅ Desktop mouse tracking event listener attached");
 
         // マウスが画面外に出た場合も追従（画面端でも反応するように）
         window.addEventListener("mouseleave", () => {
@@ -1443,7 +1466,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
 
       // 初期化完了のログ
-      console.log("✅ Mouse follow initialized successfully", {
+      devLog("✅ Mouse follow initialized successfully", {
         initialX,
         initialY,
         x,
@@ -1466,23 +1489,23 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   // GSAPが読み込まれたことを確認してから初期化を開始
   function waitForGSAPAndInit() {
     if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
-      console.log("✅ GSAP and ScrollTrigger are ready, initializing app...");
+      devLog("✅ GSAP and ScrollTrigger are ready, initializing app...");
       if (document.readyState === "loading") {
-        console.log("🔍 Document still loading, waiting for DOMContentLoaded...");
+        devLog("🔍 Document still loading, waiting for DOMContentLoaded...");
         document.addEventListener("DOMContentLoaded", initializeApp);
       } else {
-        console.log("🔍 Document already loaded, initializing immediately...");
+        devLog("🔍 Document already loaded, initializing immediately...");
         initializeApp();
       }
     } else {
-      console.log("⏳ Waiting for GSAP to load...");
+      devLog("⏳ Waiting for GSAP to load...");
       setTimeout(waitForGSAPAndInit, 100);
     }
   }
 
   // window.onloadイベントでも初期化を試みる（フォールバック）
   window.addEventListener("load", () => {
-    console.log("🔍 Window load event fired");
+    devLog("🔍 Window load event fired");
     waitForGSAPAndInit();
   });
 
@@ -1624,20 +1647,20 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
                 }, 50);
               })
               .catch((error) => {
-                console.error("Confetti animation failed:", error);
+                devError("Confetti animation failed:", error);
                 isAnimating = false;
               });
           });
         } else {
-          console.error("confettiButton element not found!");
+          devError("confettiButton element not found!");
         }
       }
     } else {
       if (!canvasElement) {
-        console.error("Full-screen canvas element (#canvas) not found!");
+        devError("Full-screen canvas element (#canvas) not found!");
       }
       if (!textCanvasElement) {
-        console.error("Text canvas element (#confetti-text-canvas) not found!");
+        devError("Text canvas element (#confetti-text-canvas) not found!");
       }
     }
   }
@@ -1645,14 +1668,14 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   // JSConfettiが読み込まれたことを確認してから初期化
   function waitForJSConfettiAndInit() {
     if (typeof JSConfetti !== "undefined") {
-      console.log("✅ JSConfetti is ready, initializing confetti...");
+      devLog("✅ JSConfetti is ready, initializing confetti...");
       if (document.readyState === "loading") {
         document.addEventListener("DOMContentLoaded", initConfetti);
       } else {
         initConfetti();
       }
     } else {
-      console.log("⏳ Waiting for JSConfetti to load...");
+      devLog("⏳ Waiting for JSConfetti to load...");
       setTimeout(waitForJSConfettiAndInit, 100);
     }
   }

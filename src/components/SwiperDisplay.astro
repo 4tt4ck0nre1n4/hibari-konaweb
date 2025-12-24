@@ -1,5 +1,7 @@
 ---
 import { SWIPER_PATH_API } from "../api/headlessCms";
+import { Image } from "astro:assets";
+import { getOptimizedWordPressImage, getWordPressImageUrl } from "../util/optimizeWordPressImage";
 
 interface Swiper {
   id: number;
@@ -45,6 +47,25 @@ try {
   // Continue with empty array
 }
 
+// WordPress画像を最適化（ビルド時に処理）
+const optimizedSwiperImages = await Promise.all(
+  swipers.slice(0, 10).map(async (swiper) => {
+    const optimizedImage = await getOptimizedWordPressImage(swiper.acf?.swiper_image, {
+      width: 270,
+      height: 360,
+      quality: 85,
+      format: "webp",
+    });
+    // 最適化に失敗した場合は元のURLを使用
+    const fallbackUrl = getWordPressImageUrl(swiper.acf?.swiper_image) ?? "";
+    return {
+      ...swiper,
+      optimizedImage,
+      fallbackUrl,
+    };
+  })
+);
+
 const swiperHeader = "Works Menu";
 const swiperText1 = "私の活動の履歴をご覧ください。";
 const swiperText2 = "Thank you for viewing my site.";
@@ -66,32 +87,55 @@ const swiperText2 = "Thank you for viewing my site.";
     <div class="swipers">
       <div class="swipers-wrapper" style={`--total: ${Math.min(swipers.length, 10)};`}>
         {
-          swipers.slice(0, 10).map((swiper, index) => (
+          optimizedSwiperImages.map((swiperData, index) => (
             <div class="swipers-slide" style={`--position: ${index + 1};`}>
-              <img
-                src={
-                  typeof swiper.acf?.swiper_image === "object" ? swiper.acf?.swiper_image.url : swiper.acf?.swiper_image
-                }
-                alt={swiper.acf?.swiper_title ?? ""}
-                class="swipers__image"
-                width="270"
-                height="360"
-                decoding="async"
-                loading="lazy"
-                fetchpriority="low"
-              />
-              <img
-                src={
-                  typeof swiper.acf?.swiper_image === "object" ? swiper.acf?.swiper_image.url : swiper.acf?.swiper_image
-                }
-                alt={swiper.acf?.swiper_title ?? ""}
-                class="swipers__shadow"
-                width="270"
-                height="360"
-                decoding="async"
-                loading="lazy"
-                fetchpriority="low"
-              />
+              {swiperData.optimizedImage ? (
+                <>
+                  <Image
+                    src={swiperData.optimizedImage}
+                    alt={swiperData.acf?.swiper_title ?? ""}
+                    class="swipers__image"
+                    width={270}
+                    height={360}
+                    loading="lazy"
+                    decoding="async"
+                    fetchpriority="low"
+                  />
+                  <Image
+                    src={swiperData.optimizedImage}
+                    alt={swiperData.acf?.swiper_title ?? ""}
+                    class="swipers__shadow"
+                    width={270}
+                    height={360}
+                    loading="lazy"
+                    decoding="async"
+                    fetchpriority="low"
+                  />
+                </>
+              ) : (
+                <>
+                  <img
+                    src={swiperData.fallbackUrl}
+                    alt={swiperData.acf?.swiper_title ?? ""}
+                    class="swipers__image"
+                    width="270"
+                    height="360"
+                    decoding="async"
+                    loading="lazy"
+                    fetchpriority="low"
+                  />
+                  <img
+                    src={swiperData.fallbackUrl}
+                    alt={swiperData.acf?.swiper_title ?? ""}
+                    class="swipers__shadow"
+                    width="270"
+                    height="360"
+                    decoding="async"
+                    loading="lazy"
+                    fetchpriority="low"
+                  />
+                </>
+              )}
             </div>
           ))
         }

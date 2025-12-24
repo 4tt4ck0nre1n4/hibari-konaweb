@@ -5,6 +5,7 @@ import { tsparticlesOptions } from "../scripts/tsparticlesOptions";
 import { Icon, addCollection, iconLoaded } from "@iconify/react";
 import particlesStyles from "../styles/particlesStyles.module.css";
 import type React from "react";
+import { devLog, devError } from "../util/logger";
 
 const playIconButton = "fluent-emoji:party-popper";
 const pauseIconButton = "fluent-emoji-high-contrast:party-popper";
@@ -50,13 +51,13 @@ export default function ParticlesComponent() {
         const magicWandLoaded = iconLoaded(stopIconButton);
         const partyPopperHCLoaded = iconLoaded(pauseIconButton);
 
-        console.log("Icon collections registered:", {
+        devLog("Icon collections registered:", {
           partyPopper: partyPopperLoaded,
           magicWand: magicWandLoaded,
           partyPopperHC: partyPopperHCLoaded,
         });
       } catch (error) {
-        console.error("Failed to load icon data:", error);
+        devError("Failed to load icon data:", error);
       }
     })();
 
@@ -72,13 +73,13 @@ export default function ParticlesComponent() {
         await initParticlesEngine(async (engine: Engine) => {
           await loadSlim(engine);
           await loadStarShape(engine);
-          console.log("tsParticles engine loaded (slim + star)");
+          devLog("tsParticles engine loaded (slim + star)");
         });
 
         setParticlesLib(() => Particles);
         setReady(true);
       } catch (error) {
-        console.error("Failed to load tsParticles:", error);
+        devError("Failed to load tsParticles:", error);
       }
     })();
   }, []);
@@ -116,7 +117,7 @@ export default function ParticlesComponent() {
         playSound.currentTime = 0;
         void playSound.play();
       } catch (error) {
-        console.error("Failed to play sound:", error);
+        devError("Failed to play sound:", error);
       }
     }
   };
@@ -131,7 +132,7 @@ export default function ParticlesComponent() {
         pauseSound.currentTime = 0;
         void pauseSound.play();
       } catch (error) {
-        console.error("Failed to play sound:", error);
+        devError("Failed to play sound:", error);
       }
     }
   };
@@ -154,7 +155,7 @@ export default function ParticlesComponent() {
         stopSound.currentTime = 0;
         void stopSound.play();
       } catch (error) {
-        console.error("Failed to play sound:", error);
+        devError("Failed to play sound:", error);
       }
     }
   };
@@ -201,7 +202,7 @@ export default function ParticlesComponent() {
           options={defaultOptions}
           particlesLoaded={(container?: Container): Promise<void> => {
             window.tsparticlesContainer = container;
-            console.log("Particles loaded");
+            devLog("Particles loaded");
             return Promise.resolve();
           }}
         />

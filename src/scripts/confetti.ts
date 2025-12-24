@@ -1,17 +1,37 @@
 import JSConfetti from "js-confetti";
 
+// 開発環境判定（ブラウザ内での実行時）
+// window.__DEV__ が設定されている場合はそれを使用、なければホスト名で判定
+const isDev =
+  typeof window !== "undefined" &&
+  ((window as unknown as { __DEV__?: boolean }).__DEV__ === true ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.endsWith(".local"));
+
+function devLog(...args: unknown[]): void {
+  if (isDev) {
+    console.log(...args);
+  }
+}
+
+function devError(...args: unknown[]): void {
+  // エラーは常に出力（本番環境でも必要）
+  console.error(...args);
+}
+
 function initConfetti() {
-  console.log("initConfetti called");
+  devLog("initConfetti called");
   const confetti: HTMLElement | null = document.getElementById("confettiButton");
   const canvasElement = document.getElementById("canvas");
   const textCanvasElement = document.getElementById("confetti-text-canvas");
 
-  console.log("confettiButton:", confetti);
-  console.log("canvas:", canvasElement);
-  console.log("textCanvas:", textCanvasElement);
+  devLog("confettiButton:", confetti);
+  devLog("canvas:", canvasElement);
+  devLog("textCanvas:", textCanvasElement);
 
   if (canvasElement instanceof HTMLCanvasElement && textCanvasElement instanceof HTMLCanvasElement) {
-    console.log("Canvas elements found, initializing...");
+    devLog("Canvas elements found, initializing...");
     // 高DPI対応のためのスケールファクター
     const devicePixelRatio = window.devicePixelRatio ?? 1;
 
@@ -114,9 +134,9 @@ function initConfetti() {
       });
 
       if (confetti) {
-        console.log("Adding click listener to confetti button");
+        devLog("Adding click listener to confetti button");
         confetti.addEventListener("click", () => {
-          console.log("Confetti button clicked!");
+          devLog("Confetti button clicked!");
 
           // まずテキストをクリア（既存のテキストを消す）
           context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
@@ -158,20 +178,20 @@ function initConfetti() {
               }, 50);
             })
             .catch((error) => {
-              console.error("Confetti animation failed:", error);
+              devError("Confetti animation failed:", error);
               isAnimating = false;
             });
         });
       } else {
-        console.error("confettiButton element not found!");
+        devError("confettiButton element not found!");
       }
     }
   } else {
     if (!canvasElement) {
-      console.error("Full-screen canvas element (#canvas) not found!");
+      devError("Full-screen canvas element (#canvas) not found!");
     }
     if (!textCanvasElement) {
-      console.error("Text canvas element (#confetti-text-canvas) not found!");
+      devError("Text canvas element (#confetti-text-canvas) not found!");
     }
   }
 }
