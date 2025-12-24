@@ -92,7 +92,7 @@ const swiperText2 = "Thank you for viewing my site.";
               {swiperData.optimizedImage ? (
                 <>
                   <Image
-                    src={swiperData.optimizedImage}
+                    src={swiperData.optimizedImage.src}
                     alt={swiperData.acf?.swiper_title ?? ""}
                     class="swipers__image"
                     width={270}
@@ -102,7 +102,7 @@ const swiperText2 = "Thank you for viewing my site.";
                     fetchpriority="low"
                   />
                   <Image
-                    src={swiperData.optimizedImage}
+                    src={swiperData.optimizedImage.src}
                     alt={swiperData.acf?.swiper_title ?? ""}
                     class="swipers__shadow"
                     width={270}
