@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import mouse from "/public/assets/mouse.png";
 import { SLIDER_PATH_API } from "../api/headlessCms";
+import { getOptimizedWordPressImage, getWordPressImageUrl } from "../util/optimizeWordPressImage";
 
 interface Slider {
   id: number;
@@ -47,8 +48,6 @@ try {
   // Continue with empty array
 }
 
-// const mouse = "/assets/mouse.png";
-
 const sliderItem = {
   href: "/works",
   ariaLabel: "ワークスページへ",
@@ -56,6 +55,24 @@ const sliderItem = {
   width: 160,
   height: 90,
 };
+
+// WordPress画像を最適化（ビルド時に処理）
+const optimizedSliders = await Promise.all(
+  sliders.map(async (slider) => {
+    const optimizedImage = await getOptimizedWordPressImage(slider.acf?.slider_image, {
+      width: sliderItem.width,
+      height: sliderItem.height,
+      quality: 85,
+      format: "webp",
+    });
+    const fallbackUrl = getWordPressImageUrl(slider.acf?.slider_image) ?? "";
+    return {
+      ...slider,
+      optimizedImage,
+      fallbackUrl,
+    };
+  })
+);
 
 const mouseItem = {
   alt: "マウスの画像",
@@ -70,18 +87,30 @@ const mouseItem = {
   <div id="swiper1" class="swiper">
     <ul class="swiper-wrapper">
       {
-        sliders.map((slider) => (
+        optimizedSliders.map((sliderData) => (
           <li class="swiper-slide">
             <a href={sliderItem.href} aria-label={sliderItem.ariaLabel} title={sliderItem.ariaTitle}>
-              <img
-                src={slider.acf?.slider_image ?? ""}
-                alt={slider.acf?.slider_title ?? ""}
-                class="swiper__image"
-                width={sliderItem.width}
-                height={sliderItem.height}
-                decoding="async"
-                loading="lazy"
-              />
+              {sliderData.optimizedImage ? (
+                <Image
+                  src={sliderData.optimizedImage.src}
+                  alt={sliderData.acf?.slider_title ?? ""}
+                  class="swiper__image"
+                  width={sliderItem.width}
+                  height={sliderItem.height}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <img
+                  src={sliderData.fallbackUrl}
+                  alt={sliderData.acf?.slider_title ?? ""}
+                  class="swiper__image"
+                  width={sliderItem.width}
+                  height={sliderItem.height}
+                  decoding="async"
+                  loading="lazy"
+                />
+              )}
             </a>
           </li>
         ))
@@ -344,7 +373,7 @@ const mouseItem = {
       width: 100%;
       max-width: 100%;
       height: calc(64px + 0.5rem);
-      margin-block-start: 1rem; /* スマホサイズでの余白調整（0.35remから変更） */
+      margin-block-start: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;

@@ -108,6 +108,19 @@ const isShowPagination = page.lastPage > 1;
 
 const works = Array.isArray(page.data) ? page.data : [];
 
+const crumbs = generateBreadcrumbs(Astro.url.pathname);
+
+const worksItems = {
+  alt: "の画像",
+  notFound: "No image available",
+  width: 320,
+  height: 160,
+  ariaLabel: "のページへ",
+  ariaTitle: "のページへ",
+  ariaLabelNewTab: "のページへ(新しいタブで開く)",
+  ariaTitleNewTab: "のページへ(新しいタブで開く)",
+};
+
 // WordPress画像を最適化（ビルド時に処理）
 const optimizedWorks = await Promise.all(
   works.map(async (work) => {
@@ -129,22 +142,10 @@ const optimizedWorks = await Promise.all(
 const repeatTimes = 3;
 
 // 最適化された画像を含むworks配列を繰り返し
-const repeatedWorks = Array.from({ length: optimizedWorks.length * repeatTimes }, (_, i) => optimizedWorks[i % optimizedWorks.length]);
-
-const crumbs = generateBreadcrumbs(Astro.url.pathname);
-
-// const crumbs = [{ name: "Home", path: "/" }, { name: "Works" }];
-
-const worksItems = {
-  alt: "の画像",
-  notFound: "No image available",
-  width: 320,
-  height: 160,
-  ariaLabel: "のページへ",
-  ariaTitle: "のページへ",
-  ariaLabelNewTab: "のページへ(新しいタブで開く)",
-  ariaTitleNewTab: "のページへ(新しいタブで開く)",
-};
+const repeatedWorks = Array.from(
+  { length: optimizedWorks.length * repeatTimes },
+  (_, i) => optimizedWorks[i % optimizedWorks.length]
+);
 
 const worksPagination = {
   first: "最初のページへ",
@@ -184,7 +185,7 @@ const worksPagination = {
                         <figure class="scrollImage__figure">
                           {work?.optimizedImage ? (
                             <Image
-                              src={work.optimizedImage}
+                              src={work.optimizedImage.src}
                               alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
                               class="scrollImage__image"
                               width={worksItems.width}
@@ -228,8 +229,8 @@ const worksPagination = {
           </p>
           <ul class="worksCard__menu">
             {
-              works.length > 0 ? (
-                works.map((work: WorkObject) => (
+              optimizedWorks.length > 0 ? (
+                optimizedWorks.map((work) => (
                   <li class="worksCard__menu_item">
                     <article
                       class="worksCard__article"
@@ -250,15 +251,27 @@ const worksPagination = {
                         aria-label={`${work.slug}(${work?.title?.rendered})${worksItems.ariaLabel}`}
                         title={`${work.slug}(${work?.title?.rendered})${worksItems.ariaTitle}`}
                       >
-                        <img
-                          class="worksCard__image"
-                          src={work?.acf?.screenshot_pc ?? ""}
-                          alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
-                          width={worksItems.width}
-                          height={worksItems.height}
-                          loading="lazy"
-                          decoding="async"
-                        />
+                        {work?.optimizedImage ? (
+                          <Image
+                            src={work.optimizedImage.src}
+                            alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
+                            class="worksCard__image"
+                            width={worksItems.width}
+                            height={worksItems.height}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <img
+                            class="worksCard__image"
+                            src={work?.fallbackUrl ?? ""}
+                            alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
+                            width={worksItems.width}
+                            height={worksItems.height}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        )}
                       </a>
                       <a
                         class="worksCard__link"
