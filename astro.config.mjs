@@ -8,7 +8,7 @@ import pagefind from "astro-pagefind";
 import sitemap from "@astrojs/sitemap";
 
 import netlify from "@astrojs/netlify";
-import { asyncSwiperCssPlugin } from "./astro-plugin-async-swiper-css.js";
+import { asyncSwiperCssPlugin } from "./async-css-optimizer.js";
 
 // WordPressドメインを環境変数から取得（リモート画像最適化用）
 function getWordPressDomain() {
@@ -120,7 +120,7 @@ export default defineConfig({
         ],
       },
     }),
-    asyncSwiperCssPlugin(), // Swiper CSSのみを非同期読み込み
+    asyncSwiperCssPlugin(), // CSSの非同期読み込み最適化（Swiper CSS、非クリティカルなフォント、reset/global CSS）
   ],
   image: {
     // リモート画像最適化を許可するドメイン

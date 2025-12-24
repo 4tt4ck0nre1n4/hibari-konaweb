@@ -1,6 +1,7 @@
 ---
 import Favicon from "../components/Favicon.astro";
 import GoogleAnalytics from "../components/GoogleAnalytics.astro";
+import NonCriticalFonts from "../components/NonCriticalFonts.astro";
 // reset.css と global.css を通常通りインポート（Astroが最適化）
 import "../styles/reset.css";
 import "../styles/global.css";
@@ -32,7 +33,6 @@ const cspContent = isDev
 <!doctype html>
 <html lang="ja">
   <head>
-    <!-- Google Analytics 4 (GA4) - できるだけ早く読み込む -->
     <GoogleAnalytics />
 
     <meta charset="UTF-8" />
@@ -336,6 +336,14 @@ const cspContent = isDev
     }
 
     <!-- フォントは@fontsource/poppinsをLayout.astroでインポート済み -->
+
+    <!-- 非クリティカルなフォントの遅延読み込み -->
+    <!--
+      非クリティカルなフォント（Poppins 700、Cinzel Decorative、Playfair Display、Marcellus）を
+      <link rel="preload"> で遅延読み込みします。
+      ビルド時に async-css-optimizer.js が自動的に最適化します。
+    -->
+    <NonCriticalFonts />
 
     <!-- ページ固有の追加head要素（LCP最適化など） -->
     <slot name="head" />

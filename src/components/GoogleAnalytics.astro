@@ -11,6 +11,7 @@
  * - 本番環境でのみ GA4 を有効化
  * - Consent Mode v2 対応（プライバシー保護）
  * - Performance と SEO への影響を最小化
+ * - requestIdleCallback を使用した遅延読み込み（PageSpeed Insights 最適化）
  */
 
 const GA_MEASUREMENT_ID: string | undefined =
@@ -31,7 +32,7 @@ const shouldLoadGA: boolean =
   <script is:inline define:vars={{ GA_MEASUREMENT_ID: GA_MEASUREMENT_ID }}>
     // Consent Mode v2: GDPR対応のため、ユーザーの同意前はデフォルトで拒否設定
     // 必要に応じて Cookie 同意バナーと連携してください
-    // Consent Mode v2 のデフォルト設定
+    // Consent Mode v2 のデフォルト設定（初期化のみ、スクリプト読み込みは遅延）
     window.dataLayer = window.dataLayer || [];
     function gtag() {
       dataLayer.push(arguments);
@@ -54,34 +55,52 @@ const shouldLoadGA: boolean =
     gtag("consent", "update", {
       analytics_storage: "granted",
     });
-  </script>
-)}
 
-{shouldLoadGA && typeof GA_MEASUREMENT_ID === "string" && (
-  <script
-    is:inline
-    async
-    src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-  ></script>
-)}
+    // Google Analytics の遅延読み込み
+    // requestIdleCallback を使用してブラウザがアイドル状態の時に読み込む
+    // これにより初期ページロードのパフォーマンスへの影響を最小化
+    function loadGoogleAnalytics() {
+      // gtag.js スクリプトの読み込み
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+      document.head.appendChild(script);
 
-{shouldLoadGA && typeof GA_MEASUREMENT_ID === "string" && (
-  <script is:inline define:vars={{ GA_MEASUREMENT_ID: GA_MEASUREMENT_ID }}>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
+      // GA4 設定スクリプト
+      script.onload = function () {
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          dataLayer.push(arguments);
+        }
+        gtag("js", new Date());
+
+        // GA4 設定
+        gtag("config", GA_MEASUREMENT_ID, {
+          // ページビューの自動送信
+          send_page_view: true,
+          // IPアドレスの匿名化（プライバシー保護）
+          anonymize_ip: true,
+          // デバッグモードの無効化
+          debug_mode: false,
+        });
+      };
     }
-    gtag("js", new Date());
 
-    // GA4 設定
-    gtag("config", GA_MEASUREMENT_ID, {
-      // ページビューの自動送信
-      send_page_view: true,
-      // IPアドレスの匿名化（プライバシー保護）
-      anonymize_ip: true,
-      // デバッグモードの無効化
-      debug_mode: false,
-    });
+    // requestIdleCallback がサポートされている場合は使用
+    // サポートされていない場合は setTimeout でフォールバック（3秒後）
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(
+        function () {
+          loadGoogleAnalytics();
+        },
+        { timeout: 3000 } // 最大3秒待機
+      );
+    } else {
+      // requestIdleCallback がサポートされていない場合のフォールバック
+      setTimeout(function () {
+        loadGoogleAnalytics();
+      }, 3000);
+    }
   </script>
 )}
 

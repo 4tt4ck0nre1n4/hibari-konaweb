@@ -1,0 +1,24 @@
+---
+/**
+ * 非クリティカルなフォントのコンポーネント
+ *
+ * このコンポーネントは遅延読み込みされます。
+ * クリティカルなフォント（Poppins 400）以外のフォントを読み込みます。
+ *
+ * 読み込むフォント:
+ * - Poppins 700
+ * - Cinzel Decorative 400, 700
+ * - Playfair Display Variable
+ * - Marcellus
+ */
+
+// 非クリティカルなフォントをインポート
+import "@fontsource/poppins/700.css";
+import "@fontsource/cinzel-decorative/400.css";
+import "@fontsource/cinzel-decorative/700.css";
+import "@fontsource-variable/playfair-display/wght-italic.css";
+import "@fontsource/marcellus";
+---
+
+<!-- このコンポーネントはフォントの CSS を読み込むためのみに使用されます -->
+<!-- 実際の HTML 出力はありません -->

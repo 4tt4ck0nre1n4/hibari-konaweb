@@ -3,6 +3,7 @@
  * レンダリングブロックを削減してLCPを改善
  * - reset.css と global.css を含むCSSファイル: preload + onload パターン
  * - Swiper CSS: media="print" hack
+ * - 非クリティカルなフォントの CSS: <link rel="preload"> で遅延読み込み
  */
 import fs from "fs";
 import path from "path";
@@ -99,9 +100,25 @@ export function asyncSwiperCssPlugin() {
                 replacement = `<link rel="stylesheet" href="${normalizedHref}" media="print" onload="this.media='all'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
                 replacements.push({ index, fullMatch, replacement });
               }
+              // 非クリティカルなフォントの CSS: <link rel="preload"> で遅延読み込み
+              // NonCriticalFonts コンポーネントの CSS を識別
+              else if (
+                href.includes("NonCriticalFonts") ||
+                href.includes("non-critical") ||
+                (href.includes("poppins") && href.includes("700")) ||
+                href.includes("cinzel") ||
+                href.includes("playfair") ||
+                href.includes("marcellus")
+              ) {
+                modified = true;
+                // <link rel="preload"> で遅延読み込み
+                // requestIdleCallback を使用してブラウザがアイドル状態の時に読み込む
+                replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                replacements.push({ index, fullMatch, replacement });
+              }
               // reset.css と global.css を含むCSSファイル: preload + onload パターン
               // HeadLayout.astroから読み込まれるCSSは通常、最初の2つ（または最初の1つにバンドルされる）
-              // Swiper CSSを除外した最初の2つを処理
+              // Swiper CSSと非クリティカルなフォントの CSS を除外した最初の2つを処理
               else {
                 nonSwiperCssIndex++;
                 // 最初の2つのCSSファイルを preload + onload パターンに変換
