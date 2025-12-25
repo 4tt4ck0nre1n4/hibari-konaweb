@@ -110,27 +110,33 @@ function initConfetti() {
         // globalAlphaはリセットしない（アニメーション中に干渉を防ぐため）
       };
 
-      // ウィンドウリサイズ時にキャンバスサイズとテキストサイズを再調整
+      // ウィンドウリサイズ時にキャンバスサイズとテキストサイズを再調整（デバウンス）
+      let resizeTimer: ReturnType<typeof setTimeout> | null = null;
       window.addEventListener("resize", () => {
-        const newDevicePixelRatio = window.devicePixelRatio ?? 1;
-
-        // 全画面canvas（confetti用）のリサイズ
-        const rect = canvasElement.getBoundingClientRect();
-        canvasElement.width = rect.width * newDevicePixelRatio;
-        canvasElement.height = rect.height * newDevicePixelRatio;
-
-        // テキスト表示用canvas（sidebar内）のリサイズ
-        const textRect = textCanvasElement.getBoundingClientRect();
-        textCanvasElement.width = textRect.width * newDevicePixelRatio;
-        textCanvasElement.height = textRect.height * newDevicePixelRatio;
-
-        // アニメーション中の場合は現在の透明度で再描画
-        if (isAnimating && currentOpacity > 0) {
-          drawText(currentOpacity);
-        } else if (!isAnimating && currentOpacity > 0) {
-          // アニメーション中でない場合のみ、通常の透明度で再描画
-          drawText();
+        if (resizeTimer) {
+          clearTimeout(resizeTimer);
         }
+        resizeTimer = setTimeout(() => {
+          const newDevicePixelRatio = window.devicePixelRatio ?? 1;
+
+          // 全画面canvas（confetti用）のリサイズ
+          const rect = canvasElement.getBoundingClientRect();
+          canvasElement.width = rect.width * newDevicePixelRatio;
+          canvasElement.height = rect.height * newDevicePixelRatio;
+
+          // テキスト表示用canvas（sidebar内）のリサイズ
+          const textRect = textCanvasElement.getBoundingClientRect();
+          textCanvasElement.width = textRect.width * newDevicePixelRatio;
+          textCanvasElement.height = textRect.height * newDevicePixelRatio;
+
+          // アニメーション中の場合は現在の透明度で再描画
+          if (isAnimating && currentOpacity > 0) {
+            drawText(currentOpacity);
+          } else if (!isAnimating && currentOpacity > 0) {
+            // アニメーション中でない場合のみ、通常の透明度で再描画
+            drawText();
+          }
+        }, 250);
       });
 
       if (confetti) {
@@ -149,33 +155,34 @@ function initConfetti() {
             })
             .then(() => jsConfetti.addConfetti({ confettiRadius: 3 }))
             .then(() => {
-              // フェードイン
+              // フェードイン（requestAnimationFrameで最適化）
               let opacity = 0;
-              const fadeIn = setInterval(() => {
+              const fadeIn = (): void => {
                 if (opacity < 1) {
                   opacity += 0.05;
                   drawText(opacity);
+                  requestAnimationFrame(fadeIn);
                 } else {
-                  clearInterval(fadeIn);
-
                   // 3秒間表示した後、フェードアウト
                   setTimeout(() => {
                     let fadeOpacity = 1;
-                    const fadeOut = setInterval(() => {
+                    const fadeOut = (): void => {
                       if (fadeOpacity > 0) {
                         fadeOpacity -= 0.05;
                         drawText(fadeOpacity);
+                        requestAnimationFrame(fadeOut);
                       } else {
-                        clearInterval(fadeOut);
                         // 完全に消す
                         context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
                         currentOpacity = 0;
                         isAnimating = false;
                       }
-                    }, 50);
+                    };
+                    requestAnimationFrame(fadeOut);
                   }, 3000);
                 }
-              }, 50);
+              };
+              requestAnimationFrame(fadeIn);
             })
             .catch((error) => {
               devError("Confetti animation failed:", error);
@@ -196,12 +203,55 @@ function initConfetti() {
   }
 }
 
-// DOMが完全にロードされてから初期化
-// window.loadを使用してすべてのリソースが読み込まれた後に実行
-if (document.readyState === "complete") {
-  // 既にロード済みの場合は即座に実行
-  initConfetti();
-} else {
-  // まだロード中の場合はloadイベントを待つ
-  window.addEventListener("load", initConfetti);
+/**
+ * 初期化関数（requestIdleCallbackで遅延実行）
+ * TBT改善のため、アイドル時間に初期化を実行
+ */
+export function initConfettiDeferred(): void {
+  // JSConfettiが読み込まれたことを確認してから初期化
+  function waitForJSConfettiAndInit(): void {
+    if (typeof JSConfetti !== "undefined") {
+      devLog("✅ JSConfetti is ready, initializing confetti...");
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          if ("requestIdleCallback" in window) {
+            requestIdleCallback(initConfetti, { timeout: 2000 });
+          } else {
+            setTimeout(initConfetti, 100);
+          }
+        });
+      } else {
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(initConfetti, { timeout: 2000 });
+        } else {
+          setTimeout(initConfetti, 100);
+        }
+      }
+    } else {
+      devLog("⏳ Waiting for JSConfetti to load...");
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(
+          () => {
+            setTimeout(waitForJSConfettiAndInit, 100);
+          },
+          { timeout: 2000 }
+        );
+      } else {
+        setTimeout(waitForJSConfettiAndInit, 100);
+      }
+    }
+  }
+
+  // window.onloadイベントでも初期化を試みる（フォールバック）
+  window.addEventListener("load", () => {
+    waitForJSConfettiAndInit();
+  });
+
+  // 即座にも試行（既に読み込まれている場合）
+  waitForJSConfettiAndInit();
+}
+
+// 自動初期化（モジュールとして読み込まれた場合）
+if (typeof window !== "undefined") {
+  initConfettiDeferred();
 }

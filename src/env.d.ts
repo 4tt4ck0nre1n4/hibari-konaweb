@@ -44,5 +44,15 @@ import type { Container } from "@tsparticles/engine";
 declare global {
   interface Window {
     tsparticlesContainer?: Container;
+    __DEV__?: boolean;
+    playAll?: () => void;
+    pauseAll?: () => void;
+    reverseAll?: () => void;
+    restartAll?: () => void;
   }
+
+  // GSAPとScrollTriggerは外部スクリプトとして読み込まれる
+  const gsap: typeof import("gsap").gsap;
+  const ScrollTrigger: typeof import("gsap/ScrollTrigger").ScrollTrigger;
+  const JSConfetti: typeof import("js-confetti").default;
 }

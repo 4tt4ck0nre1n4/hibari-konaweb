@@ -408,59 +408,9 @@ import pikucha2 from "../assets/svg/pikucha2.svg";
   }
 </style>
 
-<script is:inline>
-  // @ts-nocheck
-  // GSAPとScrollTriggerの読み込みを待つ
-  function initGridMenuAnimations() {
-    if (typeof gsap === "undefined") {
-      setTimeout(initGridMenuAnimations, 100);
-      return;
-    }
-
-    if (typeof ScrollTrigger !== "undefined") {
-      gsap.registerPlugin(ScrollTrigger);
-    }
-
-    // Tooltipのアニメーション
-    document.querySelectorAll(".grid__menu_item").forEach((item) => {
-      const tooltipRight = item.querySelector(".item__tooltip_right");
-      const tooltipLeft = item.querySelector(".item__tooltip_left");
-
-      item.addEventListener("mouseenter", () => {
-        [tooltipRight, tooltipLeft].forEach((tooltip) => {
-          if (tooltip) {
-            gsap.to(tooltip, {
-              opacity: 1,
-              y: -10,
-              duration: 0.3,
-              ease: "power1.out",
-            });
-          }
-        });
-      });
-
-      item.addEventListener("mouseleave", () => {
-        [tooltipRight, tooltipLeft].forEach((tooltip) => {
-          if (tooltip) {
-            gsap.to(tooltip, {
-              opacity: 0,
-              y: 0,
-              duration: 0.3,
-              ease: "power1.in",
-            });
-          }
-        });
-      });
-    });
-  }
-
-  // 初期化
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initGridMenuAnimations);
-  } else {
-    initGridMenuAnimations();
-  }
-
-  // window.onloadイベントでも初期化を試みる（フォールバック）
-  window.addEventListener("load", initGridMenuAnimations);
+<!-- TBT改善: インラインスクリプトを外部ファイルに移動し、requestIdleCallbackで遅延初期化 -->
+<script>
+  import { initGridMenuAnimationsDeferred } from "../scripts/gridMenuAnimations";
+  // 明示的に初期化を実行
+  initGridMenuAnimationsDeferred();
 </script>

@@ -70,7 +70,6 @@
     "astro-icon": "^1.1.2",
     "astro-pagefind": "^1.8.3",
     "axios": "^1.7.2",
-    "caniuse-lite": "^1.0.30001717",
     "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
     "gsap": "^3.12.5",
