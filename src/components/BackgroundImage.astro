@@ -30,7 +30,29 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
 </button>
 <p id="ariaLiveStatus__background" class="screenReader-only" role="status" aria-live="polite"></p>
 
+<!-- 開発環境フラグを設定（ビルド時に置換される） -->
+<script is:inline define:vars={{ isDev: import.meta.env.DEV }}>
+  // @ts-nocheck
+  // 開発環境判定（Astroのビルド時に置換される）
+  // window.__DEV__ が既に設定されている場合は上書きしない
+  if (typeof window.__DEV__ === "undefined") {
+    window.__DEV__ = isDev;
+  }
+</script>
+
 <script>
+  // @ts-nocheck
+  // 開発環境でのみログを出力する関数
+  const devLog = (...args) => {
+    if (window.__DEV__) {
+      console.log(...args);
+    }
+  };
+  const devError = (...args) => {
+    // エラーは常に出力（本番環境でも必要）
+    console.error(...args);
+  };
+
   // 即座に実行（DOMContentLoadedを待たない）
   (() => {
     const initBackgroundToggle = () => {
@@ -39,7 +61,7 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
       const ariaLiveStatus = document.getElementById("ariaLiveStatus__background");
 
       if (!mainContainer || !backgroundButton || !ariaLiveStatus) {
-        console.error("BackgroundImage: 必要な要素が見つかりません", {
+        devError("BackgroundImage: 必要な要素が見つかりません", {
           mainContainer: !!mainContainer,
           backgroundButton: !!backgroundButton,
           ariaLiveStatus: !!ariaLiveStatus,
@@ -52,7 +74,7 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
       const onIcon = backgroundButton.querySelector(".onBackgroundIcon");
 
       if (!offIcon || !onIcon) {
-        console.error("BackgroundImage: アイコンが見つかりません", {
+        devError("BackgroundImage: アイコンが見つかりません", {
           offIcon: !!offIcon,
           onIcon: !!onIcon,
         });
@@ -81,13 +103,13 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
       updateIcons();
 
       backgroundButton.addEventListener("click", () => {
-        console.log("BackgroundImage: ボタンがクリックされました");
-        console.log("mainContainer before toggle:", mainContainer.className);
+        devLog("BackgroundImage: ボタンがクリックされました");
+        devLog("mainContainer before toggle:", mainContainer.className);
 
         isImageOff = mainContainer.classList.toggle("is-notImage");
 
-        console.log("mainContainer after toggle:", mainContainer.className);
-        console.log("isImageOff:", isImageOff);
+        devLog("mainContainer after toggle:", mainContainer.className);
+        devLog("isImageOff:", isImageOff);
 
         if (isImageOff) {
           ariaLabel = "背景画像を切り替える（背景画像なし）";
@@ -102,10 +124,10 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
         updateAccessibility();
         updateIcons();
 
-        console.log("BackgroundImage: 切り替え完了");
+        devLog("BackgroundImage: 切り替え完了");
       });
 
-      console.log("BackgroundImage: 初期化完了", {
+      devLog("BackgroundImage: 初期化完了", {
         mainContainer: mainContainer,
         backgroundButton: backgroundButton,
         offIcon: offIcon,

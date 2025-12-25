@@ -25,9 +25,14 @@ import pikucha from "../assets/svg/pikucha.svg";
 import sodenoura2 from "../assets/svg/sodenoura2.svg";
 import gauraStudio2 from "../assets/svg/gauraStudio2.svg";
 import pikucha2 from "../assets/svg/pikucha2.svg";
+import fvAnimeImageSrc from "../assets/fvAnimeImage.webp";
+import fvBackgroundImageSrc from "../assets/fvBackgroundImage.webp";
 import gridBackgroundImageSrc from "../assets/gridBackground.webp";
 import { getImage } from "astro:assets";
-import FirstView from "../components/FirstView.astro";
+import NaviCard from "../components/NaviCard.astro";
+import Glitch from "../components/Glitch.astro";
+const fvAnimeImage = await getImage({ src: fvAnimeImageSrc });
+const fvBackgroundImage = await getImage({ src: fvBackgroundImageSrc });
 const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 ---
 
@@ -41,6 +46,8 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   twitterDescription={globalText.top.description}
 >
   <!-- LCP背景画像のプリロード（PageSpeed Insights最適化） -->
+  <link slot="head" rel="preload" href={fvBackgroundImage.src} as="image" fetchpriority="high" />
+  <link slot="head" rel="preload" href={fvAnimeImage.src} as="image" fetchpriority="low" />
   <link slot="head" rel="preload" href={gridBackgroundImage.src} as="image" fetchpriority="low" />
 
   <div id="outer-container">
@@ -51,7 +58,18 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
         <Breadcrumbs crumbs={[]} />
       </div>
 
-      <FirstView />
+      <div class="fv">
+        <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImage.src})`}>
+          <div class="background-container">
+            <div class="background-rotated" style={`background-image: url(${fvAnimeImage.src})`}></div>
+            <div class="background"></div>
+          </div>
+          <div class="glitch-container">
+            <NaviCard />
+            <Glitch />
+          </div>
+        </div>
+      </div>
 
       <div class="swiper-display-container swiper-display-container--mobile">
         <SwiperDisplay />
@@ -968,6 +986,23 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       );
     }
 
+    // Astro要素のスクロールアニメーション
+    const pageContainer = document.getElementById("page-wrap");
+    const astroElement = document.querySelector(".astro-a");
+
+    if (astroElement && pageContainer) {
+      gsap.to(astroElement, {
+        y: () => pageContainer.offsetHeight * 0.2,
+        ease: "power1.out",
+        scrollTrigger: {
+          trigger: pageContainer,
+          start: "top top",
+          end: "center end",
+          scrub: true,
+        },
+      });
+    }
+
     // Tooltipのアニメーション
     document.querySelectorAll(".grid__menu_item").forEach((item) => {
       const tooltipRight = item.querySelector(".item__tooltip_right");
@@ -1235,8 +1270,250 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       });
     }
 
+    // マウス追従背景の初期化
+    function initBackgroundMouseFollow() {
+      devLog("🔍 initBackgroundMouseFollow called");
+
+      // 要素が見つかるまで待機（ローディングスクリーンの終了を考慮）
+      const checkAndInit = () => {
+        devLog("🔍 Checking for elements...");
+        const backgroundContainer = document.querySelector(".background-container");
+        const fvWrapper = document.querySelector(".fv__wrapper");
+
+        devLog("🔍 Elements found:", { backgroundContainer, fvWrapper });
+
+        if (!backgroundContainer || !fvWrapper) {
+          // 要素が見つからない場合は再試行
+          devWarn("⚠️ Elements not found, retrying in 100ms...");
+          setTimeout(checkAndInit, 100);
+          return;
+        }
+
+        // ローディングスクリーンの終了を待つ
+        const loadingScreen = document.getElementById("loading-screen");
+        devLog("🔍 Loading screen:", loadingScreen);
+
+        if (loadingScreen) {
+          const checkLoadingComplete = () => {
+            const computedStyle = window.getComputedStyle(loadingScreen);
+            const isVisible =
+              loadingScreen.style.display !== "none" &&
+              loadingScreen.style.visibility !== "hidden" &&
+              computedStyle.display !== "none" &&
+              computedStyle.visibility !== "hidden";
+
+            devLog("🔍 Loading screen visible:", isVisible);
+
+            if (isVisible) {
+              // まだローディング中なので再チェック
+              devLog("⏳ Loading screen still visible, rechecking in 100ms...");
+              setTimeout(checkLoadingComplete, 100);
+            } else {
+              // ローディング終了後に初期化
+              devLog("✅ Loading complete, initializing mouse follow...");
+              initializeMouseFollow(backgroundContainer, fvWrapper);
+            }
+          };
+          checkLoadingComplete();
+        } else {
+          // ローディングスクリーンが存在しない場合は即座に初期化
+          devLog("ℹ️ No loading screen, initializing immediately...");
+          initializeMouseFollow(backgroundContainer, fvWrapper);
+        }
+      };
+
+      checkAndInit();
+    }
+
+    // マウス追従の実際の初期化処理
+    function initializeMouseFollow(backgroundContainer, fvWrapper) {
+      // デバッグログ追加（開発環境のみ）
+      devLog("✅ Initializing mouse follow...", {
+        backgroundContainer,
+        fvWrapper,
+        maskImage: window.getComputedStyle(backgroundContainer).maskImage,
+        webkitMaskImage: window.getComputedStyle(backgroundContainer).webkitMaskImage,
+        mouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
+        mouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
+      });
+
+      // パフォーマンス向上のため、requestAnimationFrameを使用
+      let rafId = null;
+      let mouseX = 0;
+      let mouseY = 0;
+
+      const updateMaskPosition = () => {
+        const rect = fvWrapper.getBoundingClientRect();
+        const x = mouseX - rect.left;
+        const y = mouseY - rect.top;
+
+        // CSS変数を使ってマスクの位置を更新（より確実に設定）
+        backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
+        backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+        rafId = null;
+      };
+
+      // デバイスがタッチデバイスかどうかを判定
+      const isTouchDevice =
+        window.matchMedia("(any-hover: none)").matches ||
+        window.matchMedia("(pointer: coarse)").matches ||
+        "ontouchstart" in window;
+
+      devLog("📱 Device type:", isTouchDevice ? "Touch device" : "Desktop");
+
+      // デスクトップ: マウス追従
+      if (!isTouchDevice) {
+        devLog("🖱️ Setting up desktop mouse tracking...");
+        // window全体でマウス移動を監視（画面全体を追従）
+        window.addEventListener(
+          "mousemove",
+          (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // requestAnimationFrameで更新を最適化
+            if (rafId === null) {
+              rafId = requestAnimationFrame(updateMaskPosition);
+            }
+          },
+          { passive: true }
+        );
+
+        devLog("✅ Desktop mouse tracking event listener attached");
+
+        // マウスが画面外に出た場合も追従（画面端でも反応するように）
+        window.addEventListener("mouseleave", () => {
+          // マウスが画面外に出た場合は最後の位置を保持
+        });
+      } else {
+        // スマホ/タブレット: タッチイベントと自動アニメーションの組み合わせ
+
+        // 1. タッチイベント対応（タッチ位置を追従）
+        let touchX = 0;
+        let touchY = 0;
+        let isTouching = false;
+
+        window.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.touches.length > 0) {
+              isTouching = true;
+              touchX = e.touches[0].clientX;
+              touchY = e.touches[0].clientY;
+              mouseX = touchX;
+              mouseY = touchY;
+
+              if (rafId === null) {
+                rafId = requestAnimationFrame(updateMaskPosition);
+              }
+            }
+          },
+          { passive: true }
+        );
+
+        window.addEventListener(
+          "touchmove",
+          (e) => {
+            if (e.touches.length > 0 && isTouching) {
+              touchX = e.touches[0].clientX;
+              touchY = e.touches[0].clientY;
+              mouseX = touchX;
+              mouseY = touchY;
+
+              if (rafId === null) {
+                rafId = requestAnimationFrame(updateMaskPosition);
+              }
+            }
+          },
+          { passive: true }
+        );
+
+        window.addEventListener(
+          "touchend",
+          () => {
+            isTouching = false;
+          },
+          { passive: true }
+        );
+
+        // 2. 自動アニメーション（タッチ操作がない場合の代替）
+        // パルスアニメーション: 定期的に位置を変更して視覚的な動きを提供
+        let autoAnimationId = null;
+        let animationPhase = 0;
+        const animationDuration = 4000; // 4秒周期
+        const animationRadius = 100; // 移動半径（px）
+
+        const startAutoAnimation = () => {
+          if (autoAnimationId !== null) return; // 既に実行中
+
+          const startTime = Date.now();
+          const rect = fvWrapper.getBoundingClientRect();
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+
+          const animate = () => {
+            if (isTouching) {
+              // タッチ中は自動アニメーションを一時停止
+              autoAnimationId = requestAnimationFrame(animate);
+              return;
+            }
+
+            const elapsed = Date.now() - startTime;
+            const progress = (elapsed % animationDuration) / animationDuration;
+
+            // 円形パスで移動（スムーズな動き）
+            const angle = progress * Math.PI * 2;
+            const offsetX = Math.cos(angle) * animationRadius;
+            const offsetY = Math.sin(angle) * animationRadius;
+
+            mouseX = centerX + rect.left + offsetX;
+            mouseY = centerY + rect.top + offsetY;
+
+            if (rafId === null) {
+              rafId = requestAnimationFrame(updateMaskPosition);
+            }
+
+            autoAnimationId = requestAnimationFrame(animate);
+          };
+
+          autoAnimationId = requestAnimationFrame(animate);
+        };
+
+        // 自動アニメーションを開始（少し遅延させて自然な動きに）
+        setTimeout(() => {
+          startAutoAnimation();
+        }, 500);
+      }
+
+      // 初期位置を設定（画面中央）
+      const initialX = window.innerWidth / 2;
+      const initialY = window.innerHeight / 2;
+      const rect = fvWrapper.getBoundingClientRect();
+      const x = initialX - rect.left;
+      const y = initialY - rect.top;
+      backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
+      backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+      // 初期化完了のログ
+      devLog("✅ Mouse follow initialized successfully", {
+        initialX,
+        initialY,
+        x,
+        y,
+        rect,
+        finalMouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
+        finalMouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
+      });
+    }
+
     // ボタンイベントの初期化
     initButtonEvents();
+
+    // マウス追従の初期化（200ms遅延させてグリッチアニメーションの初期化を待つ）
+    setTimeout(() => {
+      initBackgroundMouseFollow();
+    }, 200);
   } // initializeApp() の終わり
 
   // GSAPが読み込まれたことを確認してから初期化を開始

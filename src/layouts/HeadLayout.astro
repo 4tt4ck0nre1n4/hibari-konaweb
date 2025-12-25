@@ -132,6 +132,30 @@ const cspContent = isDev
         text-rendering: optimizespeed;
         min-block-size: 100%;
         overflow-x: hidden;
+        /* レイアウトシフト防止: 初期サイズを明示的に設定 */
+        position: relative;
+      }
+
+      /* スマホサイズでのbody最適化（レイアウトシフト対策） */
+      @media (width <= 768px) {
+        body {
+          min-height: 100vh;
+          /* スマホのアドレスバー表示/非表示に対応 */
+          min-height: -webkit-fill-available;
+          /* レイアウトシフト防止: 高さを固定 */
+          height: auto;
+        }
+      }
+
+      /* 超小型スマホサイズでのbody最適化 */
+      @media (width <= 480px) {
+        body {
+          min-height: 100vh;
+          /* スマホのアドレスバー表示/非表示に対応 */
+          min-height: -webkit-fill-available;
+          /* レイアウトシフト防止: 高さを固定 */
+          height: auto;
+        }
       }
       img,
       svg {
@@ -175,6 +199,309 @@ const cspContent = isDev
         #page-wrap {
           margin-block-start: 7rem;
         }
+      }
+
+      /* Header クリティカルCSS */
+      .header {
+        width: 100%;
+        max-width: 100%;
+        height: 70px;
+        display: grid;
+        font-family: "Poppins", sans-serif;
+        background-color: rgba(0, 0, 0, 0);
+        -webkit-backdrop-filter: blur(0);
+        backdrop-filter: blur(0);
+        border: transparent 1px solid;
+        border-radius: 1rem;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 800;
+        transition: all 1s ease;
+        margin-inline: auto;
+        padding: 0.5rem;
+        overflow: hidden;
+      }
+      .header.is-scroll {
+        background-color: rgba(255, 255, 255, 0.6);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        box-shadow:
+          inset 0.4em 0.4em 0.4em rgba(0, 0, 0, 0.2),
+          inset -0.4em -0.4em 0.4em rgba(0, 0, 0, 0.2);
+        transition: box-shadow 0.5s ease;
+      }
+      .header__wrapper {
+        width: 100%;
+        max-width: 700px;
+        margin-inline: auto;
+      }
+
+      /* タブレットサイズの調整 */
+      @media (480px <= width <= 1024px) {
+        .header {
+          height: 128px;
+          padding: 0;
+          width: 100%;
+          left: 0;
+          right: 0;
+        }
+
+        .header__wrapper {
+          width: 100%;
+          max-width: 100%;
+          padding-inline: 0.5rem;
+          margin-inline: 0;
+        }
+
+        .header__inner {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          padding-inline: 0;
+          width: 100%;
+        }
+
+        .header__logo_text,
+        .header__logo_whiteText {
+          width: auto;
+          max-width: 200px;
+          height: 24px;
+        }
+      }
+
+      @media (width <= 768px) {
+        .header {
+          height: 128px;
+          padding: 0.5rem;
+        }
+
+        .header__wrapper {
+          max-width: 100%;
+          padding-inline: 0;
+        }
+
+        .header__inner {
+          padding-inline: 0.5rem;
+        }
+      }
+
+      /* 480px以下でのスマホ最適化 */
+      @media (width <= 480px) {
+        .header {
+          height: 128px;
+          padding: 0.5rem;
+        }
+
+        .header__wrapper {
+          max-width: 100%;
+          padding-inline: 0;
+        }
+
+        .header__inner {
+          flex-direction: column;
+          gap: 0.75rem;
+          align-items: center;
+          padding-inline: 0.5rem;
+        }
+
+        .header__logo {
+          order: 1;
+        }
+
+        .header__nav {
+          order: 2;
+          width: 100%;
+        }
+
+        .header__logo_image {
+          width: 40px;
+          height: 40px;
+        }
+
+        .header__logo_text,
+        .header__logo_whiteText {
+          height: 24px;
+          width: auto;
+        }
+      }
+
+      /* iPhone特有の調整 - ロゴのスペースをAndroidと同じに */
+      @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
+        .header__logo_container {
+          margin-inline: 0.25rem;
+        }
+
+        .header__logo_image {
+          margin-inline: 0.25rem;
+        }
+
+        .header__logo_text,
+        .header__logo_whiteText {
+          margin-inline: 0.25rem;
+        }
+
+        /* スクロール時も並列配置を維持 */
+        .header__logo_link {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: row;
+        }
+      }
+      .header__inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .header__logo_container {
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .header__logo_image {
+        width: 40px;
+        height: auto;
+        display: block;
+        position: relative;
+        z-index: 2;
+        /* transition: transform 0.3s ease; */
+      }
+      .header__logo_image.is-scroll {
+        border: transparent 1px solid;
+        border-radius: 50%;
+        box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+        margin-inline: 0.5rem;
+        padding-block: 0.25rem;
+        padding-inline: 0.25rem;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.4s ease;
+      }
+
+      /* iPhone特有の調整 - スクロール時も並列配置を維持 */
+      @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
+        .header__logo_image.is-scroll {
+          margin-inline: 0.25rem;
+        }
+      }
+
+      .header__clock_animation {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .clock-circle {
+        stroke: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+        stroke: #4ecdc4;
+        transform-origin: center;
+        transform: rotate(-90deg);
+        transition: stroke-dashoffset 1s ease-in-out;
+      }
+
+      .header.is-scroll .clock-circle {
+        stroke: #45b7d1;
+      }
+
+      html.dark .clock-circle {
+        stroke: #ffeaa7;
+      }
+
+      html.dark .header.is-scroll .clock-circle {
+        stroke: #96ceb4;
+      }
+      .header__logo_text {
+        width: 280px;
+        height: auto;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .header__logo_whiteText {
+        display: none;
+        width: 280px;
+        height: auto;
+        vertical-align: middle;
+      }
+      /* Dark mode: show WhiteTextSvg, hide TextSvg */
+      html.dark .header__logo_text {
+        display: none;
+      }
+      html.dark .header__logo_whiteText {
+        display: inline-block;
+      }
+      /* Dark mode + scroll: show TextSvg, hide WhiteTextSvg */
+      html.dark .header.is-scroll .header__logo_text {
+        display: inline-block;
+      }
+      html.dark .header.is-scroll .header__logo_whiteText {
+        display: none;
+      }
+      .header__logo_link {
+        font-size: 1.25rem;
+        color: inherit;
+      }
+      .header__nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .header__menu {
+        display: flex;
+        align-items: center;
+        list-style: none;
+      }
+      .header__menu_item {
+        max-width: 100%;
+        display: inline-block;
+        border: transparent 1px solid;
+        border-radius: 50%;
+        box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+        perspective: 100px;
+        margin-inline: 0.5rem;
+        padding-block: 0.5rem;
+        padding-inline: 0.5rem;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.4s ease;
+      }
+      .header__menu_item:nth-of-type(3) {
+        padding-block: 0.03375rem;
+        padding-inline: 0.03375rem;
+      }
+      .header__menu_item:nth-of-type(4) {
+        /* padding-block-end: 0.3125rem; */
+        padding-block-end: 0.25rem;
+        padding-inline: 0.5625rem;
+      }
+      .header__menu_item:nth-of-type(4) svg {
+        vertical-align: middle;
+      }
+      .header__menu_item:nth-of-type(5) {
+        padding-block: 1.25rem;
+        padding-inline: 1.25rem;
+      }
+      .header__menu_item:is(:hover, :focus-visible) {
+        box-shadow: 0 8px 4px rgba(0 0 0 / 0.6);
+      }
+      .header__menu_item:not(.header__menu_item--hamburger):active {
+        transform: scale(0.8);
+        box-shadow: 0 8px 8px rgba(0 0 0 / 0.4);
+      }
+      html.dark .header__menu_item:is(:hover, :focus-visible) {
+        box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
+      }
+      .header__menu_item.is-scroll {
+        box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+      }
+      .header__menu_link svg {
+        color: inherit;
       }
 
       .fv {

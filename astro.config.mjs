@@ -155,7 +155,7 @@ export default defineConfig({
       commonjsOptions: {
         transformMixedEsModules: true,
       },
-      sourcemap: true, // デバッグ用に一時的に有効化
+      sourcemap: false, // 本番環境では無効化（ファイルサイズ削減とセキュリティのため）
       minify: "esbuild", // JavaScriptの最小化を有効化（パフォーマンス改善）
       cssCodeSplit: true, // CSSコード分割を有効化
       cssMinify: true, // CSSの最小化を有効化

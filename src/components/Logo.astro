@@ -80,14 +80,17 @@ const gradientTitle = "My Portfolio";
 
   .logo-container {
     position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
     margin-bottom: 2rem;
   }
 
   .logo-image {
     width: 120px;
-    height: auto;
+    height: 120px;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
     will-change: transform;
+    object-fit: contain;
   }
 
   .title {
