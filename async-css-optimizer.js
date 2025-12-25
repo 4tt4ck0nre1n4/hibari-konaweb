@@ -116,17 +116,14 @@ export function asyncSwiperCssPlugin() {
                 replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
                 replacements.push({ index, fullMatch, replacement });
               }
-              // reset.css と global.css を含むCSSファイル: preload + onload パターン
+              // reset.css と global.css を含むCSSファイル: クリティカルCSSなので同期的に読み込む
               // HeadLayout.astroから読み込まれるCSSは通常、最初の2つ（または最初の1つにバンドルされる）
-              // Swiper CSSと非クリティカルなフォントの CSS を除外した最初の2つを処理
+              // Swiper CSSと非クリティカルなフォントの CSS を除外した最初の2つは同期的に読み込む（変更なし）
               else {
                 nonSwiperCssIndex++;
-                // 最初の2つのCSSファイルを preload + onload パターンに変換
-                if (nonSwiperCssIndex <= 2) {
-                  modified = true;
-                  replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
-                  replacements.push({ index, fullMatch, replacement });
-                }
+                // reset.css と global.css を含むクリティカルCSSは同期的に読み込むため、
+                // 最初の2つのCSSファイルは非同期読み込みに変換しない
+                // （ページ遷移時のFOUCを防ぐため）
               }
             }
 

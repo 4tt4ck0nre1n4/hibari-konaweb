@@ -675,6 +675,27 @@ const cspContent = isDev
     <!-- ページ固有の追加head要素（LCP最適化など） -->
     <slot name="head" />
 
+    <!-- ページ遷移時のFOUC防止: CSS読み込み完了までページを非表示 -->
+    <script is:inline>
+      // bodyが読み込まれる前に実行されるため、html要素を非表示にする
+      document.documentElement.style.visibility = 'hidden';
+
+      // DOMContentLoaded時にページを表示（CSSは既に読み込まれているはず）
+      function showPage() {
+        document.documentElement.style.visibility = 'visible';
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', showPage);
+      } else {
+        // すでに読み込み完了している場合は即座に表示
+        showPage();
+      }
+
+      // フォールバック: 一定時間後に強制的に表示（CSSが読み込まれていない場合でも）
+      setTimeout(showPage, 100);
+    </script>
+
     <!-- CSS非同期読み込みのフォールバックスクリプト -->
     <script is:inline>
       // preload + onload パターンと media="print" hack のフォールバック
