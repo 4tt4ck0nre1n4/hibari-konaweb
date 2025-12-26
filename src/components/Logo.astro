@@ -226,8 +226,36 @@ const gradientTitle = "My Portfolio";
   // ローディングアニメーションの設定
   const LOADING_DURATION = 3000; // 3秒間のローディング表示
 
+  // 初回読み込みかどうかを判定（Astroのトランジション時はスキップ）
+  function isInitialLoad(): boolean {
+    // sessionStorageを使用して初回読み込みを判定
+    const hasVisited = sessionStorage.getItem("hasVisited");
+    if (!hasVisited) {
+      sessionStorage.setItem("hasVisited", "true");
+      return true;
+    }
+    return false;
+  }
+
+  // ローディングスクリーンを即座に非表示にする（ページ遷移時用）
+  function hideLoadingScreenImmediately() {
+    const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
+    if (loadingScreen) {
+      loadingScreen.style.display = "none";
+      loadingScreen.style.visibility = "hidden";
+      loadingScreen.style.opacity = "0";
+      document.documentElement.style.overflow = "";
+    }
+  }
+
   // DOM要素の取得とアニメーション初期化
   function initLoadingAnimation() {
+    // 初回読み込みでない場合は即座に非表示にして終了
+    if (!isInitialLoad()) {
+      hideLoadingScreenImmediately();
+      return;
+    }
+
     const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
     // AstroのImageコンポーネントはimg要素を生成するので、imgタグを直接検索
     const logoImage = document.querySelector("#loading-screen img") as HTMLElement;
