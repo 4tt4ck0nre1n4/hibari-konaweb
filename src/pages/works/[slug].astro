@@ -6,6 +6,8 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import worksText from "../../data/worksText.json";
 import globalText from "../../data/globalText.json";
 import { WORKS_SLUG_API, WORKS_PATH_API } from "../../api/headlessCms";
+import { Image } from "astro:assets";
+import { getOptimizedWordPressImage, getWordPressImageUrl } from "../../util/optimizeWordPressImage";
 
 interface Works {
   id: number;
@@ -200,6 +202,39 @@ const worksSlugRightLink = work?.acf?.right_link;
 const worksRightHeader = work?.acf?.right_header;
 const worksRightAccess = work?.acf?.right_access;
 
+// WordPress画像を最適化（ビルド時に処理）
+const optimizedScreenshotPc = await getOptimizedWordPressImage(work?.acf?.screenshot_pc, {
+  width: 800,
+  height: 600,
+  quality: 85,
+  format: "webp",
+});
+const fallbackScreenshotPc = getWordPressImageUrl(work?.acf?.screenshot_pc) ?? "";
+
+const optimizedPcImage = await getOptimizedWordPressImage(work?.acf?.pc_image, {
+  width: 800,
+  height: 600,
+  quality: 85,
+  format: "webp",
+});
+const fallbackPcImage = getWordPressImageUrl(work?.acf?.pc_image) ?? "";
+
+const optimizedSpImage = await getOptimizedWordPressImage(work?.acf?.sp_image, {
+  width: 400,
+  height: 600,
+  quality: 85,
+  format: "webp",
+});
+const fallbackSpImage = getWordPressImageUrl(work?.acf?.sp_image) ?? "";
+
+const optimizedIconImage = await getOptimizedWordPressImage(work?.acf?.icon_image, {
+  width: 200,
+  height: 200,
+  quality: 85,
+  format: "webp",
+});
+const fallbackIconImage = getWordPressImageUrl(work?.acf?.icon_image) ?? "";
+
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "CreativeWork",
@@ -247,13 +282,25 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
               <div class="split__container">
                 <div class="split left left1">
                   <div class="left__imageInner">
-                    <img
-                      class="left__image"
-                      src={worksScreenshotPc}
-                      alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
-                      decoding="async"
-                      loading="lazy"
-                    />
+                    {optimizedScreenshotPc ? (
+                      <Image
+                        class="left__image"
+                        src={optimizedScreenshotPc.src}
+                        alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
+                        width={800}
+                        height={600}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <img
+                        class="left__image"
+                        src={fallbackScreenshotPc}
+                        alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
+                        decoding="async"
+                        loading="lazy"
+                      />
+                    )}
                   </div>
                   <div class="left__inner">
                     {/* サイトタイトル */}
@@ -295,34 +342,70 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                 <div class="split right site1">
                   {/* サイト pc画像 */}
                   <div class="right__pcImageInner">
-                    <img
-                      class="right__pcImage"
-                      src={worksPcImage ?? ""}
-                      alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                      decoding="async"
-                      loading="lazy"
-                    />
+                    {optimizedPcImage ? (
+                      <Image
+                        class="right__pcImage"
+                        src={optimizedPcImage.src}
+                        alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                        width={800}
+                        height={600}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <img
+                        class="right__pcImage"
+                        src={fallbackPcImage}
+                        alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                        decoding="async"
+                        loading="lazy"
+                      />
+                    )}
                   </div>
                   {/* サイトタイトル */}
                   <h1 class="right__header" set:html={worksRightHeader ?? "No title available"} />
                   {/* ロゴアイコン */}
-                  <img
-                    class="right__logoIcon"
-                    src={worksIconImage ?? ""}
-                    alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                    decoding="async"
-                    loading="lazy"
-                  />
+                  {optimizedIconImage ? (
+                    <Image
+                      class="right__logoIcon"
+                      src={optimizedIconImage.src}
+                      alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                      width={200}
+                      height={200}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <img
+                      class="right__logoIcon"
+                      src={fallbackIconImage}
+                      alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                      decoding="async"
+                      loading="lazy"
+                    />
+                  )}
                   {/* Basic認証テキスト */}
                   <p class="right__text" set:html={worksRightAccess ?? ""} />
                   {/* サイト sp画像 */}
-                  <img
-                    class="right__spImage"
-                    src={worksSpImage ?? ""}
-                    alt={worksSlugTitle ?? "No image"}
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  {optimizedSpImage ? (
+                    <Image
+                      class="right__spImage"
+                      src={optimizedSpImage.src}
+                      alt={worksSlugTitle ?? "No image"}
+                      width={400}
+                      height={600}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <img
+                      class="right__spImage"
+                      src={fallbackSpImage}
+                      alt={worksSlugTitle ?? "No image"}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
                   {/* サイトリンク URL */}
                   <a
                     class="right__link"

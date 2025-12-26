@@ -292,16 +292,58 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   window.__DEV__ = isDev;
 </script>
 
-<!-- TBT改善: インラインスクリプトを外部ファイルに移動し、requestIdleCallbackで遅延初期化 -->
+<!-- TBT改善: 動的インポートでモジュール読み込みを遅延させ、requestIdleCallbackで初期化 -->
 <script>
-  import { initGridControlAnimationsDeferred } from "../scripts/gridControlAnimations";
-  // 明示的に初期化を実行（グローバル関数のプレースホルダーを早期に設定するため）
-  initGridControlAnimationsDeferred();
+  // 動的インポートでモジュール読み込みを遅延（PageSpeed Insights最適化）
+  function loadGridControlAnimations() {
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(
+        async () => {
+          const { initGridControlAnimationsDeferred } = await import("../scripts/gridControlAnimations");
+          initGridControlAnimationsDeferred();
+        },
+        { timeout: 2000 }
+      );
+    } else {
+      setTimeout(async () => {
+        const { initGridControlAnimationsDeferred } = await import("../scripts/gridControlAnimations");
+        initGridControlAnimationsDeferred();
+      }, 100);
+    }
+  }
+
+  // DOMContentLoaded後に実行（DOMが準備できてから）
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadGridControlAnimations);
+  } else {
+    loadGridControlAnimations();
+  }
 </script>
 
-<!-- TBT改善: インラインスクリプトを外部ファイルに移動し、requestIdleCallbackで遅延初期化 -->
+<!-- TBT改善: 動的インポートでモジュール読み込みを遅延させ、requestIdleCallbackで初期化 -->
 <script>
-  import { initConfettiDeferred } from "../scripts/confetti";
-  // 明示的に初期化を実行
-  initConfettiDeferred();
+  // 動的インポートでモジュール読み込みを遅延（PageSpeed Insights最適化）
+  function loadConfetti() {
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(
+        async () => {
+          const { initConfettiDeferred } = await import("../scripts/confetti");
+          initConfettiDeferred();
+        },
+        { timeout: 2000 }
+      );
+    } else {
+      setTimeout(async () => {
+        const { initConfettiDeferred } = await import("../scripts/confetti");
+        initConfettiDeferred();
+      }, 100);
+    }
+  }
+
+  // DOMContentLoaded後に実行（DOMが準備できてから）
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadConfetti);
+  } else {
+    loadConfetti();
+  }
 </script>

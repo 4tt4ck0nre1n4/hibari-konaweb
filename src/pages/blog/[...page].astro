@@ -11,6 +11,8 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import globalText from "../../data/globalText.json";
 import { BLOG_PAGE_API } from "../../api/headlessCms";
 import FlowingLinesWrapper from "../../components/FlowingLinesWrapper.astro";
+import { Image } from "astro:assets";
+import { getOptimizedWordPressImage, getWordPressImageUrl } from "../../util/optimizeWordPressImage";
 
 interface CategoryInfo {
   id: number;
@@ -119,6 +121,26 @@ console.log("Astro props:", JSON.stringify(page, null, 2));
 
 const posts = Array.isArray(page.data) ? page.data : [];
 
+// WordPress画像を最適化（ビルド時に処理）
+const optimizedBlogImages = await Promise.all(
+  posts.map(async (post) => {
+    const optimizedImage = await getOptimizedWordPressImage(post.acf?.blog_image, {
+      width: 800,
+      height: 600,
+      quality: 85,
+      format: "webp",
+    });
+    // 最適化に失敗した場合は元のURLを使用
+    const fallbackUrl =
+      typeof post.acf?.blog_image === "string" ? post.acf.blog_image : getWordPressImageUrl(post.acf?.blog_image) ?? "";
+    return {
+      ...post,
+      optimizedImage,
+      fallbackUrl,
+    };
+  })
+);
+
 const hasNextPage = page.size < page.total ? true : false;
 const blogTitle = "Blog";
 const blogText = "ブログ記事の一覧です。";
@@ -181,35 +203,47 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
           </FlowingLinesWrapper>
           <ul class="blog__menu">
             {
-              posts.length > 0 ? (
-                posts.map((post: PostDataObject) => (
+              optimizedBlogImages.length > 0 ? (
+                optimizedBlogImages.map((postData) => (
                   <li class="blog__menu_item">
                     <article
                       class="blog__menu_article"
-                      aria-labelledby={`blog-post-${post.id ?? post.slug}-${post.acf?.blog_title ?? post.title.rendered}`}
+                      aria-labelledby={`blog-post-${postData.id ?? postData.slug}-${postData.acf?.blog_title ?? postData.title.rendered}`}
                     >
                       <a
                         class="blog__menu_link"
-                        href={`/blog/${post.slug ?? ""}`}
-                        aria-label={`${post.slug}${postAriaLabel}`}
-                        title={`${post.slug}${postAriaTitle}`}
+                        href={`/blog/${postData.slug ?? ""}`}
+                        aria-label={`${postData.slug}${postAriaLabel}`}
+                        title={`${postData.slug}${postAriaTitle}`}
                       >
                         <div class="blog__contents">
                           <h2
-                            id={`blog-post-${post.id ?? post.slug}-${post.acf?.blog_title ?? post.title.rendered}`}
+                            id={`blog-post-${postData.id ?? postData.slug}-${postData.acf?.blog_title ?? postData.title.rendered}`}
                             class="blog__header"
                           >
-                            {post.acf?.blog_title ?? post.title.rendered}
+                            {postData.acf?.blog_title ?? postData.title.rendered}
                           </h2>
                         </div>
                         <div class="blog__thumbnail">
-                          <img
-                            class="blog__menu_image"
-                            src={typeof post.acf?.blog_image === "string" ? post.acf.blog_image : ""}
-                            alt={post.title.rendered}
-                            decoding="async"
-                            loading="lazy"
-                          />
+                          {postData.optimizedImage ? (
+                            <Image
+                              class="blog__menu_image"
+                              src={postData.optimizedImage.src}
+                              alt={postData.title.rendered}
+                              width={800}
+                              height={600}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          ) : (
+                            <img
+                              class="blog__menu_image"
+                              src={postData.fallbackUrl}
+                              alt={postData.title.rendered}
+                              decoding="async"
+                              loading="lazy"
+                            />
+                          )}
                         </div>
                       </a>
                       <div class="blog__footer">
@@ -218,14 +252,14 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
                           <span class="blog__datetime_span screenReader-only">{datetime}</span>
                           <time
                             class="blog__dateTime"
-                            datetime={new Date(post.date)
+                            datetime={new Date(postData.date)
                               .toLocaleDateString("ja-JP", {
                                 year: "numeric",
                                 month: "2-digit",
                                 day: "2-digit",
                               })
                               .replaceAll("/", "-")}
-                            set:html={new Date(post.date)
+                            set:html={new Date(postData.date)
                               .toLocaleDateString("ja-JP", {
                                 year: "numeric",
                                 month: "2-digit",
@@ -235,12 +269,12 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
                           />
                         </div>
                         <div class="blog__category">
-                          {Array.isArray(post.cat_info) && post.cat_info.length > 0 ? (
+                          {Array.isArray(postData.cat_info) && postData.cat_info.length > 0 ? (
                             <a
                               class="category__link"
-                              href={`/blog/category/${decodeURIComponent(post.cat_info[0]?.slug ?? "")}`}
-                              aria-label={`${post.cat_info[0]?.name}${categoryAriaLabel}`}
-                              title={`${post.cat_info[0]?.name}${categoryAriaTitle}`}
+                              href={`/blog/category/${decodeURIComponent(postData.cat_info[0]?.slug ?? "")}`}
+                              aria-label={`${postData.cat_info[0]?.name}${categoryAriaLabel}`}
+                              title={`${postData.cat_info[0]?.name}${categoryAriaTitle}`}
                             >
                               <SafeIcon
                                 name={categoryIcon.icon}
@@ -248,7 +282,7 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
                                 height={categoryIcon.height}
                               />
                               <span class="blog__category_span screenReader-only">{category}</span>
-                              <span class="category__link_span" set:html={post.cat_info[0]?.name} />
+                              <span class="category__link_span" set:html={postData.cat_info[0]?.name} />
                             </a>
                           ) : (
                             <span>{errorCategoryText}</span>
