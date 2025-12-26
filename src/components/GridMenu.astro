@@ -269,6 +269,19 @@ import pikucha2 from "../assets/svg/pikucha2.svg";
   .item-9 {
     background: transparent;
   }
+
+  /* item-10, item-11, item-12は初期状態で非表示 */
+  .logoSvg-hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+
+  .logoSvg-visible {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
   .grid__menu_item .grid__menu_svg:is(:hover, :focus-visible) {
     transform: scale(1.1);
   }

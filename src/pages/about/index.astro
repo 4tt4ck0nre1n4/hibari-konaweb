@@ -425,7 +425,7 @@ const stateMachine = "State Machine 1";
     left: 24%;
     width: 240px;
     height: 240px;
-    background-image: url("/public/black-outline_favicon.svg");
+    background-image: url("/black-outline_favicon.svg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -710,9 +710,20 @@ const stateMachine = "State Machine 1";
     observer.observe(aboutImageInner);
   }
 
-  // DOM読み込み完了後に実行
-  document.addEventListener("DOMContentLoaded", () => {
+  // DOM読み込み完了後に実行（View Transitions対応）
+  function initializeAnimations() {
     setupTouchAnimations();
     setupScrollAnimation();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeAnimations);
+  } else {
+    initializeAnimations();
+  }
+
+  // View Transitions対応: ページ遷移時にも再初期化
+  document.addEventListener("astro:after-swap", () => {
+    initializeAnimations();
   });
 </script>
