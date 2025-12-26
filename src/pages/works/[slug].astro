@@ -6,8 +6,7 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import worksText from "../../data/worksText.json";
 import globalText from "../../data/globalText.json";
 import { WORKS_SLUG_API, WORKS_PATH_API } from "../../api/headlessCms";
-import { Image } from "astro:assets";
-import { getOptimizedWordPressImage, getWordPressImageUrl } from "../../util/optimizeWordPressImage";
+import { getWordPressImageUrl } from "../../util/optimizeWordPressImage";
 
 interface Works {
   id: number;
@@ -193,44 +192,17 @@ const icons = work?.acf
 
 const worksSlugTitle = work?.title?.rendered;
 const worksSlugDescription = work?.acf?.description ?? "";
-const worksScreenshotPc = work?.acf?.screenshot_pc ?? "";
+const worksScreenshotPc = getWordPressImageUrl(work?.acf?.screenshot_pc) ?? "";
 const worksSlugLeftLink = work?.acf?.left_link;
 const worksSlugRightLink = work?.acf?.right_link;
 const worksRightHeader = work?.acf?.right_header;
 const worksRightAccess = work?.acf?.right_access;
 
-// WordPress画像を最適化（ビルド時に処理）
-const optimizedScreenshotPc = await getOptimizedWordPressImage(work?.acf?.screenshot_pc, {
-  width: 800,
-  height: 600,
-  quality: 85,
-  format: "webp",
-});
-const fallbackScreenshotPc = getWordPressImageUrl(work?.acf?.screenshot_pc) ?? "";
-
-const optimizedPcImage = await getOptimizedWordPressImage(work?.acf?.pc_image, {
-  width: 800,
-  height: 600,
-  quality: 85,
-  format: "webp",
-});
-const fallbackPcImage = getWordPressImageUrl(work?.acf?.pc_image) ?? "";
-
-const optimizedSpImage = await getOptimizedWordPressImage(work?.acf?.sp_image, {
-  width: 400,
-  height: 600,
-  quality: 85,
-  format: "webp",
-});
-const fallbackSpImage = getWordPressImageUrl(work?.acf?.sp_image) ?? "";
-
-const optimizedIconImage = await getOptimizedWordPressImage(work?.acf?.icon_image, {
-  width: 200,
-  height: 200,
-  quality: 85,
-  format: "webp",
-});
-const fallbackIconImage = getWordPressImageUrl(work?.acf?.icon_image) ?? "";
+// WordPress画像は外部配信のため、通常のimgタグを使用
+const screenshotPcUrl = getWordPressImageUrl(work?.acf?.screenshot_pc) ?? "";
+const pcImageUrl = getWordPressImageUrl(work?.acf?.pc_image) ?? "";
+const spImageUrl = getWordPressImageUrl(work?.acf?.sp_image) ?? "";
+const iconImageUrl = getWordPressImageUrl(work?.acf?.icon_image) ?? "";
 
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
@@ -279,25 +251,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
               <div class="split__container">
                 <div class="split left left1">
                   <div class="left__imageInner">
-                    {optimizedScreenshotPc ? (
-                      <Image
-                        class="left__image"
-                        src={optimizedScreenshotPc.src}
-                        alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
-                        width={800}
-                        height={600}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <img
-                        class="left__image"
-                        src={fallbackScreenshotPc}
-                        alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
-                        decoding="async"
-                        loading="lazy"
-                      />
-                    )}
+                    <img
+                      class="left__image"
+                      src={screenshotPcUrl}
+                      alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
+                      decoding="async"
+                      loading="lazy"
+                    />
                   </div>
                   <div class="left__inner">
                     {/* サイトタイトル */}
@@ -339,43 +299,21 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                 <div class="split right site1">
                   {/* サイト pc画像 */}
                   <div class="right__pcImageInner">
-                    {optimizedPcImage ? (
-                      <Image
-                        class="right__pcImage"
-                        src={optimizedPcImage.src}
-                        alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                        width={800}
-                        height={600}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    ) : (
-                      <img
-                        class="right__pcImage"
-                        src={fallbackPcImage}
-                        alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                        decoding="async"
-                        loading="lazy"
-                      />
-                    )}
+                    <img
+                      class="right__pcImage"
+                      src={pcImageUrl}
+                      alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                      decoding="async"
+                      loading="lazy"
+                    />
                   </div>
                   {/* サイトタイトル */}
                   <h1 class="right__header" set:html={worksRightHeader ?? "No title available"} />
                   {/* ロゴアイコン */}
-                  {optimizedIconImage ? (
-                    <Image
-                      class="right__logoIcon"
-                      src={optimizedIconImage.src}
-                      alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                      width={200}
-                      height={200}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  ) : (
+                  {iconImageUrl !== "" && (
                     <img
                       class="right__logoIcon"
-                      src={fallbackIconImage}
+                      src={iconImageUrl}
                       alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
                       decoding="async"
                       loading="lazy"
@@ -384,20 +322,10 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                   {/* Basic認証テキスト */}
                   <p class="right__text" set:html={worksRightAccess ?? ""} />
                   {/* サイト sp画像 */}
-                  {optimizedSpImage ? (
-                    <Image
-                      class="right__spImage"
-                      src={optimizedSpImage.src}
-                      alt={worksSlugTitle ?? "No image"}
-                      width={400}
-                      height={600}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  ) : (
+                  {spImageUrl !== "" && (
                     <img
                       class="right__spImage"
-                      src={fallbackSpImage}
+                      src={spImageUrl}
                       alt={worksSlugTitle ?? "No image"}
                       loading="lazy"
                       decoding="async"
@@ -458,13 +386,22 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   // GSAPプラグインを登録
   gsap.registerPlugin(ScrollTrigger);
 
-  // アニメーション初期化
+  // アニメーション初期化（重複実行を防止）
+  let isInitialized = false;
   function init() {
+    if (isInitialized) {
+      return; // 既に初期化済みの場合はスキップ
+    }
+
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", function () {
-        initSplitAnimations();
+        if (!isInitialized) {
+          isInitialized = true;
+          initSplitAnimations();
+        }
       });
     } else {
+      isInitialized = true;
       initSplitAnimations();
     }
   }
@@ -752,12 +689,18 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   }
   /* 左サイド サイト画像 */
   .left__imageInner {
-    aspect-ratio: 16 / 9;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .left__image {
     width: 100%;
-    object-fit: cover;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
     will-change: transform, opacity;
     opacity: 1;
   }

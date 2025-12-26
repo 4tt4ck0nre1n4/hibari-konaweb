@@ -680,10 +680,11 @@ const cspContent = isDev
     <!-- ページ遷移時のFOUC防止: CSS読み込み完了までページを非表示 -->
     <!-- ClientRouter使用時は初回読み込み時のみ実行（ページ遷移時はスキップ） -->
     <script is:inline>
-      // 初回読み込みかどうかを判定（Astroのトランジション時はスキップ）
-      const isInitialLoad = !sessionStorage.getItem("hasVisited");
+      // 初回読み込みかどうかを判定（AstroのView Transitions時はスキップ）
+      // View Transitions使用時は、ページ遷移時に自動的に処理されるため、初回のみ実行
+      const isInitialLoad = !sessionStorage.getItem("hasVisitedHead");
       if (isInitialLoad) {
-        sessionStorage.setItem("hasVisited", "true");
+        sessionStorage.setItem("hasVisitedHead", "true");
         // bodyが読み込まれる前に実行されるため、html要素を非表示にする
         document.documentElement.style.visibility = "hidden";
 
@@ -702,6 +703,11 @@ const cspContent = isDev
         // フォールバック: 一定時間後に強制的に表示（CSSが読み込まれていない場合でも）
         setTimeout(showPage, 100);
       }
+
+      // View Transitions対応: ページ遷移時に確実にページを表示
+      document.addEventListener("astro:after-swap", () => {
+        document.documentElement.style.visibility = "visible";
+      });
     </script>
 
     <!-- CSS非同期読み込みのフォールバックスクリプト -->

@@ -230,10 +230,15 @@ const gradientTitle = "My Portfolio";
   function isInitialLoad(): boolean {
     // sessionStorageを使用して初回読み込みを判定
     const hasVisited = sessionStorage.getItem("hasVisited");
+
+    // 初回読み込みの場合のみローディングを表示
+    // トップページに戻った場合でも、既に訪問済みの場合はローディングをスキップ
     if (!hasVisited) {
       sessionStorage.setItem("hasVisited", "true");
       return true;
     }
+
+    // 既に訪問済みの場合はローディングをスキップ（フリーズを防ぐため）
     return false;
   }
 
@@ -269,25 +274,36 @@ const gradientTitle = "My Portfolio";
         title: !!title,
         spinner: !!spinner,
       });
-      // フォールバック: 要素が見つからない場合は3秒後に強制的に非表示
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          const screen = document.getElementById("loading-screen");
-          if (screen) {
-            screen.style.display = "none";
-            screen.style.visibility = "hidden";
-            document.documentElement.style.overflow = "";
-          }
-        }, LOADING_DURATION);
-      });
+      // フォールバック: 要素が見つからない場合は即座に非表示
+      hideLoadingScreenImmediately();
       return;
     }
+
+    // タイムアウト処理を設定（フリーズを防ぐため）
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     // requestAnimationFrameを使用してブラウザのレンダリングサイクルに合わせる
     // これにより強制リフローを防ぐ
     requestAnimationFrame(() => {
       // ページ読み込み中はスクロールを無効化（CLSを防ぐためbodyではなくhtmlに設定）
       document.documentElement.style.overflow = "hidden";
+
+      // タイムアウト処理を設定（フリーズを防ぐため）
+      timeoutId = setTimeout(() => {
+        hideLoadingScreenImmediately();
+        if (spinner) {
+          gsap.killTweensOf(spinner);
+        }
+        if (loadingScreen) {
+          gsap.killTweensOf(loadingScreen);
+        }
+        if (logoImage) {
+          gsap.killTweensOf(logoImage);
+        }
+        if (title) {
+          gsap.killTweensOf(title);
+        }
+      }, LOADING_DURATION + 2000); // アニメーション時間 + 2秒のマージン
 
       // 初期状態を一度に設定（バッチ処理で強制リフローを最小化）
       // GSAPの設定を最適化：force3Dを使用してGPUアクセラレーションを有効化
@@ -357,22 +373,55 @@ const gradientTitle = "My Portfolio";
       // 指定時間後にフェードアウト
       setTimeout(() => {
         requestAnimationFrame(() => {
+          // タイムアウトをクリア
+          if (timeoutId !== null) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+          }
+
+          // スピナーのアニメーションを停止
+          gsap.killTweensOf(spinner);
+
+          // ローディングスクリーンをフェードアウト
           gsap.to(loadingScreen, {
             opacity: 0,
             duration: 0.8,
             ease: "power2.inOut",
             force3D: true,
             onComplete: () => {
+              // 確実に非表示にする
               loadingScreen.style.display = "none";
               loadingScreen.style.visibility = "hidden";
+              loadingScreen.style.opacity = "0";
               // メインコンテンツの表示を許可（CLSを防ぐためhtmlに設定）
               document.documentElement.style.overflow = "";
+              // GSAPアニメーションをクリーンアップ
+              gsap.killTweensOf(loadingScreen);
+              gsap.killTweensOf([logoImage, title, spinner]);
             },
           });
         });
       }, LOADING_DURATION);
     });
   }
+
+  // View Transitions対応: ページ遷移時の処理
+  document.addEventListener("astro:after-swap", () => {
+    // ページ遷移時はローディングスクリーンを確実に非表示にする
+    hideLoadingScreenImmediately();
+
+    // スピナーのアニメーションを停止
+    const spinner = document.querySelector("#loading-screen .spinner");
+    if (spinner) {
+      gsap.killTweensOf(spinner);
+    }
+
+    // ローディングスクリーンのアニメーションを停止
+    const loadingScreen = document.getElementById("loading-screen");
+    if (loadingScreen) {
+      gsap.killTweensOf(loadingScreen);
+    }
+  });
 
   // DOM準備状態を確認してからアニメーションを初期化
   if (document.readyState === "loading") {

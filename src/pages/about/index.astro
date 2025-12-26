@@ -7,8 +7,6 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import AboutHeading from "../../components/AboutHeading.astro";
 import AboutMe from "../../components/AboutMe.astro";
 import Sns from "../../components/Sns.astro";
-import { Image } from "astro:assets";
-import AboutImage from "/public/favicon.svg";
 import SkillsIcon from "../../components/SkillsIcon.astro";
 import Card from "../../components/Card.astro";
 import aboutText from "../../data/aboutText.json";
@@ -173,9 +171,9 @@ const stateMachine = "State Machine 1";
               </div>
             </div>
             <div class="about__imageInner">
-              <Image
+              <img
                 class="about__image"
-                src={AboutImage}
+                src="/favicon.svg"
                 alt={aboutImage.alt}
                 width={aboutImage.width}
                 height={aboutImage.height}

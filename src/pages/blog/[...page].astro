@@ -11,8 +11,7 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import globalText from "../../data/globalText.json";
 import { BLOG_PAGE_API } from "../../api/headlessCms";
 import FlowingLinesWrapper from "../../components/FlowingLinesWrapper.astro";
-import { Image } from "astro:assets";
-import { getOptimizedWordPressImage, getWordPressImageUrl } from "../../util/optimizeWordPressImage";
+import { getWordPressImageUrl } from "../../util/optimizeWordPressImage";
 
 interface CategoryInfo {
   id: number;
@@ -121,25 +120,14 @@ console.log("Astro props:", JSON.stringify(page, null, 2));
 
 const posts = Array.isArray(page.data) ? page.data : [];
 
-// WordPress画像を最適化（ビルド時に処理）
-const optimizedBlogImages = await Promise.all(
-  posts.map(async (post) => {
-    const optimizedImage = await getOptimizedWordPressImage(post.acf?.blog_image, {
-      width: 800,
-      height: 600,
-      quality: 85,
-      format: "webp",
-    });
-    // 最適化に失敗した場合は元のURLを使用
-    const fallbackUrl =
-      typeof post.acf?.blog_image === "string" ? post.acf.blog_image : getWordPressImageUrl(post.acf?.blog_image) ?? "";
-    return {
-      ...post,
-      optimizedImage,
-      fallbackUrl,
-    };
-  })
-);
+// WordPress画像は外部配信のため、通常のimgタグを使用
+const blogImages = posts.map((post) => {
+  const imageUrl = getWordPressImageUrl(post.acf?.blog_image) ?? "";
+  return {
+    ...post,
+    imageUrl,
+  };
+});
 
 const hasNextPage = page.size < page.total ? true : false;
 const blogTitle = "Blog";
@@ -203,8 +191,8 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
           </FlowingLinesWrapper>
           <ul class="blog__menu">
             {
-              optimizedBlogImages.length > 0 ? (
-                optimizedBlogImages.map((postData) => (
+              blogImages.length > 0 ? (
+                blogImages.map((postData) => (
                   <li class="blog__menu_item">
                     <article
                       class="blog__menu_article"
@@ -225,20 +213,10 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
                           </h2>
                         </div>
                         <div class="blog__thumbnail">
-                          {postData.optimizedImage ? (
-                            <Image
-                              class="blog__menu_image"
-                              src={postData.optimizedImage.src}
-                              alt={postData.title.rendered}
-                              width={800}
-                              height={600}
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          ) : (
+                          {postData.imageUrl !== "" && (
                             <img
                               class="blog__menu_image"
-                              src={postData.fallbackUrl}
+                              src={postData.imageUrl}
                               alt={postData.title.rendered}
                               decoding="async"
                               loading="lazy"
