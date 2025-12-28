@@ -28,7 +28,7 @@ const SoundToggle = () => {
       aria-label={`サウンド${isSoundOn ? "OFF" : "ON"}に切り替え`}
       title={`サウンド${isSoundOn ? "OFF" : "ON"}に切り替え`}
     >
-      <Icon icon={isSoundOn ? `${soundOn}` : `${soundOff}`} width="24" height="24" />
+      <Icon icon={isSoundOn ? `${soundOn}` : `${soundOff}`} width="40" height="40" />
     </button>
   );
 };
