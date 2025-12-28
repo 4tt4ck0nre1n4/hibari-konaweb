@@ -1,7 +1,7 @@
 ---
 import Search from "./Search.astro";
 import Clock from "./Clock.astro";
-import BackgroundImage from "./BackgroundImage.astro";
+import SoundToggle from "./SoundToggle";
 import ParticlesComponent from "./ParticlesComponent.tsx";
 import ClockIcon from "./ClockIcon.astro";
 import GridSwitch from "./GridSwitch.astro";
@@ -24,7 +24,7 @@ import ConfettiButton from "./ConfettiButton.astro";
     </div>
   </div>
   <div class="tools__wrapper">
-    <BackgroundImage />
+    <SoundToggle client:idle />
     <ClockIcon />
     <GridSwitch />
     <ConfettiButton />
@@ -175,6 +175,45 @@ import ConfettiButton from "./ConfettiButton.astro";
   }
   html.dark .tools__wrapper:is(:hover, :focus-visible) {
     box-shadow: 0 16px 8px rgba(255 255 255 / 0.6);
+  }
+  /* SoundToggleボタンのスタイル */
+  #soundToggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-white);
+    border: transparent 1px solid;
+    border-radius: 1rem;
+    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    transition:
+      transform 0.1s ease,
+      background 0.4s ease-in-out,
+      box-shadow 0.4s ease;
+  }
+  #soundToggle:is(:hover, :focus-visible) {
+    background: transparent;
+    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+  }
+  #soundToggle:active {
+    background: transparent;
+    box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+    transform: scale(0.8);
+  }
+  #soundToggle svg {
+    width: 50px !important;
+    height: 50px !important;
+    display: inline-flex;
+    filter: drop-shadow(10px 20px 20px rgba(160 160 160 / 0.7));
+    transition:
+      opacity 1.8s ease,
+      transform 0.35s ease;
+  }
+  #soundToggle svg:is(:hover, :focus-visible) {
+    transform: scale(1.1);
   }
   @media (width <= 768px) {
     .particles-tools__container {

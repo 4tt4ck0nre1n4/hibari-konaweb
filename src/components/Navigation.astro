@@ -1,7 +1,7 @@
 ---
 import HamburgerMenu from "./HamburgerMenu";
 import MenuIcon from "./MenuIcon.astro";
-import SoundToggle from "./SoundToggle";
+import BackgroundImage from "./BackgroundImage.astro";
 import ThemeColor from "./ThemeColor.astro";
 
 const home = {
@@ -43,7 +43,7 @@ const contact = {
     <ThemeColor />
   </li>
   <li class="header__menu_item">
-    <SoundToggle client:only="react" />
+    <BackgroundImage />
   </li>
   <li class="header__menu_item header__menu_item--hamburger">
     <HamburgerMenu client:visible />

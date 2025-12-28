@@ -8,35 +8,25 @@
 
 <style>
   #search {
+    width: 100%;
     height: auto;
+    min-height: 14vh; /* Clock.astroと同じ高さ基準 */
     background: white;
-    border-radius: 0.5rem;
+    border-radius: 1rem;
     border: 1px solid gray;
     transition-duration: 300ms;
     position: relative; /* Clock.astroと同じposition設定 */
-  }
-
-  #search:not(:has(.pagefind-ui__hidden)) {
-    width: 100%;
-    min-height: 14vh; /* Clock.astroと同じ高さ基準 */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
-    border-radius: 1rem;
     padding: 0.5rem; /* Clock.astroと同じパディング */
     box-sizing: border-box; /* Clock.astroと同じボックスサイズ */
   }
 
   @media (width <= 480px) {
     #search {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       min-height: 12vh; /* モバイル版のClock.astroと同じ高さ */
-
       padding: 0.25rem; /* Clock.astroと同じパディング */
     }
   }
@@ -44,10 +34,6 @@
   /* iPhone特有の調整 */
   @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
     #search {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       min-height: 14vh; /* iPhone版のClock.astroと同じ高さ */
       padding: 0.25rem;
     }
@@ -60,6 +46,23 @@
     border-radius: 0.5rem;
     width: 100%;
     max-width: 400px; /* 最大幅を制限 */
+  }
+
+  /* PagefindUIが初期化された後も、検索コンテナの基本スタイルを維持 */
+  #search .pagefind-ui {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 検索結果が表示されていない状態でも、検索コンテナのスタイルを維持 */
+  #search .pagefind-ui__search-input-wrapper {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    justify-content: center;
   }
 
   @media (width <= 480px) {
@@ -104,6 +107,63 @@
 
   let pagefindUIInstance: PagefindUI | null = null;
   let mutationObserver: MutationObserver | null = null;
+  let resizeHandler: (() => void) | null = null;
+
+  // iPhone判定のヘルパー関数
+  const isIPhone = (): boolean => {
+    return window.innerWidth <= 480 && window.devicePixelRatio >= 2;
+  };
+
+  // 検索コンテナの基本スタイルを確実に適用
+  const ensureContainerStyle = () => {
+    const searchContainer = document.querySelector("#search") as HTMLElement;
+    if (searchContainer) {
+      const isSmallScreen = window.innerWidth <= 480;
+      const isIPhoneDevice = isIPhone();
+
+      // 検索コンテナの基本スタイルを常に維持
+      searchContainer.style.width = "100%";
+      searchContainer.style.minHeight = isIPhoneDevice ? "14vh" : isSmallScreen ? "12vh" : "14vh";
+      searchContainer.style.display = "flex";
+      searchContainer.style.flexDirection = "column";
+      searchContainer.style.alignItems = "center";
+      searchContainer.style.justifyContent = "center";
+      searchContainer.style.padding = isSmallScreen ? "0.25rem" : "0.5rem";
+      searchContainer.style.boxSizing = "border-box";
+      searchContainer.style.borderRadius = "1rem";
+    }
+
+    // PagefindUIのコンテナスタイルを維持
+    const pagefindUI = document.querySelector("#search .pagefind-ui") as HTMLElement;
+    if (pagefindUI) {
+      pagefindUI.style.width = "100%";
+      pagefindUI.style.display = "flex";
+      pagefindUI.style.flexDirection = "column";
+      pagefindUI.style.alignItems = "center";
+      pagefindUI.style.justifyContent = "center";
+    }
+  };
+
+  // スマホサイズでのみ検索ボックスのborderを強制的に設定
+  const applyBorderStyle = () => {
+    const searchInput = document.querySelector("#search .pagefind-ui__search-input") as HTMLInputElement;
+    if (searchInput) {
+      // スマホサイズかどうかをチェック
+      if (window.innerWidth <= 480) {
+        searchInput.style.border = "1px solid aqua";
+        searchInput.style.borderColor = "aqua";
+        searchInput.style.setProperty("border", "1px solid aqua", "important");
+      } else {
+        // パソコンサイズではborderをリセット
+        searchInput.style.border = "";
+        searchInput.style.borderColor = "";
+        searchInput.style.removeProperty("border");
+      }
+    }
+
+    // コンテナスタイルも再適用
+    ensureContainerStyle();
+  };
 
   function initSearch() {
     // 既存のインスタンスを破棄
@@ -122,37 +182,29 @@
       mutationObserver = null;
     }
 
+    // 既存のリサイズハンドラーを削除
+    if (resizeHandler) {
+      window.removeEventListener("resize", resizeHandler);
+      resizeHandler = null;
+    }
+
     // 新しいPagefindUIインスタンスを作成
     pagefindUIInstance = new PagefindUI({
       element: "#search",
       showImages: true,
     });
 
-    // スマホサイズでのみ検索ボックスのborderを強制的に設定
-    const applyBorderStyle = () => {
-      const searchInput = document.querySelector("#search .pagefind-ui__search-input") as HTMLInputElement;
-      if (searchInput) {
-        // スマホサイズかどうかをチェック
-        if (window.innerWidth <= 480) {
-          searchInput.style.border = "1px solid aqua";
-          searchInput.style.borderColor = "aqua";
-          searchInput.style.setProperty("border", "1px solid aqua", "important");
-        } else {
-          // パソコンサイズではborderをリセット
-          searchInput.style.border = "";
-          searchInput.style.borderColor = "";
-          searchInput.style.removeProperty("border");
-        }
-      }
-    };
+    // 検索コンテナのスタイルを確実に適用
+    ensureContainerStyle();
 
     // 複数のタイミングでスタイルを適用
     setTimeout(applyBorderStyle, 100);
     setTimeout(applyBorderStyle, 500);
     setTimeout(applyBorderStyle, 1000);
 
-    // ウィンドウリサイズ時にスタイルを再適用
-    window.addEventListener("resize", applyBorderStyle);
+    // ウィンドウリサイズ時にスタイルを再適用（重複登録を防ぐ）
+    resizeHandler = applyBorderStyle;
+    window.addEventListener("resize", resizeHandler);
 
     // MutationObserverでDOMの変更を監視
     const searchContainer = document.querySelector("#search");
@@ -164,6 +216,8 @@
       mutationObserver.observe(searchContainer, {
         childList: true,
         subtree: true,
+        attributes: true,
+        attributeFilter: ["class"],
       });
     }
   }
