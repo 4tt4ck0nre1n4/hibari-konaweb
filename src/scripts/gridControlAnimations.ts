@@ -540,4 +540,13 @@ if (typeof window !== "undefined") {
     win.__gridControlAnimationsInitialized = true;
     initGridControlAnimationsDeferred();
   }
+
+  // View Transitions対応: ページ遷移時に再初期化
+  document.addEventListener("astro:after-swap", () => {
+    // フラグをリセットして再初期化を許可
+    const resetWin = window as Window & { __gridControlAnimationsInitialized?: boolean };
+    resetWin.__gridControlAnimationsInitialized = false;
+    // 再初期化
+    initGridControlAnimationsDeferred();
+  });
 }

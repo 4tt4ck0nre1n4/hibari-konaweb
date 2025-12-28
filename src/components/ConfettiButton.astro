@@ -125,9 +125,17 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
   };
 
   let lastTurnedSecond: number | null = null;
+  let intervalId: ReturnType<typeof setInterval> | null = null;
 
-  const turnConfettiIconTimeInterval = () => {
-    setInterval(() => {
+  function initConfettiButton() {
+    // 既存のインターバルをクリア
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+
+    // 新しいインターバルを開始
+    intervalId = setInterval(() => {
       const now = new Date();
       const seconds = now.getSeconds();
 
@@ -138,9 +146,14 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
         lastTurnedSecond = null;
       }
     }, 1000);
-  };
+  }
 
   window.addEventListener("load", () => {
-    turnConfettiIconTimeInterval();
+    initConfettiButton();
+  });
+
+  // View Transitions対応: ページ遷移時に再初期化
+  document.addEventListener("astro:after-swap", () => {
+    initConfettiButton();
   });
 </script>

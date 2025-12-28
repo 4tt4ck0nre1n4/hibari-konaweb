@@ -408,6 +408,20 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
   init();
 
+  // View Transitions対応: ページ遷移時にアニメーションを再初期化
+  document.addEventListener("astro:after-swap", () => {
+    // フラグをリセットして再初期化を許可
+    isInitialized = false;
+    // ScrollTriggerインスタンスをクリーンアップ
+    ScrollTrigger.getAll().forEach((trigger) => {
+      trigger.kill();
+    });
+    // アニメーションを再初期化
+    init();
+    // ScrollTriggerをリフレッシュ
+    ScrollTrigger.refresh();
+  });
+
   // リサイズ時の処理
   let resizeTimer: ReturnType<typeof setTimeout>;
   window.addEventListener("resize", () => {
@@ -432,6 +446,32 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
         rightLink: container.querySelector(".right__link"),
         iconMenuItems: container.querySelectorAll(".right__iconMenu_item"),
       };
+
+      // 既存のホバークラスをクリア（ページ遷移時の状態をリセット）
+      container.classList.remove("hover-left", "hover-right");
+
+      // 要素の初期状態をリセット（ページ遷移時の状態をクリア）
+      if (splitElement.left) {
+        const leftInner = splitElement.left.querySelector(".left__inner");
+        const leftImage = splitElement.left.querySelector(".left__image");
+        if (leftInner) {
+          gsap.set(leftInner, { opacity: 0 });
+        }
+        if (leftImage) {
+          gsap.set(leftImage, { opacity: 1 });
+        }
+      }
+      if (splitElement.right) {
+        if (splitElement.spImage) {
+          gsap.set(splitElement.spImage, { opacity: 0 });
+        }
+        if (splitElement.rightText) {
+          gsap.set(splitElement.rightText, { opacity: 0 });
+        }
+        if (splitElement.rightLink) {
+          gsap.set(splitElement.rightLink, { opacity: 0 });
+        }
+      }
 
       // スマホサイズの場合、パララックス効果とスクロールアニメーション
       if (isMobile) {
@@ -585,9 +625,23 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     }
 
     function addStyledText(element, delay) {
-      const newText = [...(element.textContent || "")].map((char) => `<span>${char}</span>`);
+      if (!element) return;
+
+      // 既に処理済みの要素（spanタグが既に存在する）の場合はスキップ
+      // ただし、ページ遷移時はDOMが置き換えられるため、通常は再処理が必要
+      const textContent = element.textContent || "";
+      if (textContent.trim() === "") return;
+
+      // 既存のspanタグをクリアして再処理
+      const newText = [...textContent].map((char) => `<span>${char}</span>`);
       element.innerHTML = newText.join("");
 
+      // 既存のis-activeクラスをクリア
+      Array.from(element.children).forEach((char) => {
+        char.classList.remove("is-active");
+      });
+
+      // アニメーションを再実行
       Array.from(element.children).forEach((char, index) => {
         setTimeout(() => char.classList.add("is-active"), delay * index);
       });

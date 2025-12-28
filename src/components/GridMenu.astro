@@ -422,6 +422,21 @@ import pikucha2 from "../assets/svg/pikucha2.svg";
 <!-- TBT改善: インラインスクリプトを外部ファイルに移動し、requestIdleCallbackで遅延初期化 -->
 <script>
   import { initGridMenuAnimationsDeferred } from "../scripts/gridMenuAnimations";
+
+  // 初期化関数
+  function loadGridMenuAnimations() {
+    initGridMenuAnimationsDeferred();
+  }
+
   // 明示的に初期化を実行
-  initGridMenuAnimationsDeferred();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadGridMenuAnimations);
+  } else {
+    loadGridMenuAnimations();
+  }
+
+  // View Transitions対応: ページ遷移時に再初期化
+  document.addEventListener("astro:after-swap", () => {
+    loadGridMenuAnimations();
+  });
 </script>

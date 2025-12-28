@@ -38,6 +38,7 @@ function initGridMenuAnimations(): void {
   }
 
   // Tooltipのアニメーション
+  // view transitionsではDOMが完全に置き換えられるため、新しい要素に対してイベントリスナーを追加
   const menuItems = document.querySelectorAll(".grid__menu_item");
 
   // 大量のDOM操作を避けるため、一度に処理する要素数を制限
@@ -118,6 +119,19 @@ export function initGridMenuAnimationsDeferred(): void {
       requestIdleCallback(initGridMenuAnimations, { timeout: 2000 });
     } else {
       setTimeout(initGridMenuAnimations, 100);
+    }
+  }
+
+  // View Transitions対応: ページ遷移時に再初期化
+  // イベントリスナーの重複登録を防ぐため、一度だけ登録
+  if (typeof window !== "undefined") {
+    const win = window as Window & { __gridMenuAnimationsSwapListenerAdded?: boolean };
+    if (win.__gridMenuAnimationsSwapListenerAdded !== true) {
+      win.__gridMenuAnimationsSwapListenerAdded = true;
+      document.addEventListener("astro:after-swap", () => {
+        // 既存のイベントリスナーをクリーンアップするため、要素を再取得
+        initGridMenuAnimations();
+      });
     }
   }
 }

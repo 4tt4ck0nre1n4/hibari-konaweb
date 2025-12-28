@@ -141,6 +141,11 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
     } else {
       initBackgroundToggle();
     }
+
+    // View Transitions対応: ページ遷移時に再初期化
+    document.addEventListener("astro:after-swap", () => {
+      initBackgroundToggle();
+    });
   })();
 </script>
 

@@ -411,42 +411,8 @@ const mouseItem = {
   import { Navigation, Autoplay } from "swiper/modules";
   import "swiper/css/bundle";
 
-  const initSwiper1 = () => {
-    new Swiper("#swiper1", {
-      direction: "vertical",
-      modules: [Navigation, Autoplay],
-      loop: true,
-      effect: "creative",
-      speed: 1500,
-      allowTouchMove: false,
-      autoplay: {
-        delay: 3000,
-        disableOnInteraction: false,
-      },
-      navigation: {
-        nextEl: "#js-mouse",
-      },
-      on: {
-        slideChangeTransitionStart: function () {
-          document.querySelectorAll(".swiper-slide img").forEach((img) => {
-            img.classList.remove("active");
-          });
-        },
-        slideChangeTransitionEnd: function () {
-          const activeSlide = document.querySelector(".swiper-slide-active img");
-
-          if (activeSlide) {
-            activeSlide.classList.add("active");
-          }
-        },
-      },
-    });
-  };
-
-  if (typeof window !== "undefined") {
-    initSwiper1();
-  }
-
+  let swiperInstance: Swiper | null = null;
+  let mouseMoveIntervalId: ReturnType<typeof setInterval> | null = null;
   let lastMouseMoveSecond: number | null = null;
 
   const triggerMouseMove = () => {
@@ -464,8 +430,55 @@ const mouseItem = {
     }, 1000);
   };
 
-  const mouseMoveTimeInterval = () => {
-    setInterval(() => {
+  function initSwiperMenu() {
+    // 既存のSwiperインスタンスを破棄
+    if (swiperInstance) {
+      swiperInstance.destroy(true, true);
+      swiperInstance = null;
+    }
+
+    // 既存のインターバルをクリア
+    if (mouseMoveIntervalId) {
+      clearInterval(mouseMoveIntervalId);
+      mouseMoveIntervalId = null;
+    }
+
+    // Swiperを初期化
+    const swiperElement = document.querySelector("#swiper1");
+    if (swiperElement && typeof window !== "undefined") {
+      swiperInstance = new Swiper("#swiper1", {
+        direction: "vertical",
+        modules: [Navigation, Autoplay],
+        loop: true,
+        effect: "creative",
+        speed: 1500,
+        allowTouchMove: false,
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false,
+        },
+        navigation: {
+          nextEl: "#js-mouse",
+        },
+        on: {
+          slideChangeTransitionStart: function () {
+            document.querySelectorAll(".swiper-slide img").forEach((img) => {
+              img.classList.remove("active");
+            });
+          },
+          slideChangeTransitionEnd: function () {
+            const activeSlide = document.querySelector(".swiper-slide-active img");
+
+            if (activeSlide) {
+              activeSlide.classList.add("active");
+            }
+          },
+        },
+      });
+    }
+
+    // マウス移動インターバルを開始
+    mouseMoveIntervalId = setInterval(() => {
       const now = new Date();
       const seconds = now.getSeconds();
 
@@ -474,30 +487,29 @@ const mouseItem = {
         lastMouseMoveSecond = seconds;
       }
     }, 1000);
-  };
 
-  // マウス画像の読み込み処理
-  const handleMouseImageLoad = () => {
-    const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
-    if (mouseImage) {
-      mouseImage.style.display = "block";
-      mouseImage.style.visibility = "visible";
-    }
-  };
+    // マウス画像の読み込み処理
+    const handleMouseImageLoad = () => {
+      const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
+      if (mouseImage) {
+        mouseImage.style.display = "block";
+        mouseImage.style.visibility = "visible";
+      }
+    };
 
-  const handleMouseImageError = () => {
-    const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
-    if (mouseImage) {
-      mouseImage.style.display = "none";
-    }
-  };
-
-  window.addEventListener("load", () => {
-    mouseMoveTimeInterval();
+    const handleMouseImageError = () => {
+      const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
+      if (mouseImage) {
+        mouseImage.style.display = "none";
+      }
+    };
 
     // マウス画像のイベントリスナーを追加
     const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
     if (mouseImage) {
+      // 既存のリスナーを削除してから追加
+      mouseImage.removeEventListener("load", handleMouseImageLoad);
+      mouseImage.removeEventListener("error", handleMouseImageError);
       mouseImage.addEventListener("load", handleMouseImageLoad);
       mouseImage.addEventListener("error", handleMouseImageError);
     }
@@ -505,20 +517,40 @@ const mouseItem = {
     // マウスボタンのクリック音処理
     const mouseButton = document.getElementById("js-mouseButton");
     if (mouseButton) {
-      const mouseSound = new Audio("/sounds/mouseSound.mp3");
+      // 既存のリスナーを削除するために、ボタンをクローン
+      const newMouseButton = mouseButton.cloneNode(true);
+      mouseButton.parentNode?.replaceChild(newMouseButton, mouseButton);
+      const newButton = document.getElementById("js-mouseButton");
 
-      mouseButton.addEventListener("click", () => {
-        const isSoundOn = localStorage.getItem("sound-enabled") === "true";
+      if (newButton) {
+        const mouseSound = new Audio("/sounds/mouseSound.mp3");
 
-        if (isSoundOn) {
-          try {
-            mouseSound.currentTime = 0;
-            void mouseSound.play();
-          } catch (error) {
-            console.error("Sound playback failed:", error);
+        newButton.addEventListener("click", () => {
+          const isSoundOn = localStorage.getItem("sound-enabled") === "true";
+
+          if (isSoundOn) {
+            try {
+              mouseSound.currentTime = 0;
+              void mouseSound.play();
+            } catch (error) {
+              console.error("Sound playback failed:", error);
+            }
           }
-        }
-      });
+        });
+      }
     }
+  }
+
+  if (typeof window !== "undefined") {
+    if (document.readyState === "loading") {
+      window.addEventListener("load", initSwiperMenu);
+    } else {
+      initSwiperMenu();
+    }
+  }
+
+  // View Transitions対応: ページ遷移時に再初期化
+  document.addEventListener("astro:after-swap", () => {
+    initSwiperMenu();
   });
 </script>

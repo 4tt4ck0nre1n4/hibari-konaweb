@@ -736,4 +736,9 @@ const menuItems: MenuItem[] = [
   } else {
     initNaviCard();
   }
+
+  // View Transitions対応: ページ遷移時に再初期化
+  document.addEventListener("astro:after-swap", () => {
+    initNaviCard();
+  });
 </script>

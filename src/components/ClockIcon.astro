@@ -128,20 +128,30 @@
 </style>
 
 <script>
-  const clockIcon: HTMLElement | null = document.getElementById("clockIcon");
-  const onClockElements: NodeListOf<HTMLElement> = document.querySelectorAll(".onClock");
-  const offClockElements: NodeListOf<HTMLElement> = document.querySelectorAll(".offClock");
-  const clock: HTMLElement | null = document.getElementById("js-clock__inner");
-  const ariaLiveStatusClockIcon: HTMLElement | null = document.getElementById("ariaLiveStatus__clockIcon");
+  function initClockIcon() {
+    const clockIcon: HTMLElement | null = document.getElementById("clockIcon");
+    const clock: HTMLElement | null = document.getElementById("js-clock__inner");
+    const ariaLiveStatusClockIcon: HTMLElement | null = document.getElementById("ariaLiveStatus__clockIcon");
 
-  window.addEventListener("DOMContentLoaded", () => {
-    if (!clockIcon || !onClockElements || !offClockElements || !clock || !ariaLiveStatusClockIcon) {
+    if (!clockIcon || !clock || !ariaLiveStatusClockIcon) {
       return;
     }
 
-    let isClockOff = false;
-    let ariaLabelClockIcon = "時計の表示を切り替える（時計表示あり）";
-    let titleClockIcon = "時計の表示を切り替える（時計表示あり）";
+    // 要素を再取得（ページ遷移時にDOMが置き換えられるため）
+    const onClockElements: NodeListOf<HTMLElement> = document.querySelectorAll(".onClock");
+    const offClockElements: NodeListOf<HTMLElement> = document.querySelectorAll(".offClock");
+
+    if (!onClockElements.length || !offClockElements.length) {
+      return;
+    }
+
+    let isClockOff = clock.classList.contains("is-notClock");
+    let ariaLabelClockIcon = isClockOff
+      ? "時計の表示を切り替える（時計表示なし）"
+      : "時計の表示を切り替える（時計表示あり）";
+    let titleClockIcon = isClockOff
+      ? "時計の表示を切り替える（時計表示なし）"
+      : "時計の表示を切り替える（時計表示あり）";
 
     const updateAccessibilityClockIcon = () => {
       clockIcon.setAttribute("aria-label", ariaLabelClockIcon);
@@ -167,22 +177,72 @@
     };
 
     updateClockIcons();
+    updateAccessibilityClockIcon();
 
-    clockIcon.addEventListener("click", () => {
-      isClockOff = clock.classList.toggle("is-notClock");
+    // 既存のイベントリスナーを削除してから新しいリスナーを追加
+    const newClockIcon = clockIcon.cloneNode(true);
+    clockIcon.parentNode?.replaceChild(newClockIcon, clockIcon);
+    const newClockIconElement = document.getElementById("clockIcon");
 
-      if (isClockOff) {
-        ariaLabelClockIcon = "時計の表示を切り替える（時計表示なし";
-        titleClockIcon = "時計の表示を切り替える（時計表示なし";
-        ariaLiveStatusClockIcon.textContent = "時計表示なしに切り替えました";
-      } else {
-        ariaLabelClockIcon = "時計の表示を切り替える（時計表示あり";
-        titleClockIcon = "時計の表示を切り替える（時計表示あり";
-        ariaLiveStatusClockIcon.textContent = "時計表示ありに切り替えました";
-      }
+    if (newClockIconElement) {
+      newClockIconElement.addEventListener("click", () => {
+        const currentClock = document.getElementById("js-clock__inner");
+        const currentAriaLiveStatus = document.getElementById("ariaLiveStatus__clockIcon");
+        if (!currentClock) return;
 
-      updateAccessibilityClockIcon();
-      updateClockIcons();
-    });
+        isClockOff = currentClock.classList.toggle("is-notClock");
+
+        if (isClockOff) {
+          ariaLabelClockIcon = "時計の表示を切り替える（時計表示なし）";
+          titleClockIcon = "時計の表示を切り替える（時計表示なし）";
+          if (currentAriaLiveStatus) {
+            currentAriaLiveStatus.textContent = "時計表示なしに切り替えました";
+          }
+        } else {
+          ariaLabelClockIcon = "時計の表示を切り替える（時計表示あり）";
+          titleClockIcon = "時計の表示を切り替える（時計表示あり）";
+          if (currentAriaLiveStatus) {
+            currentAriaLiveStatus.textContent = "時計表示ありに切り替えました";
+          }
+        }
+
+        // 要素を再取得して更新
+        const currentOnClockElements = document.querySelectorAll(".onClock");
+        const currentOffClockElements = document.querySelectorAll(".offClock");
+        const currentClockIcon = document.getElementById("clockIcon");
+
+        if (currentClockIcon) {
+          currentClockIcon.setAttribute("aria-label", ariaLabelClockIcon);
+          currentClockIcon.setAttribute("title", titleClockIcon);
+        }
+
+        if (isClockOff) {
+          currentOffClockElements.forEach((offClock) => {
+            offClock.classList.replace("clockIcon-visible", "clockIcon-hidden");
+          });
+          currentOnClockElements.forEach((onClock) => {
+            onClock.classList.replace("clockIcon-hidden", "clockIcon-visible");
+          });
+        } else {
+          currentOnClockElements.forEach((onClock) => {
+            onClock.classList.replace("clockIcon-visible", "clockIcon-hidden");
+          });
+          currentOffClockElements.forEach((offClock) => {
+            offClock.classList.replace("clockIcon-hidden", "clockIcon-visible");
+          });
+        }
+      });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initClockIcon);
+  } else {
+    initClockIcon();
+  }
+
+  // View Transitions対応: ページ遷移時に再初期化
+  document.addEventListener("astro:after-swap", () => {
+    initClockIcon();
   });
 </script>

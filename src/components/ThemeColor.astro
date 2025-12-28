@@ -90,66 +90,95 @@ const ariaTitleThemeButton = "テーマを切り替える";
   }
   .moon {
     display: none;
+    fill: #ffffff;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .sun {
-      display: none;
-    }
-    .moon {
-      display: block;
-      fill: #ffffff;
-    }
-  }
+  /* JavaScriptで制御されるため、メディアクエリは削除 */
+  /* localStorageに保存されたテーマ設定を優先する */
 </style>
 
 <script is:inline>
-  const sun = document.querySelectorAll(".sun");
-  const moon = document.querySelectorAll(".moon");
+  // テーマの初期化とイベントリスナーの設定を行う関数
+  function initTheme() {
+    const sun = document.querySelectorAll(".sun");
+    const moon = document.querySelectorAll(".moon");
 
-  const theme = (() => {
-    if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-      return localStorage.getItem("theme");
-    }
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+    // テーマの取得（localStorageを優先、なければシステム設定）
+    const getTheme = () => {
+      if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+        return localStorage.getItem("theme");
+      }
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+      } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
+        return "light";
+      }
+      // デフォルトはlight
       return "light";
-    }
-  })();
+    };
 
-  const toggleIcons = (theme) => {
+    const theme = getTheme();
+
+    // アイコンの表示を切り替える関数
+    const toggleIcons = (currentTheme) => {
+      if (currentTheme === "light") {
+        sun.forEach((icon) => (icon.style.display = "block"));
+        moon.forEach((icon) => (icon.style.display = "none"));
+      } else {
+        sun.forEach((icon) => (icon.style.display = "none"));
+        moon.forEach((icon) => (icon.style.display = "block"));
+      }
+    };
+
+    // HTML要素にクラスを適用
     if (theme === "light") {
-      sun.forEach((icon) => (icon.style.display = "block"));
-      moon.forEach((icon) => (icon.style.display = "none"));
+      document.documentElement.classList.remove("dark");
     } else {
-      sun.forEach((icon) => (icon.style.display = "none"));
-      moon.forEach((icon) => (icon.style.display = "block"));
+      document.documentElement.classList.add("dark");
     }
-  };
 
-  if (theme === "light") {
-    document.documentElement.classList.remove("dark");
-  } else {
-    document.documentElement.classList.add("dark");
+    // アイコンの表示を更新
+    toggleIcons(theme);
+
+    // localStorageに保存（初回のみ、既に保存されている場合は更新しない）
+    if (typeof localStorage !== "undefined" && !localStorage.getItem("theme")) {
+      localStorage.setItem("theme", theme);
+    }
+
+    // トグルボタンのクリックハンドラー
+    const handleToggleClick = () => {
+      const element = document.documentElement;
+      element.classList.toggle("dark");
+
+      const isDark = element.classList.contains("dark");
+      const newTheme = isDark ? "dark" : "light";
+      localStorage.setItem("theme", newTheme);
+
+      toggleIcons(newTheme);
+
+      console.log(newTheme);
+    };
+
+    // 既存のイベントリスナーを削除してから新しいリスナーを追加
+    const themeToggle = document.getElementById("themeToggle");
+    if (themeToggle) {
+      // 既存のリスナーを削除するために、クローンして置き換える
+      const newToggle = themeToggle.cloneNode(true);
+      themeToggle.parentNode?.replaceChild(newToggle, themeToggle);
+      // 新しいリスナーを追加
+      document.getElementById("themeToggle").addEventListener("click", handleToggleClick);
+    }
   }
 
-  toggleIcons(theme);
+  // 初回実行
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTheme);
+  } else {
+    initTheme();
+  }
 
-  window.localStorage.setItem("theme", theme);
-
-  const handleToggleClick = () => {
-    const element = document.documentElement;
-    element.classList.toggle("dark");
-
-    const isDark = element.classList.contains("dark");
-    const newTheme = isDark ? "dark" : "light";
-    localStorage.setItem("theme", newTheme);
-
-    toggleIcons(newTheme);
-
-    console.log(newTheme);
-  };
-
-  document.getElementById("themeToggle").addEventListener("click", handleToggleClick);
+  // View Transitions対応: ページ遷移時にテーマを再初期化
+  document.addEventListener("astro:after-swap", () => {
+    initTheme();
+  });
 </script>

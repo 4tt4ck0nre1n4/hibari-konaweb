@@ -102,9 +102,28 @@
     setTimeout(loadPagefindCSS, 1000);
   }
 
-  // DOMContentLoadedで初期化
-  document.addEventListener("DOMContentLoaded", () => {
-    new PagefindUI({
+  let pagefindUIInstance: PagefindUI | null = null;
+  let mutationObserver: MutationObserver | null = null;
+
+  function initSearch() {
+    // 既存のインスタンスを破棄
+    if (pagefindUIInstance) {
+      // PagefindUIにはdestroyメソッドがないため、要素をクリア
+      const searchElement = document.querySelector("#search");
+      if (searchElement) {
+        searchElement.innerHTML = "";
+      }
+      pagefindUIInstance = null;
+    }
+
+    // 既存のMutationObserverを破棄
+    if (mutationObserver) {
+      mutationObserver.disconnect();
+      mutationObserver = null;
+    }
+
+    // 新しいPagefindUIインスタンスを作成
+    pagefindUIInstance = new PagefindUI({
       element: "#search",
       showImages: true,
     });
@@ -138,14 +157,26 @@
     // MutationObserverでDOMの変更を監視
     const searchContainer = document.querySelector("#search");
     if (searchContainer) {
-      const observer = new MutationObserver(() => {
+      mutationObserver = new MutationObserver(() => {
         applyBorderStyle();
       });
 
-      observer.observe(searchContainer, {
+      mutationObserver.observe(searchContainer, {
         childList: true,
         subtree: true,
       });
     }
+  }
+
+  // DOMContentLoadedで初期化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSearch);
+  } else {
+    initSearch();
+  }
+
+  // View Transitions対応: ページ遷移時に再初期化
+  document.addEventListener("astro:after-swap", () => {
+    initSearch();
   });
 </script>
