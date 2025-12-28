@@ -20,6 +20,11 @@ function devError(...args: unknown[]): void {
   console.error(...args);
 }
 
+// グローバル変数でインスタンスとリスナーを管理
+let jsConfettiInstance: JSConfetti | null = null;
+let resizeHandler: (() => void) | null = null;
+let clickHandler: (() => void) | null = null;
+
 function initConfetti() {
   devLog("initConfetti called");
   const confetti: HTMLElement | null = document.getElementById("confettiButton");
@@ -45,7 +50,24 @@ function initConfetti() {
     textCanvasElement.width = textRect.width * devicePixelRatio;
     textCanvasElement.height = textRect.height * devicePixelRatio;
 
-    const jsConfetti = new JSConfetti({ canvas: canvasElement });
+    // 既存のインスタンスを破棄
+    if (jsConfettiInstance) {
+      jsConfettiInstance = null;
+    }
+
+    // 既存のイベントリスナーを削除
+    if (resizeHandler) {
+      window.removeEventListener("resize", resizeHandler);
+      resizeHandler = null;
+    }
+
+    if (clickHandler && confetti) {
+      confetti.removeEventListener("click", clickHandler);
+      clickHandler = null;
+    }
+
+    // 新しいJSConfettiインスタンスを作成
+    jsConfettiInstance = new JSConfetti({ canvas: canvasElement });
     const context = textCanvasElement.getContext("2d");
 
     if (context) {
@@ -112,7 +134,7 @@ function initConfetti() {
 
       // ウィンドウリサイズ時にキャンバスサイズとテキストサイズを再調整（デバウンス）
       let resizeTimer: ReturnType<typeof setTimeout> | null = null;
-      window.addEventListener("resize", () => {
+      resizeHandler = () => {
         if (resizeTimer) {
           clearTimeout(resizeTimer);
         }
@@ -137,23 +159,29 @@ function initConfetti() {
             drawText();
           }
         }, 250);
-      });
+      };
+      window.addEventListener("resize", resizeHandler);
 
       if (confetti) {
         devLog("Adding click listener to confetti button");
-        confetti.addEventListener("click", () => {
+        clickHandler = () => {
           devLog("Confetti button clicked!");
+
+          if (!jsConfettiInstance) {
+            devError("JSConfetti instance not found!");
+            return;
+          }
 
           // まずテキストをクリア（既存のテキストを消す）
           context.clearRect(0, 0, textCanvasElement.width, textCanvasElement.height);
           currentOpacity = 0;
           isAnimating = true;
 
-          jsConfetti
+          jsConfettiInstance
             .addConfetti({
               emojis: ["💜", "💖", "🌈", "✨", "💫", "🌸", "thanks", "💛", "💗", "💘", "🌟", "happy"],
             })
-            .then(() => jsConfetti.addConfetti({ confettiRadius: 3 }))
+            .then(() => jsConfettiInstance?.addConfetti({ confettiRadius: 3 }))
             .then(() => {
               // フェードイン（requestAnimationFrameで最適化）
               let opacity = 0;
@@ -188,7 +216,8 @@ function initConfetti() {
               devError("Confetti animation failed:", error);
               isAnimating = false;
             });
-        });
+        };
+        confetti.addEventListener("click", clickHandler);
       } else {
         devError("confettiButton element not found!");
       }
@@ -242,13 +271,36 @@ export function initConfettiDeferred(): void {
     }
   }
 
-  // window.onloadイベントでも初期化を試みる（フォールバック）
-  window.addEventListener("load", () => {
-    waitForJSConfettiAndInit();
-  });
-
   // 即座にも試行（既に読み込まれている場合）
   waitForJSConfettiAndInit();
+}
+
+// View Transitions対応: ページ遷移時に再初期化
+// イベントリスナーの重複登録を防ぐため、一度だけ登録
+if (typeof window !== "undefined") {
+  const win = window as Window & { __confettiSwapListenerAdded?: boolean };
+  if (win.__confettiSwapListenerAdded !== true) {
+    win.__confettiSwapListenerAdded = true;
+    document.addEventListener("astro:after-swap", () => {
+      // 既存のインスタンスとリスナーをクリーンアップ
+      if (jsConfettiInstance) {
+        jsConfettiInstance = null;
+      }
+      if (resizeHandler) {
+        window.removeEventListener("resize", resizeHandler);
+        resizeHandler = null;
+      }
+      if (clickHandler) {
+        const confetti = document.getElementById("confettiButton");
+        if (confetti) {
+          confetti.removeEventListener("click", clickHandler);
+        }
+        clickHandler = null;
+      }
+      // 再初期化
+      initConfettiDeferred();
+    });
+  }
 }
 
 // 自動初期化（モジュールとして読み込まれた場合）

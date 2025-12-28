@@ -35,10 +35,8 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       <div class="breadcrumbs__wrapper breadcrumbs__wrapper_top">
         <Breadcrumbs crumbs={[]} />
       </div>
-
       <FirstView />
-
-      <div class="swiper-display-container swiper-display-container--mobile">
+      <div class="swiper-display-container">
         <SwiperDisplay />
       </div>
       <div id="main-container" style={`background-image: url(${gridBackgroundImage.src})`}>
@@ -54,10 +52,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
         <div class="sidebar">
           <SwiperMenu />
         </div>
-      </div>
-      <!-- デスクトップ用：footer直上に配置 -->
-      <div class="swiper-display-container swiper-display-container--desktop">
-        <SwiperDisplay />
       </div>
     </main>
     <Footer />
@@ -86,28 +80,14 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   .sidebar {
     min-height: 400px; /* CLSを防ぐために最小高さを設定 */
   }
-  .swiper-display-container--mobile {
-    display: none; /* デスクトップでは非表示 */
-  }
-
-  .swiper-display-container--desktop {
-    display: block; /* デスクトップでは表示 */
+  .swiper-display-container {
+    display: block;
     width: 100%;
+    margin-bottom: 0.5rem;
   }
 
   /* タブレット・スマホサイズでのレスポンシブ対応 */
   @media (width <= 768px) {
-    /* タブレット・スマホでは#main-containerの直上に配置 */
-    .swiper-display-container--mobile {
-      display: block; /* タブレット・スマホでは表示 */
-      width: 100%;
-      margin-bottom: 0.5rem;
-    }
-
-    .swiper-display-container--desktop {
-      display: none; /* タブレット・スマホでは非表示 */
-    }
-
     #main-container {
       display: flex;
       flex-direction: column;
@@ -245,12 +225,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     grid-area: 1 / 3 / 2 / 4;
     display: grid;
   }
-  /* .particles-container {
-    width: 100%;
-    height: 200px;
-    border: rebeccapurple 1px solid;
-    position: relative;
-  } */
+
   #tsparticles {
     width: 100%;
     height: 500px;

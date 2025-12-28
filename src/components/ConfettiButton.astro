@@ -134,6 +134,9 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
       intervalId = null;
     }
 
+    // lastTurnedSecondをリセット（ページ遷移時に状態をリセット）
+    lastTurnedSecond = null;
+
     // 新しいインターバルを開始
     intervalId = setInterval(() => {
       const now = new Date();
@@ -148,9 +151,13 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     }, 1000);
   }
 
-  window.addEventListener("load", () => {
+  // 初回初期化（DOMContentLoadedまたは即座に実行）
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initConfettiButton);
+  } else {
+    // DOMが既に読み込まれている場合は即座に実行
     initConfettiButton();
-  });
+  }
 
   // View Transitions対応: ページ遷移時に再初期化
   document.addEventListener("astro:after-swap", () => {
