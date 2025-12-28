@@ -30,8 +30,9 @@
     border-radius: 1rem;
     position: relative;
     z-index: 1;
-
     padding-block: 0.25rem;
+    box-sizing: border-box;
+    min-width: 0; /* 親要素のgridレイアウトで適切に縮小できるように */
   }
   .clock__inner::before {
     content: "";
@@ -98,6 +99,8 @@
     align-items: center;
     padding: 0.5rem; /* パディングを追加 */
     box-sizing: border-box; /* ボックスサイズを調整 */
+    min-width: 0; /* 親要素のgridレイアウトで適切に縮小できるように */
+    overflow: hidden; /* はみ出しを防ぐ */
   }
   .clock.js-color {
     color: whitesmoke;
@@ -118,6 +121,8 @@
     .clock__inner {
       height: 12vh; /* 高さを少し増やす */
       min-height: 80px; /* 最小高さを設定 */
+      width: 100%; /* 幅を確実に100%に */
+      min-width: 0; /* gridアイテムが適切に縮小できるように */
     }
     .clock__inner::before {
       width: 60%;
@@ -126,6 +131,8 @@
     .clock {
       padding: 0.25rem; /* モバイルではパディングを小さく */
       line-height: 1.1; /* 行間をさらに詰める */
+      width: 100%; /* 幅を確実に100%に */
+      min-width: 0; /* gridアイテムが適切に縮小できるように */
     }
     .clock__date {
       font-size: 0.9rem; /* フォントサイズを小さく */

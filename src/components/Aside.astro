@@ -45,6 +45,9 @@ import ConfettiButton from "./ConfettiButton.astro";
     padding-block: 1rem;
     padding-inline: 0.5rem;
     transition: box-shadow 0.4s ease;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0; /* gridアイテムが適切に縮小できるように */
   }
   .clock__wrapper:is(:hover, :focus-visible) {
     box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
@@ -59,6 +62,9 @@ import ConfettiButton from "./ConfettiButton.astro";
     padding-block: 1rem;
     padding-inline: 0.5rem;
     transition: box-shadow 0.4s ease;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0; /* gridアイテムが適切に縮小できるように */
   }
   .search__wrapper:is(:hover, :focus-visible) {
     box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
@@ -72,12 +78,15 @@ import ConfettiButton from "./ConfettiButton.astro";
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0.5rem;
+      align-items: stretch; /* 両方のアイテムを同じ高さに */
     }
 
     .clock__wrapper,
     .search__wrapper {
       width: 100%;
       margin-bottom: 0;
+      min-width: 0; /* gridアイテムが適切に縮小できるように */
+      padding-inline: 0.25rem; /* スマホサイズではpaddingを小さく */
     }
     .particles__container {
       height: 200px;
@@ -94,10 +103,14 @@ import ConfettiButton from "./ConfettiButton.astro";
       grid-template-columns: 1fr 1fr;
       gap: 0.25rem;
       margin-block-start: 3rem; /* スマホサイズでの余白調整 */
+      align-items: stretch; /* 両方のアイテムを同じ高さに */
     }
 
+    .clock__wrapper,
     .search__wrapper {
-      padding-block: 1rem;
+      padding-block: 0.5rem; /* スマホサイズではpaddingを小さく */
+      padding-inline: 0.25rem; /* スマホサイズではpaddingを小さく */
+      min-width: 0; /* gridアイテムが適切に縮小できるように */
     }
 
     .particles__wrapper,

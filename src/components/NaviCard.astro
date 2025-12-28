@@ -72,12 +72,6 @@ const menuItems: MenuItem[] = [
     /* position: relative; */
     overflow: hidden;
     /* 洗練されたグラデーション背景 - カードと調和 */
-    background: linear-gradient(
-      135deg,
-      rgba(147, 51, 234, 0.9) 0%,
-      rgba(168, 85, 247, 0.85) 50%,
-      rgba(192, 132, 252, 0.9) 100%
-    );
     background-image: conic-gradient(
       from var(--angle),
       var(--color-white),
@@ -103,6 +97,9 @@ const menuItems: MenuItem[] = [
     animation:
       naviCardButtonAnimation 6s ease-in-out infinite,
       naviCardButtonGradientAnimation 3s linear infinite;
+    /* タッチデバイスでのアニメーション継続を保証 */
+    animation-play-state: running;
+    will-change: transform, --angle;
   }
 
   @keyframes naviCardButtonAnimation {
@@ -140,11 +137,11 @@ const menuItems: MenuItem[] = [
   @keyframes buttonShine {
     0%,
     100% {
-      opacity: 0;
+      opacity: 0.3;
       transform: scale(0.7);
     }
     50% {
-      opacity: 0.8;
+      opacity: 0.9;
       transform: scale(1.5);
     }
   }
@@ -175,6 +172,8 @@ const menuItems: MenuItem[] = [
       0 0 0 1px rgba(255, 255, 255, 0.3) inset,
       0 0 40px rgba(147, 51, 234, 0.5),
       0 8px 24px rgba(0, 0, 0, 0.4);
+    /* アクティブ状態でもアニメーションを継続 */
+    animation-play-state: running;
   }
 
   .navi-card__button.is-open {
@@ -457,14 +456,19 @@ const menuItems: MenuItem[] = [
       top: 40px;
       left: 50%;
       transform: translateX(-50%);
+      /* スマホサイズでもアニメーションを確実に動作させる */
+      animation-play-state: running;
     }
 
     .navi-card__button:is(:hover, :focus-visible) {
       transform: translateX(-50%) translateY(-4px) scale(0.9);
+      animation-play-state: running;
     }
 
     .navi-card__button:active {
       transform: translateX(-50%) translateY(-2px) scale(1.02);
+      /* アクティブ状態でもアニメーションを継続 */
+      animation-play-state: running;
     }
 
     .navi-card__button_text {
@@ -508,14 +512,19 @@ const menuItems: MenuItem[] = [
       top: 32px;
       left: 27%;
       transform: translateX(-50%);
+      /* 小画面サイズでもアニメーションを確実に動作させる */
+      animation-play-state: running;
     }
 
     .navi-card__button:is(:hover, :focus-visible) {
       transform: translateX(-50%) translateY(-4px) scale(0.9);
+      animation-play-state: running;
     }
 
     .navi-card__button:active {
       transform: translateX(-50%) translateY(-2px) scale(1.02);
+      /* アクティブ状態でもアニメーションを継続 */
+      animation-play-state: running;
     }
 
     .navi-card__button_text {
@@ -570,6 +579,26 @@ const menuItems: MenuItem[] = [
     // 初期状態は開いている（カードが表示されている）
     let isOpen = true;
 
+    // タッチイベント後にアニメーションを確実に再開する処理
+    const ensureAnimationRunning = () => {
+      // アニメーションを強制的に再開
+      button.style.animationPlayState = "running";
+      // 少し遅延させて確実に再開
+      requestAnimationFrame(() => {
+        button.style.animationPlayState = "running";
+      });
+    };
+
+    // タッチイベントの処理（スマホ対応）
+    button.addEventListener(
+      "touchend",
+      () => {
+        // タッチ終了後にアニメーションを確実に再開
+        ensureAnimationRunning();
+      },
+      { passive: true }
+    );
+
     button.addEventListener("click", () => {
       isOpen = !isOpen;
 
@@ -581,6 +610,9 @@ const menuItems: MenuItem[] = [
       // クラスの切り替え
       button.classList.toggle("is-open", isOpen);
       menu.classList.toggle("is-open", isOpen);
+
+      // クリック後にもアニメーションを確実に再開
+      ensureAnimationRunning();
 
       // main要素内のglitch-container以外の要素のpointer-eventsを制御
       // ただし、カード要素とボタン要素は除外
