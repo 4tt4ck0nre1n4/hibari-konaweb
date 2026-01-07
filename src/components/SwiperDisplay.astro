@@ -155,8 +155,9 @@ const swiperText2 = "Thank you for viewing my site.";
     display: grid;
     place-items: center;
     position: absolute;
-    top: 34%;
-    left: 42%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 5;
   }
   .swipers__header {
@@ -176,7 +177,7 @@ const swiperText2 = "Thank you for viewing my site.";
     position: relative;
     overflow: hidden;
     border-radius: 0.5rem;
-    box-shadow: 0 8px 16px 0 rgba(0 0 0 / 0.6);
+    box-shadow: 0 8px 16px 0 rgb(0 0 0 / 0.6);
     margin-block-start: 4rem;
     padding-block-start: 4rem;
     padding-block-end: 2rem;
@@ -191,7 +192,6 @@ const swiperText2 = "Thank you for viewing my site.";
     transform-style: preserve-3d;
     transform: perspective(1600px);
     backface-visibility: hidden;
-    /* パフォーマンス最適化: will-changeはJavaScriptで動的に管理 */
     animation: rotation 32s ease-in-out infinite;
   }
   @keyframes rotation {
@@ -213,9 +213,6 @@ const swiperText2 = "Thank you for viewing my site.";
   .swipers-slide {
     width: 100%;
     height: 100%;
-    /* box-shadow:
-      10px 15px 22px -5px rgba(0 0 0 / 0.2),
-      0 0 2px rgba(0 0 0 / 0.15); */
     border-radius: 0.5rem;
     position: absolute;
     top: 0%;
@@ -231,8 +228,8 @@ const swiperText2 = "Thank you for viewing my site.";
     height: 100%;
     background: radial-gradient(
       ellipse farthest-corner at center,
-      rgba(255 255 255 / 0.8) 0%,
-      rgba(255 255 255 / 0) 100%
+      rgb(255 255 255 / 0.8) 0%,
+      rgb(255 255 255 / 0) 100%
     );
     background-size: 600% 100%;
     position: absolute;
@@ -285,10 +282,10 @@ const swiperText2 = "Thank you for viewing my site.";
   .swipers__image {
     width: 100%;
     height: 100%;
-    background: linear-gradient(225deg, #bdc3c9 0%, #ffffff 50%, #bdc3c9 100%);
+    background: linear-gradient(225deg, #bdc3c9 0%, var(--color-white) 50%, #bdc3c9 100%);
     box-shadow:
-      10px 15px 22px -5px rgba(0 0 0 / 0.2),
-      0 0 2px rgba(0 0 0 / 0.15);
+      10px 15px 22px -5px rgb(0 0 0 / 0.2),
+      0 0 2px rgb(0 0 0 / 0.15);
     border-radius: 0.5rem;
     object-fit: cover;
     position: absolute;
@@ -307,7 +304,7 @@ const swiperText2 = "Thank you for viewing my site.";
     height: 100%;
     background: linear-gradient(180deg, #ffffff71 10%, transparent 32%, #ffffff 72%);
     background-size: 600% 100%;
-    box-shadow: 0 16px 32px 0 rgba(0 0 0 / 0.6);
+    box-shadow: 0 16px 32px 0 rgb(0 0 0 / 0.6);
     /* パフォーマンス最適化: blurを削除（視覚的影響を最小限に） */
     border-radius: 0.5rem;
     position: absolute;
@@ -321,10 +318,10 @@ const swiperText2 = "Thank you for viewing my site.";
   .swipers__shadow {
     width: 100%;
     height: 100%;
-    background: linear-gradient(225deg, #bdc3c9 0%, #ffffff 50%, #bdc3c9 100%);
+    background: linear-gradient(225deg, #bdc3c9 0%, var(--color-white) 50%, #bdc3c9 100%);
     box-shadow:
-      10px 15px 22px -5px rgba(0 0 0 / 0.2),
-      0 0 2px rgba(0 0 0 / 0.15);
+      10px 15px 22px -5px rgb(0 0 0 / 0.2),
+      0 0 2px rgb(0 0 0 / 0.15);
     border-radius: 0.5rem;
     object-fit: cover;
     position: absolute;
@@ -343,28 +340,24 @@ const swiperText2 = "Thank you for viewing my site.";
     /* 下部に向かってフェードアウトするグラデーションマスク */
     mask-image: linear-gradient(
       to bottom,
-      rgba(0 0 0 / 0.9) 0%,
-      rgba(0 0 0 / 0.8) 30%,
-      rgba(0 0 0 / 0.6) 60%,
-      rgba(0 0 0 / 0.3) 85%,
-      rgba(0 0 0 / 0) 100%
+      rgb(0 0 0 / 0.9) 0%,
+      rgb(0 0 0 / 0.8) 30%,
+      rgb(0 0 0 / 0.6) 60%,
+      rgb(0 0 0 / 0.3) 85%,
+      rgb(0 0 0 / 0) 100%
     );
     -webkit-mask-image: linear-gradient(
       to bottom,
-      rgba(0 0 0 / 0.9) 0%,
-      rgba(0 0 0 / 0.8) 30%,
-      rgba(0 0 0 / 0.6) 60%,
-      rgba(0 0 0 / 0.3) 85%,
-      rgba(0 0 0 / 0) 100%
+      rgb(0 0 0 / 0.9) 0%,
+      rgb(0 0 0 / 0.8) 30%,
+      rgb(0 0 0 / 0.6) 60%,
+      rgb(0 0 0 / 0.3) 85%,
+      rgb(0 0 0 / 0) 100%
     );
   }
 
   /* スマホサイズでのテキスト中央配置 */
   @media (width <= 480px) {
-    .swipersDisplay__textInner {
-      top: 30%;
-      left: 20%;
-    }
     .swipers__header {
       width: 100%;
     }

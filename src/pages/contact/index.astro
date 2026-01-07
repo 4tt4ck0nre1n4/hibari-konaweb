@@ -76,7 +76,7 @@ export const prerender = true;
   .contact {
     width: 100%;
     min-height: 100vh;
-    color: #020202;
+    color: var(--color-black);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -100,12 +100,11 @@ export const prerender = true;
   }
   .contact__body {
     width: 100%;
-    max-width: 400px;
+    max-width: 312px;
     display: block;
     font-size: 0.9375rem;
     line-height: 1.8;
     letter-spacing: 0.06em;
-    /* テキストの各行の頭を揃える */
     text-align: left;
     margin-inline: auto;
   }
@@ -115,12 +114,12 @@ export const prerender = true;
   }
   @media (width <= 480px) {
     .contact__body {
-      max-width: 480px;
+      max-width: 330px;
       text-align: justify;
       padding-inline: 0.5rem;
     }
   }
   .contact__body--required {
-    color: #ff4f48;
+    color: var(--color-red);
   }
 </style>

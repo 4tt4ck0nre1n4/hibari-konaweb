@@ -270,10 +270,9 @@ const datetime = "投稿日:";
   .category__menu {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(32ch, 1fr));
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1rem;
-    color: white;
+    color: var(--color-white);
     list-style: none;
     margin-block-start: 3rem;
     padding-inline-start: 0;
@@ -282,10 +281,10 @@ const datetime = "投稿日:";
     flex-basis: 33.3%;
     flex-basis: 48%;
     height: 100%;
-    color: rebeccapurple;
+    color: var(--color-purple);
     background-color: whitesmoke;
     border: none;
-    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
     border-radius: 1rem;
     overflow: hidden;
     position: relative;
@@ -295,7 +294,7 @@ const datetime = "投稿日:";
   }
   .category__menu_item:is(:hover, :focus-visible) {
     border: transparent 1px solid;
-    box-shadow: 0 20px 20px rgba(0 0 0 / 0.6);
+    box-shadow: 0 20px 20px rgb(0 0 0 / 0.6);
     /* border: rebeccapurple 1px solid; */
   }
   .category__menu_link {
@@ -331,7 +330,7 @@ const datetime = "投稿日:";
     transform: scale(1.2);
   }
   .category__contents {
-    color: rebeccapurple;
+    color: var(--color-purple);
     transition: all 0.25s ease;
   }
   .category__contents:is(:hover, :focus-visible) {
@@ -340,9 +339,6 @@ const datetime = "投稿日:";
   }
   .category__header {
     font-size: 1.125rem;
-    /* color: inherit; */
-    /* color: rebeccapurple; */
-    /* color: white; */
     overflow: hidden;
     margin-block-start: 1rem;
   }
@@ -371,16 +367,16 @@ const datetime = "投稿日:";
   }
   .category__footer_link {
     letter-spacing: 0.04em;
-    color: rebeccapurple;
+    color: var(--color-purple);
     border: none;
     padding-block: 0.5rem;
     padding-inline: 1rem;
     transition: all 0.5s ease;
   }
   .category__footer_link:is(:hover, :focus-visible) {
-    color: rebeccapurple;
+    color: var(--color-purple);
     border: transparent 1px solid;
-    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
     border-radius: 0.5rem;
     text-decoration: none;
   }

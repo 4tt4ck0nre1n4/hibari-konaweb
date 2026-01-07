@@ -111,20 +111,22 @@ const mouseItem = {
 <style>
   .swiper__wrapper {
     width: 100%;
-    /* max-width: 320px; */
-    min-height: 300px; /* CLS対策: Swiper初期化前の高さを確保 */
-    margin-inline: auto;
+    height: 100%;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
     background: transparent;
-    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
     border-radius: 1rem;
-    padding-block-start: 1rem;
+    margin-inline: auto;
+    padding-block: 1rem;
     transition: box-shadow 0.4s ease;
   }
   .swiper__wrapper:is(:hover, :focus-visible) {
-    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
   }
   html.dark .swiper__wrapper:is(:hover, :focus-visible) {
-    box-shadow: 0 16px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
   }
   #swiper1.swiper {
     width: 100%;
@@ -234,33 +236,33 @@ const mouseItem = {
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
+    margin-block-start: 1.5rem;
     padding-inline-end: 2rem;
   }
 
   #js-mouseButton {
     width: 120px;
-    background: transparent;
-    border: transparent 1px solid;
-    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
-    border-radius: 1rem;
-    margin-block-start: 1rem;
-    transition:
-      transform 0.1s ease,
-      box-shadow 0.4s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: transparent;
+    border: transparent 1px solid;
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
+    border-radius: 1rem;
     overflow: hidden;
     aspect-ratio: 5 / 4;
+    transition:
+      transform 0.1s ease,
+      box-shadow 0.4s ease;
   }
   html.dark #js-mouseButton:is(:hover, :focus-visible) {
-    box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 8px 8px rgb(255 255 255 / 0.6);
   }
   html.dark #js-mouseButton:active {
-    box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.4);
   }
   #js-mouseButton:active {
-    box-shadow: 0 4px 8px rgba(0 0 0 / 0.4);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.4);
   }
   #js-mouse {
     width: 100px;
@@ -282,9 +284,9 @@ const mouseItem = {
     width: 100%;
     /* max-width: 320px; */
     height: calc(124px + 2rem - 40px);
-    min-height: 116px; /* CLS対策: 固定の最小高さを設定 */
+    min-height: 140px; /* CLS対策: 固定の最小高さを設定 */
     background: transparent;
-    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
     border-radius: 1rem;
     position: relative;
     margin-block-start: 1rem;
@@ -292,10 +294,17 @@ const mouseItem = {
     transition: box-shadow 0.4s ease;
   }
   .confetti__wrapper:is(:hover, :focus-visible) {
-    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
   }
   html.dark .confetti__wrapper:is(:hover, :focus-visible) {
-    box-shadow: 0 16px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
+  }
+
+  /* タブレットサイズでのレスポンシブ対応 */
+  @media (width <= 1024px) and (width > 768px) {
+    .swiper__wrapper {
+      display: none;
+    }
   }
 
   /* スマホサイズでのレスポンシブ対応 */
@@ -337,13 +346,20 @@ const mouseItem = {
     }
   }
 
+  /* 480px〜768pxサイズでのレスポンシブ対応 */
+  @media (width <= 768px) and (width > 480px) {
+    .swiper__wrapper {
+      display: none;
+    }
+  }
+
   /* 480px以下での超小型スマホ最適化 */
   @media (width <= 480px) {
     .swiper__wrapper {
       display: none;
       width: 100%;
       max-width: 100%;
-      margin-block-start: 1rem; /* スマホサイズでの余白調整 */
+      margin-block-start: 1rem;
     }
     .confetti__wrapper {
       width: 100%;

@@ -11,9 +11,9 @@
     width: 100%;
     height: auto;
     min-height: 14vh; /* Clock.astroと同じ高さ基準 */
-    background: white;
+    background: var(--color-white);
     border-radius: 1rem;
-    border: 1px solid gray;
+    border: var(--color-gray) 1px solid;
     transition-duration: 300ms;
     position: relative; /* Clock.astroと同じposition設定 */
     display: flex;
@@ -71,7 +71,7 @@
       max-width: 100%; /* モバイルでは全幅使用 */
       margin: 0 auto; /* 中央配置 */
       padding: 0.5rem;
-      border: 1px solid aqua !important;
+      border: 1px solid var(--color-aqua) !important;
     }
 
     /* スマホサイズでのPagefind UIのコンテナ全体を中央配置 */
@@ -98,11 +98,19 @@
     }
   };
 
-  // 遅延読み込み: requestIdleCallbackが利用可能な場合はそれを使用、そうでなければsetTimeout
-  if ("requestIdleCallback" in window) {
-    requestIdleCallback(loadPagefindCSS, { timeout: 2000 });
+  // 初回読み込み時のみ遅延読み込み
+  // View Transitions後は即座に読み込む必要があるため、別途処理
+  const isInitialLoad = !(window as any).__pagefindCSSLoaded;
+  if (isInitialLoad) {
+    (window as any).__pagefindCSSLoaded = true;
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(loadPagefindCSS, { timeout: 2000 });
+    } else {
+      setTimeout(loadPagefindCSS, 1000);
+    }
   } else {
-    setTimeout(loadPagefindCSS, 1000);
+    // View Transitions後は即座に読み込む
+    loadPagefindCSS();
   }
 
   let pagefindUIInstance: PagefindUI | null = null;
@@ -121,16 +129,21 @@
       const isSmallScreen = window.innerWidth <= 480;
       const isIPhoneDevice = isIPhone();
 
-      // 検索コンテナの基本スタイルを常に維持
+      // 検索コンテナの基本スタイルを常に維持（CSSで定義されているスタイルも明示的に設定）
       searchContainer.style.width = "100%";
+      searchContainer.style.height = "auto";
       searchContainer.style.minHeight = isIPhoneDevice ? "14vh" : isSmallScreen ? "12vh" : "14vh";
+      searchContainer.style.background = "#f1f5f9";
+      searchContainer.style.borderRadius = "1rem";
+      searchContainer.style.border = "1px solid #808080";
+      searchContainer.style.transitionDuration = "300ms";
       searchContainer.style.display = "flex";
       searchContainer.style.flexDirection = "column";
       searchContainer.style.alignItems = "center";
       searchContainer.style.justifyContent = "center";
       searchContainer.style.padding = isSmallScreen ? "0.25rem" : "0.5rem";
       searchContainer.style.boxSizing = "border-box";
-      searchContainer.style.borderRadius = "1rem";
+      searchContainer.style.position = "relative";
     }
 
     // PagefindUIのコンテナスタイルを維持
@@ -146,13 +159,16 @@
 
   // スマホサイズでのみ検索ボックスのborderを強制的に設定
   const applyBorderStyle = () => {
+    // コンテナスタイルを先に適用
+    ensureContainerStyle();
+
     const searchInput = document.querySelector("#search .pagefind-ui__search-input") as HTMLInputElement;
     if (searchInput) {
       // スマホサイズかどうかをチェック
       if (window.innerWidth <= 480) {
-        searchInput.style.border = "1px solid aqua";
-        searchInput.style.borderColor = "aqua";
-        searchInput.style.setProperty("border", "1px solid aqua", "important");
+        searchInput.style.border = "1px solid #00ffff";
+        searchInput.style.borderColor = "#00ffff";
+        searchInput.style.setProperty("border", "1px solid #00ffff", "important");
       } else {
         // パソコンサイズではborderをリセット
         searchInput.style.border = "";
@@ -160,12 +176,12 @@
         searchInput.style.removeProperty("border");
       }
     }
-
-    // コンテナスタイルも再適用
-    ensureContainerStyle();
   };
 
   function initSearch() {
+    // CSSの読み込みを確実にする（View Transitions後も）
+    loadPagefindCSS();
+
     // 既存のインスタンスを破棄
     if (pagefindUIInstance) {
       // PagefindUIにはdestroyメソッドがないため、要素をクリア
@@ -188,28 +204,52 @@
       resizeHandler = null;
     }
 
+    // 検索コンテナの基本スタイルを先に適用（PagefindUI初期化前）
+    ensureContainerStyle();
+
     // 新しいPagefindUIインスタンスを作成
     pagefindUIInstance = new PagefindUI({
       element: "#search",
       showImages: true,
     });
 
-    // 検索コンテナのスタイルを確実に適用
+    // 検索コンテナのスタイルを確実に適用（初期化直後）
     ensureContainerStyle();
 
-    // 複数のタイミングでスタイルを適用
-    setTimeout(applyBorderStyle, 100);
-    setTimeout(applyBorderStyle, 500);
-    setTimeout(applyBorderStyle, 1000);
+    // 複数のタイミングでスタイルを適用（PagefindUIのDOM生成を待つ）
+    setTimeout(() => {
+      ensureContainerStyle();
+      applyBorderStyle();
+    }, 50);
+    setTimeout(() => {
+      ensureContainerStyle();
+      applyBorderStyle();
+    }, 100);
+    setTimeout(() => {
+      ensureContainerStyle();
+      applyBorderStyle();
+    }, 300);
+    setTimeout(() => {
+      ensureContainerStyle();
+      applyBorderStyle();
+    }, 500);
+    setTimeout(() => {
+      ensureContainerStyle();
+      applyBorderStyle();
+    }, 1000);
 
     // ウィンドウリサイズ時にスタイルを再適用（重複登録を防ぐ）
-    resizeHandler = applyBorderStyle;
+    resizeHandler = () => {
+      ensureContainerStyle();
+      applyBorderStyle();
+    };
     window.addEventListener("resize", resizeHandler);
 
     // MutationObserverでDOMの変更を監視
     const searchContainer = document.querySelector("#search");
     if (searchContainer) {
       mutationObserver = new MutationObserver(() => {
+        ensureContainerStyle();
         applyBorderStyle();
       });
 
@@ -231,6 +271,10 @@
 
   // View Transitions対応: ページ遷移時に再初期化
   document.addEventListener("astro:after-swap", () => {
-    initSearch();
+    // CSS読み込みを確実にするため、少し遅延してから初期化
+    // DOMの更新とCSSの読み込み完了を待つ
+    setTimeout(() => {
+      initSearch();
+    }, 0);
   });
 </script>

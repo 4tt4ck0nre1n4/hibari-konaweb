@@ -107,8 +107,8 @@ depthAppearアニメーション中に適用するグリッチ効果の実装方
 
 ```css
 .image {
-  filter: drop-shadow(3px 0 0 rgba(255, 0, 0, 0.5)) drop-shadow(-3px 0 0 rgba(0, 0, 255, 0.5))
-    drop-shadow(0 2px 0 rgba(0, 255, 0, 0.3));
+  filter: drop-shadow(3px 0 0 rgb(255 0 0 / 0.5)) drop-shadow(-3px 0 0 rgb(0 0 255 / 0.5))
+    drop-shadow(0 2px 0 rgb(0 255 0 / 0.3));
 }
 ```
 

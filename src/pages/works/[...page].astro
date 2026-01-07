@@ -445,7 +445,7 @@ const worksPagination = {
   .scrollImage__menu_item {
     width: 100%;
     display: grid;
-    color: rebeccapurple;
+    color: var(--color-purple);
     background-color: transparent;
   }
   .scrollImage__header {
@@ -471,7 +471,7 @@ const worksPagination = {
   }
   .scrollImage__link {
     font-size: 0.875rem;
-    color: white;
+    color: var(--color-white);
     text-align: center;
     text-decoration: none;
     pointer-events: none;
@@ -511,11 +511,11 @@ const worksPagination = {
     display: block grid;
     grid-template-rows: subgrid;
     grid-row: span 4;
-    color: rebeccapurple;
+    color: var(--color-purple);
     background-color: whitesmoke;
-    border: rebeccapurple 1px solid;
+    border: var(--color-purple) 1px solid;
     border-radius: 1rem;
-    box-shadow: 0 0 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 0 8px rgb(0 0 0 / 0.6);
     overflow: hidden;
     position: relative;
     padding-block: 1rem;
@@ -568,11 +568,11 @@ const worksPagination = {
   }
   .worksCard__menu_item:is(:hover, :focus-visible) {
     background-color: transparent;
-    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
   }
   @media (prefers-color-scheme: dark) {
     html.dark .worksCard__menu_item:is(:hover, :focus-visible) {
-      color: #f1f5f9;
+      color: var(--color-white);
     }
     html.dark .worksCard__menu_item::before {
       background: linear-gradient(-90deg, transparent, #ffffff71, transparent, #ffffff71, transparent);
@@ -605,22 +605,22 @@ const worksPagination = {
     transition: all 0.4s ease;
   }
   .worksCard__link:is(:hover, :focus-visible) {
-    color: #020202;
-    border-bottom: 1px solid white;
-    box-shadow: 0 6px 10px rgba(0 0 0 / 0.6);
+    color: var(--color-black);
+    border-bottom: var(--color-white) 1px solid;
+    box-shadow: 0 6px 10px rgb(0 0 0 / 0.6);
     border-radius: 0.5rem;
     margin-inline: 0.5rem;
   }
   @media (prefers-color-scheme: dark) {
     html.dark .worksCard__link:is(:hover, :focus-visible) {
-      color: #f1f5f9;
-      border: 1px solid white;
+      color: var(--color-white);
+      border: 1px solid var(--color-white);
     }
   }
   .worksCard__image {
     width: 100%;
     height: 100%;
-    box-shadow: 0 6px 10px rgba(0 0 0 / 0.6);
+    box-shadow: 0 6px 10px rgb(0 0 0 / 0.6);
     object-fit: contain;
     overflow: hidden;
     transition: all 0.3s ease-in;
@@ -644,7 +644,7 @@ const worksPagination = {
     }
     @media (prefers-color-scheme: dark) {
       html.dark .worksCard__menu_item {
-        color: #f1f5f9;
+        color: var(--color-white);
       }
     }
   }

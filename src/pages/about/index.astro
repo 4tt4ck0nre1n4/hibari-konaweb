@@ -314,13 +314,13 @@ const stateMachine = "State Machine 1";
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    color: #020202;
+    color: var(--color-black);
     background: transparent;
     padding-inline: 1rem;
   }
 
   html.dark .about__textInner {
-    color: #f1f5f9;
+    color: var(--color-white);
   }
   .about__text {
     font-size: 0.9375rem;
@@ -329,7 +329,7 @@ const stateMachine = "State Machine 1";
     text-align: justify;
   }
   .about__text_link {
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-decoration: underline;
   }
   .about__text_link:is(:hover, :focus-visible) {
@@ -360,17 +360,17 @@ const stateMachine = "State Machine 1";
     height: 48px;
     border: transparent 1px solid;
     border-radius: 50%;
-    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
     transition:
       transform 0.1s ease,
       box-shadow 0.3s ease;
   }
   .about__snsMenu .sns-icon__item:is(:hover, :focus-visible) {
-    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
   }
   .about__snsMenu .sns-icon__item:active {
     transform: scale(0.8);
-    box-shadow: 0 8px 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 8px 8px rgb(0 0 0 / 0.6);
   }
   .about__snsMenu .sns-icon__link {
     display: flex;
@@ -384,24 +384,24 @@ const stateMachine = "State Machine 1";
     transition: all 0.3s ease;
   }
   .about__snsMenu .sns-icon__link:is(:hover, :focus-visible) {
-    color: rebeccapurple;
-    stroke: rebeccapurple;
-    fill: rebeccapurple;
+    color: var(--color-purple);
+    stroke: var(--color-purple);
+    fill: var(--color-purple);
   }
 
   /* ダークモード対応 */
   html.dark .about__snsMenu .sns-icon__item {
-    box-shadow: 0 4px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 4px 8px rgb(255 255 255 / 0.6);
   }
   html.dark .about__snsMenu .sns-icon__item:is(:hover, :focus-visible) {
-    box-shadow: 0 8px 4px rgba(255 255 255 / 0.6);
+    box-shadow: 0 8px 4px rgb(255 255 255 / 0.6);
   }
   html.dark .about__snsMenu .sns-icon__item:active {
     transform: scale(0.8);
-    box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 8px 8px rgb(255 255 255 / 0.6);
   }
   html.dark .about__snsMenu .sns-icon__link svg {
-    stroke: #f1f5f9;
+    stroke: var(--color-white);
   }
   .about__snsMenu .sns-icon__link svg {
     font-size: 1.5rem;
@@ -529,7 +529,7 @@ const stateMachine = "State Machine 1";
     width: 40px;
     height: 40px;
     font-size: 2rem;
-    text-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    text-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
     transition: all 0.4s ease-out;
   }
   /* ホバー可能なデバイス（主にPC）でのみホバー効果を適用 */

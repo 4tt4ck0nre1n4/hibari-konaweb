@@ -69,7 +69,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
     background-position: center;
     background-repeat: no-repeat;
     position: relative;
-    padding-block: 1.5rem;
+    padding-block: 2rem;
     z-index: 1;
   }
 
@@ -87,7 +87,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   }
 
   /* タブレット・スマホサイズでのレスポンシブ対応 */
-  @media (width <= 768px) {
+  @media (width <= 1024px) {
     #main-container {
       display: flex;
       flex-direction: column;

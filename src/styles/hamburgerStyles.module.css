@@ -1,7 +1,3 @@
-:root {
-  --color-purple: rgb(102 51 153);
-}
-
 .hamburger__overlay {
   --menu-top: 0px;
   --menu-left: 0px;
@@ -188,7 +184,7 @@
   height: auto;
   max-height: 100vh;
   color: #1a1a1a;
-  background: #fff;
+  background: var(--color-white);
   box-shadow:
     -8px 0 32px rgb(0 0 0 / 0.6),
     -4px 0 16px rgb(102 126 234 / 0.6);
@@ -211,8 +207,21 @@
     visibility 1.2s linear;
 }
 
-/* PCサイズでの調整 */
-@media (width >= 769px) {
+/* iPadサイズ（480px〜1024px）: PCサイズと同じ表示、ただしtop: 0, right: 16px */
+@media (width >= 481px) and (width <= 1024px) {
+  .hamburger__menu {
+    top: 0;
+    right: 16px;
+    transform: none;
+  }
+
+  .hamburger__menu.open {
+    transform: none;
+  }
+}
+
+/* PCサイズ（1025px以上）での調整 */
+@media (width >= 1025px) {
   .hamburger__menu {
     top: 50%;
     transform: translateY(-50%);
@@ -235,7 +244,7 @@
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* タブレットサイズとスマホサイズでのみ表示 */
+/* タブレットサイズとスマホサイズ（1024px以下）でロゴを表示 */
 @media (width <= 1024px) {
   .hamburger__logo_wrapper {
     display: flex;
@@ -359,7 +368,7 @@
   padding-block-end: 1rem;
 }
 
-/* タブレット・スマホサイズでロゴが表示される場合の調整 */
+/* タブレットサイズとスマホサイズ（1024px以下）でロゴが表示される場合の調整 */
 @media (width <= 1024px) {
   .hamburger__menu ul {
     margin-block-start: 0.75rem;
@@ -641,13 +650,13 @@
 }
 
 .hamburger__snsLink:is(:hover, :focus-visible) {
-  color: rebeccapurple;
-  stroke: rebeccapurple;
-  fill: rebeccapurple;
+  color: var(--color-purple);
+  stroke: var(--color-purple);
+  fill: var(--color-purple);
 }
 
 .hamburger__snsLink:focus-visible {
-  outline: 2px solid rebeccapurple;
+  outline: 2px solid var(--color-purple);
   outline-offset: 2px;
 }
 
@@ -658,7 +667,7 @@
 }
 
 :global(html.dark) .hamburger__snsLink svg {
-  stroke: #f1f5f9;
+  stroke: var(--color-white);
 }
 
 .hamburger__snsLink :global(.sns-icon__name) {
@@ -669,7 +678,7 @@
   width: 94%;
   display: block;
   font-size: 0.75rem;
-  color: rebeccapurple;
+  color: var(--color-purple);
   color: inherit;
   text-align: center;
   border-top: 2px solid rgb(102 126 234 / 0.4);

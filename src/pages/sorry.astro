@@ -59,10 +59,6 @@ const sorryImageMeta = {
 </Layout>
 
 <style>
-  :root {
-    --color-purple: rgb(102 51 153);
-    --color-red: #ff4f48;
-  }
   .sorry__wrapper {
     width: 100%;
     max-width: 700px;
@@ -123,7 +119,7 @@ const sorryImageMeta = {
   }
   /* ダークモード時に猫の体を白色にする */
   html.dark .sorry__image {
-    background-color: #ffffff;
+    background-color: var(--color-white);
   }
   @keyframes movingCat {
     0% {
@@ -133,17 +129,4 @@ const sorryImageMeta = {
       transform: translateY(-10px) translateZ(16px);
     }
   }
-
-  /* .sorry__link {
-    display: block;
-    color: rebeccapurple;
-    text-align: center;
-    text-decoration: underline;
-    margin-block-start: 3rem;
-    padding-block: 1rem;
-  }
-  .sorry__link:is(:hover, :focus-within) {
-    color: #ff4f48;
-    text-decoration: none;
-  } */
 </style>

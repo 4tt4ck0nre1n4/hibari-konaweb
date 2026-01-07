@@ -42,6 +42,11 @@ export default {
       },
     ],
 
+    // Allow vendor prefixes for mask properties (needed for browser compatibility)
+    // Note: This rule checks for vendor-prefixed properties, so we disable it
+    // to allow -webkit-mask-* properties alongside standard mask-* properties
+    "property-no-vendor-prefix": null,
+
     // Declaration block no redundant longhand properties
     "declaration-block-no-redundant-longhand-properties": null,
 

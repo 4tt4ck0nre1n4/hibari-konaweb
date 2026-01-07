@@ -86,7 +86,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     background-position: 100%;
     perspective: 1000px;
     border-radius: 0.5rem;
-    box-shadow: 0 0 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 0 8px rgb(0 0 0 / 0.6);
     transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     padding-block: 1rem;
   }
@@ -230,7 +230,6 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     opacity: 0.8;
     padding: calc(1.5rem - 1px);
     overflow: hidden;
-    /* transform: translateZ(80px); */
   }
   .card__article {
     width: 100%;
@@ -239,7 +238,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
 
   .card__item_header {
     font-size: 1.125rem;
-    border-bottom: rebeccapurple 1px solid;
+    border-bottom: var(--color-purple) 1px solid;
     transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
     margin: 0;
     text-align: center;
@@ -253,27 +252,26 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     gap: 0.5rem;
     font-size: 1rem;
     font-weight: bold;
-    color: white;
-    background: linear-gradient(135deg, rgb(102, 51, 153) 0%, rgb(120, 70, 180) 100%);
-    box-shadow: 0 4px 12px rgba(102, 51, 153, 0.3);
+    color: var(--color-white);
+    background: linear-gradient(135deg, var(--color-purple) 0%, rgb(120 70 180) 100%);
+    box-shadow: 0 4px 12px rgb(102 51 153 / 0.3);
     border: none;
     border-radius: 0.5rem;
     margin-block-start: 1rem;
     padding-block: 0.5rem;
     padding-inline: 1rem;
     transition: all 0.3s ease-in-out;
-    /* cursor: pointer; */
   }
 
   .card__flip_arrow:hover {
-    background: linear-gradient(135deg, rgb(120, 70, 180) 0%, rgb(102, 51, 153) 100%);
+    background: linear-gradient(135deg, rgb(120 70 180) 0%, rgb(102 51 153) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 51, 153, 0.4);
+    box-shadow: 0 6px 16px rgb(102 51 153 / 0.4);
   }
 
   .card__flip_arrow:active {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(102, 51, 153, 0.3);
+    box-shadow: 0 2px 8px rgb(102 51 153 / 0.3);
   }
 
   .card__flip_arrow svg {
@@ -282,9 +280,6 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     transition: transform 0.3s ease;
   }
 
-  .card__flip_arrow:hover svg {
-    /* transform: translateX(2px); */
-  }
   .card__item_body {
     font-size: 0.9375rem;
     line-height: 1.8;
@@ -297,38 +292,38 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   }
   .card__item:is(:hover, :focus-visible) {
     background-color: transparent;
-    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
     background-position: 0;
     background-image: linear-gradient(
       45deg,
-      rgba(238, 161, 255, 1),
+      rgb(238 161 255 / 1),
       #ffffff71,
-      rgba(147, 183, 255, 1),
+      rgb(147 183 255 / 1),
       #ffffff71,
-      rgba(170, 244, 254, 1)
+      rgb(170 244 254 / 1)
     );
   }
   html.dark .card__item {
-    box-shadow: 0 4px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 4px 8px rgb(255 255 255 / 0.6);
   }
   html.dark .card__item:is(:hover, :focus-visible) {
-    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
     background-position: 0;
     background-image: linear-gradient(45deg, #ffffff71, transparent, #ffffff71, transparent, #ffffff71);
   }
 
   html.dark .card__flip_arrow {
     background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
-    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 4px 12px rgb(168 85 247 / 0.3);
   }
 
   html.dark .card__flip_arrow:hover {
     background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
-    box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4);
+    box-shadow: 0 6px 16px rgb(168 85 247 / 0.4);
   }
   .card__item:is(:hover, :focus-visible) .card__item_header {
     color: rgb(var(--accent-light));
-    color: rebeccapurple;
+    color: var(--color-purple);
   }
   .card__item_image {
     width: 100%;
@@ -385,7 +380,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     width: 40px;
     height: 40px;
     border: 4px solid #f3f3f3;
-    border-top: 4px solid rebeccapurple;
+    border-top: var(--color-purple) 4px solid;
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -408,8 +403,8 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(135deg, rgba(102, 51, 153, 0.1) 0%, rgba(102, 51, 153, 0.05) 100%);
-    border: 1px solid rgba(102, 51, 153, 0.2);
+    background: linear-gradient(135deg, rgb(102 51 153 / 0.1) 0%, rgb(102 51 153 / 0.05) 100%);
+    border: 1px solid rgb(102 51 153 / 0.2);
     border-radius: 0.5rem;
     position: relative;
     overflow: hidden;
@@ -424,17 +419,16 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(45deg, transparent 30%, rgba(102, 51, 153, 0.03) 50%, transparent 70%);
+    background: linear-gradient(45deg, transparent 30%, rgb(102 51 153 / 0.03) 50%, transparent 70%);
     pointer-events: none;
   }
 
   .card__back_header {
     font-size: 1.125rem;
     font-weight: bold;
-    /* color: rgb(102, 51, 153); */
     text-align: center;
 
-    border-bottom: 2px solid rgba(102, 51, 153, 0.3);
+    border-bottom: 2px solid rgb(102 51 153 / 0.3);
     position: relative;
     z-index: 1;
     padding-block-end: 0.5rem;
@@ -446,7 +440,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     letter-spacing: 0.02em;
     text-align: center;
     margin-bottom: 1.5rem;
-    color: rgba(102, 51, 153, 0.8);
+    color: rgb(102 51 153 / 0.8);
     flex-grow: 1;
     display: flex;
     align-items: center;
@@ -457,7 +451,6 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   .card__back_details {
     width: 100%;
     max-width: 288px;
-
     padding-block-start: 1rem;
     position: relative;
     z-index: 1;
@@ -466,20 +459,20 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   .card__back_details_item {
     font-size: 0.9375rem;
     line-height: 1.4;
-    background: rgba(102, 51, 153, 0.08);
-    color: rgb(102, 51, 153);
+    background: rgb(102 51 153 / 0.08);
+    color: var(--color-purple);
     margin-block-start: 0.5rem;
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
-    border-left: 3px solid rgb(102, 51, 153);
+    border-left: var(--color-purple) 3px solid;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(102, 51, 153, 0.1);
+    box-shadow: 0 2px 4px rgb(102 51 153 / 0.1);
   }
 
   .card__back_details_item:hover {
-    background: rgba(102, 51, 153, 0.12);
+    background: rgb(102 51 153 / 0.12);
     transform: translateX(2px);
-    box-shadow: 0 4px 8px rgba(102, 51, 153, 0.15);
+    box-shadow: 0 4px 8px rgb(102 51 153 / 0.15);
   }
 
   .card__back_details_item:last-child {
@@ -487,7 +480,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
   }
 
   html.dark .card__back_details_item {
-    color: #ffffff;
+    color: var(--color-white);
   }
 
   .card__back_details p {
@@ -497,8 +490,8 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
 
   .card__flip_back {
     min-width: 120px;
-    background: linear-gradient(135deg, rgb(102, 51, 153) 0%, rgb(120, 70, 180) 100%);
-    color: white;
+    background: linear-gradient(135deg, rgb(102 51 153) 0%, rgb(120 70 180) 100%);
+    color: var(--color-white);
     border: none;
     border-radius: 0.5rem;
     margin-block-start: 0.5rem;
@@ -506,20 +499,20 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     font-size: 1.25rem;
     font-weight: bold;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(102, 51, 153, 0.3);
+    box-shadow: 0 4px 12px rgb(102 51 153 / 0.3);
     position: relative;
     z-index: 1;
   }
 
   .card__flip_back:hover {
-    background: linear-gradient(135deg, rgb(120, 70, 180) 0%, rgb(102, 51, 153) 100%);
+    background: linear-gradient(135deg, rgb(120 70 180) 0%, rgb(102 51 153) 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 51, 153, 0.4);
+    box-shadow: 0 6px 16px rgb(102 51 153 / 0.4);
   }
 
   .card__flip_back:active {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(102, 51, 153, 0.3);
+    box-shadow: 0 2px 8px rgb(102 51 153 / 0.3);
   }
 
   /* 裏面オーバーレイ（タッチ操作用） */

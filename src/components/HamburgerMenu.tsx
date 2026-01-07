@@ -61,6 +61,7 @@ const HamburgerMenu = () => {
   const [portalTarget, setPortalTarget] = useState<Element | null>(null);
   const firstMenuLinkRef = useRef<HTMLAnchorElement | null>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+  const scrollPositionRef = useRef<number>(0);
 
   const closeMenu = () => setIsOpen(false);
   const toggleMenu = () => {
@@ -216,16 +217,52 @@ const HamburgerMenu = () => {
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("keydown", handleKeyDown);
 
-    // CLS対策: scrollbar-gutterがあるためbodyのoverflowでも問題なし
+    // スクロールロック: メニューが開いている時は背景のスクロールを防ぐ
     if (isOpen) {
+      // 現在のスクロール位置を保存
+      scrollPositionRef.current =
+        window.scrollY !== undefined && window.scrollY !== null ? window.scrollY : document.documentElement.scrollTop;
+
+      // htmlとbodyの両方にoverflow: hiddenを設定（確実にスクロールを防ぐ）
+      document.documentElement.style.overflow = "hidden";
+      document.documentElement.style.position = "fixed";
+      document.documentElement.style.top = `-${scrollPositionRef.current}px`;
+      document.documentElement.style.width = "100%";
       document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollPositionRef.current}px`;
+      document.body.style.width = "100%";
     } else {
+      // スクロールロックを解除
+      document.documentElement.style.overflow = "";
+      document.documentElement.style.position = "";
+      document.documentElement.style.top = "";
+      document.documentElement.style.width = "";
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+
+      // 保存したスクロール位置に復元
+      window.scrollTo(0, scrollPositionRef.current);
+      scrollPositionRef.current = 0;
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
+
+      // クリーンアップ: メニューが閉じられた時に確実にスクロールロックを解除
+      if (!isOpen) {
+        document.documentElement.style.overflow = "";
+        document.documentElement.style.position = "";
+        document.documentElement.style.top = "";
+        document.documentElement.style.width = "";
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+      }
     };
   }, [isOpen]);
 

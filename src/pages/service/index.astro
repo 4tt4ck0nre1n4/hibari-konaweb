@@ -109,7 +109,7 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   }
   /* ダークモード時に猫の体を白色にする */
   html.dark .price__image {
-    background-color: #ffffff;
+    background-color: var(--color-white);
   }
   @keyframes movingCat {
     0% {

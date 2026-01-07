@@ -103,20 +103,14 @@ const categoryIcon = {
   .category__wrapper {
     width: 700px;
     max-width: 100%;
-    /* margin-block: 2rem; */
     margin-inline: auto;
   }
   .category__inner {
-    /* display: grid; */
-    /* place-items: center; */
-    /* border: 1px solid rebeccapurple; */
-
     padding-block: 2rem;
   }
   .category__title {
     font-size: 2rem;
     text-align: center;
-    /* margin-block-start: 2rem; */
   }
   .category__text {
     font-size: 1rem;
@@ -142,7 +136,7 @@ const categoryIcon = {
     border: transparent 1px solid;
     border: none;
     border-radius: 0.5rem;
-    box-shadow: 0 0px 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 0px 8px rgb(0 0 0 / 0.6);
     overflow: hidden;
     position: relative;
     padding-block: 0.5rem;
@@ -157,11 +151,11 @@ const categoryIcon = {
     background: linear-gradient(
       -90deg,
       transparent,
-      rgba(236, 159, 255, 1),
+      rgb(236 159 255 / 1),
       #ffffff71,
-      rgba(147, 183, 255, 1),
+      rgb(147 183 255 / 1),
       #ffffff71,
-      rgba(170, 244, 254, 1),
+      rgb(170 244 254 / 1),
       transparent
     );
     position: absolute;
@@ -195,7 +189,7 @@ const categoryIcon = {
   .category__menu_item:is(:hover, :focus-visible) {
     background-color: transparent;
     border: transparent 1px solid;
-    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
   }
   .category__menu_link {
     display: flex;
@@ -208,7 +202,7 @@ const categoryIcon = {
     transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .category__menu_link:is(:hover, :focus-visible) {
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-decoration: underline;
   }
   .category__menu_name {

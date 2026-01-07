@@ -197,7 +197,7 @@ export default function RiveComponent({
         }}
       />
       {error !== null && error !== "" && (
-        <div className="rive-error" style={{ padding: "1rem", textAlign: "center", color: "red" }}>
+        <div className="rive-error" style={{ padding: "1rem", textAlign: "center", color: "#ff4f48" }}>
           <p>Rive animation failed to load</p>
           <p style={{ fontSize: "0.875rem", opacity: 0.7 }}>{error}</p>
         </div>

@@ -17,11 +17,9 @@ const glitchImage = await getImage({ src: glitchImageSrc });
 <style is:global>
   .glitch {
     width: 100%;
-    max-width: 600px;
     max-width: 500px;
-    height: 100vh;
     height: 500px;
-    background: #000000;
+    background-color: #000000;
     border-radius: 50%;
     background-position: center;
     background-repeat: no-repeat;
@@ -43,11 +41,10 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     .glitch {
       max-width: 480px;
       height: 400px;
-      /* background-size: contain; */
     }
   }
   .glitch-image {
-    background: inherit;
+    background: inherit; /* 親要素のbackgroundプロパティ全体を継承 */
     background-size: cover;
     position: absolute;
     top: 0;
@@ -65,20 +62,21 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   @keyframes shake {
     0% {
       transform: translate3d(0, 0, 0);
+      opacity: 0.2;
     }
     25% {
-      transform: translate3d(16px, 0, -16px);
-      opacity: 0.8;
+      transform: translate3d(8px, 0, -16px);
+      opacity: 0.2;
     }
     50% {
       opacity: 0.5;
     }
-    75% {
+    /* 75% {
       opacity: 0.25;
-    }
+    } */
     100% {
-      transform: translate3d(0, 0, 0);
-      opacity: 0.5;
+      transform: translate3d(0, 0, 0) perspective(100px);
+      opacity: 0.2;
     }
   }
 
@@ -102,27 +100,32 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     background: #00ff00;
     animation: glitchAnime-2 1.4s infinite linear;
   }
+
   .b::before {
     background: #0000ff;
     animation: glitchAnime-3 1.6s infinite linear;
   }
-
   .f::before {
-    background: rgba(29, 31, 32, 0.1);
+    background: #000000;
     background-blend-mode: overlay;
     animation: glitchAnime-4 1.8s infinite linear;
   }
 
   .glitch-layer {
+    background-size: cover;
     background-repeat: no-repeat;
-    background-position: 0 0;
+    background-position: 50% 0;
+    border-radius: 50%;
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    border-radius: 50%;
-    transform: translateX(-5%);
+    overflow: hidden;
+    mix-blend-mode: screen;
+    /* mix-blend-mode: overlay; */
+    opacity: 1;
+    /* transform: translateX(3%); */
     /* アニメーションはJavaScriptで動的に制御 */
     animation: none;
     z-index: 0;
@@ -138,6 +141,21 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   }
   @keyframes opacity {
     0% {
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+    /* 0% {
       opacity: 0.8;
     }
     8% {
@@ -162,13 +180,15 @@ const glitchImage = await getImage({ src: glitchImageSrc });
       opacity: 0.2;
     }
     100% {
-      opacity: 0.1;
-    }
+      opacity: 0;
+    } */
   }
   @keyframes glitchAnime-1 {
     0% {
+      opacity: 1;
       clip-path: polygon(0 0, 100% 16%, 100% 24%, 0 40%);
       transform: translate(16px, 0);
+      transform: translate3d(-8px, -8px, 0);
     }
     2% {
       clip-path: polygon(0 16%, 100% 16%, 100% 16%, 0 18%);
@@ -210,20 +230,26 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
 
     21.9% {
+      opacity: 1;
       transform: translate(16px, 0);
+      transform: translate3d(-8px, -8px, 0);
     }
 
     22%,
-    to {
+    100% {
+      opacity: 0;
       clip-path: polygon(0 0, 0 0, 0 0, 0 0);
       transform: translate(0, 0);
+      transform: translate3d(0, 0, 0);
     }
   }
 
   @keyframes glitchAnime-2 {
     0% {
+      opacity: 1;
       clip-path: polygon(0 24%, 100% 24%, 100% 32%, 0 32%);
       transform: translate(8px, 0);
+      transform: translate3d(8px, 8px, 0);
     }
 
     3% {
@@ -267,20 +293,26 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
 
     21.9% {
+      opacity: 1;
       transform: translate(8px, 0);
+      transform: translate3d(8px, 8px, 0);
     }
 
     22%,
-    to {
+    100% {
+      opacity: 0;
       clip-path: polygon(0 0, 0 0, 0 0, 0 0);
       transform: translate(0, 0);
+      transform: translate3d(0, 0, 0);
     }
   }
 
   @keyframes glitchAnime-3 {
     0% {
+      opacity: 1;
       clip-path: polygon(0 1%, 100% 1%, 100% 4%, 0 1%);
       transform: translate(8px, 0);
+      transform: translate3d(16px, 0, 0);
     }
 
     1.5% {
@@ -356,13 +388,17 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
 
     21.9% {
+      opacity: 1;
       transform: translate(8px, 0);
+      transform: translate3d(16px, 0, 0);
     }
 
     22%,
-    to {
+    100% {
+      opacity: 0;
       clip-path: polygon(0 0, 0 0, 0 0, 0 0);
       transform: translate(0, 0);
+      transform: translate3d(0, 0, 0);
     }
   }
 
@@ -380,42 +416,63 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     }
     100% {
       opacity: 0;
+      transform: translate3d(0, 0, 0);
     }
   }
 
   @keyframes glitchAnime-5 {
     0% {
+      opacity: 1;
+      background-position: 50% 0;
       clip-path: polygon(0 0%, 100% 0%, 100% 5%, 0 5%);
     }
-    10% {
+    2% {
+      background-position: 45% 0;
       clip-path: polygon(0 15%, 100% 15%, 100% 15%, 0 15%);
     }
-    20% {
+    4% {
+      background-position: 55% 0;
       clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%);
     }
-    30% {
+    6% {
+      background-position: 45% 0;
       clip-path: polygon(0 1%, 100% 1%, 100% 2%, 0 2%);
     }
-    40% {
+    8% {
+      background-position: 50% 0;
       clip-path: polygon(0 35%, 100% 35%, 100% 35%, 0 35%);
     }
-    50% {
+    10% {
+      background-position: 55% 0;
       clip-path: polygon(0 45%, 100% 45%, 100% 46%, 0 46%);
     }
-    60% {
+    12% {
+      background-position: 50% 0;
       clip-path: polygon(0 50%, 100% 50%, 100% 70%, 0 70%);
     }
-    70% {
+    14% {
+      clip-path: polygon(0 40%, 100% 48%, 100% 56%, 0 40%);
+    }
+    16% {
+      background-position: 45% 0;
       clip-path: polygon(0 70%, 100% 70%, 100% 70%, 0 70%);
     }
-    80% {
+    18% {
+      background-position: 50% 0;
       clip-path: polygon(0 80%, 100% 80%, 100% 80%, 0 80%);
     }
-    90% {
-      clip-path: polygon(0 50%, 100% 50%, 100% 55%, 0 55%);
+    20% {
+      clip-path: polygon(0 72%, 100% 72%, 100% 72%, 0 88%);
     }
-    100% {
+    21.9% {
+      background-position: 45% 0;
       clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+    }
+    22%,
+    100% {
+      opacity: 0;
+      background-position: 50% 0;
+      clip-path: polygon(0 0, 0 0, 0 0, 0 0);
     }
   }
 </style>
@@ -493,49 +550,14 @@ const glitchImage = await getImage({ src: glitchImageSrc });
         });
       }
 
-      // 親要素から背景画像を取得して、.glitch-image要素に設定
-      const glitchContainer = document.querySelector(".glitch") as HTMLElement;
-      const containerBgImage = glitchContainer ? window.getComputedStyle(glitchContainer).backgroundImage : "";
-
-      // .glitch-image要素に背景画像を設定
-      if (glitchR && containerBgImage) {
-        glitchR.style.backgroundImage = containerBgImage;
-        glitchR.style.backgroundPosition = "center";
-        glitchR.style.backgroundRepeat = "no-repeat";
-        glitchR.style.borderRadius = "50%";
-      }
-      if (glitchG && containerBgImage) {
-        glitchG.style.backgroundImage = containerBgImage;
-        glitchG.style.backgroundPosition = "center";
-        glitchG.style.backgroundRepeat = "no-repeat";
-        glitchG.style.borderRadius = "50%";
-      }
-      if (glitchB && containerBgImage) {
-        glitchB.style.backgroundImage = containerBgImage;
-        glitchB.style.backgroundPosition = "center";
-        glitchB.style.backgroundRepeat = "no-repeat";
-        glitchB.style.borderRadius = "50%";
-      }
-      if (glitchF && containerBgImage) {
-        glitchF.style.backgroundImage = containerBgImage;
-        glitchF.style.backgroundPosition = "center";
-        glitchF.style.backgroundRepeat = "no-repeat";
-        glitchF.style.borderRadius = "50%";
-      }
-
-      // glitchLayerにも背景画像を設定
-      const glitchLayer = document.querySelector(".glitch-layer") as HTMLElement;
-      if (glitchLayer && containerBgImage) {
-        glitchLayer.style.backgroundImage = containerBgImage;
-        glitchLayer.style.borderRadius = "50%";
-      }
-
       // 1. glitchAnimeアニメーションを8秒間実行
       if (glitchR) glitchR.style.animation = "glitchAnime-1 1.2s linear infinite alternate";
       if (glitchG) glitchG.style.animation = "glitchAnime-2 1.4s linear infinite alternate";
       if (glitchB) glitchB.style.animation = "glitchAnime-3 1.6s linear infinite alternate";
       if (glitchF) glitchF.style.animation = "glitchAnime-4 1.8s linear infinite alternate";
 
+      // glitchLayerの背景画像を設定（glitchLayerはインラインスタイルで設定済み）
+      const glitchLayer = document.querySelector(".glitch-layer") as HTMLElement;
       // ② glitchAnime-5を.glitch-layerに適用
       // glitchLayerは上で既に取得済み
       if (glitchLayer) {
@@ -555,10 +577,21 @@ const glitchImage = await getImage({ src: glitchImageSrc });
       // 3. 16秒後（shake終了後）にopacityアニメーションを発動
       setTimeout(() => {
         if (DEBUG) console.log("Starting opacity animation...");
+        if (glitchR) glitchR.style.animation = "glitchAnime-1 1.2s linear infinite alternate";
+      if (glitchG) glitchG.style.animation = "glitchAnime-2 1.4s linear infinite alternate";
+      if (glitchB) glitchB.style.animation = "glitchAnime-3 1.6s linear infinite alternate";
+      if (glitchF) glitchF.style.animation = "glitchAnime-4 1.8s linear infinite alternate";
         glitchImages.forEach((img) => {
           const element = img as HTMLElement;
+          // ループ2巡目以降でも確実にopacityアニメーションが発火するように、
+          // 一度アニメーションとopacityをリセットしてから再適用する
+          element.style.removeProperty("animation");
+          element.style.removeProperty("opacity");
+          // 再描画を強制して同一アニメーション名でも再生されるようにする
+          void element.offsetWidth;
           // opacityアニメーションを追加
           element.style.animation = "opacity 8s linear";
+          // element.style.animation = "noise 8s linear";
         });
       }, 16000); // 8秒 + 8秒 = 16秒後
 
@@ -624,17 +657,19 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           glitchLayer.style.borderRadius = "50%";
         }
 
-        // ④ .glitchの背景色をふわっと#ffffffに変更
+        // ④ .glitchの背景色をふわっとvar(--color-white)#f1f5f9に変更
         const glitchContainer = document.querySelector(".glitch") as HTMLElement;
         if (glitchContainer) {
-          // 背景画像を保持したまま背景色のみを変更
+          // 背景画像を保持したまま背景色のみを変更（backgroundImageは再設定しない）
           const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
           glitchContainer.style.transition = "background-color 3s ease-out";
-          glitchContainer.style.backgroundColor = "#ffffff";
+          glitchContainer.style.backgroundColor = "#f1f5f9";
+          // 追加したコード
           glitchContainer.style.backgroundImage = bgImage;
           glitchContainer.style.backgroundPosition = "center";
           glitchContainer.style.backgroundRepeat = "no-repeat";
           glitchContainer.style.borderRadius = "50%";
+          // 追加したコードここまで
         }
 
         // 5. 3秒後（フェードアウト完了後）に背景をtransparentにフェード
@@ -642,14 +677,16 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           if (DEBUG) console.log("Fading background to transparent...");
           const glitchContainer = document.querySelector(".glitch") as HTMLElement;
           if (glitchContainer) {
-            // 背景画像を保持したまま背景色のみをtransparentに変更
+            // 背景画像を保持したまま背景色のみをtransparentに変更（backgroundImageは再設定しない）
             const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
             glitchContainer.style.transition = "background-color 3s ease-out";
             glitchContainer.style.backgroundColor = "transparent";
+            // 追加したコード
             glitchContainer.style.backgroundImage = bgImage;
             glitchContainer.style.backgroundPosition = "center";
             glitchContainer.style.backgroundRepeat = "no-repeat";
             glitchContainer.style.borderRadius = "50%";
+            // 追加したコードここまで
           }
 
           // 6. 3秒後（transparentフェード完了後）に6秒待機してから背景を黒にフェード
@@ -661,14 +698,16 @@ const glitchImage = await getImage({ src: glitchImageSrc });
               if (DEBUG) console.log("Fading background to black...");
               const glitchContainer = document.querySelector(".glitch") as HTMLElement;
               if (glitchContainer) {
-                // 背景画像を保持したまま背景色のみを変更
+                // 背景画像を保持したまま背景色のみを変更（backgroundImageは再設定しない）
                 const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
                 glitchContainer.style.transition = "background-color 3s ease-out";
                 glitchContainer.style.backgroundColor = "#000000";
+                // 追加したコード
                 glitchContainer.style.backgroundImage = bgImage;
                 glitchContainer.style.backgroundPosition = "center";
                 glitchContainer.style.backgroundRepeat = "no-repeat";
                 glitchContainer.style.borderRadius = "50%";
+                // 追加したコードここまで
               }
 
               // 背景が黒にフェード完了後、アニメーションをリセットしてループ
@@ -682,89 +721,114 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                   if (DEBUG) console.log("Removed stop style element");
                 }
 
+                // 追加したコード
                 // 親コンテナから背景画像を取得し、背景色もリセット
                 const containerBgImage = window.getComputedStyle(glitchContainer).backgroundImage;
                 if (DEBUG) console.log("Container background image:", containerBgImage);
+                // 追加したコードここまで
 
-                // .glitchコンテナの背景色を黒に戻す（背景画像を保持）
+                // .glitchコンテナの背景色を黒に戻す（backgroundImageは再設定しない）
                 if (glitchContainer) {
                   glitchContainer.style.transition = "";
                   glitchContainer.style.backgroundColor = "#000000";
+                  // 追加したコード
                   glitchContainer.style.backgroundImage = containerBgImage;
                   glitchContainer.style.backgroundPosition = "center";
                   glitchContainer.style.backgroundRepeat = "no-repeat";
                   glitchContainer.style.borderRadius = "50%";
+                  // 追加したコードここまで
                 }
 
                 // 要素を完全に初期状態にリセット
                 // glitchLayer
                 if (glitchLayer) {
                   glitchLayer.removeAttribute("style");
+                  // 追加したコード
                   glitchLayer.style.backgroundImage = containerBgImage;
                   glitchLayer.style.borderRadius = "50%";
+                  // 追加したコードここまで
                 }
 
                 // R, G, B, F要素のリセット（初期状態に確実に戻す）
-
                 if (glitchR) {
-                  glitchR.style.backgroundImage = containerBgImage;
-                  glitchR.style.backgroundPosition = "center";
-                  glitchR.style.backgroundRepeat = "no-repeat";
-                  glitchR.style.position = "absolute";
-                  glitchR.style.top = "0";
-                  glitchR.style.right = "0";
-                  glitchR.style.bottom = "0";
-                  glitchR.style.left = "0";
-                  glitchR.style.borderRadius = "50%";
-                  glitchR.style.mixBlendMode = "screen";
+                  // 追加したコード
+                  // glitchR.style.removeProperty("background-image");
+                  // glitchR.style.removeProperty("background-position");
+                  // glitchR.style.removeProperty("background-repeat");
+                  // glitchR.style.backgroundImage = containerBgImage;
+                  // glitchR.style.backgroundPosition = "center";
+                  // glitchR.style.backgroundRepeat = "no-repeat";
+                  // glitchR.style.borderRadius = "50%";
+                  // glitchR.style.mixBlendMode = "screen";
+                  // glitchF.style.position = "absolute";
+                  // glitchF.style.top = "0";
+                  // glitchF.style.right = "0";
+                  // glitchF.style.bottom = "0";
+                  // glitchF.style.left = "0";
+                  // 追加したコードここまで
                   glitchR.style.removeProperty("opacity");
                   glitchR.style.removeProperty("transition");
                   glitchR.style.removeProperty("transform");
                   glitchR.style.animation = "none";
                 }
                 if (glitchG) {
-                  glitchG.style.backgroundImage = containerBgImage;
-                  glitchG.style.backgroundPosition = "center";
-                  glitchG.style.backgroundRepeat = "no-repeat";
-                  glitchG.style.position = "absolute";
-                  glitchG.style.top = "0";
-                  glitchG.style.right = "0";
-                  glitchG.style.bottom = "0";
-                  glitchG.style.left = "0";
-                  glitchG.style.borderRadius = "50%";
-                  glitchG.style.mixBlendMode = "screen";
+                  // 追加したコード
+                  // glitchG.style.removeProperty("background-image");
+                  // glitchG.style.removeProperty("background-position");
+                  // glitchG.style.removeProperty("background-repeat");
+                  // glitchG.style.backgroundImage = containerBgImage;
+                  // glitchG.style.backgroundPosition = "center";
+                  // glitchG.style.backgroundRepeat = "no-repeat";
+                  // glitchG.style.borderRadius = "50%";
+                  // glitchG.style.mixBlendMode = "screen";
+                  // glitchG.style.position = "absolute";
+                  // glitchG.style.top = "0";
+                  // glitchG.style.right = "0";
+                  // glitchG.style.bottom = "0";
+                  // glitchG.style.left = "0";
+                  // 追加したコードここまで
                   glitchG.style.removeProperty("opacity");
                   glitchG.style.removeProperty("transition");
                   glitchG.style.removeProperty("transform");
                   glitchG.style.animation = "none";
                 }
                 if (glitchB) {
-                  glitchB.style.backgroundImage = containerBgImage;
-                  glitchB.style.backgroundPosition = "center";
-                  glitchB.style.backgroundRepeat = "no-repeat";
-                  glitchB.style.position = "absolute";
-                  glitchB.style.top = "0";
-                  glitchB.style.right = "0";
-                  glitchB.style.bottom = "0";
-                  glitchB.style.left = "0";
-                  glitchB.style.borderRadius = "50%";
-                  glitchB.style.mixBlendMode = "screen";
+                  // 追加したコード
+                  // glitchB.style.removeProperty("background-image");
+                  // glitchB.style.removeProperty("background-position");
+                  // glitchB.style.removeProperty("background-repeat");
+                  // glitchB.style.backgroundImage = containerBgImage;
+                  // glitchB.style.backgroundPosition = "center";
+                  // glitchB.style.backgroundRepeat = "no-repeat";
+                  // glitchB.style.borderRadius = "50%";
+                  // glitchB.style.mixBlendMode = "screen";
+                  // glitchB.style.position = "absolute";
+                  // glitchB.style.top = "0";
+                  // glitchB.style.right = "0";
+                  // glitchB.style.bottom = "0";
+                  // glitchB.style.left = "0";
+                  // 追加したコードここまで
                   glitchB.style.removeProperty("opacity");
                   glitchB.style.removeProperty("transition");
                   glitchB.style.removeProperty("transform");
                   glitchB.style.animation = "none";
                 }
                 if (glitchF) {
-                  glitchF.style.backgroundImage = containerBgImage;
-                  glitchF.style.backgroundPosition = "center";
-                  glitchF.style.backgroundRepeat = "no-repeat";
-                  glitchF.style.position = "absolute";
-                  glitchF.style.top = "0";
-                  glitchF.style.right = "0";
-                  glitchF.style.bottom = "0";
-                  glitchF.style.left = "0";
-                  glitchF.style.borderRadius = "50%";
-                  glitchF.style.mixBlendMode = "screen";
+                  // 追加したコード
+                  // glitchF.style.removeProperty("background-image");
+                  // glitchF.style.removeProperty("background-position");
+                  // glitchF.style.removeProperty("background-repeat");
+                  // glitchF.style.backgroundImage = containerBgImage;
+                  // glitchF.style.backgroundPosition = "center";
+                  // glitchF.style.backgroundRepeat = "no-repeat";
+                  // glitchF.style.borderRadius = "50%";
+                  // glitchF.style.mixBlendMode = "screen";
+                  // glitchF.style.position = "absolute";
+                  // glitchF.style.top = "0";
+                  // glitchF.style.right = "0";
+                  // glitchF.style.bottom = "0";
+                  // glitchF.style.left = "0";
+                  // 追加したコードここまで
                   glitchF.style.removeProperty("opacity");
                   glitchF.style.removeProperty("transition");
                   glitchF.style.removeProperty("transform");

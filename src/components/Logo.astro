@@ -88,7 +88,7 @@ const gradientTitle = "My Portfolio";
   .logo-image {
     width: 120px;
     height: 120px;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.2));
     will-change: transform;
     object-fit: contain;
   }
@@ -117,16 +117,16 @@ const gradientTitle = "My Portfolio";
     color: transparent;
     text-align: center;
     position: relative;
-    -webkit-text-stroke: 2px #ffffff;
-    text-stroke: 2px #ffffff;
+    -webkit-text-stroke: 2px var(--color-white);
+    text-stroke: 2px var(--color-white);
     paint-order: stroke;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
     display: inline-block;
   }
 
   html.dark .text-stroke {
-    color: #f1f5f9;
-    background-image: var(--gradient);
+    color: var(--color-white);
+    background-image: var(--gradient-text);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-size: 180%;
@@ -139,7 +139,7 @@ const gradientTitle = "My Portfolio";
     font-size: 3rem;
     font-weight: 700;
     text-align: center;
-    background-image: var(--gradient);
+    background-image: var(--gradient-text);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-size: 180%;
@@ -155,16 +155,16 @@ const gradientTitle = "My Portfolio";
   .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top: 3px solid #ffffff;
+    border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
+    border-top: var(--color-white) 3px solid;
     border-radius: 50%;
     will-change: transform, opacity;
     /* CSS animation disabled - using GSAP instead */
   }
 
   html.dark .spinner {
-    border: 3px solid rgba(241, 245, 249, 0.3);
-    border-top: 3px solid #f1f5f9;
+    border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
+    border-top: var(--color-white) 3px solid;
   }
 
   @keyframes flowingGradation {

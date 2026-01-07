@@ -24,8 +24,8 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
 const privacyTitle = "プライバシーポリシー";
 
-const establishmentDate = "2025年05月05日";
-const establishmentDateIso = "2025-05-05";
+const establishmentDate = "2025年10月28日";
+const establishmentDateIso = "2025-10-28";
 const establishmentDateText = "制定日";
 
 const toIso = (str: string) => {
@@ -145,7 +145,7 @@ const googlePrivacypolicyLinks = {
             からお問い合わせいただく際に、お名前、メールアドレス、その他お問い合わせ内容に関する個人情報を取得します。
           </p>
           <p class="privacy__body">
-            当サイトは、その他、適正に個人情報を取得し、偽りその他不正の手段により取得しません。
+            当サイトは、適正に個人情報を取得し、偽り、その他不正の手段により取得しません。
           </p>
         </section>
 
@@ -444,7 +444,7 @@ const googlePrivacypolicyLinks = {
     color: inherit;
   }
   .privacy__menu_link:is(:hover, :focus-visible) {
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-decoration: underline;
   }
 
@@ -453,7 +453,7 @@ const googlePrivacypolicyLinks = {
     letter-spacing: 0.1em;
     color: inherit;
     text-align: center;
-    border: rebeccapurple 1px solid;
+    border: var(--color-purple) 1px solid;
     margin-block-start: 4rem;
     padding-block: 0.5rem;
   }
@@ -490,7 +490,7 @@ const googlePrivacypolicyLinks = {
 
   .privacy__body_link {
     font-size: 1rem;
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-decoration: underline;
     transform: all 0.5s ease;
   }

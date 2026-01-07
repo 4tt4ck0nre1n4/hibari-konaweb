@@ -137,8 +137,8 @@ const typedContact = contact as ContactType;
     font-size: 0.75rem;
     background-color: transparent;
     box-shadow:
-      inset 0.4em 0.4em 0.4em rgba(0, 0, 0, 0.4),
-      inset -0.4em -0.4em 0.4em rgba(0, 0, 0, 0.4);
+      inset 0.4em 0.4em 0.4em rgb(0 0 0 / 0.4),
+      inset -0.4em -0.4em 0.4em rgb(0 0 0 / 0.4);
     border-radius: 0.75rem;
     position: relative;
     z-index: 1;
@@ -202,28 +202,28 @@ const typedContact = contact as ContactType;
     height: 48px;
     border: transparent 1px solid;
     border-radius: 50%;
-    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
     margin-inline: 0.5rem;
     transition:
       transform 0.1s ease,
       box-shadow 0.3s ease;
   }
   .footer__snsMenu .sns-icon__item:is(:hover, :focus-visible) {
-    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
   }
   .footer__snsMenu .sns-icon__item:active {
     transform: scale(0.8);
-    box-shadow: 0 8px 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 8px 8px rgb(0 0 0 / 0.6);
   }
   html.dark .footer__snsMenu .sns-icon__item {
-    box-shadow: 0 4px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 4px 8px rgb(255 255 255 / 0.6);
   }
   html.dark .footer__snsMenu .sns-icon__item:is(:hover, :focus-visible) {
-    box-shadow: 0 8px 4px rgba(255 255 255 / 0.6);
+    box-shadow: 0 8px 4px rgb(255 255 255 / 0.6);
   }
   html.dark .footer__snsMenu .sns-icon__item:active {
     transform: scale(0.8);
-    box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 8px 8px rgb(255 255 255 / 0.6);
   }
   .footer__snsMenu .sns-icon__link {
     display: flex;
@@ -238,9 +238,9 @@ const typedContact = contact as ContactType;
     transition: all 0.3s ease;
   }
   .footer__snsMenu .sns-icon__link:is(:hover, :focus-visible) {
-    color: rebeccapurple;
-    stroke: rebeccapurple;
-    fill: rebeccapurple;
+    color: var(--color-purple);
+    stroke: var(--color-purple);
+    fill: var(--color-purple);
   }
   .footer__snsMenu .sns-icon__link svg {
     display: block;
@@ -253,35 +253,24 @@ const typedContact = contact as ContactType;
   }
 
   .footer__snsMenu .sns-icon__link svg:is(:hover, :focus-visible) {
-    color: rebeccapurple;
+    color: var(--color-purple);
   }
   .footer__snsMenu .sns-icon__link svg:nth-child(3):is(:hover, :focus-visible) {
-    background: rebeccapurple;
+    background: var(--color-purple);
   }
   .footer__snsMenu .sns-icon__link svg:nth-of-type(2):is(:hover, :focus-visible) {
-    background: rebeccapurple;
+    background: var(--color-purple);
   }
   .footer__snsMenu .sns-icon__link svg:nth-of-type(4):is(:hover, :focus-visible) {
-    background: rebeccapurple;
+    background: var(--color-purple);
   }
   html.dark .footer__snsMenu .sns-icon__link svg {
-    stroke: #f1f5f9;
+    stroke: var(--color-white);
   }
-  /* .footer__snsMenu [data-sns-icon="/logo_outline.svg"] {
-    display: block;
-    filter: brightness(0) saturate(100%);
-  } */
-  /* .footer__snsMenu:is(:hover, :focus-visible) [data-sns-icon="/logo_outline.svg"] {
-    display: block;
-    filter: hue-rotate(240deg);
-  } */
   .footer__snsMenu [data-sns-icon="/favicon.svg"] {
     display: block;
-    /* filter: brightness(0) saturate(100%); */
-    /* transition: filter 0.3s ease; */
   }
   .footer__snsMenu:is(:hover, :focus-visible) [data-sns-icon="/favicon.svg"] {
-    /* display: block; */
     filter: hue-rotate(240deg) saturate(80%);
   }
   .footer .footer__menu {
@@ -302,7 +291,7 @@ const typedContact = contact as ContactType;
     transition: all 0.7s ease;
   }
   .footer__menu_link:is(:hover, :focus-visible) {
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-decoration: underline;
   }
   .footer .footer__snsMenu {
@@ -332,13 +321,13 @@ const typedContact = contact as ContactType;
     transition: all 0.7s ease;
   }
   .footer__contactMenu svg:is(:hover, :focus-visible) {
-    color: rebeccapurple;
+    color: var(--color-purple);
   }
   .footer .footer-icon__link {
     transition: all 0.7s ease;
   }
   .footer .footer-icon__link:is(:hover, :focus-visible) {
-    color: rebeccapurple;
+    color: var(--color-purple);
     text-decoration: underline;
   }
   .footer-icon__link {
@@ -347,10 +336,10 @@ const typedContact = contact as ContactType;
     display: grid;
     grid-template-columns: 2.125rem 1fr;
     grid-template-columns: repeat(48px, 1fr);
-    color: #010101;
+    color: var(--color-black);
     color: inherit;
     text-decoration: none;
-    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
     border-radius: 50%;
     transition:
       transform 0.1s ease,
@@ -363,21 +352,21 @@ const typedContact = contact as ContactType;
     margin-inline-start: 0.375rem;
   }
   .footer-icon__item .footer-icon__link:is(:hover, :focus-visible) {
-    box-shadow: 0 10px 10px rgba(0 0 0 / 0.6);
+    box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
   }
   .footer-icon__item .footer-icon__link:active {
     transform: scale(0.8);
-    box-shadow: 0 8px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 8px rgb(0 0 0 / 0.4);
   }
   html.dark .footer-icon__item .footer-icon__link {
-    box-shadow: 0 4px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 4px 8px rgb(255 255 255 / 0.6);
   }
   html.dark .footer-icon__item .footer-icon__link:is(:hover, :focus-visible) {
-    box-shadow: 0 8px 4px rgba(255 255 255 / 0.6);
+    box-shadow: 0 8px 4px rgb(255 255 255 / 0.6);
   }
   html.dark .footer-icon__item .footer-icon__link:active {
     transform: scale(0.8);
-    box-shadow: 0 8px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 8px 8px rgb(255 255 255 / 0.6);
   }
   .footer-icon__name {
     background-color: transparent;
@@ -388,14 +377,14 @@ const typedContact = contact as ContactType;
     width: 94%;
     display: block;
     font-size: 0.75rem;
-    color: rebeccapurple;
+    color: var(--color-purple);
     color: inherit;
     text-align: center;
-    border-top: 1px solid gray;
+    border-top: var(--color-gray) 1px solid;
     margin-inline: auto;
     padding-block: 1rem;
   }
-  @media (width <= 768px) {
+  @media (width <= 1024px) {
     .footer {
       width: 100%;
     }
@@ -403,7 +392,8 @@ const typedContact = contact as ContactType;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
-      padding-inline: 1rem;
+      padding-inline-start: 2rem;
+      padding-inline-end: 1rem;
     }
 
     .footer__middleRow {

@@ -1,8 +1,5 @@
 ---
 import HeadLayout from "./HeadLayout.astro";
-// @fontsourceはfont-display: swapをデフォルトで含む
-// クリティカルなフォント（Poppins 400）のみ先に読み込み
-// その他のフォントは遅延読み込み（PageSpeed Insights 最適化）
 import "@fontsource/poppins/400.css";
 
 interface Props {
@@ -42,15 +39,3 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     <script is:inline defer src="https://unpkg.com/js-confetti@0.12.0/dist/js-confetti.browser.js"></script>
   </body>
 </html>
-
-<style is:global>
-  :root {
-    --accent: rgb(136, 58, 234);
-    --accent-light: rgb(224, 204, 250);
-    --accent-dark: rgb(49, 10, 101);
-    --accent-gradient: linear-gradient(45deg, var(--accent), var(--accent-light) 30%, white 60%);
-  }
-  body {
-    background-size: 224px;
-  }
-</style>

@@ -50,12 +50,14 @@ import { play, pause, reverse, restart } from "../scripts/constButton";
 
 <style is:global>
   .control__menu {
+    height: 100%;
+    min-height: 112px;
     display: flex;
     justify-content: center;
     align-items: center;
     background: transparent;
     list-style: none;
-    box-shadow: 0 8px 16px rgba(0 0 0 / 0.6);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
     border-radius: 1rem;
     position: relative;
     z-index: 1;
@@ -66,10 +68,10 @@ import { play, pause, reverse, restart } from "../scripts/constButton";
     transition: all 0.3s ease-in;
   }
   .control__menu:is(:hover, :focus-visible) {
-    box-shadow: 0 16px 8px rgba(0 0 0 / 0.6);
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
   }
   html.dark .control__menu:is(:hover, :focus-visible) {
-    box-shadow: 0 16px 8px rgba(255 255 255 / 0.6);
+    box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
   }
   .control__menu::before {
     content: "";
@@ -78,20 +80,7 @@ import { play, pause, reverse, restart } from "../scripts/constButton";
     height: 100%;
     max-height: 120px;
     display: block;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.15) 10%,
-      rgba(255, 255, 255, 0.5) 20%,
-      var(--color-purple) 30%,
-      rgba(255, 255, 255, 0.8) 40%,
-      var(--color-purple) 50%,
-      rgba(255, 255, 255, 0.8) 60%,
-      var(--color-purple) 70%,
-      rgba(255, 255, 255, 0.5) 80%,
-      rgba(255, 255, 255, 0.15) 90%,
-      transparent 100%
-    );
+    background: var(--gradient-shinePurple);
     position: absolute;
     top: 0;
     left: 0;
@@ -120,21 +109,38 @@ import { play, pause, reverse, restart } from "../scripts/constButton";
       opacity: 0;
     }
   }
+
   .button {
+    /* グラデーションの角度 */
+    --gradient-angle: 135deg;
+    /* 白の透明度（開始・中間・終了） */
+    --gradient-white-opacity-start: 20%;
+    --gradient-white-opacity-mid: 60%;
+    --gradient-white-opacity-end: 30%;
+    /* 白の位置（開始・中間・終了） */
+    --gradient-white-pos-start: 0%;
+    --gradient-white-pos-mid: 45%;
+    --gradient-white-pos-end: 85%;
+    /* 紫の位置（開始・中間・終了） */
+    --gradient-purple-pos-start: 25%;
+    --gradient-purple-pos-mid: 65%;
+    --gradient-purple-pos-end: 100%;
+    /* グラデーション定義: 白と紫が交互に配置される3段階のグラデーション */
+    --gradient-controller: linear-gradient(
+      var(--gradient-angle),
+      color-mix(in srgb, var(--white) var(--gradient-white-opacity-start), transparent) var(--gradient-white-pos-start),
+      var(--color-purple) var(--gradient-purple-pos-start),
+      color-mix(in srgb, var(--white) var(--gradient-white-opacity-mid), transparent) var(--gradient-white-pos-mid),
+      var(--color-purple) var(--gradient-purple-pos-mid),
+      color-mix(in srgb, var(--white) var(--gradient-white-opacity-end), transparent) var(--gradient-white-pos-end),
+      var(--color-purple) var(--gradient-purple-pos-end)
+    );
     display: block;
     width: 60px;
     height: 60px;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.2) 0%,
-      var(--color-purple) 25%,
-      rgba(255, 255, 255, 0.6) 45%,
-      var(--color-purple) 65%,
-      rgba(255, 255, 255, 0.3) 85%,
-      var(--color-purple) 100%
-    );
-    box-shadow: 0 18px 20px rgba(0 0 0 / 0.6);
-    border: #fff 1px solid;
+    background: var(--gradient-controller);
+    box-shadow: 0 18px 20px rgb(0 0 0 / 0.6);
+    border: var(--color-white) 1px solid;
     border-radius: 0.675rem;
     overflow: hidden;
     aspect-ratio: 1 / 1;
@@ -154,15 +160,19 @@ import { play, pause, reverse, restart } from "../scripts/constButton";
     }
   }
   .button.is-rotating {
-    background: linear-gradient(
-      45deg,
-      rgba(255, 255, 255, 0.3) 0%,
-      var(--color-purple) 20%,
-      rgba(255, 255, 255, 0.7) 40%,
-      var(--color-purple) 60%,
-      rgba(255, 255, 255, 0.5) 80%,
-      var(--color-purple) 100%
-    );
+    /* 回転時のグラデーションパラメータを上書き */
+    --gradient-angle: 45deg;
+    --gradient-white-opacity-start: 30%;
+    --gradient-white-opacity-mid: 70%;
+    --gradient-white-opacity-end: 50%;
+    --gradient-white-pos-start: 0%;
+    --gradient-purple-pos-start: 20%;
+    --gradient-white-pos-mid: 40%;
+    --gradient-purple-pos-mid: 60%;
+    --gradient-white-pos-end: 80%;
+    --gradient-purple-pos-end: 100%;
+    /* グラデーションは親要素の定義を継承し、変数のみ上書き */
+    background: var(--gradient-controller);
     top: -10px;
     border-radius: 50%;
     box-shadow:
@@ -184,7 +194,7 @@ import { play, pause, reverse, restart } from "../scripts/constButton";
   }
   .button:active {
     transform: scale(0.8);
-    box-shadow: 0 8px 8px rgba(0 0 0 / 0.4);
+    box-shadow: 0 8px 8px rgb(0 0 0 / 0.4);
   }
   .button__image {
     width: 40px;
@@ -196,8 +206,8 @@ import { play, pause, reverse, restart } from "../scripts/constButton";
   #pause svg,
   #reverse svg,
   #restart svg {
-    color: rgb(255, 255, 255);
-    fill: rgb(255, 255, 255);
+    color: var(--white);
+    fill: var(--white);
   }
 
   /* タブレット・スマホサイズでのレスポンシブ対応 */
