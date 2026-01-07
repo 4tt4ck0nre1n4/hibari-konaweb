@@ -481,8 +481,61 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   // デバッグモード（開発環境でのみtrue）
   const DEBUG = import.meta.env.DEV;
 
+  // タイムアウトIDを保存する配列（クリーンアップ用）
+  let timeoutIds: ReturnType<typeof setTimeout>[] = [];
+
+  // すべてのタイムアウトをクリアする関数
+  function clearAllTimeouts() {
+    timeoutIds.forEach((id) => clearTimeout(id));
+    timeoutIds = [];
+  }
+
+  // 要素の状態を完全にリセットする関数
+  function resetGlitchElements() {
+    const glitchImages = document.querySelectorAll(".glitch-image");
+    const glitchLayer = document.querySelector(".glitch-layer") as HTMLElement;
+    const glitchContainer = document.querySelector(".glitch") as HTMLElement;
+
+    // 動的に追加されたスタイル要素を削除
+    const stopStyleElement = document.getElementById("glitch-before-stop");
+    if (stopStyleElement) {
+      stopStyleElement.remove();
+      if (DEBUG) console.log("Removed stop style element");
+    }
+
+    // すべての要素のスタイルをリセット
+    glitchImages.forEach((img) => {
+      const element = img as HTMLElement;
+      element.style.removeProperty("animation");
+      element.style.removeProperty("opacity");
+      element.style.removeProperty("transition");
+      element.style.removeProperty("transform");
+      element.style.animation = "none";
+    });
+
+    if (glitchLayer) {
+      glitchLayer.removeAttribute("style");
+    }
+
+    if (glitchContainer) {
+      glitchContainer.style.removeProperty("transition");
+      glitchContainer.style.backgroundColor = "#000000";
+    }
+
+    const glitchF = document.querySelector(".glitch-image.f") as HTMLElement;
+    if (glitchF) {
+      glitchF.style.removeProperty("mix-blend-mode");
+    }
+  }
+
   // ローディング終了後にグリッチアニメーションを制御
   function initGlitchAnimation() {
+    // 既存のタイムアウトをクリア
+    clearAllTimeouts();
+
+    // 要素の状態をリセット
+    resetGlitchElements();
+
     const glitchImages = document.querySelectorAll(".glitch-image");
     const glitchR = document.querySelector(".glitch-image.r") as HTMLElement;
     const glitchG = document.querySelector(".glitch-image.g") as HTMLElement;
@@ -526,7 +579,8 @@ const glitchImage = await getImage({ src: glitchImageSrc });
 
       if (isVisible) {
         // まだローディング中なので再チェック
-        setTimeout(checkLoadingComplete, 100);
+        const timeoutId = setTimeout(checkLoadingComplete, 100);
+        timeoutIds.push(timeoutId);
       } else {
         // ローディング終了後にアニメーション開始
         startGlitchSequence();
@@ -565,7 +619,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
       }
 
       // 2. 8秒後にRGBズレアニメーションを終了し、shakeアニメーションに切り替え
-      setTimeout(() => {
+      const timeoutId1 = setTimeout(() => {
         if (DEBUG) console.log("Switching to shake animation...");
         glitchImages.forEach((img) => {
           const element = img as HTMLElement;
@@ -573,9 +627,10 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           element.style.animation = "shake 8s ease-in-out";
         });
       }, 8000); // 8秒後
+      timeoutIds.push(timeoutId1);
 
       // 3. 16秒後（shake終了後）にopacityアニメーションを発動
-      setTimeout(() => {
+      const timeoutId2 = setTimeout(() => {
         if (DEBUG) console.log("Starting opacity animation...");
         if (glitchR) glitchR.style.animation = "glitchAnime-1 1.2s linear infinite alternate";
         if (glitchG) glitchG.style.animation = "glitchAnime-2 1.4s linear infinite alternate";
@@ -594,9 +649,10 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           // element.style.animation = "noise 8s linear";
         });
       }, 16000); // 8秒 + 8秒 = 16秒後
+      timeoutIds.push(timeoutId2);
 
       // 4. 24秒後（opacity開始から8秒後）に::beforeアニメーションを停止し、画像を正常表示
-      setTimeout(() => {
+      const timeoutId3 = setTimeout(() => {
         if (DEBUG) console.log("Stopping ::before animations and showing final image...");
 
         // CSSでアニメーションを停止し、エフェクトレイヤーを非表示にする
@@ -644,9 +700,10 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           glitchF.style.animation = "none";
           glitchF.style.opacity = "1";
           // 3秒後にブレンドモードを変更（トランジション完了後）
-          setTimeout(() => {
+          const timeoutId3_1 = setTimeout(() => {
             if (glitchF) glitchF.style.mixBlendMode = "normal";
           }, 3000);
+          timeoutIds.push(timeoutId3_1);
         }
 
         // ③ glitchAnime-5を停止
@@ -673,7 +730,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
         }
 
         // 5. 3秒後（フェードアウト完了後）に背景をtransparentにフェード
-        setTimeout(() => {
+        const timeoutId4 = setTimeout(() => {
           if (DEBUG) console.log("Fading background to transparent...");
           const glitchContainer = document.querySelector(".glitch") as HTMLElement;
           if (glitchContainer) {
@@ -690,11 +747,11 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           }
 
           // 6. 3秒後（transparentフェード完了後）に6秒待機してから背景を黒にフェード
-          setTimeout(() => {
+          const timeoutId5 = setTimeout(() => {
             if (DEBUG) console.log("Waiting 6 seconds with transparent background...");
 
             // 6秒待機
-            setTimeout(() => {
+            const timeoutId6 = setTimeout(() => {
               if (DEBUG) console.log("Fading background to black...");
               const glitchContainer = document.querySelector(".glitch") as HTMLElement;
               if (glitchContainer) {
@@ -711,7 +768,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
               }
 
               // 背景が黒にフェード完了後、アニメーションをリセットしてループ
-              setTimeout(() => {
+              const timeoutId7 = setTimeout(() => {
                 if (DEBUG) console.log("Resetting and looping animation...");
 
                 // 動的に追加されたスタイルタグを確実に削除
@@ -854,18 +911,25 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 }
 
                 // 少し待機してからアニメーションを再開
-                setTimeout(() => {
+                const timeoutId8 = setTimeout(() => {
                   startGlitchSequence();
                 }, 100);
+                timeoutIds.push(timeoutId8);
               }, 3000); // 黒へのフェード完了まで3秒
+              timeoutIds.push(timeoutId7);
             }, 6000); // 6秒待機
+            timeoutIds.push(timeoutId6);
           }, 3000); // transparentフェード完了まで3秒
+          timeoutIds.push(timeoutId5);
         }, 3000); // フェードアウト完了まで3秒
+        timeoutIds.push(timeoutId4);
       }, 24000); // 16秒 + 8秒 = 24秒後
+      timeoutIds.push(timeoutId3);
     };
 
     // チェック開始
-    setTimeout(checkLoadingComplete, 100);
+    const timeoutId0 = setTimeout(checkLoadingComplete, 100);
+    timeoutIds.push(timeoutId0);
   }
 
   // DOM準備完了後に実行
@@ -874,4 +938,15 @@ const glitchImage = await getImage({ src: glitchImageSrc });
   } else {
     initGlitchAnimation();
   }
+
+  // View Transitions対応: ページ遷移時に再初期化
+  document.addEventListener("astro:after-swap", () => {
+    if (DEBUG) console.log("Page swapped, reinitializing glitch animation...");
+    // 既存のタイムアウトをクリア
+    clearAllTimeouts();
+    // 要素の状態をリセット
+    resetGlitchElements();
+    // 再初期化
+    initGlitchAnimation();
+  });
 </script>
