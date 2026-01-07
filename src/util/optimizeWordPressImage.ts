@@ -63,7 +63,7 @@ export async function optimizeWordPressImage(
       src: imageUrl,
       width: options?.width,
       height: options?.height,
-      quality: options?.quality ?? 80,
+      quality: options?.quality ?? 95,
       format: options?.format,
     });
 

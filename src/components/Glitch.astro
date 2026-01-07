@@ -578,9 +578,9 @@ const glitchImage = await getImage({ src: glitchImageSrc });
       setTimeout(() => {
         if (DEBUG) console.log("Starting opacity animation...");
         if (glitchR) glitchR.style.animation = "glitchAnime-1 1.2s linear infinite alternate";
-      if (glitchG) glitchG.style.animation = "glitchAnime-2 1.4s linear infinite alternate";
-      if (glitchB) glitchB.style.animation = "glitchAnime-3 1.6s linear infinite alternate";
-      if (glitchF) glitchF.style.animation = "glitchAnime-4 1.8s linear infinite alternate";
+        if (glitchG) glitchG.style.animation = "glitchAnime-2 1.4s linear infinite alternate";
+        if (glitchB) glitchB.style.animation = "glitchAnime-3 1.6s linear infinite alternate";
+        if (glitchF) glitchF.style.animation = "glitchAnime-4 1.8s linear infinite alternate";
         glitchImages.forEach((img) => {
           const element = img as HTMLElement;
           // ループ2巡目以降でも確実にopacityアニメーションが発火するように、

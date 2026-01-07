@@ -252,27 +252,15 @@ const worksPagination = {
                         aria-label={`${work.slug}(${work?.title?.rendered})${worksItems.ariaLabel}`}
                         title={`${work.slug}(${work?.title?.rendered})${worksItems.ariaTitle}`}
                       >
-                        {work?.optimizedImage ? (
-                          <Image
-                            src={work.optimizedImage.src}
-                            alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
-                            class="worksCard__image"
-                            width={worksItems.width}
-                            height={worksItems.height}
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : (
-                          <img
-                            class="worksCard__image"
-                            src={work?.fallbackUrl ?? ""}
-                            alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
-                            width={worksItems.width}
-                            height={worksItems.height}
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        )}
+                        <img
+                          class="worksCard__image"
+                          src={work?.fallbackUrl ?? ""}
+                          alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
+                          width={worksItems.width}
+                          height={worksItems.height}
+                          loading="lazy"
+                          decoding="async"
+                        />
                       </a>
                       <a
                         class="worksCard__link"
