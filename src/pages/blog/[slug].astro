@@ -339,7 +339,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
 
   /* メイン記事 */
   .blog-detail__article {
-    background-color: var(--color-white, #ffffff);
+    background-color: var(--color-white, #f1f5f9);
     border-radius: 0.5rem;
     padding: 2rem;
     box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
@@ -349,7 +349,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   .blog-detail__header {
     margin-block-end: 2rem;
     padding-block-end: 1.5rem;
-    border-bottom: 2px solid var(--color-purple, #8b5cf6);
+    border-bottom: 2px solid var(--color-purple, #639);
   }
 
   .blog-detail__title {
@@ -357,7 +357,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
     font-weight: 700;
     line-height: 1.5;
     margin-block-end: 1rem;
-    color: var(--color-purple, #8b5cf6);
+    color: var(--color-purple, #639);
   }
 
   /* メタ情報 */
@@ -441,8 +441,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
     margin-block-start: 2rem;
     margin-block-end: 1rem;
     padding-block-end: 0.5rem;
-    border-bottom: 2px solid var(--color-purple, #8b5cf6);
-    color: var(--color-purple, #8b5cf6);
+    border-bottom: 2px solid var(--color-purple, #639);
+    color: var(--color-purple, #639);
   }
 
   .blog-detail__content :global(h3) {
@@ -450,7 +450,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
     font-weight: 600;
     margin-block-start: 1.5rem;
     margin-block-end: 0.75rem;
-    color: var(--color-purple, #8b5cf6);
+    color: var(--color-purple, #639);
   }
 
   .blog-detail__content :global(h4) {
@@ -469,7 +469,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
     height: auto;
     border-radius: 0.5rem;
     margin-block: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
   }
 
   .blog-detail__content :global(ul),
@@ -483,7 +483,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   }
 
   .blog-detail__content :global(blockquote) {
-    border-inline-start: 4px solid var(--color-purple, #8b5cf6);
+    border-inline-start: 4px solid var(--color-purple, #639);
     padding-inline-start: 1rem;
     margin-block: 1.5rem;
     font-style: italic;
@@ -512,7 +512,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   }
 
   .blog-detail__content :global(a) {
-    color: var(--color-purple, #8b5cf6);
+    color: var(--color-purple, #639);
     text-decoration: underline;
     transition: opacity 0.2s;
   }
@@ -525,7 +525,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   .blog-detail__footer {
     margin-block-start: 3rem;
     padding-block-start: 2rem;
-    border-top: 2px solid var(--color-purple, #8b5cf6);
+    border-top: 2px solid var(--color-purple, #639);
   }
 
   .blog-detail__share {
@@ -536,7 +536,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
     font-size: 1.25rem;
     font-weight: 600;
     margin-block-end: 1rem;
-    color: var(--color-purple, #8b5cf6);
+    color: var(--color-purple, #639);
   }
 
   .blog-detail__share-buttons {
@@ -554,7 +554,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
     text-decoration: none;
     font-weight: 600;
     transition: all 0.2s;
-    color: var(--color-white, #ffffff);
+    color: var(--color-white, #f1f5f9);
   }
 
   .blog-detail__share-button--twitter {
@@ -590,10 +590,10 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
 
   .blog-detail__toc,
   .blog-detail__related {
-    background-color: var(--color-white, #ffffff);
+    background-color: var(--color-white, #f1f5f9);
     border-radius: 0.5rem;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
     min-height: 200px;
   }
 
@@ -622,7 +622,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   }
 
   /* スクリーンリーダー用 */
-  .screenReader-only {
+  /* .screenReader-only {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -632,5 +632,5 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
-  }
+  } */
 </style>
