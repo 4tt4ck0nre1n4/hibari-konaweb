@@ -1,0 +1,177 @@
+---
+import pageTopIcon from "../assets/svg/pageTop.svg";
+---
+
+<button id="pageTopButton" class="page-top-button" aria-label="ページトップへ戻る">
+  <img src={pageTopIcon.src} alt="" class="page-top-button__icon" />
+  <span class="page-top-button__text">↑ Page Top</span>
+</button>
+
+<style>
+  .page-top-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: transparent;
+    border: 2px solid currentColor;
+    border-radius: 1rem;
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(1rem);
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s ease,
+      transform 0.3s ease,
+      box-shadow 0.4s ease;
+    z-index: 1000;
+    color: inherit;
+    min-width: 80px;
+    min-height: 80px;
+  }
+
+  .page-top-button.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .page-top-button:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
+    transform: translateY(-0.25rem);
+  }
+
+  html.dark .page-top-button:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
+  }
+
+  .page-top-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.4);
+  }
+
+  .page-top-button__icon {
+    width: 32px;
+    height: 32px;
+    display: block;
+    filter: drop-shadow(2px 4px 4px rgb(160 160 160 / 0.7));
+    transition: transform 0.3s ease;
+  }
+
+  .page-top-button:is(:hover, :focus-visible) .page-top-button__icon {
+    transform: scale(1.1);
+  }
+
+  .page-top-button__text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* タブレット・スマホサイズでのレスポンシブ対応 */
+  @media (width <= 768px) {
+    .page-top-button {
+      bottom: 1.5rem;
+      right: 1.5rem;
+      padding: 0.75rem;
+      min-width: 64px;
+      min-height: 64px;
+      gap: 0.25rem;
+    }
+
+    .page-top-button__icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .page-top-button__text {
+      font-size: 0.625rem;
+    }
+  }
+
+  /* 超小型スマホサイズでの最適化 */
+  @media (width <= 480px) {
+    .page-top-button {
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.5rem;
+      min-width: 56px;
+      min-height: 56px;
+    }
+
+    .page-top-button__icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .page-top-button__text {
+      font-size: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  function initPageTopButton() {
+    const pageTopButton = document.getElementById("pageTopButton");
+    const firstView = document.querySelector(".fv");
+
+    if (!pageTopButton || !firstView) return;
+
+    // FirstViewのbottom位置（ページトップからの距離）を取得
+    function getFirstViewBottom() {
+      const rect = firstView.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+      return rect.bottom + scrollY;
+    }
+
+    // スクロールイベントハンドラー
+    function handleScroll() {
+      const firstViewBottom = getFirstViewBottom();
+      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+
+      // FirstViewを過ぎたかどうかを判定
+      if (scrollY > firstViewBottom) {
+        pageTopButton.classList.add("is-visible");
+      } else {
+        pageTopButton.classList.remove("is-visible");
+      }
+    }
+
+    // トップへ戻る処理
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+
+    // イベントリスナーの設定
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    // ボタンクリックイベント
+    pageTopButton.addEventListener("click", scrollToTop);
+
+    // 初期状態をチェック
+    handleScroll();
+
+    // View Transitions対応: ページ遷移時に再初期化
+    document.addEventListener("astro:after-swap", () => {
+      handleScroll();
+    });
+  }
+
+  // DOMが読み込まれた後に初期化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPageTopButton);
+  } else {
+    initPageTopButton();
+  }
+</script>

@@ -56,13 +56,13 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
   // 即座に実行（DOMContentLoadedを待たない）
   (() => {
     const initBackgroundToggle = () => {
-      const mainContainer = document.getElementById("main-container");
+      const mainBackground = document.getElementById("main-background");
       const backgroundButton = document.getElementById("toggleBackgroundButton");
       const ariaLiveStatus = document.getElementById("ariaLiveStatus__background");
 
-      if (!mainContainer || !backgroundButton || !ariaLiveStatus) {
+      if (!mainBackground || !backgroundButton || !ariaLiveStatus) {
         devError("BackgroundImage: 必要な要素が見つかりません", {
-          mainContainer: !!mainContainer,
+          mainBackground: !!mainBackground,
           backgroundButton: !!backgroundButton,
           ariaLiveStatus: !!ariaLiveStatus,
         });
@@ -104,11 +104,11 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
 
       backgroundButton.addEventListener("click", () => {
         devLog("BackgroundImage: ボタンがクリックされました");
-        devLog("mainContainer before toggle:", mainContainer.className);
+        devLog("mainBackground before toggle:", mainBackground.className);
 
-        isImageOff = mainContainer.classList.toggle("is-notImage");
+        isImageOff = mainBackground.classList.toggle("is-notImage");
 
-        devLog("mainContainer after toggle:", mainContainer.className);
+        devLog("mainBackground after toggle:", mainBackground.className);
         devLog("isImageOff:", isImageOff);
 
         if (isImageOff) {
@@ -128,7 +128,7 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
       });
 
       devLog("BackgroundImage: 初期化完了", {
-        mainContainer: mainContainer,
+        mainBackground: mainBackground,
         backgroundButton: backgroundButton,
         offIcon: offIcon,
         onIcon: onIcon,

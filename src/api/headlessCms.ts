@@ -88,7 +88,7 @@ export const wpcf7PostId = import.meta.env["PUBLIC_WPCF7_POST_ID"] as string;
 
 export const blogPageApi = "posts?_embed&context=embed&acf_format=standard&per_page=100";
 export const blogPostApi = "posts?context=embed&acf_format=standard";
-export const blogSlugApi = "posts?context=embed&acf_format=standard&slug=";
+export const blogSlugApi = "posts?context=view&acf_format=standard&slug=";
 
 export const categoryPageApi = "categories?context=embed&acf_format=standard&per_page=100";
 export const categorySlugApi = "categories?context=embed&acf_format=standard&slug=";

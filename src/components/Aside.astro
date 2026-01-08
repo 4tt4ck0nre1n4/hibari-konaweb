@@ -8,30 +8,41 @@ import GridSwitch from "./GridSwitch.astro";
 import ConfettiButton from "./ConfettiButton.astro";
 ---
 
-<div class="clock-search__container">
-  <div class="clock__wrapper">
-    <Clock />
-  </div>
-  <div class="search__wrapper">
-    <Search />
-  </div>
-</div>
-<div class="particles-tools__container">
-  <div class="particles__wrapper">
-    <div class="particles__container">
-      <!-- パフォーマンス最適化: ローディング画面が消えた後に読み込む -->
-      <ParticlesComponent client:idle />
+<div class="aside__container">
+  <div class="clock-search__container">
+    <div class="clock__wrapper">
+      <Clock />
+    </div>
+    <div class="search__wrapper">
+      <Search />
     </div>
   </div>
-  <div class="tools__wrapper">
-    <SoundToggle client:idle />
-    <ClockIcon />
-    <GridSwitch />
-    <ConfettiButton />
+  <div class="particles-tools__container">
+    <div class="particles__wrapper">
+      <div class="particles__container">
+        <!-- パフォーマンス最適化: ローディング画面が消えた後に読み込む -->
+        <ParticlesComponent client:idle />
+      </div>
+    </div>
+    <div class="tools__wrapper">
+      <SoundToggle client:idle />
+      <ClockIcon />
+      <GridSwitch />
+      <ConfettiButton />
+    </div>
   </div>
 </div>
 
 <style is:global>
+  /* 通常スタイル */
+  .aside__container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
   .clock-search__container {
     display: flex;
     flex-direction: column;
@@ -55,6 +66,7 @@ import ConfettiButton from "./ConfettiButton.astro";
   html.dark .clock__wrapper:is(:hover, :focus-visible) {
     box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
   }
+
   .search__wrapper {
     background: transparent;
     box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
@@ -77,161 +89,8 @@ import ConfettiButton from "./ConfettiButton.astro";
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-block-start: 0.25rem;
-  }
-
-  /* タブレットサイズ（768px〜1024px）でのレスポンシブ対応 */
-  @media (width <= 1024px) and (width > 768px) {
-    .clock-search__container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.25rem;
-      margin-block-start: 3rem; /* スマホサイズでの余白調整 */
-      align-items: stretch; /* 両方のアイテムを同じ高さに */
-    }
-
-    .clock__wrapper,
-    .search__wrapper {
-      width: 100%;
-      margin-bottom: 0;
-      min-width: 0; /* gridアイテムが適切に縮小できるように */
-      padding-block: 0.5rem;
-      padding-inline: 0.25rem;
-    }
-    .particles__container {
-      height: 80px;
-    }
-    .particles-tools__container {
-      display: flex;
-      flex-direction: row;
-      gap: 0.5rem;
-      margin-block-start: 1rem; /* スマホサイズでの余白調整 */
-    }
-    .particles__wrapper {
-      flex: 1;
-      height: 90px; /* tools__wrapperと同じheight */
-      min-height: 90px; /* 通常スタイルのmin-heightを上書き */
-      padding-block: 0.5rem;
-      padding-inline: 0.25rem;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-    }
-    .tools__wrapper {
-      flex: 1;
-      height: 90px; /* particles__wrapperと同じheight */
-      min-height: 90px; /* 通常スタイルのmin-height: 120pxを上書き */
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap: 0.25rem;
-      align-items: center;
-      justify-items: center;
-      place-items: center;
-      padding-block: 0.5rem; /* particles__wrapperと同じpadding */
-      padding-inline: 0.25rem;
-    }
-  }
-
-  /* タブレット・スマホサイズ（768px以下）でのレスポンシブ対応 */
-  @media (width <= 768px) {
-    .clock-search__container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.25rem;
-      margin-block-start: 3rem; /* スマホサイズでの余白調整 */
-      align-items: stretch; /* 両方のアイテムを同じ高さに */
-    }
-
-    .clock__wrapper,
-    .search__wrapper {
-      width: 100%;
-      margin-bottom: 0;
-      min-width: 0; /* gridアイテムが適切に縮小できるように */
-      padding-block: 0.5rem;
-      padding-inline: 0.25rem;
-    }
-    .particles__container {
-      height: 80px;
-    }
-    .particles-tools__container {
-      display: flex;
-      flex-direction: row;
-      gap: 0.5rem;
-      margin-block-start: 1rem; /* スマホサイズでの余白調整 */
-    }
-    .particles__wrapper {
-      flex: 1;
-      height: 90px; /* tools__wrapperと同じheight */
-      min-height: 90px; /* 通常スタイルのmin-heightを上書き */
-      padding-block: 0.5rem;
-      padding-inline: 0.25rem;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-    }
-    .tools__wrapper {
-      flex: 1;
-      height: 90px; /* particles__wrapperと同じheight */
-      min-height: 90px; /* 通常スタイルのmin-height: 120pxを上書き */
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap: 0.25rem;
-      align-items: center;
-      justify-items: center;
-      place-items: center;
-      padding-block: 0.5rem; /* particles__wrapperと同じpadding */
-      padding-inline: 0.25rem;
-    }
-  }
-
-  /* 480px以下での超小型スマホ最適化 */
-  @media (width <= 480px) {
-    .clock-search__container {
-      grid-template-columns: 1fr 1fr;
-      gap: 0.25rem;
-      margin-block-start: 3rem; /* スマホサイズでの余白調整 */
-      align-items: stretch; /* 両方のアイテムを同じ高さに */
-    }
-
-    .clock__wrapper,
-    .search__wrapper {
-      padding-block: 0.5rem;
-      padding-inline: 0.25rem;
-      min-width: 0;
-    }
-
-    .particles__container {
-      height: 80px;
-    }
-    .particles-tools__container {
-      display: flex;
-      flex-direction: row;
-      gap: 0.5rem;
-      margin-block-start: 1rem; /* スマホサイズでの余白調整 */
-    }
-    .particles__wrapper {
-      flex: 1;
-      height: 90px; /* tools__wrapperと同じheight */
-      min-height: 90px; /* 通常スタイルのmin-heightを上書き */
-      padding-block: 0.5rem;
-      padding-inline: 0.25rem;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-    }
-    .tools__wrapper {
-      flex: 1;
-      height: 90px; /* particles__wrapperと同じheight */
-      min-height: 90px; /* 通常スタイルのmin-height: 120pxを上書き */
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap: 0.25rem;
-      align-items: center;
-      justify-items: center;
-      place-items: center;
-      padding-block: 0.5rem; /* particles__wrapperと同じpadding */
-      padding-inline: 0.25rem;
-    }
+    flex: 1; /* 利用可能な空間を埋める */
+    min-height: 0; /* flexアイテムが縮小できるように */
   }
 
   .particles__wrapper {
@@ -248,6 +107,7 @@ import ConfettiButton from "./ConfettiButton.astro";
     padding-block: 1rem;
     padding-inline: 0.5rem;
     transition: box-shadow 0.4s ease;
+    box-sizing: border-box;
   }
   .particles__wrapper:is(:hover, :focus-visible) {
     box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
@@ -255,10 +115,12 @@ import ConfettiButton from "./ConfettiButton.astro";
   html.dark .particles__wrapper:is(:hover, :focus-visible) {
     box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
   }
+
   .particles-container {
     width: 100%;
     position: relative;
   }
+
   .particles__container {
     /* ラッパー側では中央寄せだけ行い、中身のレイアウトはモジュールCSSに任せる */
     display: flex;
@@ -267,6 +129,7 @@ import ConfettiButton from "./ConfettiButton.astro";
     width: 100%;
     height: 100%;
   }
+
   .tools__wrapper {
     height: 100%;
     min-height: 120px; /* CLS対策: 固定の最小高さを設定 */
@@ -284,6 +147,7 @@ import ConfettiButton from "./ConfettiButton.astro";
     padding-inline: 0.5rem;
     transition: box-shadow 0.4s ease;
     aspect-ratio: auto; /* アスペクト比を明示 */
+    box-sizing: border-box;
   }
   .tools__wrapper:is(:hover, :focus-visible) {
     box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
@@ -291,6 +155,7 @@ import ConfettiButton from "./ConfettiButton.astro";
   html.dark .tools__wrapper:is(:hover, :focus-visible) {
     box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
   }
+
   /* SoundToggleボタンのスタイル */
   #soundToggle {
     display: flex;
@@ -329,5 +194,128 @@ import ConfettiButton from "./ConfettiButton.astro";
   }
   #soundToggle svg:is(:hover, :focus-visible) {
     transform: scale(1.1);
+  }
+
+  /* レスポンシブスタイル */
+  /* タブレット・スマホサイズ（768px以下）でのレスポンシブ対応 */
+  @media (width <= 768px) {
+    .clock-search__container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.25rem;
+      margin-block-start: 3rem;
+      align-items: stretch; /* 両方のアイテムを同じ高さに */
+    }
+
+    .clock__wrapper,
+    .search__wrapper {
+      width: 100%;
+      margin-bottom: 0;
+      min-width: 0; /* gridアイテムが適切に縮小できるように */
+      padding-block: 0.5rem;
+      padding-inline: 0.25rem;
+    }
+
+    .particles__container {
+      height: 100%; /* 親要素の利用可能な高さを使用 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .particles-tools__container {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      margin-block-start: 1rem;
+      align-items: stretch; /* 両方のアイテムを同じ高さに */
+    }
+
+    .particles__wrapper {
+      flex: 1;
+      height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      min-height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      max-height: 120px; /* 高さを確実に固定 */
+      padding-block: 1.25rem; /* tools__wrapperと同じpadding-blockに統一 */
+      padding-inline: 0.25rem;
+      display: flex;
+      flex-direction: row; /* 横方向に配置 */
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tools__wrapper {
+      flex: 1;
+      height: 120px; /* 明示的に120pxを指定 */
+      min-height: 120px; /* 明示的に120pxを指定 */
+      max-height: 120px; /* 高さを確実に固定 */
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 0.25rem;
+      padding-block: 1.25rem; /* 通常スタイルのpadding-block: 1.25remを維持 */
+      padding-inline: 0.25rem;
+    }
+  }
+
+  /* タブレットサイズ（768px〜1024px）でのレスポンシブ対応 */
+  @media (width <= 1024px) and (width > 768px) {
+    .clock-search__container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.25rem;
+      margin-block-start: 3rem;
+      align-items: stretch; /* 両方のアイテムを同じ高さに */
+    }
+
+    .clock__wrapper,
+    .search__wrapper {
+      width: 100%;
+      margin-bottom: 0;
+      min-width: 0; /* gridアイテムが適切に縮小できるように */
+      padding-block: 0.5rem;
+      padding-inline: 0.25rem;
+    }
+
+    .particles__container {
+      height: 100%; /* 親要素の利用可能な高さを使用 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .particles-tools__container {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      margin-block-start: 1rem;
+      align-items: stretch; /* 両方のアイテムを同じ高さに */
+    }
+
+    .particles__wrapper {
+      flex: 1;
+      height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      min-height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      max-height: 120px; /* 高さを確実に固定 */
+      padding-block: 1.25rem; /* tools__wrapperと同じpadding-blockに統一 */
+      padding-inline: 0.25rem;
+      display: flex;
+      flex-direction: row; /* 横方向に配置 */
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tools__wrapper {
+      flex: 1;
+      height: 120px; /* 明示的に120pxを指定 */
+      min-height: 120px; /* 明示的に120pxを指定 */
+      max-height: 120px; /* 高さを確実に固定 */
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 0.25rem;
+      padding-block: 1.25rem; /* 通常スタイルのpadding-block: 1.25remを維持 */
+      padding-inline: 0.25rem;
+    }
   }
 </style>

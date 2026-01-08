@@ -56,7 +56,14 @@
 /* スマホサイズでのレスポンシブ対応 */
 @media (width <= 768px) {
   .particles__inner {
-    height: 100px;
+    height: 100%; /* 親要素の利用可能な高さを使用 */
+    min-height: 100%; /* 親要素の高さを確実に使用 */
+    max-height: 100%; /* 親要素の高さを超えないように */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
   }
 
   .particlesButton__inner {
@@ -64,5 +71,8 @@
     gap: 0.5rem;
     margin-block: 0;
     margin-inline: 0;
+    width: 100%;
+    height: auto;
+    flex-shrink: 0; /* ボタン部分の縮小を防ぐ */
   }
 }
