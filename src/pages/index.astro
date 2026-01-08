@@ -13,7 +13,6 @@ import { getImage } from "astro:assets";
 import FirstView from "../components/FirstView.astro";
 import GridMenu from "../components/GridMenu.astro";
 import ControlMenu from "../components/ControlMenu.astro";
-import PageTopButton from "../components/PageTopButton.astro";
 const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 ---
 
@@ -58,7 +57,6 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       </div>
     </main>
     <Footer />
-    <PageTopButton />
     <canvas id="canvas" class="canvas" width="800" height="600"></canvas>
   </div>
 </Layout>

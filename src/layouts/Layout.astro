@@ -1,5 +1,6 @@
 ---
 import HeadLayout from "./HeadLayout.astro";
+import PageTopButton from "../components/PageTopButton.astro";
 import "@fontsource/poppins/400.css";
 
 interface Props {
@@ -33,6 +34,7 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
   <body>
     <div id="overlay-root"></div>
     <slot />
+    <PageTopButton />
 
     <script is:inline defer src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
     <script is:inline defer src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
