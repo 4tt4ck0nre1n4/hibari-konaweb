@@ -15,6 +15,20 @@ interface Props {
 }
 
 const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitterDescription, jsonLd } = Astro.props;
+
+// Google Analytics設定
+const GA_MEASUREMENT_ID: string | undefined =
+  typeof import.meta.env.PUBLIC_GA_MEASUREMENT_ID === "string"
+    ? import.meta.env.PUBLIC_GA_MEASUREMENT_ID
+    : undefined;
+const isDev: boolean = typeof import.meta.env.DEV === "boolean" ? import.meta.env.DEV : false;
+
+// 開発環境またはMeasurement IDが未設定の場合はスクリプトを読み込まない
+const shouldLoadGA: boolean =
+  !isDev &&
+  typeof GA_MEASUREMENT_ID === "string" &&
+  GA_MEASUREMENT_ID !== "" &&
+  GA_MEASUREMENT_ID !== "G-XXXXXXXXXX";
 ---
 
 <!doctype html>
@@ -39,5 +53,211 @@ const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitte
     <script is:inline defer src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
     <script is:inline defer src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
     <script is:inline defer src="https://unpkg.com/js-confetti@0.12.0/dist/js-confetti.browser.js"></script>
+
+    {/* Google Analytics デバイスごとの条件分岐による遅延読み込み */}
+    {shouldLoadGA && typeof GA_MEASUREMENT_ID === "string" && (
+      <script
+        is:inline
+        define:vars={{ GA_MEASUREMENT_ID: GA_MEASUREMENT_ID }}
+      >
+        (function () {
+          "use strict";
+
+          // 一度だけ実行されるようにフラグを設定
+          let isLoaded = false;
+          let timeoutId = null;
+          let scrollEventListeners = [];
+
+          /**
+           * Google Analytics スクリプトを読み込む
+           * 一度だけ実行される（isLoadedフラグで制御）
+           */
+          function loadGoogleAnalytics() {
+            // 既に読み込み済み、または読み込み中の場合はスキップ
+            if (isLoaded) {
+              return;
+            }
+
+            // フラグを設定（重複実行を防止）
+            isLoaded = true;
+
+            // タイムアウトをクリア
+            if (timeoutId !== null) {
+              clearTimeout(timeoutId);
+              timeoutId = null;
+            }
+
+            // イベントリスナーを削除
+            removeScrollListeners();
+
+            // gtag.js スクリプトの読み込み
+            const script = document.createElement("script");
+            script.async = true;
+            script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+            script.onerror = function () {
+              console.warn("[Google Analytics] スクリプトの読み込みに失敗しました");
+            };
+
+            // スクリプトが読み込まれた後の処理
+            script.onload = function () {
+              // dataLayerとgtag関数は既にheadタグで初期化済み
+              // ここでは追加の設定があれば実行
+              if (window.dataLayer && window.gtag) {
+                // スクリプト読み込み完了を通知（既にheadタグで設定済みのため、ここでは不要）
+                // 必要に応じて追加の設定をここに記述
+              }
+            };
+
+            document.head.appendChild(script);
+          }
+
+          /**
+           * スクロールイベントリスナーを削除
+           */
+          function removeScrollListeners() {
+            scrollEventListeners.forEach(function (listener) {
+              window.removeEventListener(listener.event, listener.handler, { passive: true });
+            });
+            scrollEventListeners = [];
+          }
+
+          /**
+           * 画面幅を取得（リサイズにも対応）
+           */
+          function getScreenWidth() {
+            return (
+              window.innerWidth ||
+              document.documentElement.clientWidth ||
+              document.body.clientWidth ||
+              0
+            );
+          }
+
+          /**
+           * デバイス判定と読み込み方法の条件分岐
+           */
+          function initGoogleAnalytics() {
+            const screenWidth = getScreenWidth();
+
+            // ①スマホ・タブレット（768px以下）：スクロール検知後に実行
+            if (screenWidth <= 768) {
+              // スクロール閾値：50px以上スクロールした後に実行（誤検知を防ぐ）
+              const SCROLL_THRESHOLD = 50;
+              let hasScrolled = false;
+
+              /**
+               * スクロールイベントハンドラー
+               * 50px以上スクロールした場合のみ実行
+               */
+              function handleScroll() {
+                const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+
+                // 50px以上スクロールした場合のみ実行
+                if (!hasScrolled && scrollY >= SCROLL_THRESHOLD) {
+                  hasScrolled = true;
+                  loadGoogleAnalytics();
+                }
+              }
+
+              // スクロール検知のためのイベントリスナーを設定
+              // パッシブリスナーを使用してパフォーマンスを最適化
+              const scrollHandler = { event: "scroll", handler: handleScroll };
+              const wheelHandler = { event: "wheel", handler: handleScroll };
+              const touchHandler = { event: "touchstart", handler: handleScroll };
+
+              window.addEventListener("scroll", handleScroll, { passive: true });
+              window.addEventListener("wheel", handleScroll, { passive: true });
+              window.addEventListener("touchstart", handleScroll, { passive: true });
+
+              scrollEventListeners.push(scrollHandler, wheelHandler, touchHandler);
+
+              // フォールバック: スクロールしない場合でも10秒後に読み込む
+              // 10秒は業界標準の中間値（5-15秒の範囲で一般的に使用）
+              timeoutId = setTimeout(function () {
+                if (!isLoaded) {
+                  loadGoogleAnalytics();
+                }
+              }, 10000); // 10秒後にフォールバック
+
+              // ページが既にスクロールされている場合（リロード時など）は即座に読み込む
+              const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+              if (currentScrollY >= SCROLL_THRESHOLD) {
+                loadGoogleAnalytics();
+              }
+            }
+            // ②パソコン（1024px以上）：ページ読み込み後すぐに実行
+            else if (screenWidth >= 1024) {
+              // DOMContentLoadedイベントで実行（ページ読み込み完了後）
+              if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", function () {
+                  loadGoogleAnalytics();
+                });
+              } else {
+                // 既に読み込み完了している場合は即座に実行
+                loadGoogleAnalytics();
+              }
+
+              // フォールバック: 10秒後に読み込む（念のため）
+              timeoutId = setTimeout(function () {
+                if (!isLoaded) {
+                  loadGoogleAnalytics();
+                }
+              }, 10000);
+            }
+            // ③中間サイズ（769px-1023px）：スクロール検知後に実行（スマホと同じ動作）
+            else {
+              const SCROLL_THRESHOLD = 50;
+              let hasScrolled = false;
+
+              function handleScroll() {
+                const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+
+                if (!hasScrolled && scrollY >= SCROLL_THRESHOLD) {
+                  hasScrolled = true;
+                  loadGoogleAnalytics();
+                }
+              }
+
+              const scrollHandler = { event: "scroll", handler: handleScroll };
+              const wheelHandler = { event: "wheel", handler: handleScroll };
+              const touchHandler = { event: "touchstart", handler: handleScroll };
+
+              window.addEventListener("scroll", handleScroll, { passive: true });
+              window.addEventListener("wheel", handleScroll, { passive: true });
+              window.addEventListener("touchstart", handleScroll, { passive: true });
+
+              scrollEventListeners.push(scrollHandler, wheelHandler, touchHandler);
+
+              timeoutId = setTimeout(function () {
+                if (!isLoaded) {
+                  loadGoogleAnalytics();
+                }
+              }, 10000);
+
+              const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+              if (currentScrollY >= SCROLL_THRESHOLD) {
+                loadGoogleAnalytics();
+              }
+            }
+          }
+
+          // 初期化実行
+          initGoogleAnalytics();
+
+          // リサイズ時の再判定（オプション：通常は不要だが、念のため）
+          // 注意: リサイズ時に再実行すると重複読み込みの可能性があるため、コメントアウト
+          // window.addEventListener('resize', function() {
+          //   if (!isLoaded) {
+          //     removeScrollListeners();
+          //     if (timeoutId !== null) {
+          //       clearTimeout(timeoutId);
+          //       timeoutId = null;
+          //     }
+          //     initGoogleAnalytics();
+          //   }
+          // });
+        })();
+      </script>
+    )}
   </body>
 </html>

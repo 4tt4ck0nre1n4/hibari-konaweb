@@ -2,7 +2,7 @@
 import { Image } from "astro:assets";
 import mouse from "/public/assets/mouse.png";
 import { SLIDER_PATH_API } from "../api/headlessCms";
-import { getWordPressImageUrl } from "../util/optimizeWordPressImage";
+import { getWordPressImageUrl, getOptimizedWordPressImage } from "../util/optimizeWordPressImage";
 
 interface Slider {
   id: number;
@@ -48,14 +48,27 @@ try {
   // Continue with empty array
 }
 
-// WordPress画像は外部配信のため、通常のimgタグを使用
-const sliderImages = sliders.map((slider) => {
-  const imageUrl = getWordPressImageUrl(slider.acf?.slider_image) ?? "";
-  return {
-    ...slider,
-    imageUrl,
-  };
-});
+// WordPress画像をAstroで最適化してキャッシュ可能にする
+// ビルド時に画像をダウンロードして最適化し、Netlifyのキャッシュ設定が適用される
+const sliderImages = await Promise.all(
+  sliders.map(async (slider) => {
+    const optimizedImage = await getOptimizedWordPressImage(slider.acf?.slider_image, {
+      width: 340, // 2x解像度（170px × 2）でRetina対応
+      height: 240, // 2x解像度（120px × 2）でRetina対応
+      quality: 85,
+      format: "webp",
+    });
+
+    // フォールバック用のURL（最適化に失敗した場合）
+    const fallbackUrl = getWordPressImageUrl(slider.acf?.slider_image) ?? "";
+
+    return {
+      ...slider,
+      optimizedImage,
+      fallbackUrl,
+    };
+  })
+);
 
 const sliderItem = {
   href: "/works",
@@ -80,13 +93,29 @@ const mouseItem = {
           sliderImages.map((sliderData) => (
             <li class="swiper-slide">
               <a href={sliderItem.href} aria-label={sliderItem.ariaLabel} title={sliderItem.ariaTitle}>
-                <img
-                  src={sliderData.imageUrl}
-                  alt={sliderData.acf?.slider_title ?? ""}
-                  class="swiper__image"
-                  decoding="async"
-                  loading="lazy"
-                />
+                {sliderData.optimizedImage ? (
+                  <Image
+                    src={sliderData.optimizedImage.src}
+                    alt={sliderData.acf?.slider_title ?? ""}
+                    class="swiper__image"
+                    width={170}
+                    height={112}
+                    decoding="async"
+                    loading="lazy"
+                    fetchpriority="low"
+                  />
+                ) : (
+                  <img
+                    src={sliderData.fallbackUrl}
+                    alt={sliderData.acf?.slider_title ?? ""}
+                    class="swiper__image"
+                    width={170}
+                    height={112}
+                    decoding="async"
+                    loading="lazy"
+                    fetchpriority="low"
+                  />
+                )}
               </a>
             </li>
           ))

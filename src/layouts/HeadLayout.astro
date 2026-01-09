@@ -68,8 +68,6 @@ const cspContent = isDev
 
     <!-- Critical CSS インライン化 -->
     <style is:global>
-      /* 最小限のクリティカルCSS */
-      /* 注意: :rootのCSS変数は global.css に集約されています */
       *,
       *::before,
       *::after {
@@ -104,11 +102,9 @@ const cspContent = isDev
         color: var(--color-white);
         background-color: var(--color-blue);
       }
-
       html.dark header {
         background-color: transparent;
       }
-
       html.dark footer {
         background-color: transparent;
       }
@@ -153,7 +149,6 @@ const cspContent = isDev
         display: block;
         vertical-align: middle;
       }
-
       ul {
         list-style: none;
       }
@@ -165,7 +160,6 @@ const cspContent = isDev
       button {
         text-align: center;
       }
-
       a[href],
       button,
       button[type],
@@ -513,6 +507,187 @@ const cspContent = isDev
       }
       .header__menu_link svg {
         color: inherit;
+      }
+
+      .logo__wrapper {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+        opacity: 1;
+        visibility: visible;
+        transition:
+          opacity 0.8s ease-in-out,
+          visibility 0.8s ease-in-out;
+      }
+
+      .logo__wrapper.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      html.dark .logo__wrapper {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      }
+
+      .loading-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+        min-height: 400px; /* CLSを防ぐために最小高さを設定 */
+        padding: 2rem;
+      }
+
+      .logo-container {
+        position: relative;
+        overflow: hidden;
+        aspect-ratio: 1 / 1;
+        margin-bottom: 2rem;
+      }
+
+      .logo-image {
+        width: 120px;
+        height: 120px;
+        filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.2));
+        will-change: transform;
+        object-fit: contain;
+      }
+
+      .title {
+        margin-bottom: 2rem;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        will-change: transform, opacity;
+      }
+
+      .title-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .text-stroke {
+        font-family: "Poppins", sans-serif;
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1.2;
+        color: transparent;
+        text-align: center;
+        position: relative;
+        -webkit-text-stroke: 2px var(--color-white);
+        text-stroke: 2px var(--color-white);
+        paint-order: stroke;
+        text-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
+        display: inline-block;
+      }
+
+      html.dark .text-stroke {
+        color: var(--color-white);
+        background-image: var(--gradient-text);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 180%;
+        background-position: 0%;
+        animation: flowingGradation 6s ease-in infinite;
+      }
+
+      .text-gradient {
+        display: inline-block;
+        font-size: 3rem;
+        font-weight: 700;
+        text-align: center;
+        background-image: var(--gradient-text);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 180%;
+        background-position: 0%;
+        z-index: 3;
+        animation: flowingGradation 6s ease-in infinite;
+      }
+
+      .loading-spinner {
+        margin-top: 1rem;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
+        border-top: var(--color-white) 3px solid;
+        border-radius: 50%;
+        will-change: transform, opacity;
+        /* CSS animation disabled - using GSAP instead */
+      }
+
+      html.dark .spinner {
+        border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
+        border-top: var(--color-white) 3px solid;
+      }
+
+      @keyframes flowingGradation {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* レスポンシブデザイン */
+      @media (width <= 768px) {
+        .text-stroke,
+        .text-gradient {
+          font-size: 2.5rem;
+        }
+
+        .logo-image {
+          width: 100px;
+        }
+
+        .title {
+          gap: 0.3rem;
+        }
+      }
+
+      @media (width <= 480px) {
+        .text-stroke,
+        .text-gradient {
+          font-size: 2rem;
+        }
+
+        .logo-image {
+          width: 80px;
+        }
+
+        .title {
+          gap: 0.2rem;
+        }
       }
 
       .fv {
