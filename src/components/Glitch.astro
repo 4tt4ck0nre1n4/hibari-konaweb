@@ -640,13 +640,15 @@ const glitchImage = await getImage({ src: glitchImageSrc });
           const element = img as HTMLElement;
           // ループ2巡目以降でも確実にopacityアニメーションが発火するように、
           // 一度アニメーションとopacityをリセットしてから再適用する
-          element.style.removeProperty("animation");
-          element.style.removeProperty("opacity");
-          // 再描画を強制して同一アニメーション名でも再生されるようにする
-          void element.offsetWidth;
-          // opacityアニメーションを追加
-          element.style.animation = "opacity 8s linear";
-          // element.style.animation = "noise 8s linear";
+          // 強制リフローを避けるため、requestAnimationFrameを2回使用
+          requestAnimationFrame(() => {
+            element.style.removeProperty("animation");
+            element.style.removeProperty("opacity");
+            // 次のフレームでアニメーションを再適用
+            requestAnimationFrame(() => {
+              element.style.animation = "opacity 8s linear";
+            });
+          });
         });
       }, 16000); // 8秒 + 8秒 = 16秒後
       timeoutIds.push(timeoutId2);

@@ -38,8 +38,6 @@ const gradientTitle = "My Portfolio";
 </div>
 
 <script>
-  import { gsap } from "gsap";
-
   // ローディングアニメーションの設定
   const LOADING_DURATION = 3000; // 3秒間のローディング表示
 
@@ -61,13 +59,15 @@ const gradientTitle = "My Portfolio";
 
   // ローディングスクリーンを即座に非表示にする（ページ遷移時用）
   // 強制リフローを避けるため、GSAPを使用してスタイルを変更
-  function hideLoadingScreenImmediately() {
+  // displayプロパティの変更はレイアウトをトリガーするため、opacityとvisibilityのみを使用
+  function hideLoadingScreenImmediately(gsap: typeof import("gsap").gsap) {
     const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
     if (loadingScreen) {
       // GSAPのautoAlphaを使用（opacityとvisibilityを同時に制御、レイアウトをトリガーしない）
+      // displayプロパティは変更せず、pointer-eventsでクリックを無効化
       gsap.set(loadingScreen, {
         autoAlpha: 0,
-        display: "none",
+        pointerEvents: "none",
         immediateRender: true, // 即座に適用
       });
 
@@ -80,10 +80,10 @@ const gradientTitle = "My Portfolio";
   }
 
   // DOM要素の取得とアニメーション初期化
-  function initLoadingAnimation() {
+  function initLoadingAnimation(gsap: typeof import("gsap").gsap) {
     // 初回読み込みでない場合は即座に非表示にして終了
     if (!isInitialLoad()) {
-      hideLoadingScreenImmediately();
+      hideLoadingScreenImmediately(gsap);
       return;
     }
 
@@ -101,26 +101,48 @@ const gradientTitle = "My Portfolio";
         spinner: !!spinner,
       });
       // フォールバック: 要素が見つからない場合は即座に非表示
-      hideLoadingScreenImmediately();
+      hideLoadingScreenImmediately(gsap);
       return;
     }
 
     // タイムアウト処理を設定（フリーズを防ぐため）
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-    // requestAnimationFrameを使用してブラウザのレンダリングサイクルに合わせる
-    // これにより強制リフローを防ぐ
+    // 単一のrequestAnimationFrameで統合（ネストを削減）
+    // バッチ処理でスタイル変更をまとめて実行し、強制リフローを最小化
     requestAnimationFrame(() => {
       // ページ読み込み中はスクロールを無効化（CLSを防ぐためbodyではなくhtmlに設定）
       // 強制リフローを避けるため、GSAPを使用
-      gsap.set(document.documentElement, {
+      const docElement = document.documentElement;
+
+      // バッチ処理で初期状態を一度に設定（強制リフローを最小化）
+      // GSAPの設定を最適化：force3Dを使用してGPUアクセラレーションを有効化
+      // autoAlphaを使用してopacityとvisibilityを同時に制御（レイアウトをトリガーしない）
+      gsap.set(docElement, {
         overflow: "hidden",
         immediateRender: true,
       });
 
+      // will-changeプロパティを適切に管理（パフォーマンス最適化）
+      gsap.set(loadingScreen, {
+        autoAlpha: 1,
+        pointerEvents: "auto",
+        force3D: true,
+        immediateRender: true,
+        willChange: "opacity, transform", // アニメーション前に設定
+      });
+
+      // 複数要素を一度に設定（バッチ処理）
+      gsap.set([logoImage, title, spinner], {
+        opacity: 0,
+        scale: 0.8,
+        force3D: true,
+        willChange: "opacity, transform", // アニメーション前に設定
+      });
+
       // タイムアウト処理を設定（フリーズを防ぐため）
       timeoutId = setTimeout(() => {
-        hideLoadingScreenImmediately();
+        hideLoadingScreenImmediately(gsap);
         if (spinner) {
           gsap.killTweensOf(spinner);
         }
@@ -135,29 +157,7 @@ const gradientTitle = "My Portfolio";
         }
       }, LOADING_DURATION + 2000); // アニメーション時間 + 2秒のマージン
 
-      // 初期状態を一度に設定（バッチ処理で強制リフローを最小化）
-      // GSAPの設定を最適化：force3Dを使用してGPUアクセラレーションを有効化
-      // autoAlphaを使用してopacityとvisibilityを同時に制御（レイアウトをトリガーしない）
-      gsap.set(loadingScreen, {
-        autoAlpha: 1,
-        display: "flex",
-        force3D: true,
-        immediateRender: true,
-      });
-
-      gsap.set([logoImage, title], {
-        opacity: 0,
-        scale: 0.8,
-        force3D: true,
-      });
-
-      gsap.set(spinner, {
-        opacity: 0,
-        scale: 0.8,
-        force3D: true,
-      });
-
-      // 次のフレームでアニメーションを開始（レイアウト計算を待つ）
+      // アニメーションを開始（レイアウト計算を待つ）
       requestAnimationFrame(() => {
         // ローディングアニメーションの実行
         const tl = gsap.timeline({
@@ -203,78 +203,118 @@ const gradientTitle = "My Portfolio";
 
       // 指定時間後にフェードアウト
       setTimeout(() => {
-        requestAnimationFrame(() => {
-          // タイムアウトをクリア
-          if (timeoutId !== null) {
-            clearTimeout(timeoutId);
-            timeoutId = null;
-          }
+        // タイムアウトをクリア
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
 
-          // スピナーのアニメーションを停止
-          gsap.killTweensOf(spinner);
+        // スピナーのアニメーションを停止
+        gsap.killTweensOf(spinner);
 
-          // ローディングスクリーンをフェードアウト
-          // autoAlphaを使用してopacityとvisibilityを同時に制御（強制リフローを避ける）
-          gsap.to(loadingScreen, {
-            autoAlpha: 0,
-            duration: 0.8,
-            ease: "power2.inOut",
-            force3D: true,
-            onComplete: () => {
-              // 確実に非表示にする（GSAPで設定、直接的なstyle操作を避ける）
-              gsap.set(loadingScreen, {
-                display: "none",
-                autoAlpha: 0,
-                immediateRender: true,
-              });
+        // ローディングスクリーンをフェードアウト
+        // autoAlphaを使用してopacityとvisibilityを同時に制御（強制リフローを避ける）
+        gsap.to(loadingScreen, {
+          autoAlpha: 0,
+          duration: 0.8,
+          ease: "power2.inOut",
+          force3D: true,
+          onComplete: () => {
+            // 確実に非表示にする（GSAPで設定、直接的なstyle操作を避ける）
+            // displayプロパティは変更せず、pointer-eventsでクリックを無効化（レイアウトをトリガーしない）
+            gsap.set(loadingScreen, {
+              autoAlpha: 0,
+              pointerEvents: "none",
+              immediateRender: true,
+            });
 
-              // メインコンテンツの表示を許可（CLSを防ぐためhtmlに設定）
-              // 強制リフローを避けるため、GSAPを使用
-              gsap.set(document.documentElement, {
-                overflow: "",
-                immediateRender: true,
-              });
+            // メインコンテンツの表示を許可（CLSを防ぐためhtmlに設定）
+            // 強制リフローを避けるため、GSAPを使用
+            gsap.set(document.documentElement, {
+              overflow: "",
+              immediateRender: true,
+            });
 
-              // GSAPアニメーションをクリーンアップ
-              gsap.killTweensOf(loadingScreen);
-              gsap.killTweensOf([logoImage, title, spinner]);
-            },
-          });
+            // GSAPアニメーションをクリーンアップ
+            gsap.killTweensOf(loadingScreen);
+            gsap.killTweensOf([logoImage, title, spinner]);
+
+            // will-changeプロパティを削除（メモリリークを防ぐ）
+            gsap.set([loadingScreen, logoImage, title, spinner], {
+              willChange: "auto",
+            });
+          },
         });
       }, LOADING_DURATION);
     });
   }
 
-  // View Transitions対応: ページ遷移時の処理
-  document.addEventListener("astro:after-swap", () => {
-    // ページ遷移時はローディングスクリーンを確実に非表示にする
-    hideLoadingScreenImmediately();
-
-    // スピナーのアニメーションを停止
-    const spinner = document.querySelector("#loading-screen .spinner");
-    if (spinner) {
-      gsap.killTweensOf(spinner);
+  // GSAPを動的インポートで遅延読み込み（メインスレッド処理の最適化）
+  async function initGSAPAnimation() {
+    try {
+      // requestIdleCallbackで遅延実行（メインスレッドの負荷を削減）
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(
+          async () => {
+            const { gsap } = await import("gsap");
+            initLoadingAnimation(gsap);
+          },
+          { timeout: 2000 } // 2秒以内に実行を保証
+        );
+      } else {
+        // フォールバック: requestIdleCallbackがサポートされていない場合
+        setTimeout(async () => {
+          const { gsap } = await import("gsap");
+          initLoadingAnimation(gsap);
+        }, 100);
+      }
+    } catch (error) {
+      console.error("Failed to load GSAP:", error);
+      // エラー時はローディングスクリーンを非表示にする
+      const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
+      if (loadingScreen) {
+        loadingScreen.style.display = "none";
+      }
     }
+  }
 
-    // ローディングスクリーンのアニメーションを停止
-    const loadingScreen = document.getElementById("loading-screen");
-    if (loadingScreen) {
-      gsap.killTweensOf(loadingScreen);
+  // View Transitions対応: ページ遷移時の処理
+  document.addEventListener("astro:after-swap", async () => {
+    // GSAPが読み込まれているか確認
+    try {
+      const { gsap } = await import("gsap");
+
+      // ページ遷移時はローディングスクリーンを確実に非表示にする
+      hideLoadingScreenImmediately(gsap);
+
+      // スピナーのアニメーションを停止
+      const spinner = document.querySelector("#loading-screen .spinner");
+      if (spinner) {
+        gsap.killTweensOf(spinner);
+      }
+
+      // ローディングスクリーンのアニメーションを停止
+      const loadingScreen = document.getElementById("loading-screen");
+      if (loadingScreen) {
+        gsap.killTweensOf(loadingScreen);
+      }
+    } catch (error) {
+      console.error("Failed to load GSAP for cleanup:", error);
+      // エラー時は直接非表示にする
+      const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
+      if (loadingScreen) {
+        loadingScreen.style.display = "none";
+      }
     }
   });
 
   // DOM準備状態を確認してからアニメーションを初期化
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
-      // requestAnimationFrameを使用してブラウザのレンダリングサイクルに合わせる
-      requestAnimationFrame(() => {
-        requestAnimationFrame(initLoadingAnimation);
-      });
+      initGSAPAnimation();
     });
   } else {
-    // DOMが既に読み込まれている場合もrequestAnimationFrameを使用
-    requestAnimationFrame(() => {
-      requestAnimationFrame(initLoadingAnimation);
-    });
+    // DOMが既に読み込まれている場合
+    initGSAPAnimation();
   }
 </script>

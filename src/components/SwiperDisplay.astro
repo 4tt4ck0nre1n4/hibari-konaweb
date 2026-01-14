@@ -480,17 +480,20 @@ const swiperText2 = "Thank you for viewing my site.";
       } else {
         // ページが再表示された時、Intersection Observerが自動的に処理
         // 念のため、ビューポート内か確認して再開
-        const rect = swiperSection.getBoundingClientRect();
-        const isInViewport =
-          rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0;
+        // 強制リフローを避けるため、requestAnimationFrame内でgetBoundingClientRectを実行
+        requestAnimationFrame(() => {
+          const rect = swiperSection.getBoundingClientRect();
+          const isInViewport =
+            rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0;
 
-        if (isInViewport) {
-          swiperWrapper.classList.remove("paused");
-          swiperWrapper.style.willChange = "transform";
-          swiperSlides.forEach((slide) => {
-            slide.classList.remove("paused");
-          });
-        }
+          if (isInViewport) {
+            swiperWrapper.classList.remove("paused");
+            swiperWrapper.style.willChange = "transform";
+            swiperSlides.forEach((slide) => {
+              slide.classList.remove("paused");
+            });
+          }
+        });
       }
     });
   })();

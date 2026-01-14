@@ -72,6 +72,28 @@ const cspContent = isDev
 
     <!-- Critical CSS インライン化 -->
     <style is:global>
+      /* CSS変数の定義（初期レンダリングに必須） */
+      :root {
+        --color-white: #f1f5f9;
+        --color-black: #010101;
+        --color-purple: #639;
+        --color-red: #ff4f48;
+        --color-blue: #0d0950;
+        --color-gray: #808080;
+        --accent: rgb(136 58 234);
+        --accent-light: rgb(224 204 250);
+        --accent-dark: rgb(49 10 101);
+        --accent-gradient: linear-gradient(45deg, var(--accent), var(--accent-light) 30%, var(--color-white) 60%);
+        --color-aqua: #0ff;
+        --white: rgb(255 255 255);
+        --angle: 90deg;
+        --gradient-text: linear-gradient(
+          var(--angle),
+          rgb(238 161 255 / 1) 0%,
+          rgb(147 183 255 / 1) 55%,
+          rgb(170 244 254 / 1) 100%
+        );
+      }
       *,
       *::before,
       *::after {

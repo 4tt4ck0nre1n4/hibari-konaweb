@@ -107,7 +107,8 @@ const HamburgerMenu = () => {
       requestAnimationFrame(updateOverlayMetrics);
     };
 
-    handleResize();
+    // 初期化時もrequestAnimationFrame内で実行（強制リフローを避ける）
+    requestAnimationFrame(updateOverlayMetrics);
 
     const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(handleResize) : null;
     if (resizeObserver && menuRef.current) {

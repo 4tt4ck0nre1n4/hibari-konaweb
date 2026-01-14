@@ -232,9 +232,6 @@ const fvAnimeImage = await getImage({
         if (autoAnimationId !== null) return; // 既に実行中
 
         const startTime = Date.now();
-        const rect = fvWrapper.getBoundingClientRect();
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
 
         const animate = () => {
           if (isTouching) {
@@ -242,6 +239,12 @@ const fvAnimeImage = await getImage({
             autoAnimationId = requestAnimationFrame(animate);
             return;
           }
+
+          // 強制リフローを避けるため、requestAnimationFrame内でgetBoundingClientRectを実行
+          // animate関数は既にrequestAnimationFrame内で実行されているため、ここで取得しても問題ない
+          const rect = fvWrapper.getBoundingClientRect();
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
 
           const elapsed = Date.now() - startTime;
           const progress = (elapsed % animationDuration) / animationDuration;
@@ -271,13 +274,16 @@ const fvAnimeImage = await getImage({
     }
 
     // 初期位置を設定（画面中央）
+    // 強制リフローを避けるため、requestAnimationFrame内でgetBoundingClientRectを実行
     const initialX = window.innerWidth / 2;
     const initialY = window.innerHeight / 2;
-    const rect = fvWrapper.getBoundingClientRect();
-    const x = initialX - rect.left;
-    const y = initialY - rect.top;
-    backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
-    backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+    requestAnimationFrame(() => {
+      const rect = fvWrapper.getBoundingClientRect();
+      const x = initialX - rect.left;
+      const y = initialY - rect.top;
+      backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
+      backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+    });
 
     // 初期化完了のログ
     devLog("✅ Mouse follow initialized successfully", {

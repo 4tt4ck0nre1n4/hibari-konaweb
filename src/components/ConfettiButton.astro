@@ -115,9 +115,14 @@ const confettiIcon = "fluent-emoji:wrapped-gift";
     const confettiIcon = document.querySelector(".onConfettiIcon") as HTMLElement | null;
     if (!confettiIcon) return;
 
-    confettiIcon.classList.remove("js-turnIcon");
-    void confettiIcon.offsetWidth;
-    confettiIcon.classList.add("js-turnIcon");
+    // 強制リフローを避けるため、requestAnimationFrameを2回使用
+    requestAnimationFrame(() => {
+      confettiIcon.classList.remove("js-turnIcon");
+      // 次のフレームでクラスを追加（アニメーションを再開）
+      requestAnimationFrame(() => {
+        confettiIcon.classList.add("js-turnIcon");
+      });
+    });
 
     setTimeout(() => {
       confettiIcon.classList.remove("js-turnIcon");

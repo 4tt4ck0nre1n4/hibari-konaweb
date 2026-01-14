@@ -476,9 +476,14 @@ const mouseItem = {
       return;
     }
 
-    mouse.classList.remove("js-mouseMove");
-    void mouse.offsetWidth;
-    mouse.classList.add("js-mouseMove");
+    // 強制リフローを避けるため、requestAnimationFrameを2回使用
+    requestAnimationFrame(() => {
+      mouse.classList.remove("js-mouseMove");
+      // 次のフレームでクラスを追加（アニメーションを再開）
+      requestAnimationFrame(() => {
+        mouse.classList.add("js-mouseMove");
+      });
+    });
 
     setTimeout(() => {
       mouse.classList.remove("js-mouseMove");

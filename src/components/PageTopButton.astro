@@ -203,30 +203,38 @@ import pageTopIcon from "../assets/svg/top.svg";
     }
 
     // スクロールイベントハンドラー
+    // 強制リフローを避けるため、requestAnimationFrame内でレイアウトプロパティを読み取る
+    let rafId: number | null = null;
     function handleScroll() {
       if (!pageTopButton) return;
 
-      const firstViewBottom = getFirstViewBottom();
-      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+      // 既にrequestAnimationFrameがスケジュールされている場合はスキップ
+      if (rafId !== null) return;
 
-      devLog("📜 Scroll event:", {
-        scrollY,
-        firstViewBottom,
-        shouldShow: scrollY > firstViewBottom,
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        const firstViewBottom = getFirstViewBottom();
+        const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+
+        devLog("📜 Scroll event:", {
+          scrollY,
+          firstViewBottom,
+          shouldShow: scrollY > firstViewBottom,
+        });
+
+        // FirstViewを過ぎたかどうかを判定（FirstViewがない場合は300px以上スクロールで表示）
+        if (scrollY > firstViewBottom) {
+          if (!pageTopButton.classList.contains("is-visible")) {
+            devLog("👁️ Showing PageTopButton");
+            pageTopButton.classList.add("is-visible");
+          }
+        } else {
+          if (pageTopButton.classList.contains("is-visible")) {
+            devLog("🙈 Hiding PageTopButton");
+            pageTopButton.classList.remove("is-visible");
+          }
+        }
       });
-
-      // FirstViewを過ぎたかどうかを判定（FirstViewがない場合は300px以上スクロールで表示）
-      if (scrollY > firstViewBottom) {
-        if (!pageTopButton.classList.contains("is-visible")) {
-          devLog("👁️ Showing PageTopButton");
-          pageTopButton.classList.add("is-visible");
-        }
-      } else {
-        if (pageTopButton.classList.contains("is-visible")) {
-          devLog("🙈 Hiding PageTopButton");
-          pageTopButton.classList.remove("is-visible");
-        }
-      }
     }
 
     // トップへ戻る処理

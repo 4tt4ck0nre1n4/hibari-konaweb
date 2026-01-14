@@ -37,7 +37,7 @@ export default defineConfig({
   site: "https://hibari-konaweb.netlify.app",
   build: {
     format: "file",
-    inlineStylesheets: "auto", // 自動的に小さなCSSをインライン化
+    inlineStylesheets: "auto", // 小さなCSSを自動的にインライン化（Critical CSSと組み合わせて最適化）
   },
   // docs/ディレクトリをビルドから除外（ドキュメントは本番環境には不要）
   publicDir: "public",

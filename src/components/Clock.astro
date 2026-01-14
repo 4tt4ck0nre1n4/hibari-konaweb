@@ -208,9 +208,14 @@
       return;
     }
 
-    clockInner.classList.remove("js-shine");
-    void clockInner.offsetWidth;
-    clockInner.classList.add("js-shine");
+    // 強制リフローを避けるため、requestAnimationFrameを2回使用
+    requestAnimationFrame(() => {
+      clockInner.classList.remove("js-shine");
+      // 次のフレームでクラスを追加（アニメーションを再開）
+      requestAnimationFrame(() => {
+        clockInner.classList.add("js-shine");
+      });
+    });
 
     setTimeout(() => {
       clockInner.classList.remove("js-shine");

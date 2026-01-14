@@ -117,24 +117,21 @@ export function asyncSwiperCssPlugin() {
                 replacements.push({ index, fullMatch, replacement });
               }
               // コンポーネントのCSS（index.*.cssなど）: media="print" hack を使用
-              // ただし、最初の2つのCSSファイル（reset.cssとglobal.cssを含む）は除外
-              else if (
-                (href.match(/index\.[A-Za-z0-9]+\.css/) || href.match(/_[A-Za-z0-9]+\.css/)) &&
-                nonSwiperCssIndex >= 2
-              ) {
+              // すべてのindex.*.cssファイルを非同期読み込みにする（Critical CSSがインライン化されているため）
+              else if (href.match(/index\.[A-Za-z0-9]+\.css/) || href.match(/_[A-Za-z0-9]+\.css/)) {
                 modified = true;
-                // media="print" hack を使用して遅延読み込み
-                replacement = `<link rel="stylesheet" href="${normalizedHref}" media="print" onload="this.media='all'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                // preload + onload パターンを使用（media="print" hackより推奨）
+                // Critical CSSがインライン化されているため、すべてのCSSを非同期読み込み可能
+                replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
                 replacements.push({ index, fullMatch, replacement });
               }
-              // reset.css と global.css を含むCSSファイル: クリティカルCSSなので同期的に読み込む
-              // HeadLayout.astroから読み込まれるCSSは通常、最初の2つ（または最初の1つにバンドルされる）
-              // Swiper CSSと非クリティカルなフォントの CSS を除外した最初の2つは同期的に読み込む（変更なし）
+              // その他のCSSファイル（reset.css、global.cssなど）も非同期読み込み
+              // Critical CSSがインライン化されているため、すべてのCSSを非同期読み込み可能
               else {
-                nonSwiperCssIndex++;
-                // reset.css と global.css を含むクリティカルCSSは同期的に読み込むため、
-                // 最初の2つのCSSファイルは非同期読み込みに変換しない
-                // （ページ遷移時のFOUCを防ぐため）
+                modified = true;
+                // preload + onload パターンを使用
+                replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                replacements.push({ index, fullMatch, replacement });
               }
             }
 
