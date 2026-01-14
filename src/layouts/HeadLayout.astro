@@ -64,6 +64,10 @@ const cspContent = isDev
     <meta name="twitter:description" content={twitterDescription} />
     <meta name="twitter:site" content={globalText.twitter.site} />
     <meta name="twitter:image" content={globalText.twitter.image} />
+
+    <!-- ページ固有の追加head要素（LCP最適化など）- 早期読み込みのため、metaタグの直後に配置 -->
+    <slot name="head" />
+
     <ClientRouter />
 
     <!-- Critical CSS インライン化 -->
@@ -701,6 +705,7 @@ const cspContent = isDev
 
       .fv__wrapper {
         height: 100%;
+        min-height: 100vh; /* CLS防止: 最小高さを設定してレイアウトシフトを防止 */
         background: #1d1f20;
         /* 背景画像の設定（HTMLでインラインスタイルとして指定） */
         background-size: cover;
@@ -858,9 +863,6 @@ const cspContent = isDev
     -->
     <NonCriticalFonts />
 
-    <!-- ページ固有の追加head要素（LCP最適化など） -->
-    <slot name="head" />
-
     <!-- ページ遷移時のFOUC防止: CSS読み込み完了までページを非表示 -->
     <!-- ClientRouter使用時は初回読み込み時のみ実行（ページ遷移時はスキップ） -->
     <script is:inline>
@@ -917,12 +919,15 @@ const cspContent = isDev
           }
         });
 
-        // media="print" hack のフォールバック（Swiper CSS用）
+        // media="print" hack のフォールバック（Swiper CSS、コンポーネントCSS用）
         const printLinks = document.querySelectorAll('link[rel="stylesheet"][media="print"]');
         printLinks.forEach(function (link) {
           const href = link.getAttribute("href");
-          // Swiper CSSのみを処理
-          if (href && href.includes("swiper")) {
+          // Swiper CSSまたはコンポーネントのCSS（index.*.cssなど）を処理
+          if (
+            href &&
+            (href.includes("swiper") || href.match(/index\.[A-Za-z0-9]+\.css/) || href.match(/_[A-Za-z0-9]+\.css/))
+          ) {
             // onloadがサポートされていない場合は、即座にmedia="all"に変換
             if (!("onload" in link)) {
               link.media = "all";
@@ -931,6 +936,10 @@ const cspContent = isDev
               link.onload = function () {
                 this.media = "all";
               };
+              // フォールバック: 読み込みが完了している場合に備えて即座にチェック
+              if (link.sheet) {
+                link.media = "all";
+              }
             }
           }
         });

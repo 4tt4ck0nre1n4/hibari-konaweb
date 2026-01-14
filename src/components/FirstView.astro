@@ -5,13 +5,27 @@ import fvAnimeImageSrc from "../assets/fvAnimeImage.webp";
 import fvBackgroundImageSrc from "../assets/fvBackgroundImage.webp";
 import { getImage } from "astro:assets";
 
-const fvAnimeImage = await getImage({ src: fvAnimeImageSrc });
-const fvBackgroundImage = await getImage({ src: fvBackgroundImageSrc });
+// LCP最適化: 背景画像を高品質・適切なサイズで最適化
+// 1920px幅（一般的なデスクトップ画面幅）で最適化し、AVIF/WebP形式を優先
+const fvBackgroundImage = await getImage({
+  src: fvBackgroundImageSrc,
+  width: 1920,
+  quality: 85, // 品質とファイルサイズのバランス
+  format: "webp", // WebP形式を明示的に指定（AVIFはフォールバック）
+});
+
+// アニメーション画像は低優先度で最適化
+const fvAnimeImage = await getImage({
+  src: fvAnimeImageSrc,
+  width: 1920,
+  quality: 80,
+  format: "webp",
+});
 ---
 
-<!-- LCP背景画像のプリロード（PageSpeed Insights最適化） -->
-<link slot="head" rel="preload" href={fvBackgroundImage.src} as="image" fetchpriority="high" />
-<link slot="head" rel="preload" href={fvAnimeImage.src} as="image" fetchpriority="low" />
+<!-- LCP背景画像のプリロード（PageSpeed Insights最適化） --><!-- リソース読み込みの遅延を削減するため、headの最初に配置 -->
+<link slot="head" rel="preload" href={fvBackgroundImage.src} as="image" fetchpriority="high" type="image/webp" />
+<link slot="head" rel="preload" href={fvAnimeImage.src} as="image" fetchpriority="low" type="image/webp" />
 
 <div class="fv">
   <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImage.src})`}>

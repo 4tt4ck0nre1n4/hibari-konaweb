@@ -116,6 +116,17 @@ export function asyncSwiperCssPlugin() {
                 replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
                 replacements.push({ index, fullMatch, replacement });
               }
+              // コンポーネントのCSS（index.*.cssなど）: media="print" hack を使用
+              // ただし、最初の2つのCSSファイル（reset.cssとglobal.cssを含む）は除外
+              else if (
+                (href.match(/index\.[A-Za-z0-9]+\.css/) || href.match(/_[A-Za-z0-9]+\.css/)) &&
+                nonSwiperCssIndex >= 2
+              ) {
+                modified = true;
+                // media="print" hack を使用して遅延読み込み
+                replacement = `<link rel="stylesheet" href="${normalizedHref}" media="print" onload="this.media='all'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                replacements.push({ index, fullMatch, replacement });
+              }
               // reset.css と global.css を含むCSSファイル: クリティカルCSSなので同期的に読み込む
               // HeadLayout.astroから読み込まれるCSSは通常、最初の2つ（または最初の1つにバンドルされる）
               // Swiper CSSと非クリティカルなフォントの CSS を除外した最初の2つは同期的に読み込む（変更なし）

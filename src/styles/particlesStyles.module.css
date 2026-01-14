@@ -53,6 +53,16 @@
   color: #788288;
 }
 
+.iconFallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  line-height: 56px;
+  width: 56px;
+  height: 56px;
+}
+
 /* スマホサイズでのレスポンシブ対応 */
 @media (width <= 768px) {
   .particles__inner {

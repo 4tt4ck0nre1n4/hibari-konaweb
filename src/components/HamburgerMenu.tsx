@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import hamburgerStyles from "../styles/hamburgerStyles.module.css";
 import ReactDOM from "react-dom";
-import { Icon } from "@iconify/react";
 import SnsLink from "./SnsLink";
 import { twitter, github_sns, contact, mail } from "../scripts/constSns";
 import HamburgerMenuLogo from "./HamburgerMenuLogo";
+import IconifyInline from "./IconifyInline";
 
 const title = "My Portfolio Site";
 const menuItems = [
@@ -357,7 +357,13 @@ const HamburgerMenu = () => {
                 ref={index === 0 ? firstMenuLinkRef : undefined}
               >
                 {typeof icon === "string" && icon?.trim() !== "" ? (
-                  <Icon icon={icon} className={hamburgerStyles.hamburger__menu_icon} width="36" height="36" />
+                  <IconifyInline
+                    icon={icon}
+                    className={hamburgerStyles.hamburger__menu_icon}
+                    width="36"
+                    height="36"
+                    aria-hidden
+                  />
                 ) : null}
                 <span className={hamburgerStyles.hamburger__menu_label}>{label}</span>
               </a>

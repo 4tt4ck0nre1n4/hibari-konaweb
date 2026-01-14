@@ -26,7 +26,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   twitterDescription={globalText.top.description}
 >
   <!-- LCP背景画像のプリロード（PageSpeed Insights最適化） -->
-  <link slot="head" rel="preload" href={gridBackgroundImage.src} as="image" fetchpriority="low" />
+  <link slot="head" rel="preload" href={gridBackgroundImage.src} as="image" fetchpriority="low" type="image/webp"　/>
 
   <div id="outer-container">
     <Header />

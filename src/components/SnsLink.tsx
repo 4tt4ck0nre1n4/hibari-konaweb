@@ -1,4 +1,4 @@
-import { Icon } from "@iconify/react";
+import IconifyInline from "./IconifyInline";
 
 export interface SnsLinkProps {
   itemClassName?: string;
@@ -65,7 +65,7 @@ const SnsLink = ({
             />
           )
         ) : (
-          <Icon icon={snsIconSvg ?? ""} width={snsIconWidth} height={snsIconHeight} />
+          <IconifyInline icon={snsIconSvg ?? ""} width={snsIconWidth} height={snsIconHeight} aria-hidden />
         )}
         {hasIconName ? <span className="sns-icon__name">{snsIconName}</span> : null}
       </a>

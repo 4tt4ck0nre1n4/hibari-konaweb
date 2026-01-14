@@ -60,13 +60,22 @@ const gradientTitle = "My Portfolio";
   }
 
   // ローディングスクリーンを即座に非表示にする（ページ遷移時用）
+  // 強制リフローを避けるため、GSAPを使用してスタイルを変更
   function hideLoadingScreenImmediately() {
     const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
     if (loadingScreen) {
-      loadingScreen.style.display = "none";
-      loadingScreen.style.visibility = "hidden";
-      loadingScreen.style.opacity = "0";
-      document.documentElement.style.overflow = "";
+      // GSAPのautoAlphaを使用（opacityとvisibilityを同時に制御、レイアウトをトリガーしない）
+      gsap.set(loadingScreen, {
+        autoAlpha: 0,
+        display: "none",
+        immediateRender: true, // 即座に適用
+      });
+
+      // overflowの変更もGSAPで行う（強制リフローを避ける）
+      gsap.set(document.documentElement, {
+        overflow: "",
+        immediateRender: true,
+      });
     }
   }
 
@@ -103,7 +112,11 @@ const gradientTitle = "My Portfolio";
     // これにより強制リフローを防ぐ
     requestAnimationFrame(() => {
       // ページ読み込み中はスクロールを無効化（CLSを防ぐためbodyではなくhtmlに設定）
-      document.documentElement.style.overflow = "hidden";
+      // 強制リフローを避けるため、GSAPを使用
+      gsap.set(document.documentElement, {
+        overflow: "hidden",
+        immediateRender: true,
+      });
 
       // タイムアウト処理を設定（フリーズを防ぐため）
       timeoutId = setTimeout(() => {
@@ -124,11 +137,12 @@ const gradientTitle = "My Portfolio";
 
       // 初期状態を一度に設定（バッチ処理で強制リフローを最小化）
       // GSAPの設定を最適化：force3Dを使用してGPUアクセラレーションを有効化
+      // autoAlphaを使用してopacityとvisibilityを同時に制御（レイアウトをトリガーしない）
       gsap.set(loadingScreen, {
-        opacity: 1,
+        autoAlpha: 1,
         display: "flex",
-        visibility: "visible",
         force3D: true,
+        immediateRender: true,
       });
 
       gsap.set([logoImage, title], {
@@ -200,18 +214,27 @@ const gradientTitle = "My Portfolio";
           gsap.killTweensOf(spinner);
 
           // ローディングスクリーンをフェードアウト
+          // autoAlphaを使用してopacityとvisibilityを同時に制御（強制リフローを避ける）
           gsap.to(loadingScreen, {
-            opacity: 0,
+            autoAlpha: 0,
             duration: 0.8,
             ease: "power2.inOut",
             force3D: true,
             onComplete: () => {
-              // 確実に非表示にする
-              loadingScreen.style.display = "none";
-              loadingScreen.style.visibility = "hidden";
-              loadingScreen.style.opacity = "0";
+              // 確実に非表示にする（GSAPで設定、直接的なstyle操作を避ける）
+              gsap.set(loadingScreen, {
+                display: "none",
+                autoAlpha: 0,
+                immediateRender: true,
+              });
+
               // メインコンテンツの表示を許可（CLSを防ぐためhtmlに設定）
-              document.documentElement.style.overflow = "";
+              // 強制リフローを避けるため、GSAPを使用
+              gsap.set(document.documentElement, {
+                overflow: "",
+                immediateRender: true,
+              });
+
               // GSAPアニメーションをクリーンアップ
               gsap.killTweensOf(loadingScreen);
               gsap.killTweensOf([logoImage, title, spinner]);

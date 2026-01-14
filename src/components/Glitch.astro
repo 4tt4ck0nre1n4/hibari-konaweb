@@ -4,7 +4,7 @@ import { getImage } from "astro:assets";
 const glitchImage = await getImage({ src: glitchImageSrc });
 ---
 
-<link slot="head" rel="preload" href={glitchImage.src} as="image" fetchpriority="high" />
+<link slot="head" rel="preload" href={glitchImage.src} as="image" fetchpriority="high" type="image/webp" />
 
 <div class="glitch" style={`background-image: url(${glitchImage.src})`}>
   <div class="glitch-image r"></div>

@@ -165,8 +165,21 @@ export default defineConfig({
         output: {
           // GSAPなどのライブラリを適切にバンドル
           manualChunks: (id) => {
+            // GSAPライブラリ
             if (id.includes("node_modules/gsap")) {
               return "gsap";
+            }
+            // Iconify関連のライブラリをまとめる（アイコンの読み込み最適化）
+            if (id.includes("node_modules/@iconify") || id.includes("node_modules/@iconify-json")) {
+              return "iconify";
+            }
+            // tsParticles関連のライブラリをまとめる
+            if (id.includes("node_modules/@tsparticles")) {
+              return "tsparticles";
+            }
+            // React関連のライブラリ
+            if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) {
+              return "react-vendor";
             }
           },
         },

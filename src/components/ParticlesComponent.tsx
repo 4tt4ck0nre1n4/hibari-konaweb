@@ -15,15 +15,70 @@ let playSound: HTMLAudioElement | null = null;
 let pauseSound: HTMLAudioElement | null = null;
 let stopSound: HTMLAudioElement | null = null;
 
+// アイコンの読み込み状態をグローバルに管理（複数回の読み込みを防ぐ）
+let iconLoadPromise: Promise<void> | null = null;
+let iconsLoaded = false;
+
 declare global {
   interface Window {
     tsparticlesContainer?: Container;
   }
 }
 
+/**
+ * アイコンコレクションを読み込む（リトライ機能付き）
+ * @param retries リトライ回数（デフォルト: 3）
+ * @param delay リトライ間隔（ミリ秒、デフォルト: 1000）
+ */
+async function loadIconCollections(retries = 3, delay = 1000): Promise<void> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      // 動的インポートをプリロード（ブラウザのプリフェッチを活用）
+      const [fluentEmojiModule, fluentEmojiHCModule] = await Promise.all([
+        import("@iconify-json/fluent-emoji"),
+        import("@iconify-json/fluent-emoji-high-contrast"),
+      ]);
+
+      const fluentEmojiIcons = fluentEmojiModule.icons;
+      const fluentEmojiHighContrastIcons = fluentEmojiHCModule.icons;
+
+      // コレクション全体を登録（必要なアイコンを含む）
+      addCollection(fluentEmojiIcons);
+      addCollection(fluentEmojiHighContrastIcons);
+
+      // アイコンが正しく登録されているか確認
+      const partyPopperLoaded = iconLoaded(playIconButton);
+      const magicWandLoaded = iconLoaded(stopIconButton);
+      const partyPopperHCLoaded = iconLoaded(pauseIconButton);
+
+      if (partyPopperLoaded && magicWandLoaded && partyPopperHCLoaded) {
+        iconsLoaded = true;
+        devLog("Icon collections registered successfully:", {
+          partyPopper: partyPopperLoaded,
+          magicWand: magicWandLoaded,
+          partyPopperHC: partyPopperHCLoaded,
+        });
+        return;
+      } else {
+        throw new Error("Icons not properly registered after import");
+      }
+    } catch (error) {
+      if (attempt === retries) {
+        devError(`Failed to load icon data after ${retries} attempts:`, error);
+        throw error;
+      }
+      devLog(`Icon load attempt ${attempt} failed, retrying in ${delay}ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      // 指数バックオフ: リトライ間隔を徐々に増やす
+      delay = Math.min(delay * 1.5, 5000);
+    }
+  }
+}
+
 export default function ParticlesComponent() {
   const [ready, setReady] = useState(false);
   const [ParticlesLib, setParticlesLib] = useState<React.FC<IParticlesProps> | null>(null);
+  const [iconsReady, setIconsReady] = useState(false);
 
   useEffect(() => {
     // Initialize audio only in browser
@@ -35,29 +90,33 @@ export default function ParticlesComponent() {
 
     // アイコンをローカルレジストリに登録（外部APIリクエストを回避）
     // ビルド時にバンドルされるため、実行時の外部APIリクエストが不要
+    // グローバルな読み込み状態をチェックして、重複読み込みを防ぐ
     void (async () => {
+      if (iconsLoaded) {
+        setIconsReady(true);
+        return;
+      }
+
+      if (iconLoadPromise) {
+        // 既に読み込み中の場合は、そのPromiseを待つ
+        try {
+          await iconLoadPromise;
+          setIconsReady(true);
+        } catch (error) {
+          devError("Failed to load icons from existing promise:", error);
+          setIconsReady(false);
+        }
+        return;
+      }
+
+      // 新しい読み込みを開始
+      iconLoadPromise = loadIconCollections();
       try {
-        const [{ icons: fluentEmojiIcons }, { icons: fluentEmojiHighContrastIcons }] = await Promise.all([
-          import("@iconify-json/fluent-emoji"),
-          import("@iconify-json/fluent-emoji-high-contrast"),
-        ]);
-
-        // コレクション全体を登録（必要なアイコンを含む）
-        addCollection(fluentEmojiIcons);
-        addCollection(fluentEmojiHighContrastIcons);
-
-        // アイコンが正しく登録されているか確認
-        const partyPopperLoaded = iconLoaded(playIconButton);
-        const magicWandLoaded = iconLoaded(stopIconButton);
-        const partyPopperHCLoaded = iconLoaded(pauseIconButton);
-
-        devLog("Icon collections registered:", {
-          partyPopper: partyPopperLoaded,
-          magicWand: magicWandLoaded,
-          partyPopperHC: partyPopperHCLoaded,
-        });
+        await iconLoadPromise;
+        setIconsReady(true);
       } catch (error) {
         devError("Failed to load icon data:", error);
+        setIconsReady(false);
       }
     })();
 
@@ -97,6 +156,7 @@ export default function ParticlesComponent() {
     };
   }, []);
 
+  // Particlesライブラリが準備できてから表示（アイコンは読み込み中でも表示可能）
   if (!ready || ParticlesLib === null) return null;
 
   const handlePlay = () => {
@@ -160,6 +220,29 @@ export default function ParticlesComponent() {
     }
   };
 
+  // アイコンのフォールバック（読み込み失敗時や読み込み中）
+  const renderIcon = (iconName: string, className?: string) => {
+    if (iconsReady && iconName !== null && iconName !== "" && iconLoaded(iconName)) {
+      const iconClassName = className ?? particlesStyles.particles__icon;
+      return <Icon className={iconClassName} icon={iconName} width="56" height="56" />;
+    }
+    // フォールバック: シンプルなテキスト表示（アイコンが読み込めない場合）
+    const fallbackText =
+      iconName === playIconButton
+        ? "▶"
+        : iconName === pauseIconButton
+          ? "⏸"
+          : iconName === stopIconButton
+            ? "⏹"
+            : "?";
+    const iconClassName = className ?? particlesStyles.particles__icon;
+    return (
+      <span className={`${iconClassName} ${particlesStyles.iconFallback}`} aria-hidden="true">
+        {fallbackText}
+      </span>
+    );
+  };
+
   return (
     <>
       <div className={particlesStyles.particles__inner}>
@@ -171,7 +254,7 @@ export default function ParticlesComponent() {
             aria-label="Play particles animation"
             title="Play"
           >
-            <Icon className={particlesStyles.particles__icon} icon={playIconButton} width="56" height="56" />
+            {renderIcon(playIconButton)}
           </button>
           <button
             className={particlesStyles.particlesButton}
@@ -180,12 +263,7 @@ export default function ParticlesComponent() {
             aria-label="Pause particles animation"
             title="Pause"
           >
-            <Icon
-              className={`${particlesStyles.particles__icon} ${particlesStyles.pauseIcon}`}
-              icon={pauseIconButton}
-              width="56"
-              height="56"
-            />
+            {renderIcon(pauseIconButton, `${particlesStyles.particles__icon} ${particlesStyles.pauseIcon}`)}
           </button>
           <button
             className={particlesStyles.particlesButton}
@@ -194,7 +272,7 @@ export default function ParticlesComponent() {
             aria-label="Stop particles animation"
             title="Stop"
           >
-            <Icon className={particlesStyles.particles__icon} icon={stopIconButton} width="56" height="56" />
+            {renderIcon(stopIconButton)}
           </button>
         </div>
         <ParticlesLib
