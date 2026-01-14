@@ -2,15 +2,15 @@ import type { ReactElement } from "react";
 
 // アイコンセット（必要なものだけ）をローカルJSONから読み込み
 // 文字列指定の @iconify/react は外部（api.iconify.design）フェッチが発生し得るため避ける
-import bi from "@iconify-json/bi/icons.json";
-import devicon from "@iconify-json/devicon/icons.json";
-import fa6solid from "@iconify-json/fa6-solid/icons.json";
-import flatColorIcons from "@iconify-json/flat-color-icons/icons.json";
-import fluentEmojiFlat from "@iconify-json/fluent-emoji-flat/icons.json";
-import ic from "@iconify-json/ic/icons.json";
-import streamlineUltimateColor from "@iconify-json/streamline-ultimate-color/icons.json";
-import twemoji from "@iconify-json/twemoji/icons.json";
-import vscodeIcons from "@iconify-json/vscode-icons/icons.json";
+import biRaw from "@iconify-json/bi/icons.json";
+import deviconRaw from "@iconify-json/devicon/icons.json";
+import fa6solidRaw from "@iconify-json/fa6-solid/icons.json";
+import flatColorIconsRaw from "@iconify-json/flat-color-icons/icons.json";
+import fluentEmojiFlatRaw from "@iconify-json/fluent-emoji-flat/icons.json";
+import icRaw from "@iconify-json/ic/icons.json";
+import streamlineUltimateColorRaw from "@iconify-json/streamline-ultimate-color/icons.json";
+import twemojiRaw from "@iconify-json/twemoji/icons.json";
+import vscodeIconsRaw from "@iconify-json/vscode-icons/icons.json";
 
 type IconifyIcon = {
   body: string;
@@ -26,21 +26,32 @@ type IconifyIconsJSON = {
   // aliases 等は必要になったら対応（現状利用アイコンは icons の直指定想定）
 };
 
+// JSONインポートの型を明示的に指定
+const bi = biRaw as IconifyIconsJSON;
+const devicon = deviconRaw as IconifyIconsJSON;
+const fa6solid = fa6solidRaw as IconifyIconsJSON;
+const flatColorIcons = flatColorIconsRaw as IconifyIconsJSON;
+const fluentEmojiFlat = fluentEmojiFlatRaw as IconifyIconsJSON;
+const ic = icRaw as IconifyIconsJSON;
+const streamlineUltimateColor = streamlineUltimateColorRaw as IconifyIconsJSON;
+const twemoji = twemojiRaw as IconifyIconsJSON;
+const vscodeIcons = vscodeIconsRaw as IconifyIconsJSON;
+
 const ICON_SETS: Record<string, IconifyIconsJSON> = {
-  [bi.prefix]: bi as unknown as IconifyIconsJSON,
-  [devicon.prefix]: devicon as unknown as IconifyIconsJSON,
-  [fa6solid.prefix]: fa6solid as unknown as IconifyIconsJSON,
-  [flatColorIcons.prefix]: flatColorIcons as unknown as IconifyIconsJSON,
-  [fluentEmojiFlat.prefix]: fluentEmojiFlat as unknown as IconifyIconsJSON,
-  [ic.prefix]: ic as unknown as IconifyIconsJSON,
-  [streamlineUltimateColor.prefix]: streamlineUltimateColor as unknown as IconifyIconsJSON,
-  [twemoji.prefix]: twemoji as unknown as IconifyIconsJSON,
-  [vscodeIcons.prefix]: vscodeIcons as unknown as IconifyIconsJSON,
+  [bi.prefix]: bi,
+  [devicon.prefix]: devicon,
+  [fa6solid.prefix]: fa6solid,
+  [flatColorIcons.prefix]: flatColorIcons,
+  [fluentEmojiFlat.prefix]: fluentEmojiFlat,
+  [ic.prefix]: ic,
+  [streamlineUltimateColor.prefix]: streamlineUltimateColor,
+  [twemoji.prefix]: twemoji,
+  [vscodeIcons.prefix]: vscodeIcons,
 };
 
 function parseIconName(icon: string): { prefix: string; name: string } | null {
   const trimmed = icon.trim();
-  if (!trimmed) return null;
+  if (trimmed === "") return null;
   const idx = trimmed.indexOf(":");
   if (idx <= 0 || idx === trimmed.length - 1) return null;
   return { prefix: trimmed.slice(0, idx), name: trimmed.slice(idx + 1) };
@@ -75,17 +86,26 @@ export default function IconifyInline({
   const vbW = iconData.width ?? set.width ?? 16;
   const vbH = iconData.height ?? set.height ?? 16;
 
-  return (
-    <svg
-      className={className}
-      width={width}
-      height={height}
-      viewBox={`0 0 ${vbW} ${vbH}`}
-      xmlns="http://www.w3.org/2000/svg"
-      role={title ? "img" : "presentation"}
-      aria-hidden={ariaHidden}
-      focusable="false"
-      dangerouslySetInnerHTML={{ __html: iconData.body }}
-    />
-  );
+  // titleがある場合はimgロール、ない場合はpresentationロール
+  const hasTitle = title != null && title !== "";
+
+  // ARIA属性を条件分岐で設定（ESLintのjsx-a11y-strictルール対応）
+  // aria-hiddenは条件付きで設定（trueの場合のみ）
+  const svgProps: React.SVGProps<SVGSVGElement> = {
+    className,
+    width,
+    height,
+    viewBox: `0 0 ${vbW} ${vbH}`,
+    xmlns: "http://www.w3.org/2000/svg",
+    role: hasTitle ? "img" : "presentation",
+    focusable: "false",
+    dangerouslySetInnerHTML: { __html: iconData.body },
+  };
+
+  // aria-hiddenはtrueの場合のみ設定（falseの場合は属性を省略）
+  if (ariaHidden) {
+    svgProps["aria-hidden"] = "true";
+  }
+
+  return <svg {...svgProps} />;
 }
