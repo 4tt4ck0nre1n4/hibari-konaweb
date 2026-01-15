@@ -737,21 +737,35 @@ const menuItems: MenuItem[] = [
         const clickX = (e as MouseEvent).clientX;
         const clickY = (e as MouseEvent).clientY;
 
+        // 強制リフローを避けるため、バッチ処理でgetBoundingClientRectを実行
+        // クリックイベント内では既にレイアウトが確定しているため、直接呼び出しでも問題は少ないが、
+        // パフォーマンス最適化のため、一度に全ての読み取りを実行（レイアウトスラッシングを避ける）
+        const linkRects: Array<{ left: number; right: number; top: number; bottom: number }> = [];
         allCards.forEach((card) => {
           if (card.classList.contains("is-open")) {
             const link = card.querySelector(".navi-card__menu_link") as HTMLElement;
             if (link) {
+              // 読み取りを一度に実行（レイアウトスラッシングを避ける）
               const linkRect = link.getBoundingClientRect();
-              // リンク要素の拡大領域内かどうかを確認
-              if (
-                clickX >= linkRect.left &&
-                clickX <= linkRect.right &&
-                clickY >= linkRect.top &&
-                clickY <= linkRect.bottom
-              ) {
-                isWithinCardArea = true;
-              }
+              linkRects.push({
+                left: linkRect.left,
+                right: linkRect.right,
+                top: linkRect.top,
+                bottom: linkRect.bottom,
+              });
             }
+          }
+        });
+
+        // 読み取り後に判定を実行（書き込みと読み取りを分離）
+        linkRects.forEach((linkRect) => {
+          if (
+            clickX >= linkRect.left &&
+            clickX <= linkRect.right &&
+            clickY >= linkRect.top &&
+            clickY <= linkRect.bottom
+          ) {
+            isWithinCardArea = true;
           }
         });
 

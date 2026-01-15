@@ -163,9 +163,22 @@ export default defineConfig({
       chunkSizeWarningLimit: 500,
       rollupOptions: {
         output: {
+          // Tree shakingを強化: 未使用のコードを削除
+          treeshake: {
+            moduleSideEffects: (id) => {
+              // CSSファイルとAstroファイルは副作用ありとして扱う
+              if (id.endsWith(".css") || id.endsWith(".scss") || id.endsWith(".astro")) {
+                return true;
+              }
+              // その他のモジュールはTree shakingを適用
+              return false;
+            },
+            propertyReadSideEffects: false,
+            tryCatchDeoptimization: false,
+          },
           // GSAPなどのライブラリを適切にバンドル
           manualChunks: (id) => {
-            // GSAPライブラリ
+            // GSAPライブラリ（動的インポートで読み込まれるため、使用されないページではバンドルされない）
             if (id.includes("node_modules/gsap")) {
               return "gsap";
             }
@@ -177,9 +190,17 @@ export default defineConfig({
             if (id.includes("node_modules/@tsparticles")) {
               return "tsparticles";
             }
-            // React関連のライブラリ
+            // React関連のライブラリ（client:*ディレクティブで使用されるページでのみバンドルされる）
             if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) {
               return "react-vendor";
+            }
+            // Rive関連のライブラリ
+            if (id.includes("node_modules/@rive-app")) {
+              return "rive";
+            }
+            // js-confetti（動的インポートで読み込まれるため、使用されないページではバンドルされない）
+            if (id.includes("node_modules/js-confetti")) {
+              return "js-confetti";
             }
           },
         },

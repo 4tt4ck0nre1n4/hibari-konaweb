@@ -1114,38 +1114,65 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
 <script>
   // @ts-nocheck
-  import { gsap } from "gsap";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-  // GSAPプラグインを登録
-  gsap.registerPlugin(ScrollTrigger);
+  // GSAPを動的インポートで遅延読み込み（未使用JavaScript削減のため）
+  let gsapInstance: typeof import("gsap").gsap | null = null;
+  let ScrollTriggerInstance: typeof import("gsap/ScrollTrigger").ScrollTrigger | null = null;
 
   // アニメーション初期化（重複実行を防止）
   let isInitialized = false;
-  function init() {
+
+  async function loadGSAP() {
+    if (gsapInstance && ScrollTriggerInstance) {
+      return { gsap: gsapInstance, ScrollTrigger: ScrollTriggerInstance };
+    }
+
+    const [{ gsap }, { ScrollTrigger }] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
+
+    gsapInstance = gsap;
+    ScrollTriggerInstance = ScrollTrigger;
+
+    // GSAPプラグインを登録
+    gsap.registerPlugin(ScrollTrigger);
+
+    return { gsap, ScrollTrigger };
+  }
+
+  async function init() {
     if (isInitialized) {
       return; // 既に初期化済みの場合はスキップ
     }
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", function () {
-        if (!isInitialized) {
-          isInitialized = true;
-          initSplitAnimations();
+    const { gsap, ScrollTrigger } = await loadGSAP();
+    isInitialized = true;
+    initSplitAnimations(gsap, ScrollTrigger);
+  }
+
+  // requestIdleCallbackで遅延読み込み
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(
+      () => {
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", init);
+        } else {
+          init();
         }
-      });
+      },
+      { timeout: 2000 }
+    );
+  } else {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
     } else {
-      isInitialized = true;
-      initSplitAnimations();
+      setTimeout(init, 100);
     }
   }
 
-  init();
-
   // View Transitions対応: ページ遷移時にアニメーションを再初期化
-  document.addEventListener("astro:after-swap", () => {
+  document.addEventListener("astro:after-swap", async () => {
     // フラグをリセットして再初期化を許可
     isInitialized = false;
+
+    const { ScrollTrigger } = await loadGSAP();
     // ScrollTriggerインスタンスをクリーンアップ
     ScrollTrigger.getAll().forEach((trigger) => {
       trigger.kill();
@@ -1156,18 +1183,91 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     ScrollTrigger.refresh();
   });
 
-  // リサイズ時の処理
+  // リサイズ時の処理（デバウンスとバッチ処理で最適化）
   let resizeTimer: ReturnType<typeof setTimeout>;
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 250);
-  });
+  let isRefreshing = false;
+  window.addEventListener(
+    "resize",
+    async () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(async () => {
+        // 既にリフレッシュ中の場合はスキップ（メインスレッド処理の最適化）
+        if (isRefreshing) return;
 
-  function initSplitAnimations() {
+        isRefreshing = true;
+        // requestIdleCallbackで遅延実行（メインスレッドの負荷を削減）
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(
+            async () => {
+              const { ScrollTrigger } = await loadGSAP();
+              ScrollTrigger.refresh();
+              isRefreshing = false;
+            },
+            { timeout: 500 }
+          );
+        } else {
+          // フォールバック
+          requestAnimationFrame(async () => {
+            const { ScrollTrigger } = await loadGSAP();
+            ScrollTrigger.refresh();
+            isRefreshing = false;
+          });
+        }
+      }, 300); // デバウンス時間を300msに延長
+    },
+    { passive: true }
+  );
+
+  function initSplitAnimations(
+    gsap: typeof import("gsap").gsap,
+    ScrollTrigger: typeof import("gsap/ScrollTrigger").ScrollTrigger
+  ) {
     const containers = document.querySelectorAll(".split__container");
     const isMobile = window.innerWidth <= 768;
+
+    // ネストされた関数からもアクセスできるようにクロージャとして保持
+    function fadeInElement(element: Element | null) {
+      if (element) {
+        gsap.to(element, {
+          opacity: 1,
+          duration: 1.2,
+          ease: "power1.out",
+        });
+      }
+    }
+
+    function fadeOutElement(element: Element | null) {
+      if (element) {
+        gsap.to(element, {
+          opacity: 0,
+          duration: 1,
+          ease: "power1.out",
+        });
+      }
+    }
+
+    function addStyledText(element: Element | null, delay: number) {
+      if (!element) return;
+
+      // 既に処理済みの要素（spanタグが既に存在する）の場合はスキップ
+      // ただし、ページ遷移時はDOMが置き換えられるため、通常は再処理が必要
+      const textContent = element.textContent || "";
+      if (textContent.trim() === "") return;
+
+      // 既存のspanタグをクリアして再処理
+      const newText = [...textContent].map((char) => `<span>${char}</span>`);
+      element.innerHTML = newText.join("");
+
+      // 既存のis-activeクラスをクリア
+      Array.from(element.children).forEach((char) => {
+        char.classList.remove("is-active");
+      });
+
+      // アニメーションを再実行
+      Array.from(element.children).forEach((char, index) => {
+        setTimeout(() => char.classList.add("is-active"), delay * index);
+      });
+    }
 
     containers.forEach((container) => {
       const splitElement = {
@@ -1337,48 +1437,5 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
         });
       }
     });
-
-    function fadeInElement(element) {
-      if (element) {
-        gsap.to(element, {
-          opacity: 1,
-          duration: 1.2,
-          ease: "power1.out",
-        });
-      }
-    }
-
-    function fadeOutElement(element) {
-      if (element) {
-        gsap.to(element, {
-          opacity: 0,
-          duration: 1,
-          ease: "power1.out",
-        });
-      }
-    }
-
-    function addStyledText(element, delay) {
-      if (!element) return;
-
-      // 既に処理済みの要素（spanタグが既に存在する）の場合はスキップ
-      // ただし、ページ遷移時はDOMが置き換えられるため、通常は再処理が必要
-      const textContent = element.textContent || "";
-      if (textContent.trim() === "") return;
-
-      // 既存のspanタグをクリアして再処理
-      const newText = [...textContent].map((char) => `<span>${char}</span>`);
-      element.innerHTML = newText.join("");
-
-      // 既存のis-activeクラスをクリア
-      Array.from(element.children).forEach((char) => {
-        char.classList.remove("is-active");
-      });
-
-      // アニメーションを再実行
-      Array.from(element.children).forEach((char, index) => {
-        setTimeout(() => char.classList.add("is-active"), delay * index);
-      });
-    }
   }
 </script>

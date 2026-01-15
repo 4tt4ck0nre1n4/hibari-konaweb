@@ -26,7 +26,7 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
   twitterDescription={globalText.top.description}
 >
   <!-- LCP背景画像のプリロード（PageSpeed Insights最適化） -->
-  <link slot="head" rel="preload" href={gridBackgroundImage.src} as="image" fetchpriority="low" type="image/webp"　/>
+  <link slot="head" rel="preload" href={gridBackgroundImage.src} as="image" fetchpriority="low" type="image/webp"  />
 
   <div id="outer-container">
     <Header />
@@ -297,11 +297,27 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 
 <!-- TBT改善: 動的インポートでモジュール読み込みを遅延させ、requestIdleCallbackで初期化 -->
 <script>
+  // GSAPを動的インポートで読み込み（未使用JavaScript削減のため）
+  async function loadGSAP() {
+    if (typeof window !== "undefined" && typeof (window as Window & { gsap?: unknown }).gsap === "undefined") {
+      const [{ gsap }, { ScrollTrigger }] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
+
+      // グローバル変数に設定（gridControlAnimations.tsが期待している形式）
+      (window as Window & { gsap?: typeof gsap; ScrollTrigger?: typeof ScrollTrigger }).gsap = gsap;
+      (window as Window & { gsap?: typeof gsap; ScrollTrigger?: typeof ScrollTrigger }).ScrollTrigger = ScrollTrigger;
+
+      // GSAPプラグインを登録
+      gsap.registerPlugin(ScrollTrigger);
+    }
+  }
+
   // 動的インポートでモジュール読み込みを遅延（PageSpeed Insights最適化）
   function loadGridControlAnimations() {
     if ("requestIdleCallback" in window) {
       requestIdleCallback(
         async () => {
+          // GSAPを先に読み込む
+          await loadGSAP();
           const { initGridControlAnimationsDeferred } = await import("../scripts/gridControlAnimations");
           initGridControlAnimationsDeferred();
         },
@@ -309,6 +325,8 @@ const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
       );
     } else {
       setTimeout(async () => {
+        // GSAPを先に読み込む
+        await loadGSAP();
         const { initGridControlAnimationsDeferred } = await import("../scripts/gridControlAnimations");
         initGridControlAnimationsDeferred();
       }, 100);

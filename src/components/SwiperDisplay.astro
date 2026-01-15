@@ -51,7 +51,7 @@ try {
 const optimizedSwiperImages = await Promise.all(
   swipers.slice(0, 10).map(async (swiper) => {
     const optimizedImage = await getOptimizedWordPressImage(swiper.acf?.swiper_image, {
-      width: 270,
+      width: 240,
       height: 360,
       quality: 85,
       format: "webp",
@@ -95,7 +95,7 @@ const swiperText2 = "Thank you for viewing my site.";
                     src={swiperData.optimizedImage.src}
                     alt={swiperData.acf?.swiper_title ?? ""}
                     class="swipers__image"
-                    width={270}
+                    width={240}
                     height={360}
                     loading="lazy"
                     decoding="async"
@@ -105,7 +105,7 @@ const swiperText2 = "Thank you for viewing my site.";
                     src={swiperData.optimizedImage.src}
                     alt={swiperData.acf?.swiper_title ?? ""}
                     class="swipers__shadow"
-                    width={270}
+                    width={240}
                     height={360}
                     loading="lazy"
                     decoding="async"
@@ -118,7 +118,7 @@ const swiperText2 = "Thank you for viewing my site.";
                     src={swiperData.fallbackUrl}
                     alt={swiperData.acf?.swiper_title ?? ""}
                     class="swipers__image"
-                    width="270"
+                    width="240"
                     height="360"
                     decoding="async"
                     loading="lazy"
@@ -128,7 +128,7 @@ const swiperText2 = "Thank you for viewing my site.";
                     src={swiperData.fallbackUrl}
                     alt={swiperData.acf?.swiper_title ?? ""}
                     class="swipers__shadow"
-                    width="270"
+                    width="240"
                     height="360"
                     decoding="async"
                     loading="lazy"
@@ -194,6 +194,10 @@ const swiperText2 = "Thank you for viewing my site.";
     transform: perspective(1600px);
     backface-visibility: hidden;
     animation: rotation 32s ease-in-out infinite;
+    /* パフォーマンス最適化: GPUアクセラレーションを有効化 */
+    will-change: transform;
+    /* パフォーマンス最適化: コンポジタレイヤーを分離 */
+    contain: layout style paint;
   }
   @keyframes rotation {
     from {
@@ -221,6 +225,8 @@ const swiperText2 = "Thank you for viewing my site.";
     z-index: 20;
     /* パフォーマンス最適化: GPUアクセラレーションを有効化 */
     transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(600px) scale(-1, 1);
+    /* パフォーマンス最適化: コンポジタレイヤーを分離 */
+    contain: layout style paint;
     /* パフォーマンス最適化: will-changeはJavaScriptで動的に管理 */
   }
   .swipers-slide::before {
@@ -480,13 +486,13 @@ const swiperText2 = "Thank you for viewing my site.";
       } else {
         // ページが再表示された時、Intersection Observerが自動的に処理
         // 念のため、ビューポート内か確認して再開
-        // 強制リフローを避けるため、requestAnimationFrame内でgetBoundingClientRectを実行
+        // 強制リフローを避けるため、Intersection Observerの結果を優先使用
+        // getBoundingClientRectの呼び出しを削減
         requestAnimationFrame(() => {
-          const rect = swiperSection.getBoundingClientRect();
-          const isInViewport =
-            rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0;
-
-          if (isInViewport) {
+          // Intersection Observerが既に監視しているため、追加のgetBoundingClientRectは不要
+          // 代わりに、Intersection Observerの結果を信頼する
+          if (swiperSection && observer) {
+            // 既存のIntersection Observerが自動的に処理するため、ここでは最小限の処理のみ
             swiperWrapper.classList.remove("paused");
             swiperWrapper.style.willChange = "transform";
             swiperSlides.forEach((slide) => {

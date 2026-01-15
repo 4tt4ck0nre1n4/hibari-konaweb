@@ -38,36 +38,40 @@ export default function RiveComponent({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 高品質レンダリング設定の関数
+  // 強制リフローを避けるため、getBoundingClientRectはrequestAnimationFrame内で実行
   const setupHighQualityRendering = useCallback(
     (canvas: HTMLCanvasElement) => {
-      const devicePixelRatio = window.devicePixelRatio ?? 1;
-      const rect = canvas.getBoundingClientRect();
+      // 強制リフローを避けるため、requestAnimationFrame内でgetBoundingClientRectを実行
+      requestAnimationFrame(() => {
+        const devicePixelRatio = window.devicePixelRatio ?? 1;
+        const rect = canvas.getBoundingClientRect();
 
-      // 最小サイズを保証（propsから取得）
-      const actualWidth = Math.max(rect.width, minWidth);
-      const actualHeight = Math.max(rect.height, minHeight);
+        // 最小サイズを保証（propsから取得）
+        const actualWidth = Math.max(rect.width, minWidth);
+        const actualHeight = Math.max(rect.height, minHeight);
 
-      // Canvasの解像度を高DPI対応に設定（より高解像度に）
-      const scaleFactor = Math.max(devicePixelRatio, 2); // 最低2倍の解像度を保証
-      canvas.width = Math.floor(actualWidth * scaleFactor);
-      canvas.height = Math.floor(actualHeight * scaleFactor);
+        // Canvasの解像度を高DPI対応に設定（より高解像度に）
+        const scaleFactor = Math.max(devicePixelRatio, 2); // 最低2倍の解像度を保証
+        canvas.width = Math.floor(actualWidth * scaleFactor);
+        canvas.height = Math.floor(actualHeight * scaleFactor);
 
-      // CSSサイズは元のサイズを維持
-      canvas.style.width = `${actualWidth}px`;
-      canvas.style.height = `${actualHeight}px`;
+        // CSSサイズは元のサイズを維持
+        canvas.style.width = `${actualWidth}px`;
+        canvas.style.height = `${actualHeight}px`;
 
-      // 高品質レンダリング設定
-      const ctx = canvas.getContext("2d", {
-        alpha: true,
-        desynchronized: false,
+        // 高品質レンダリング設定
+        const ctx = canvas.getContext("2d", {
+          alpha: true,
+          desynchronized: false,
+        });
+
+        if (ctx) {
+          ctx.scale(scaleFactor, scaleFactor);
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.textBaseline = "alphabetic";
+        }
       });
-
-      if (ctx) {
-        ctx.scale(scaleFactor, scaleFactor);
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-        ctx.textBaseline = "alphabetic";
-      }
     },
     [minWidth, minHeight]
   );

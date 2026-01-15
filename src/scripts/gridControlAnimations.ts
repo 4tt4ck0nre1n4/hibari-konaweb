@@ -241,21 +241,24 @@ function initializeApp(): void {
       const item6 = document.querySelector(".item-6");
       if (!item4 || !item6) return;
 
-      const rect4 = item4.getBoundingClientRect();
-      const rect6 = item6.getBoundingClientRect();
+      // 強制リフローを避けるため、requestAnimationFrame内でgetBoundingClientRectを実行
+      requestAnimationFrame(() => {
+        const rect4 = item4.getBoundingClientRect();
+        const rect6 = item6.getBoundingClientRect();
 
-      const tooltip4 = item4.querySelector(".item__tooltip_left, .item__tooltip_right");
-      const tooltip6 = item6.querySelector(".item__tooltip_left, .item__tooltip_right");
+        const tooltip4 = item4.querySelector(".item__tooltip_left, .item__tooltip_right");
+        const tooltip6 = item6.querySelector(".item__tooltip_left, .item__tooltip_right");
 
-      if (tooltip4) {
-        tooltip4.classList.remove("item__tooltip_left", "item__tooltip_right");
-        tooltip4.classList.add(rect4.left < rect6.left ? "item__tooltip_left" : "item__tooltip_right");
-      }
+        if (tooltip4) {
+          tooltip4.classList.remove("item__tooltip_left", "item__tooltip_right");
+          tooltip4.classList.add(rect4.left < rect6.left ? "item__tooltip_left" : "item__tooltip_right");
+        }
 
-      if (tooltip6) {
-        tooltip6.classList.remove("item__tooltip_left", "item__tooltip_right");
-        tooltip6.classList.add(rect6.left < rect4.left ? "item__tooltip_left" : "item__tooltip_right");
-      }
+        if (tooltip6) {
+          tooltip6.classList.remove("item__tooltip_left", "item__tooltip_right");
+          tooltip6.classList.add(rect6.left < rect4.left ? "item__tooltip_left" : "item__tooltip_right");
+        }
+      });
     }
 
     function playAll(): void {

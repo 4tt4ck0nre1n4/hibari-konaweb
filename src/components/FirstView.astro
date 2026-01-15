@@ -126,8 +126,18 @@ const fvAnimeImage = await getImage({
     let mouseX = 0;
     let mouseY = 0;
 
+    // getBoundingClientRectの結果をキャッシュ（メインスレッド処理の最適化）
+    let cachedRect = null;
+    let lastRectUpdate = 0;
+    const RECT_CACHE_DURATION = 100; // 100ms間キャッシュ
+
     const updateMaskPosition = () => {
-      const rect = fvWrapper.getBoundingClientRect();
+      // キャッシュが古い場合のみ再計算
+      if (!cachedRect || Date.now() - lastRectUpdate > RECT_CACHE_DURATION) {
+        cachedRect = fvWrapper.getBoundingClientRect();
+        lastRectUpdate = Date.now();
+      }
+      const rect = cachedRect;
       const x = mouseX - rect.left;
       const y = mouseY - rect.top;
 
@@ -240,9 +250,13 @@ const fvAnimeImage = await getImage({
             return;
           }
 
-          // 強制リフローを避けるため、requestAnimationFrame内でgetBoundingClientRectを実行
-          // animate関数は既にrequestAnimationFrame内で実行されているため、ここで取得しても問題ない
-          const rect = fvWrapper.getBoundingClientRect();
+          // 強制リフローを避けるため、getBoundingClientRectの結果をキャッシュ
+          // リサイズ時のみ再計算（パフォーマンス最適化）
+          if (!cachedRect || Date.now() - lastRectUpdate > 100) {
+            cachedRect = fvWrapper.getBoundingClientRect();
+            lastRectUpdate = Date.now();
+          }
+          const rect = cachedRect;
           const centerX = rect.width / 2;
           const centerY = rect.height / 2;
 
@@ -278,12 +292,33 @@ const fvAnimeImage = await getImage({
     const initialX = window.innerWidth / 2;
     const initialY = window.innerHeight / 2;
     requestAnimationFrame(() => {
-      const rect = fvWrapper.getBoundingClientRect();
+      // キャッシュを使用（既に設定されている場合）
+      if (!cachedRect) {
+        cachedRect = fvWrapper.getBoundingClientRect();
+        lastRectUpdate = Date.now();
+      }
+      const rect = cachedRect;
       const x = initialX - rect.left;
       const y = initialY - rect.top;
       backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
       backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
     });
+
+    // リサイズ時にキャッシュをクリア
+    let resizeCacheTimer = null;
+    window.addEventListener(
+      "resize",
+      () => {
+        if (resizeCacheTimer) {
+          clearTimeout(resizeCacheTimer);
+        }
+        resizeCacheTimer = setTimeout(() => {
+          cachedRect = null;
+          lastRectUpdate = 0;
+        }, 150);
+      },
+      { passive: true }
+    );
 
     // 初期化完了のログ
     devLog("✅ Mouse follow initialized successfully", {

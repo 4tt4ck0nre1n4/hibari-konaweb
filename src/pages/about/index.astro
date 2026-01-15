@@ -531,6 +531,17 @@ const stateMachine = "State Machine 1";
     font-size: 2rem;
     text-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
     transition: all 0.4s ease-out;
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  /* スクロール検知時の順次表示アニメーション */
+  .skills-icon__image[data-icon].show {
+    opacity: 1;
+    transform: scale(1);
+    transition:
+      opacity 0.4s ease-out,
+      transform 0.4s ease-out;
   }
   /* ホバー可能なデバイス（主にPC）でのみホバー効果を適用 */
   @media (any-hover: hover) {
@@ -710,10 +721,80 @@ const stateMachine = "State Machine 1";
     observer.observe(aboutImageInner);
   }
 
+  // スキルアイコンの順次表示アニメーション
+  function setupSkillsIconAnimation() {
+    const skillsMenu = document.querySelector(".skills__menu");
+
+    if (!skillsMenu) return;
+
+    // タイムアウトIDを管理する配列
+    let timeoutIds: number[] = [];
+
+    // すべてのスキルアイコンの画像を取得する関数
+    const getSkillImages = () => {
+      const skillIcons = skillsMenu.querySelectorAll(".skills-icon");
+      return Array.from(skillIcons)
+        .map((icon) => icon.querySelector(".skills-icon__image[data-icon]"))
+        .filter((image): image is Element => image !== null);
+    };
+
+    // アニメーションをリセットする関数
+    const resetAnimation = () => {
+      // 実行中のタイムアウトをすべてクリア
+      timeoutIds.forEach((id) => clearTimeout(id));
+      timeoutIds = [];
+
+      // すべての画像からshowクラスを削除
+      const skillImages = getSkillImages();
+      skillImages.forEach((image) => {
+        image.classList.remove("show");
+      });
+    };
+
+    // アニメーションを実行する関数
+    const runAnimation = () => {
+      // 既存のタイムアウトをクリア
+      timeoutIds.forEach((id) => clearTimeout(id));
+      timeoutIds = [];
+
+      const skillImages = getSkillImages();
+
+      // 各画像を0.2秒ずつ遅らせながら順番に表示
+      skillImages.forEach((image, index) => {
+        const timeoutId = window.setTimeout(() => {
+          image.classList.add("show");
+        }, index * 200); // 0.2秒 = 200ms
+        timeoutIds.push(timeoutId);
+      });
+    };
+
+    // Intersection Observer の設定
+    const observerOptions = {
+      threshold: 0.2, // 要素の20%が見えたら発火
+      rootMargin: "0px 0px -50px 0px", // 少し早めに発火させる
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // ビューポートに入ったらアニメーションを実行
+          runAnimation();
+        } else {
+          // ビューポートから出たらアニメーションをリセット
+          resetAnimation();
+        }
+      });
+    }, observerOptions);
+
+    // 要素の監視を開始
+    observer.observe(skillsMenu);
+  }
+
   // DOM読み込み完了後に実行（View Transitions対応）
   function initializeAnimations() {
     setupTouchAnimations();
     setupScrollAnimation();
+    setupSkillsIconAnimation();
   }
 
   if (document.readyState === "loading") {

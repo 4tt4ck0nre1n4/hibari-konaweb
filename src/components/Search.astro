@@ -216,41 +216,34 @@
     // 検索コンテナのスタイルを確実に適用（初期化直後）
     ensureContainerStyle();
 
-    // 複数のタイミングでスタイルを適用（PagefindUIのDOM生成を待つ）
-    setTimeout(() => {
-      ensureContainerStyle();
-      applyBorderStyle();
-    }, 50);
-    setTimeout(() => {
-      ensureContainerStyle();
-      applyBorderStyle();
-    }, 100);
-    setTimeout(() => {
-      ensureContainerStyle();
-      applyBorderStyle();
-    }, 300);
-    setTimeout(() => {
-      ensureContainerStyle();
-      applyBorderStyle();
-    }, 500);
-    setTimeout(() => {
-      ensureContainerStyle();
-      applyBorderStyle();
-    }, 1000);
-
-    // ウィンドウリサイズ時にスタイルを再適用（重複登録を防ぐ）
-    resizeHandler = () => {
-      ensureContainerStyle();
-      applyBorderStyle();
-    };
-    window.addEventListener("resize", resizeHandler);
-
-    // MutationObserverでDOMの変更を監視
-    const searchContainer = document.querySelector("#search");
-    if (searchContainer) {
-      mutationObserver = new MutationObserver(() => {
+    // requestAnimationFrameでバッチ処理（メインスレッド処理の最適化）
+    let rafScheduled = false;
+    const scheduleStyleUpdate = () => {
+      if (rafScheduled) return;
+      rafScheduled = true;
+      requestAnimationFrame(() => {
         ensureContainerStyle();
         applyBorderStyle();
+        rafScheduled = false;
+      });
+    };
+
+    // PagefindUIのDOM生成を待つ（MutationObserverで効率的に監視）
+    const searchContainer = document.querySelector("#search");
+    if (searchContainer) {
+      let checkCount = 0;
+      const maxChecks = 10; // 最大10回までチェック（約1秒）
+
+      // MutationObserverでDOMの変更を監視（デバウンス付き）
+      mutationObserver = new MutationObserver(() => {
+        checkCount++;
+        if (checkCount <= maxChecks) {
+          scheduleStyleUpdate();
+        } else {
+          // 最大チェック回数に達したら監視を停止
+          mutationObserver?.disconnect();
+          mutationObserver = null;
+        }
       });
 
       mutationObserver.observe(searchContainer, {
@@ -259,7 +252,29 @@
         attributes: true,
         attributeFilter: ["class"],
       });
+
+      // 初期スタイル適用（即座に1回）
+      scheduleStyleUpdate();
+
+      // フォールバック: 500ms後に最終確認（最大チェック回数に達していない場合）
+      setTimeout(() => {
+        if (checkCount < maxChecks) {
+          scheduleStyleUpdate();
+        }
+      }, 500);
     }
+
+    // ウィンドウリサイズ時にスタイルを再適用（デバウンス付き）
+    let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+    resizeHandler = () => {
+      if (resizeTimer) {
+        clearTimeout(resizeTimer);
+      }
+      resizeTimer = setTimeout(() => {
+        scheduleStyleUpdate();
+      }, 150); // デバウンス時間を150msに短縮
+    };
+    window.addEventListener("resize", resizeHandler, { passive: true });
   }
 
   // DOMContentLoadedで初期化

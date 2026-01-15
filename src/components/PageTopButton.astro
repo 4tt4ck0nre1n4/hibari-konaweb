@@ -180,6 +180,7 @@ import pageTopIcon from "../assets/svg/top.svg";
     const firstView = document.querySelector(".fv") as HTMLElement | null;
 
     // FirstViewのbottom位置（ページトップからの距離）を取得
+    // 強制リフローを避けるため、この関数はrequestAnimationFrame内で呼び出すこと
     function getFirstViewBottom(): number {
       if (!firstView) {
         // FirstViewがない場合は、一定のスクロール位置（300px）で表示
@@ -188,6 +189,7 @@ import pageTopIcon from "../assets/svg/top.svg";
       }
 
       // offsetTopとoffsetHeightを使用して、より確実にbottom位置を取得
+      // 注意: この関数はrequestAnimationFrame内で呼び出す必要がある
       const offsetTop = firstView.offsetTop;
       const offsetHeight = firstView.offsetHeight;
       const bottom = offsetTop + offsetHeight;
