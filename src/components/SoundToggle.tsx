@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Icon } from "@iconify/react";
+import IconifyInline from "./IconifyInline";
 
-const soundOn = "emojione:speaker-high-volume";
+const soundOn = "twemoji:speaker-high-volume";
 const soundOff = "twemoji:muted-speaker";
 
 const SoundToggle = () => {
@@ -28,7 +28,7 @@ const SoundToggle = () => {
       aria-label={`サウンド${isSoundOn ? "OFF" : "ON"}に切り替え`}
       title={`サウンド${isSoundOn ? "OFF" : "ON"}に切り替え`}
     >
-      <Icon icon={isSoundOn ? `${soundOn}` : `${soundOff}`} width="40" height="40" />
+      <IconifyInline icon={isSoundOn ? soundOn : soundOff} width="40" height="40" aria-hidden />
     </button>
   );
 };

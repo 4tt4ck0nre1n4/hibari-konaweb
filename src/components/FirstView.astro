@@ -1,36 +1,20 @@
 ---
 import NaviCard from "./NaviCard.astro";
 import Glitch from "./Glitch.astro";
-import fvAnimeImageSrc from "../assets/fvAnimeImage.webp";
-import fvBackgroundImageSrc from "../assets/fvBackgroundImage.webp";
-import { getImage } from "astro:assets";
+// LCP最適化: 画像の最適化はindex.astroで実行（プリロードを最優先配置するため）
+// 画像URLはpropsとして受け取る
+interface Props {
+  fvBackgroundImageSrc: string;
+  fvAnimeImageSrc: string;
+}
 
-// LCP最適化: 背景画像を高品質・適切なサイズで最適化
-// 1920px幅（一般的なデスクトップ画面幅）で最適化し、AVIF/WebP形式を優先
-const fvBackgroundImage = await getImage({
-  src: fvBackgroundImageSrc,
-  width: 1920,
-  quality: 85, // 品質とファイルサイズのバランス
-  format: "webp", // WebP形式を明示的に指定（AVIFはフォールバック）
-});
-
-// アニメーション画像は低優先度で最適化
-const fvAnimeImage = await getImage({
-  src: fvAnimeImageSrc,
-  width: 1920,
-  quality: 80,
-  format: "webp",
-});
+const { fvBackgroundImageSrc, fvAnimeImageSrc } = Astro.props;
 ---
 
-<!-- LCP背景画像のプリロード（PageSpeed Insights最適化） --><!-- リソース読み込みの遅延を削減するため、headの最初に配置 -->
-<link slot="head" rel="preload" href={fvBackgroundImage.src} as="image" fetchpriority="high" type="image/webp" />
-<link slot="head" rel="preload" href={fvAnimeImage.src} as="image" fetchpriority="low" type="image/webp" />
-
 <div class="fv">
-  <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImage.src})`}>
+  <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImageSrc})`}>
     <div class="background-container">
-      <div class="background-rotated" style={`background-image: url(${fvAnimeImage.src})`}></div>
+      <div class="background-rotated" style={`background-image: url(${fvAnimeImageSrc})`}></div>
       <div class="background"></div>
     </div>
     <div class="glitch-container">
@@ -302,6 +286,22 @@ const fvAnimeImage = await getImage({
       const y = initialY - rect.top;
       backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
       backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+      // 初期化完了のログ（requestAnimationFrame内で実行してスコープ内の変数を使用）
+      devLog("✅ Mouse follow initialized successfully", {
+        initialX,
+        initialY,
+        x,
+        y,
+        rect: {
+          left: rect.left,
+          top: rect.top,
+          width: rect.width,
+          height: rect.height,
+        },
+        finalMouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
+        finalMouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
+      });
     });
 
     // リサイズ時にキャッシュをクリア
@@ -319,31 +319,39 @@ const fvAnimeImage = await getImage({
       },
       { passive: true }
     );
-
-    // 初期化完了のログ
-    devLog("✅ Mouse follow initialized successfully", {
-      initialX,
-      initialY,
-      x,
-      y,
-      rect,
-      finalMouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
-      finalMouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
-    });
   }
 
-  // マウス追従の初期化（200ms遅延させてグリッチアニメーションの初期化を待つ）
+  // LCP最適化: マウス追従の初期化を遅延させずに即座に実行（ローディングスクリーンの待機は最小限に）
   function waitForInit() {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-          initBackgroundMouseFollow();
-        }, 200);
-      });
-    } else {
-      setTimeout(() => {
+    // ローディングスクリーンの待機を最適化: 最大500msまで待機（リソース読み込みの遅延を削減）
+    const MAX_WAIT_TIME = 500;
+    const startTime = Date.now();
+
+    const tryInit = () => {
+      const loadingScreen = document.getElementById("loading-screen");
+      const elapsed = Date.now() - startTime;
+
+      // ローディングスクリーンが存在しない、または非表示、または最大待機時間を超えた場合は即座に初期化
+      if (
+        !loadingScreen ||
+        elapsed >= MAX_WAIT_TIME ||
+        loadingScreen.style.display === "none" ||
+        loadingScreen.style.visibility === "hidden" ||
+        window.getComputedStyle(loadingScreen).display === "none" ||
+        window.getComputedStyle(loadingScreen).visibility === "hidden"
+      ) {
         initBackgroundMouseFollow();
-      }, 200);
+        return;
+      }
+
+      // まだローディング中の場合は50ms後に再試行（100msから短縮）
+      setTimeout(tryInit, 50);
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", tryInit);
+    } else {
+      tryInit();
     }
   }
 
