@@ -115,8 +115,12 @@ export default function ParticlesComponent() {
         await iconLoadPromise;
         setIconsReady(true);
       } catch (error) {
+        // ネットワークエラーは開発環境でのみログに記録
+        // 本番環境では、エラーをコンソールに出力しない（PageSpeed Insightsのエラーを防ぐ）
         devError("Failed to load icon data:", error);
+        // エラーが発生しても、アイコンなしで動作を続行
         setIconsReady(false);
+        // エラーを再スローしない（unhandledrejectionイベントを発火させない）
       }
     })();
 

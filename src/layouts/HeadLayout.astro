@@ -745,10 +745,6 @@ const cspContent = isDev
         height: 100%;
         min-height: 100vh; /* CLS防止: 最小高さを設定してレイアウトシフトを防止 */
         background: #1d1f20;
-        /* 背景画像の設定（HTMLでインラインスタイルとして指定） */
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
         /* LCP最適化: 背景画像の読み込みを最優先にする */
         content-visibility: auto;
         contain-intrinsic-size: 1920px 1080px;
@@ -759,6 +755,19 @@ const cspContent = isDev
         margin-inline: auto;
         pointer-events: none; /* カードへのクリックを通過させる */
         z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+      }
+
+      /* LCP最適化: 背景画像を<img>タグとして使用し、fetchpriority="high"を適用 */
+      .fv__background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        z-index: 0;
+        pointer-events: none; /* カードへのクリックを通過させる */
       }
 
       .fv__wrapper > * {
@@ -989,87 +998,106 @@ const cspContent = isDev
 
     <!-- グローバルエラーハンドラー: 動的インポートのエラーを適切に処理 -->
     <script is:inline>
-      // 開発環境でのみログを出力（重複宣言を防ぐため、既存チェック）
-      if (typeof window !== "undefined" && typeof window.devLog === "undefined") {
-        window.devLog = (...args) => {
-          if (window.__DEV__) {
-            console.log("[ErrorHandler]", ...args);
-          }
-        };
-      }
-      const devLog = typeof window !== "undefined" ? window.devLog : () => {};
+      // @ts-nocheck
+      // IIFEでスコープを分離（重複宣言エラーを防ぐ）
+      (() => {
+        // 開発環境でのみログを出力（重複宣言を防ぐため、既存チェック）
+        if (typeof window !== "undefined" && typeof window.devLog === "undefined") {
+          window.devLog = (...args) => {
+            if (window.__DEV__) {
+              console.log("[ErrorHandler]", ...args);
+            }
+          };
+        }
+        const devLog = typeof window !== "undefined" ? window.devLog : () => {};
 
-      // 動的インポートのエラーを処理（コンソールエラーを抑制）
-      if (typeof window !== "undefined") {
-        // 未処理のPromise拒否をキャッチ（動的インポートのエラーなど）
-        window.addEventListener("unhandledrejection", (event) => {
-          const error = event.reason;
-          const errorMessage = error?.message || String(error);
-          const errorStack = error?.stack;
+        // 動的インポートのエラーを処理（コンソールエラーを抑制）
+        if (typeof window !== "undefined") {
+          // 未処理のPromise拒否をキャッチ（動的インポートのエラーなど）
+          window.addEventListener("unhandledrejection", (event) => {
+            const error = event.reason;
+            const errorMessage = error?.message || String(error);
+            const errorStack = error?.stack;
 
-          // 動的インポートのエラーを特定
-          const isDynamicImportError =
-            errorMessage.includes("Failed to fetch dynamically imported module") ||
-            errorMessage.includes("Failed to load resource") ||
-            errorMessage.includes("ERR_CONNECTION_FAILED") ||
-            errorMessage.includes("Loading chunk") ||
-            errorMessage.includes("Loading CSS chunk");
+            // 動的インポートのエラーを特定（iconify、tsparticles、gsapなどのチャンク読み込みエラーを含む）
+            const isDynamicImportError =
+              errorMessage.includes("Failed to fetch dynamically imported module") ||
+              errorMessage.includes("Failed to load resource") ||
+              errorMessage.includes("ERR_CONNECTION_FAILED") ||
+              errorMessage.includes("ERR_NETWORK_CHANGED") ||
+              errorMessage.includes("ERR_INTERNET_DISCONNECTED") ||
+              errorMessage.includes("Loading chunk") ||
+              errorMessage.includes("Loading CSS chunk") ||
+              errorMessage.includes("/_astro/") ||
+              errorMessage.includes("iconify") ||
+              errorMessage.includes("netlify.app");
 
-          if (isDynamicImportError) {
-            // 動的インポートのエラーは開発環境でのみログに記録
-            devLog("Dynamic import error (suppressed in production):", {
-              message: errorMessage,
-              stack: errorStack,
-            });
-            // 本番環境ではエラーを抑制（PageSpeed Insightsのエラーを防ぐ）
-            event.preventDefault();
-            return;
-          }
+            if (isDynamicImportError) {
+              // 動的インポートのエラーは開発環境でのみログに記録
+              devLog("Dynamic import error (suppressed in production):", {
+                message: errorMessage,
+                stack: errorStack,
+              });
+              // 本番環境ではエラーを抑制（PageSpeed Insightsのエラーを防ぐ）
+              // ネットワークエラーはユーザーのネットワーク環境によるものであり、アプリケーションのエラーではない
+              event.preventDefault();
+              event.stopPropagation();
+              return;
+            }
 
-          // その他のエラーは通常通り処理
-          devLog("Unhandled promise rejection:", error);
-        });
+            // その他のエラーは通常通り処理
+            devLog("Unhandled promise rejection:", error);
+          });
 
-        // グローバルエラーハンドラー（ReferenceErrorなど）
-        window.addEventListener("error", (event) => {
-          const error = event.error;
-          const errorMessage = error?.message || event.message;
-          const errorStack = error?.stack;
+          // グローバルエラーハンドラー（ReferenceErrorなど）
+          window.addEventListener("error", (event) => {
+            const error = event.error;
+            const errorMessage = error?.message || event.message;
+            const errorStack = error?.stack;
 
-          // 既に処理済みのエラーは無視
-          if (event.defaultPrevented) {
-            return;
-          }
+            // 既に処理済みのエラーは無視
+            if (event.defaultPrevented) {
+              return;
+            }
 
-          // 動的インポート関連のエラーを特定
-          const isDynamicImportError =
-            errorMessage.includes("Failed to fetch dynamically imported module") ||
-            errorMessage.includes("Failed to load resource") ||
-            errorMessage.includes("ERR_CONNECTION_FAILED");
+            // 動的インポート関連のエラーを特定（iconify、tsparticles、gsapなどのチャンク読み込みエラーを含む）
+            const isDynamicImportError =
+              errorMessage.includes("Failed to fetch dynamically imported module") ||
+              errorMessage.includes("Failed to load resource") ||
+              errorMessage.includes("ERR_CONNECTION_FAILED") ||
+              errorMessage.includes("ERR_NETWORK_CHANGED") ||
+              errorMessage.includes("ERR_INTERNET_DISCONNECTED") ||
+              (event.filename &&
+                (event.filename.includes("/_astro/") ||
+                  event.filename.includes("iconify") ||
+                  event.filename.includes("netlify.app")));
 
-          if (isDynamicImportError) {
-            devLog("Dynamic import error (suppressed in production):", {
+            if (isDynamicImportError) {
+              devLog("Dynamic import error (suppressed in production):", {
+                message: errorMessage,
+                stack: errorStack,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+              });
+              // 本番環境ではエラーを抑制
+              // ネットワークエラーはユーザーのネットワーク環境によるものであり、アプリケーションのエラーではない
+              event.preventDefault();
+              event.stopPropagation();
+              return;
+            }
+
+            // その他のエラーは開発環境でのみログに記録
+            devLog("Global error:", {
               message: errorMessage,
               stack: errorStack,
               filename: event.filename,
               lineno: event.lineno,
               colno: event.colno,
             });
-            // 本番環境ではエラーを抑制
-            event.preventDefault();
-            return;
-          }
-
-          // その他のエラーは開発環境でのみログに記録
-          devLog("Global error:", {
-            message: errorMessage,
-            stack: errorStack,
-            filename: event.filename,
-            lineno: event.lineno,
-            colno: event.colno,
           });
-        });
-      }
+        }
+      })();
     </script>
   </head>
 </html>

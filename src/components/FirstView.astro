@@ -12,7 +12,16 @@ const { fvBackgroundImageSrc, fvAnimeImageSrc } = Astro.props;
 ---
 
 <div class="fv">
-  <div class="fv__wrapper" style={`background-image: url(${fvBackgroundImageSrc})`}>
+  <div class="fv__wrapper">
+    <!-- LCP最適化: 背景画像を<img>タグとして使用し、fetchpriority="high"を設定 -->
+    <img
+      src={fvBackgroundImageSrc}
+      alt=""
+      class="fv__background-image"
+      fetchpriority="high"
+      decoding="async"
+      loading="eager"
+    />
     <div class="background-container">
       <div class="background-rotated" style={`background-image: url(${fvAnimeImageSrc})`}></div>
       <div class="background"></div>
@@ -26,346 +35,393 @@ const { fvBackgroundImageSrc, fvAnimeImageSrc } = Astro.props;
 
 <script is:inline>
   // @ts-nocheck
-  // 開発環境でのみログを出力する関数（重複宣言を防ぐため、既存チェック）
-  if (typeof window.devLog === "undefined") {
-    window.devLog = (...args) => {
-      if (window.__DEV__) {
-        console.log(...args);
-      }
-    };
-  }
-  if (typeof window.devWarn === "undefined") {
-    window.devWarn = (...args) => {
-      if (window.__DEV__) {
-        console.warn(...args);
-      }
-    };
-  }
-  const devLog = window.devLog;
-  const devWarn = window.devWarn;
+  // IIFEでスコープを分離（重複宣言エラーを防ぐ）
+  (() => {
+    // 開発環境でのみログを出力する関数（重複宣言を防ぐため、既存チェック）
+    if (typeof window.devLog === "undefined") {
+      window.devLog = (...args) => {
+        if (window.__DEV__) {
+          console.log(...args);
+        }
+      };
+    }
+    if (typeof window.devWarn === "undefined") {
+      window.devWarn = (...args) => {
+        if (window.__DEV__) {
+          console.warn(...args);
+        }
+      };
+    }
+    // 重複宣言を避けるため、constで宣言せず、window.devLogを直接使用
+    const devLog = typeof window !== "undefined" && window.devLog ? window.devLog : () => {};
+    const devWarn = typeof window !== "undefined" && window.devWarn ? window.devWarn : () => {};
 
-  // マウス追従背景の初期化
-  function initBackgroundMouseFollow() {
-    devLog("🔍 initBackgroundMouseFollow called");
+    // マウス追従背景の初期化
+    function initBackgroundMouseFollow() {
+      devLog("🔍 initBackgroundMouseFollow called");
 
-    // 要素が見つかるまで待機（ローディングスクリーンの終了を考慮）
-    const checkAndInit = () => {
-      devLog("🔍 Checking for elements...");
-      const backgroundContainer = document.querySelector(".background-container");
-      const fvWrapper = document.querySelector(".fv__wrapper");
+      // 要素が見つかるまで待機（ローディングスクリーンの終了を考慮）
+      const checkAndInit = () => {
+        devLog("🔍 Checking for elements...");
+        const backgroundContainer = document.querySelector(".background-container");
+        const fvWrapper = document.querySelector(".fv__wrapper");
 
-      devLog("🔍 Elements found:", { backgroundContainer, fvWrapper });
+        devLog("🔍 Elements found:", { backgroundContainer, fvWrapper });
 
-      if (!backgroundContainer || !fvWrapper) {
-        // 要素が見つからない場合は再試行
-        devWarn("⚠️ Elements not found, retrying in 100ms...");
-        setTimeout(checkAndInit, 100);
-        return;
-      }
+        if (!backgroundContainer || !fvWrapper) {
+          // 要素が見つからない場合は再試行
+          devWarn("⚠️ Elements not found, retrying in 100ms...");
+          setTimeout(checkAndInit, 100);
+          return;
+        }
 
-      // ローディングスクリーンの終了を待つ
-      const loadingScreen = document.getElementById("loading-screen");
-      devLog("🔍 Loading screen:", loadingScreen);
+        // ローディングスクリーンの終了を待つ
+        const loadingScreen = document.getElementById("loading-screen");
+        devLog("🔍 Loading screen:", loadingScreen);
 
-      if (loadingScreen) {
-        const checkLoadingComplete = () => {
-          const computedStyle = window.getComputedStyle(loadingScreen);
-          const isVisible =
-            loadingScreen.style.display !== "none" &&
-            loadingScreen.style.visibility !== "hidden" &&
-            computedStyle.display !== "none" &&
-            computedStyle.visibility !== "hidden";
+        if (loadingScreen) {
+          const checkLoadingComplete = () => {
+            // 強制リフローを避けるため、まずインラインスタイルを確認
+            const inlineDisplay = loadingScreen.style.display;
+            const inlineVisibility = loadingScreen.style.visibility;
 
-          devLog("🔍 Loading screen visible:", isVisible);
+            // インラインスタイルで判定可能な場合は、getComputedStyleを呼ばない
+            let isVisible = false;
+            if (inlineDisplay !== "none" && inlineVisibility !== "hidden") {
+              if (inlineDisplay === "" && inlineVisibility === "") {
+                // インラインスタイルが設定されていない場合のみ、requestAnimationFrame内でgetComputedStyleを呼ぶ
+                requestAnimationFrame(() => {
+                  const computedStyle = window.getComputedStyle(loadingScreen);
+                  const computedDisplay = computedStyle.display;
+                  const computedVisibility = computedStyle.visibility;
+                  const computedVisible = computedDisplay !== "none" && computedVisibility !== "hidden";
 
-          if (isVisible) {
-            // まだローディング中なので再チェック
-            devLog("⏳ Loading screen still visible, rechecking in 100ms...");
-            setTimeout(checkLoadingComplete, 100);
-          } else {
-            // ローディング終了後に初期化
-            devLog("✅ Loading complete, initializing mouse follow...");
-            initializeMouseFollow(backgroundContainer, fvWrapper);
-          }
-        };
-        checkLoadingComplete();
-      } else {
-        // ローディングスクリーンが存在しない場合は即座に初期化
-        devLog("ℹ️ No loading screen, initializing immediately...");
-        initializeMouseFollow(backgroundContainer, fvWrapper);
-      }
-    };
+                  devLog("🔍 Loading screen visible (computed):", computedVisible);
 
-    checkAndInit();
-  }
+                  if (computedVisible) {
+                    // まだローディング中なので再チェック
+                    devLog("⏳ Loading screen still visible, rechecking in 100ms...");
+                    setTimeout(checkLoadingComplete, 100);
+                  } else {
+                    // ローディング終了後に初期化
+                    devLog("✅ Loading complete, initializing mouse follow...");
+                    initializeMouseFollow(backgroundContainer, fvWrapper);
+                  }
+                });
+                return;
+              } else {
+                isVisible = true;
+              }
+            }
 
-  // マウス追従の実際の初期化処理
-  function initializeMouseFollow(backgroundContainer, fvWrapper) {
-    // デバッグログ追加（開発環境のみ）
-    devLog("✅ Initializing mouse follow...", {
-      backgroundContainer,
-      fvWrapper,
-      maskImage: window.getComputedStyle(backgroundContainer).maskImage,
-      webkitMaskImage: window.getComputedStyle(backgroundContainer).webkitMaskImage,
-      mouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
-      mouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
-    });
+            devLog("🔍 Loading screen visible (inline):", isVisible);
 
-    // パフォーマンス向上のため、requestAnimationFrameを使用
-    let rafId = null;
-    let mouseX = 0;
-    let mouseY = 0;
+            if (isVisible) {
+              // まだローディング中なので再チェック
+              devLog("⏳ Loading screen still visible, rechecking in 100ms...");
+              setTimeout(checkLoadingComplete, 100);
+            } else {
+              // ローディング終了後に初期化
+              devLog("✅ Loading complete, initializing mouse follow...");
+              initializeMouseFollow(backgroundContainer, fvWrapper);
+            }
+          };
+          checkLoadingComplete();
+        } else {
+          // ローディングスクリーンが存在しない場合は即座に初期化
+          devLog("ℹ️ No loading screen, initializing immediately...");
+          initializeMouseFollow(backgroundContainer, fvWrapper);
+        }
+      };
 
-    // getBoundingClientRectの結果をキャッシュ（メインスレッド処理の最適化）
-    let cachedRect = null;
-    let lastRectUpdate = 0;
-    const RECT_CACHE_DURATION = 100; // 100ms間キャッシュ
+      checkAndInit();
+    }
 
-    const updateMaskPosition = () => {
-      // キャッシュが古い場合のみ再計算
-      if (!cachedRect || Date.now() - lastRectUpdate > RECT_CACHE_DURATION) {
-        cachedRect = fvWrapper.getBoundingClientRect();
-        lastRectUpdate = Date.now();
-      }
-      const rect = cachedRect;
-      const x = mouseX - rect.left;
-      const y = mouseY - rect.top;
-
-      // CSS変数を使ってマスクの位置を更新（より確実に設定）
-      backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
-      backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
-
-      rafId = null;
-    };
-
-    // デバイスがタッチデバイスかどうかを判定
-    const isTouchDevice =
-      window.matchMedia("(any-hover: none)").matches ||
-      window.matchMedia("(pointer: coarse)").matches ||
-      "ontouchstart" in window;
-
-    devLog("📱 Device type:", isTouchDevice ? "Touch device" : "Desktop");
-
-    // デスクトップ: マウス追従
-    if (!isTouchDevice) {
-      devLog("🖱️ Setting up desktop mouse tracking...");
-      // window全体でマウス移動を監視（画面全体を追従）
-      window.addEventListener(
-        "mousemove",
-        (e) => {
-          mouseX = e.clientX;
-          mouseY = e.clientY;
-
-          // requestAnimationFrameで更新を最適化
-          if (rafId === null) {
-            rafId = requestAnimationFrame(updateMaskPosition);
-          }
-        },
-        { passive: true }
-      );
-
-      devLog("✅ Desktop mouse tracking event listener attached");
-
-      // マウスが画面外に出た場合も追従（画面端でも反応するように）
-      window.addEventListener("mouseleave", () => {
-        // マウスが画面外に出た場合は最後の位置を保持
+    // マウス追従の実際の初期化処理
+    function initializeMouseFollow(backgroundContainer, fvWrapper) {
+      // デバッグログ追加（開発環境のみ）
+      // 強制リフローを避けるため、requestAnimationFrame内でgetComputedStyleを実行
+      requestAnimationFrame(() => {
+        devLog("✅ Initializing mouse follow...", {
+          backgroundContainer,
+          fvWrapper,
+          maskImage: window.getComputedStyle(backgroundContainer).maskImage,
+          webkitMaskImage: window.getComputedStyle(backgroundContainer).webkitMaskImage,
+          mouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
+          mouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
+        });
       });
-    } else {
-      // スマホ/タブレット: タッチイベントと自動アニメーションの組み合わせ
 
-      // 1. タッチイベント対応（タッチ位置を追従）
-      let touchX = 0;
-      let touchY = 0;
-      let isTouching = false;
+      // パフォーマンス向上のため、requestAnimationFrameを使用
+      let rafId = null;
+      let mouseX = 0;
+      let mouseY = 0;
 
-      window.addEventListener(
-        "touchstart",
-        (e) => {
-          if (e.touches.length > 0) {
-            isTouching = true;
-            touchX = e.touches[0].clientX;
-            touchY = e.touches[0].clientY;
-            mouseX = touchX;
-            mouseY = touchY;
+      // getBoundingClientRectの結果をキャッシュ（メインスレッド処理の最適化）
+      let cachedRect = null;
+      let lastRectUpdate = 0;
+      const RECT_CACHE_DURATION = 100; // 100ms間キャッシュ
+
+      const updateMaskPosition = () => {
+        // キャッシュが古い場合のみ再計算
+        if (!cachedRect || Date.now() - lastRectUpdate > RECT_CACHE_DURATION) {
+          cachedRect = fvWrapper.getBoundingClientRect();
+          lastRectUpdate = Date.now();
+        }
+        const rect = cachedRect;
+        const x = mouseX - rect.left;
+        const y = mouseY - rect.top;
+
+        // CSS変数を使ってマスクの位置を更新（より確実に設定）
+        backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
+        backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+        rafId = null;
+      };
+
+      // デバイスがタッチデバイスかどうかを判定
+      const isTouchDevice =
+        window.matchMedia("(any-hover: none)").matches ||
+        window.matchMedia("(pointer: coarse)").matches ||
+        "ontouchstart" in window;
+
+      devLog("📱 Device type:", isTouchDevice ? "Touch device" : "Desktop");
+
+      // デスクトップ: マウス追従
+      if (!isTouchDevice) {
+        devLog("🖱️ Setting up desktop mouse tracking...");
+        // window全体でマウス移動を監視（画面全体を追従）
+        window.addEventListener(
+          "mousemove",
+          (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+
+            // requestAnimationFrameで更新を最適化
+            if (rafId === null) {
+              rafId = requestAnimationFrame(updateMaskPosition);
+            }
+          },
+          { passive: true }
+        );
+
+        devLog("✅ Desktop mouse tracking event listener attached");
+
+        // マウスが画面外に出た場合も追従（画面端でも反応するように）
+        window.addEventListener("mouseleave", () => {
+          // マウスが画面外に出た場合は最後の位置を保持
+        });
+      } else {
+        // スマホ/タブレット: タッチイベントと自動アニメーションの組み合わせ
+
+        // 1. タッチイベント対応（タッチ位置を追従）
+        let touchX = 0;
+        let touchY = 0;
+        let isTouching = false;
+
+        window.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.touches.length > 0) {
+              isTouching = true;
+              touchX = e.touches[0].clientX;
+              touchY = e.touches[0].clientY;
+              mouseX = touchX;
+              mouseY = touchY;
+
+              if (rafId === null) {
+                rafId = requestAnimationFrame(updateMaskPosition);
+              }
+            }
+          },
+          { passive: true }
+        );
+
+        window.addEventListener(
+          "touchmove",
+          (e) => {
+            if (e.touches.length > 0 && isTouching) {
+              touchX = e.touches[0].clientX;
+              touchY = e.touches[0].clientY;
+              mouseX = touchX;
+              mouseY = touchY;
+
+              if (rafId === null) {
+                rafId = requestAnimationFrame(updateMaskPosition);
+              }
+            }
+          },
+          { passive: true }
+        );
+
+        window.addEventListener(
+          "touchend",
+          () => {
+            isTouching = false;
+          },
+          { passive: true }
+        );
+
+        // 2. 自動アニメーション（タッチ操作がない場合の代替）
+        // パルスアニメーション: 定期的に位置を変更して視覚的な動きを提供
+        let autoAnimationId = null;
+        let animationPhase = 0;
+        const animationDuration = 4000; // 4秒周期
+        const animationRadius = 100; // 移動半径（px）
+
+        const startAutoAnimation = () => {
+          if (autoAnimationId !== null) return; // 既に実行中
+
+          const startTime = Date.now();
+
+          const animate = () => {
+            if (isTouching) {
+              // タッチ中は自動アニメーションを一時停止
+              autoAnimationId = requestAnimationFrame(animate);
+              return;
+            }
+
+            // 強制リフローを避けるため、getBoundingClientRectの結果をキャッシュ
+            // リサイズ時のみ再計算（パフォーマンス最適化）
+            if (!cachedRect || Date.now() - lastRectUpdate > 100) {
+              cachedRect = fvWrapper.getBoundingClientRect();
+              lastRectUpdate = Date.now();
+            }
+            const rect = cachedRect;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const elapsed = Date.now() - startTime;
+            const progress = (elapsed % animationDuration) / animationDuration;
+
+            // 円形パスで移動（スムーズな動き）
+            const angle = progress * Math.PI * 2;
+            const offsetX = Math.cos(angle) * animationRadius;
+            const offsetY = Math.sin(angle) * animationRadius;
+
+            mouseX = centerX + rect.left + offsetX;
+            mouseY = centerY + rect.top + offsetY;
 
             if (rafId === null) {
               rafId = requestAnimationFrame(updateMaskPosition);
             }
-          }
-        },
-        { passive: true }
-      );
 
-      window.addEventListener(
-        "touchmove",
-        (e) => {
-          if (e.touches.length > 0 && isTouching) {
-            touchX = e.touches[0].clientX;
-            touchY = e.touches[0].clientY;
-            mouseX = touchX;
-            mouseY = touchY;
-
-            if (rafId === null) {
-              rafId = requestAnimationFrame(updateMaskPosition);
-            }
-          }
-        },
-        { passive: true }
-      );
-
-      window.addEventListener(
-        "touchend",
-        () => {
-          isTouching = false;
-        },
-        { passive: true }
-      );
-
-      // 2. 自動アニメーション（タッチ操作がない場合の代替）
-      // パルスアニメーション: 定期的に位置を変更して視覚的な動きを提供
-      let autoAnimationId = null;
-      let animationPhase = 0;
-      const animationDuration = 4000; // 4秒周期
-      const animationRadius = 100; // 移動半径（px）
-
-      const startAutoAnimation = () => {
-        if (autoAnimationId !== null) return; // 既に実行中
-
-        const startTime = Date.now();
-
-        const animate = () => {
-          if (isTouching) {
-            // タッチ中は自動アニメーションを一時停止
             autoAnimationId = requestAnimationFrame(animate);
-            return;
-          }
-
-          // 強制リフローを避けるため、getBoundingClientRectの結果をキャッシュ
-          // リサイズ時のみ再計算（パフォーマンス最適化）
-          if (!cachedRect || Date.now() - lastRectUpdate > 100) {
-            cachedRect = fvWrapper.getBoundingClientRect();
-            lastRectUpdate = Date.now();
-          }
-          const rect = cachedRect;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-
-          const elapsed = Date.now() - startTime;
-          const progress = (elapsed % animationDuration) / animationDuration;
-
-          // 円形パスで移動（スムーズな動き）
-          const angle = progress * Math.PI * 2;
-          const offsetX = Math.cos(angle) * animationRadius;
-          const offsetY = Math.sin(angle) * animationRadius;
-
-          mouseX = centerX + rect.left + offsetX;
-          mouseY = centerY + rect.top + offsetY;
-
-          if (rafId === null) {
-            rafId = requestAnimationFrame(updateMaskPosition);
-          }
+          };
 
           autoAnimationId = requestAnimationFrame(animate);
         };
 
-        autoAnimationId = requestAnimationFrame(animate);
+        // 自動アニメーションを開始（少し遅延させて自然な動きに）
+        setTimeout(() => {
+          startAutoAnimation();
+        }, 500);
+      }
+
+      // 初期位置を設定（画面中央）
+      // 強制リフローを避けるため、requestAnimationFrame内でgetBoundingClientRectを実行
+      const initialX = window.innerWidth / 2;
+      const initialY = window.innerHeight / 2;
+      requestAnimationFrame(() => {
+        // キャッシュを使用（既に設定されている場合）
+        if (!cachedRect) {
+          cachedRect = fvWrapper.getBoundingClientRect();
+          lastRectUpdate = Date.now();
+        }
+        const rect = cachedRect;
+        const x = initialX - rect.left;
+        const y = initialY - rect.top;
+        backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
+        backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
+
+        // 初期化完了のログ（requestAnimationFrame内で実行してスコープ内の変数を使用）
+        devLog("✅ Mouse follow initialized successfully", {
+          initialX,
+          initialY,
+          x,
+          y,
+          rect: {
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height,
+          },
+          // デバッグ情報は別のrequestAnimationFrameで取得して強制リフローを避ける
+          finalMouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
+          finalMouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
+        });
+      });
+
+      // リサイズ時にキャッシュをクリア
+      let resizeCacheTimer = null;
+      window.addEventListener(
+        "resize",
+        () => {
+          if (resizeCacheTimer) {
+            clearTimeout(resizeCacheTimer);
+          }
+          resizeCacheTimer = setTimeout(() => {
+            cachedRect = null;
+            lastRectUpdate = 0;
+          }, 150);
+        },
+        { passive: true }
+      );
+    }
+
+    // LCP最適化: マウス追従の初期化を遅延させずに即座に実行（ローディングスクリーンの待機は最小限に）
+    function waitForInit() {
+      // ローディングスクリーンの待機を最適化: 最大500msまで待機（リソース読み込みの遅延を削減）
+      const MAX_WAIT_TIME = 500;
+      const startTime = Date.now();
+
+      const tryInit = () => {
+        const loadingScreen = document.getElementById("loading-screen");
+        const elapsed = Date.now() - startTime;
+
+        // 強制リフローを避けるため、まずインラインスタイルを確認
+        // ローディングスクリーンが存在しない、または非表示、または最大待機時間を超えた場合は即座に初期化
+        if (
+          !loadingScreen ||
+          elapsed >= MAX_WAIT_TIME ||
+          loadingScreen.style.display === "none" ||
+          loadingScreen.style.visibility === "hidden"
+        ) {
+          initBackgroundMouseFollow();
+          return;
+        }
+
+        // インラインスタイルで判定できない場合のみ、requestAnimationFrame内でgetComputedStyleを呼ぶ
+        if (loadingScreen.style.display === "" && loadingScreen.style.visibility === "") {
+          requestAnimationFrame(() => {
+            const computedStyle = window.getComputedStyle(loadingScreen);
+            if (computedStyle.display === "none" || computedStyle.visibility === "hidden") {
+              initBackgroundMouseFollow();
+              return;
+            }
+            // まだローディング中の場合は再試行
+            setTimeout(tryInit, 50);
+          });
+          return;
+        }
+
+        // まだローディング中の場合は50ms後に再試行（100msから短縮）
+        setTimeout(tryInit, 50);
       };
 
-      // 自動アニメーションを開始（少し遅延させて自然な動きに）
-      setTimeout(() => {
-        startAutoAnimation();
-      }, 500);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", tryInit);
+      } else {
+        tryInit();
+      }
     }
 
-    // 初期位置を設定（画面中央）
-    // 強制リフローを避けるため、requestAnimationFrame内でgetBoundingClientRectを実行
-    const initialX = window.innerWidth / 2;
-    const initialY = window.innerHeight / 2;
-    requestAnimationFrame(() => {
-      // キャッシュを使用（既に設定されている場合）
-      if (!cachedRect) {
-        cachedRect = fvWrapper.getBoundingClientRect();
-        lastRectUpdate = Date.now();
-      }
-      const rect = cachedRect;
-      const x = initialX - rect.left;
-      const y = initialY - rect.top;
-      backgroundContainer.style.setProperty("--mouse-x", `${x}px`);
-      backgroundContainer.style.setProperty("--mouse-y", `${y}px`);
-
-      // 初期化完了のログ（requestAnimationFrame内で実行してスコープ内の変数を使用）
-      devLog("✅ Mouse follow initialized successfully", {
-        initialX,
-        initialY,
-        x,
-        y,
-        rect: {
-          left: rect.left,
-          top: rect.top,
-          width: rect.width,
-          height: rect.height,
-        },
-        finalMouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
-        finalMouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
-      });
+    // window.onloadイベントでも初期化を試みる（フォールバック）
+    window.addEventListener("load", () => {
+      waitForInit();
     });
 
-    // リサイズ時にキャッシュをクリア
-    let resizeCacheTimer = null;
-    window.addEventListener(
-      "resize",
-      () => {
-        if (resizeCacheTimer) {
-          clearTimeout(resizeCacheTimer);
-        }
-        resizeCacheTimer = setTimeout(() => {
-          cachedRect = null;
-          lastRectUpdate = 0;
-        }, 150);
-      },
-      { passive: true }
-    );
-  }
-
-  // LCP最適化: マウス追従の初期化を遅延させずに即座に実行（ローディングスクリーンの待機は最小限に）
-  function waitForInit() {
-    // ローディングスクリーンの待機を最適化: 最大500msまで待機（リソース読み込みの遅延を削減）
-    const MAX_WAIT_TIME = 500;
-    const startTime = Date.now();
-
-    const tryInit = () => {
-      const loadingScreen = document.getElementById("loading-screen");
-      const elapsed = Date.now() - startTime;
-
-      // ローディングスクリーンが存在しない、または非表示、または最大待機時間を超えた場合は即座に初期化
-      if (
-        !loadingScreen ||
-        elapsed >= MAX_WAIT_TIME ||
-        loadingScreen.style.display === "none" ||
-        loadingScreen.style.visibility === "hidden" ||
-        window.getComputedStyle(loadingScreen).display === "none" ||
-        window.getComputedStyle(loadingScreen).visibility === "hidden"
-      ) {
-        initBackgroundMouseFollow();
-        return;
-      }
-
-      // まだローディング中の場合は50ms後に再試行（100msから短縮）
-      setTimeout(tryInit, 50);
-    };
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", tryInit);
-    } else {
-      tryInit();
-    }
-  }
-
-  // window.onloadイベントでも初期化を試みる（フォールバック）
-  window.addEventListener("load", () => {
+    // 即座にも試行（既に読み込まれている場合）
     waitForInit();
-  });
-
-  // 即座にも試行（既に読み込まれている場合）
-  waitForInit();
+  })();
 </script>

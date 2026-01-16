@@ -553,10 +553,13 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     });
 
     // background-containerが存在する場合、マウス追従が機能していることを確認
+    // 強制リフローを避けるため、requestAnimationFrame内でgetComputedStyleを実行
     const backgroundContainer = document.querySelector(".background-container") as HTMLElement;
     if (backgroundContainer && DEBUG) {
-      console.log("Background container found:", {
-        maskImage: window.getComputedStyle(backgroundContainer).maskImage,
+      requestAnimationFrame(() => {
+        console.log("Background container found:", {
+          maskImage: window.getComputedStyle(backgroundContainer).maskImage,
+        });
       });
     }
 
@@ -570,12 +573,33 @@ const glitchImage = await getImage({ src: glitchImageSrc });
         return;
       }
 
-      const computedStyle = window.getComputedStyle(loadingScreen);
-      const isVisible =
-        loadingScreen.style.display !== "none" &&
-        loadingScreen.style.visibility !== "hidden" &&
-        computedStyle.display !== "none" &&
-        computedStyle.visibility !== "hidden";
+      // 強制リフローを避けるため、まずインラインスタイルを確認
+      // getComputedStyleは最小限の使用（インラインスタイルで判定できない場合のみ）
+      const inlineDisplay = loadingScreen.style.display;
+      const inlineVisibility = loadingScreen.style.visibility;
+
+      // インラインスタイルで判定可能な場合は、getComputedStyleを呼ばない
+      let isVisible = true;
+      if (inlineDisplay === "none" || inlineVisibility === "hidden") {
+        isVisible = false;
+      } else if (inlineDisplay === "" && inlineVisibility === "") {
+        // インラインスタイルが設定されていない場合のみ、getComputedStyleを呼ぶ
+        // ただし、requestAnimationFrame内で実行して強制リフローを遅延させる
+        const checkComputed = () => {
+          const computedStyle = window.getComputedStyle(loadingScreen);
+          const computedDisplay = computedStyle.display;
+          const computedVisibility = computedStyle.visibility;
+          if (computedDisplay === "none" || computedVisibility === "hidden") {
+            // 非表示の場合は再チェック
+            setTimeout(checkLoadingComplete, 100);
+          } else {
+            // 表示されている場合は開始
+            startGlitchSequence();
+          }
+        };
+        requestAnimationFrame(checkComputed);
+        return;
+      }
 
       if (isVisible) {
         // まだローディング中なので再チェック
@@ -592,15 +616,18 @@ const glitchImage = await getImage({ src: glitchImageSrc });
       if (DEBUG) console.log("Starting glitch sequence...");
 
       // background-containerのマスク状態を確認（デバッグ用）
+      // 強制リフローを避けるため、requestAnimationFrame内でgetComputedStyleを実行
       const backgroundContainer = document.querySelector(".background-container") as HTMLElement;
       if (backgroundContainer && DEBUG) {
-        const styles = window.getComputedStyle(backgroundContainer);
-        console.log("Background container before glitch:", {
-          maskImage: styles.maskImage,
-          mouseX: styles.getPropertyValue("--mouse-x"),
-          mouseY: styles.getPropertyValue("--mouse-y"),
-          display: styles.display,
-          position: styles.position,
+        requestAnimationFrame(() => {
+          const styles = window.getComputedStyle(backgroundContainer);
+          console.log("Background container before glitch:", {
+            maskImage: styles.maskImage,
+            mouseX: styles.getPropertyValue("--mouse-x"),
+            mouseY: styles.getPropertyValue("--mouse-y"),
+            display: styles.display,
+            position: styles.position,
+          });
         });
       }
 
@@ -717,35 +744,41 @@ const glitchImage = await getImage({ src: glitchImageSrc });
         }
 
         // ④ .glitchの背景色をふわっとvar(--color-white)#f1f5f9に変更
+        // 強制リフローを避けるため、requestAnimationFrame内でgetComputedStyleを実行
         const glitchContainer = document.querySelector(".glitch") as HTMLElement;
         if (glitchContainer) {
-          // 背景画像を保持したまま背景色のみを変更（backgroundImageは再設定しない）
-          const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
-          glitchContainer.style.transition = "background-color 3s ease-out";
-          glitchContainer.style.backgroundColor = "#f1f5f9";
-          // 追加したコード
-          glitchContainer.style.backgroundImage = bgImage;
-          glitchContainer.style.backgroundPosition = "center";
-          glitchContainer.style.backgroundRepeat = "no-repeat";
-          glitchContainer.style.borderRadius = "50%";
-          // 追加したコードここまで
-        }
-
-        // 5. 3秒後（フェードアウト完了後）に背景をtransparentにフェード
-        const timeoutId4 = setTimeout(() => {
-          if (DEBUG) console.log("Fading background to transparent...");
-          const glitchContainer = document.querySelector(".glitch") as HTMLElement;
-          if (glitchContainer) {
-            // 背景画像を保持したまま背景色のみをtransparentに変更（backgroundImageは再設定しない）
+          requestAnimationFrame(() => {
+            // 背景画像を保持したまま背景色のみを変更（backgroundImageは再設定しない）
             const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
             glitchContainer.style.transition = "background-color 3s ease-out";
-            glitchContainer.style.backgroundColor = "transparent";
+            glitchContainer.style.backgroundColor = "#f1f5f9";
             // 追加したコード
             glitchContainer.style.backgroundImage = bgImage;
             glitchContainer.style.backgroundPosition = "center";
             glitchContainer.style.backgroundRepeat = "no-repeat";
             glitchContainer.style.borderRadius = "50%";
             // 追加したコードここまで
+          });
+        }
+
+        // 5. 3秒後（フェードアウト完了後）に背景をtransparentにフェード
+        // 強制リフローを避けるため、requestAnimationFrame内でgetComputedStyleを実行
+        const timeoutId4 = setTimeout(() => {
+          if (DEBUG) console.log("Fading background to transparent...");
+          const glitchContainer = document.querySelector(".glitch") as HTMLElement;
+          if (glitchContainer) {
+            requestAnimationFrame(() => {
+              // 背景画像を保持したまま背景色のみをtransparentに変更（backgroundImageは再設定しない）
+              const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
+              glitchContainer.style.transition = "background-color 3s ease-out";
+              glitchContainer.style.backgroundColor = "transparent";
+              // 追加したコード
+              glitchContainer.style.backgroundImage = bgImage;
+              glitchContainer.style.backgroundPosition = "center";
+              glitchContainer.style.backgroundRepeat = "no-repeat";
+              glitchContainer.style.borderRadius = "50%";
+              // 追加したコードここまで
+            });
           }
 
           // 6. 3秒後（transparentフェード完了後）に6秒待機してから背景を黒にフェード
@@ -757,16 +790,19 @@ const glitchImage = await getImage({ src: glitchImageSrc });
               if (DEBUG) console.log("Fading background to black...");
               const glitchContainer = document.querySelector(".glitch") as HTMLElement;
               if (glitchContainer) {
-                // 背景画像を保持したまま背景色のみを変更（backgroundImageは再設定しない）
-                const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
-                glitchContainer.style.transition = "background-color 3s ease-out";
-                glitchContainer.style.backgroundColor = "#000000";
-                // 追加したコード
-                glitchContainer.style.backgroundImage = bgImage;
-                glitchContainer.style.backgroundPosition = "center";
-                glitchContainer.style.backgroundRepeat = "no-repeat";
-                glitchContainer.style.borderRadius = "50%";
-                // 追加したコードここまで
+                // 強制リフローを避けるため、requestAnimationFrame内でgetComputedStyleを実行
+                requestAnimationFrame(() => {
+                  // 背景画像を保持したまま背景色のみを変更（backgroundImageは再設定しない）
+                  const bgImage = window.getComputedStyle(glitchContainer).backgroundImage;
+                  glitchContainer.style.transition = "background-color 3s ease-out";
+                  glitchContainer.style.backgroundColor = "#000000";
+                  // 追加したコード
+                  glitchContainer.style.backgroundImage = bgImage;
+                  glitchContainer.style.backgroundPosition = "center";
+                  glitchContainer.style.backgroundRepeat = "no-repeat";
+                  glitchContainer.style.borderRadius = "50%";
+                  // 追加したコードここまで
+                });
               }
 
               // 背景が黒にフェード完了後、アニメーションをリセットしてループ
@@ -780,33 +816,36 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                   if (DEBUG) console.log("Removed stop style element");
                 }
 
-                // 追加したコード
-                // 親コンテナから背景画像を取得し、背景色もリセット
-                const containerBgImage = window.getComputedStyle(glitchContainer).backgroundImage;
-                if (DEBUG) console.log("Container background image:", containerBgImage);
-                // 追加したコードここまで
-
-                // .glitchコンテナの背景色を黒に戻す（backgroundImageは再設定しない）
-                if (glitchContainer) {
-                  glitchContainer.style.transition = "";
-                  glitchContainer.style.backgroundColor = "#000000";
+                // 強制リフローを避けるため、requestAnimationFrame内でgetComputedStyleを実行
+                requestAnimationFrame(() => {
                   // 追加したコード
-                  glitchContainer.style.backgroundImage = containerBgImage;
-                  glitchContainer.style.backgroundPosition = "center";
-                  glitchContainer.style.backgroundRepeat = "no-repeat";
-                  glitchContainer.style.borderRadius = "50%";
+                  // 親コンテナから背景画像を取得し、背景色もリセット
+                  const containerBgImage = window.getComputedStyle(glitchContainer).backgroundImage;
+                  if (DEBUG) console.log("Container background image:", containerBgImage);
                   // 追加したコードここまで
-                }
 
-                // 要素を完全に初期状態にリセット
-                // glitchLayer
-                if (glitchLayer) {
-                  glitchLayer.removeAttribute("style");
-                  // 追加したコード
-                  glitchLayer.style.backgroundImage = containerBgImage;
-                  glitchLayer.style.borderRadius = "50%";
-                  // 追加したコードここまで
-                }
+                  // .glitchコンテナの背景色を黒に戻す（backgroundImageは再設定しない）
+                  if (glitchContainer) {
+                    glitchContainer.style.transition = "";
+                    glitchContainer.style.backgroundColor = "#000000";
+                    // 追加したコード
+                    glitchContainer.style.backgroundImage = containerBgImage;
+                    glitchContainer.style.backgroundPosition = "center";
+                    glitchContainer.style.backgroundRepeat = "no-repeat";
+                    glitchContainer.style.borderRadius = "50%";
+                    // 追加したコードここまで
+                  }
+
+                  // 要素を完全に初期状態にリセット
+                  // glitchLayer
+                  if (glitchLayer) {
+                    glitchLayer.removeAttribute("style");
+                    // 追加したコード
+                    glitchLayer.style.backgroundImage = containerBgImage;
+                    glitchLayer.style.borderRadius = "50%";
+                    // 追加したコードここまで
+                  }
+                });
 
                 // R, G, B, F要素のリセット（初期状態に確実に戻す）
                 if (glitchR) {
@@ -895,21 +934,24 @@ const glitchImage = await getImage({ src: glitchImageSrc });
                 }
 
                 // デバッグ情報：要素の状態を確認
+                // 強制リフローを避けるため、requestAnimationFrame内でgetComputedStyleを実行
                 if (DEBUG) {
-                  console.log("Reset complete. Elements should be visible now.");
-                  console.log("glitchF opacity:", window.getComputedStyle(glitchF).opacity);
-                  console.log("glitchF display:", window.getComputedStyle(glitchF).display);
-                  console.log("glitchF mix-blend-mode:", window.getComputedStyle(glitchF).mixBlendMode);
-                  console.log(
-                    "glitchF backgroundImage:",
-                    window.getComputedStyle(glitchF).backgroundImage.substring(0, 50) + "..."
-                  );
-                  console.log("glitchF backgroundSize:", window.getComputedStyle(glitchF).backgroundSize);
-                  console.log("glitchF position:", window.getComputedStyle(glitchF).position);
-                  console.log(
-                    "glitchContainer backgroundColor:",
-                    window.getComputedStyle(glitchContainer).backgroundColor
-                  );
+                  requestAnimationFrame(() => {
+                    console.log("Reset complete. Elements should be visible now.");
+                    console.log("glitchF opacity:", window.getComputedStyle(glitchF).opacity);
+                    console.log("glitchF display:", window.getComputedStyle(glitchF).display);
+                    console.log("glitchF mix-blend-mode:", window.getComputedStyle(glitchF).mixBlendMode);
+                    console.log(
+                      "glitchF backgroundImage:",
+                      window.getComputedStyle(glitchF).backgroundImage.substring(0, 50) + "..."
+                    );
+                    console.log("glitchF backgroundSize:", window.getComputedStyle(glitchF).backgroundSize);
+                    console.log("glitchF position:", window.getComputedStyle(glitchF).position);
+                    console.log(
+                      "glitchContainer backgroundColor:",
+                      window.getComputedStyle(glitchContainer).backgroundColor
+                    );
+                  });
                 }
 
                 // 少し待機してからアニメーションを再開

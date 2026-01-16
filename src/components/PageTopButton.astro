@@ -135,178 +135,187 @@ import pageTopIcon from "../assets/svg/top.svg";
 
 <script>
   // @ts-nocheck
-  // 開発環境でのみログを出力する関数（重複宣言を防ぐため、既存チェック）
-  if (typeof window !== "undefined" && typeof window.devLog === "undefined") {
-    window.devLog = (...args: unknown[]) => {
-      if (window.__DEV__) {
-        console.log("[PageTopButton]", ...args);
-      }
-    };
-  }
-  const devLog = typeof window !== "undefined" && window.devLog ? window.devLog : () => {};
-
-  // グローバル変数でイベントリスナーを管理（重複登録を防ぐ）
-  let scrollHandler: (() => void) | null = null;
-  let clickHandler: (() => void) | null = null;
-  let isInitialized = false;
-
-  function cleanup() {
-    devLog("🧹 Cleaning up event listeners");
-    // 既存のイベントリスナーを削除
-    if (scrollHandler) {
-      window.removeEventListener("scroll", scrollHandler);
-      scrollHandler = null;
-    }
-    if (clickHandler) {
-      const pageTopButton = document.getElementById("pageTopButton");
-      if (pageTopButton && clickHandler) {
-        pageTopButton.removeEventListener("click", clickHandler);
-        clickHandler = null;
-      }
-    }
-    isInitialized = false;
-  }
-
-  function initPageTopButton() {
-    const pageTopButton = document.getElementById("pageTopButton") as HTMLElement | null;
-    if (!pageTopButton) {
-      devLog("⚠️ PageTopButton element not found");
-      return;
-    }
-
-    devLog("✅ Initializing PageTopButton");
-
-    // 既に初期化されている場合はクリーンアップ
-    if (isInitialized) {
-      cleanup();
-    }
-
-    const firstView = document.querySelector(".fv") as HTMLElement | null;
-
-    // FirstViewのbottom位置（ページトップからの距離）を取得
-    // 強制リフローを避けるため、この関数はrequestAnimationFrame内で呼び出すこと
-    function getFirstViewBottom(): number {
-      if (!firstView) {
-        // FirstViewがない場合は、一定のスクロール位置（300px）で表示
-        devLog("ℹ️ FirstView not found, using 300px threshold");
-        return 300;
-      }
-
-      // offsetTopとoffsetHeightを使用して、より確実にbottom位置を取得
-      // 注意: この関数はrequestAnimationFrame内で呼び出す必要がある
-      const offsetTop = firstView.offsetTop;
-      const offsetHeight = firstView.offsetHeight;
-      const bottom = offsetTop + offsetHeight;
-
-      devLog("📏 FirstView bottom position:", {
-        offsetTop,
-        offsetHeight,
-        bottom,
-        scrollY: window.scrollY || window.pageYOffset || document.documentElement.scrollTop,
-      });
-
-      return bottom;
-    }
-
-    // スクロールイベントハンドラー
-    // 強制リフローを避けるため、requestAnimationFrame内でレイアウトプロパティを読み取る
-    let rafId: number | null = null;
-    function handleScroll() {
-      if (!pageTopButton) return;
-
-      // 既にrequestAnimationFrameがスケジュールされている場合はスキップ
-      if (rafId !== null) return;
-
-      rafId = requestAnimationFrame(() => {
-        rafId = null;
-        const firstViewBottom = getFirstViewBottom();
-        const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-
-        devLog("📜 Scroll event:", {
-          scrollY,
-          firstViewBottom,
-          shouldShow: scrollY > firstViewBottom,
-        });
-
-        // FirstViewを過ぎたかどうかを判定（FirstViewがない場合は300px以上スクロールで表示）
-        if (scrollY > firstViewBottom) {
-          if (!pageTopButton.classList.contains("is-visible")) {
-            devLog("👁️ Showing PageTopButton");
-            pageTopButton.classList.add("is-visible");
-          }
-        } else {
-          if (pageTopButton.classList.contains("is-visible")) {
-            devLog("🙈 Hiding PageTopButton");
-            pageTopButton.classList.remove("is-visible");
-          }
+  // IIFEでスコープを分離（重複宣言エラーを防ぐ）
+  (() => {
+    // 開発環境でのみログを出力する関数（重複宣言を防ぐため、既存チェック）
+    if (typeof window !== "undefined" && typeof window.devLog === "undefined") {
+      window.devLog = (...args: unknown[]) => {
+        if (window.__DEV__) {
+          console.log("[PageTopButton]", ...args);
         }
-      });
+      };
+    }
+    const devLog = typeof window !== "undefined" && window.devLog ? window.devLog : () => {};
+
+    // グローバル変数でイベントリスナーを管理（重複登録を防ぐ）
+    let scrollHandler: (() => void) | null = null;
+    let clickHandler: (() => void) | null = null;
+    let isInitialized = false;
+
+    function cleanup() {
+      devLog("🧹 Cleaning up event listeners");
+      // 既存のイベントリスナーを削除
+      if (scrollHandler) {
+        window.removeEventListener("scroll", scrollHandler);
+        scrollHandler = null;
+      }
+      if (clickHandler) {
+        const pageTopButton = document.getElementById("pageTopButton");
+        if (pageTopButton && clickHandler) {
+          pageTopButton.removeEventListener("click", clickHandler);
+          clickHandler = null;
+        }
+      }
+      isInitialized = false;
     }
 
-    // トップへ戻る処理
-    function scrollToTop() {
-      devLog("⬆️ Scrolling to top");
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    }
-
-    // イベントリスナーの設定
-    scrollHandler = handleScroll;
-    clickHandler = scrollToTop;
-
-    window.addEventListener("scroll", scrollHandler, { passive: true });
-    pageTopButton.addEventListener("click", clickHandler);
-
-    devLog("✅ Event listeners attached");
-
-    // 初期状態をチェック（少し遅延させてDOMが完全に読み込まれるのを待つ）
-    setTimeout(() => {
-      handleScroll();
-    }, 100);
-
-    // リサイズ時にも再計算（FirstViewの高さが変わる可能性があるため）
-    const resizeHandler = () => {
-      devLog("📐 Window resized, recalculating");
-      handleScroll();
-    };
-    window.addEventListener("resize", resizeHandler, { passive: true });
-
-    isInitialized = true;
-  }
-
-  // 初期化関数
-  function setupPageTopButton() {
-    // DOMが完全に読み込まれるまで待つ
-    const checkAndInit = () => {
-      const pageTopButton = document.getElementById("pageTopButton");
+    function initPageTopButton() {
+      const pageTopButton = document.getElementById("pageTopButton") as HTMLElement | null;
       if (!pageTopButton) {
-        devLog("⏳ PageTopButton not found yet, retrying...");
-        setTimeout(checkAndInit, 100);
+        devLog("⚠️ PageTopButton element not found");
         return;
       }
-      initPageTopButton();
-    };
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", checkAndInit);
-    } else {
-      // 既に読み込まれている場合でも、少し遅延させてから初期化
-      setTimeout(checkAndInit, 100);
+      devLog("✅ Initializing PageTopButton");
+
+      // 既に初期化されている場合はクリーンアップ
+      if (isInitialized) {
+        cleanup();
+      }
+
+      const firstView = document.querySelector(".fv") as HTMLElement | null;
+
+      // FirstViewのbottom位置（ページトップからの距離）を取得
+      // 強制リフローを避けるため、この関数はrequestAnimationFrame内で呼び出すこと
+      function getFirstViewBottom(): number {
+        if (!firstView) {
+          // FirstViewがない場合は、一定のスクロール位置（300px）で表示
+          devLog("ℹ️ FirstView not found, using 300px threshold");
+          return 300;
+        }
+
+        // offsetTopとoffsetHeightを使用して、より確実にbottom位置を取得
+        // 注意: offsetTopとoffsetHeightは強制リフローを引き起こすため、
+        // この関数はrequestAnimationFrame内で呼び出す必要がある
+        // getBoundingClientRect()の方が強制リフローを避けやすいが、
+        // スクロール位置を考慮する必要があるため、offsetTop/offsetHeightを使用
+        const offsetTop = firstView.offsetTop;
+        const offsetHeight = firstView.offsetHeight;
+        const bottom = offsetTop + offsetHeight;
+
+        // キャッシュを使用して、同じフレーム内での複数回の呼び出しを避ける
+        // 注意: スクロールやリサイズ時はキャッシュを無効化する必要がある
+
+        devLog("📏 FirstView bottom position:", {
+          offsetTop,
+          offsetHeight,
+          bottom,
+          scrollY: window.scrollY || window.pageYOffset || document.documentElement.scrollTop,
+        });
+
+        return bottom;
+      }
+
+      // スクロールイベントハンドラー
+      // 強制リフローを避けるため、requestAnimationFrame内でレイアウトプロパティを読み取る
+      let rafId: number | null = null;
+      function handleScroll() {
+        if (!pageTopButton) return;
+
+        // 既にrequestAnimationFrameがスケジュールされている場合はスキップ
+        if (rafId !== null) return;
+
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          const firstViewBottom = getFirstViewBottom();
+          const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+
+          devLog("📜 Scroll event:", {
+            scrollY,
+            firstViewBottom,
+            shouldShow: scrollY > firstViewBottom,
+          });
+
+          // FirstViewを過ぎたかどうかを判定（FirstViewがない場合は300px以上スクロールで表示）
+          if (scrollY > firstViewBottom) {
+            if (!pageTopButton.classList.contains("is-visible")) {
+              devLog("👁️ Showing PageTopButton");
+              pageTopButton.classList.add("is-visible");
+            }
+          } else {
+            if (pageTopButton.classList.contains("is-visible")) {
+              devLog("🙈 Hiding PageTopButton");
+              pageTopButton.classList.remove("is-visible");
+            }
+          }
+        });
+      }
+
+      // トップへ戻る処理
+      function scrollToTop() {
+        devLog("⬆️ Scrolling to top");
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+
+      // イベントリスナーの設定
+      scrollHandler = handleScroll;
+      clickHandler = scrollToTop;
+
+      window.addEventListener("scroll", scrollHandler, { passive: true });
+      pageTopButton.addEventListener("click", clickHandler);
+
+      devLog("✅ Event listeners attached");
+
+      // 初期状態をチェック（少し遅延させてDOMが完全に読み込まれるのを待つ）
+      setTimeout(() => {
+        handleScroll();
+      }, 100);
+
+      // リサイズ時にも再計算（FirstViewの高さが変わる可能性があるため）
+      const resizeHandler = () => {
+        devLog("📐 Window resized, recalculating");
+        handleScroll();
+      };
+      window.addEventListener("resize", resizeHandler, { passive: true });
+
+      isInitialized = true;
     }
-  }
 
-  // View Transitions対応: ページ遷移時に再初期化
-  document.addEventListener("astro:after-swap", () => {
-    devLog("🔄 Page swapped, reinitializing");
-    cleanup();
-    // 少し遅延させてから再初期化（DOMが完全に更新されるのを待つ）
-    setTimeout(() => {
-      setupPageTopButton();
-    }, 200);
-  });
+    // 初期化関数
+    function setupPageTopButton() {
+      // DOMが完全に読み込まれるまで待つ
+      const checkAndInit = () => {
+        const pageTopButton = document.getElementById("pageTopButton");
+        if (!pageTopButton) {
+          devLog("⏳ PageTopButton not found yet, retrying...");
+          setTimeout(checkAndInit, 100);
+          return;
+        }
+        initPageTopButton();
+      };
 
-  // 初回初期化
-  setupPageTopButton();
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", checkAndInit);
+      } else {
+        // 既に読み込まれている場合でも、少し遅延させてから初期化
+        setTimeout(checkAndInit, 100);
+      }
+    }
+
+    // View Transitions対応: ページ遷移時に再初期化
+    document.addEventListener("astro:after-swap", () => {
+      devLog("🔄 Page swapped, reinitializing");
+      cleanup();
+      // 少し遅延させてから再初期化（DOMが完全に更新されるのを待つ）
+      setTimeout(() => {
+        setupPageTopButton();
+      }, 200);
+    });
+
+    // 初回初期化
+    setupPageTopButton();
+  })();
 </script>

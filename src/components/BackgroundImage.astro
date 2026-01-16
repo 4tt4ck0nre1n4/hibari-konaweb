@@ -42,25 +42,27 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
 
 <script>
   // @ts-nocheck
-  // 開発環境でのみログを出力する関数（重複宣言を防ぐため、既存チェック）
-  if (typeof window.devLog === "undefined") {
-    window.devLog = (...args) => {
-      if (window.__DEV__) {
-        console.log(...args);
-      }
-    };
-  }
-  if (typeof window.devError === "undefined") {
-    window.devError = (...args) => {
-      // エラーは常に出力（本番環境でも必要）
-      console.error(...args);
-    };
-  }
-  const devLog = window.devLog;
-  const devError = window.devError;
-
-  // 即座に実行（DOMContentLoadedを待たない）
+  // IIFEでスコープを分離（重複宣言エラーを防ぐ）
   (() => {
+    // 開発環境でのみログを出力する関数（重複宣言を防ぐため、既存チェック）
+    if (typeof window.devLog === "undefined") {
+      window.devLog = (...args) => {
+        if (window.__DEV__) {
+          console.log(...args);
+        }
+      };
+    }
+    if (typeof window.devError === "undefined") {
+      window.devError = (...args) => {
+        // エラーは常に出力（本番環境でも必要）
+        console.error(...args);
+      };
+    }
+    // 重複宣言を避けるため、constで宣言せず、window.devLog/devErrorを直接使用
+    const devLog = typeof window !== "undefined" && window.devLog ? window.devLog : () => {};
+    const devError = typeof window !== "undefined" && window.devError ? window.devError : () => {};
+
+    // 即座に実行（DOMContentLoadedを待たない）
     const initBackgroundToggle = () => {
       const mainBackground = document.getElementById("main-background");
       const backgroundButton = document.getElementById("toggleBackgroundButton");
