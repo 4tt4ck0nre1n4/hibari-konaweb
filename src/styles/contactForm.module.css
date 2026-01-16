@@ -236,6 +236,11 @@
   filter: drop-shadow(0 5px 10px rgb(0 255 255 / 0.6));
 }
 
+.error__message {
+  color: var(--color-red);
+  margin-top: 1rem;
+}
+
 .form__inner p {
   font-size: 1rem;
   color: var(--color-red);

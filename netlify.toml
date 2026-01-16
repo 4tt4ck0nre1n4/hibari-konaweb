@@ -35,6 +35,10 @@
 #   PUBLIC_WPCF7_ID = 123
 #   PUBLIC_WPCF7_UNIT_TAG = wpcf7-f123-p456-o1
 #   PUBLIC_WPCF7_POST_ID = 456
+#
+# オプション（セキュリティ対策 - reCAPTCHA）:
+#   PUBLIC_RECAPTCHA_SITE_KEY = your_recaptcha_site_key_here
+#   注意: これは公開されても問題ないサイトキーです。シークレットキーは設定しないでください
 
 # ============================================
 # キャッシュヘッダーの設定（PageSpeed Insights最適化）

@@ -147,7 +147,7 @@ const swiperText2 = "Thank you for viewing my site.";
 <style>
   .swipersDisplay__wrapper {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
     position: relative;
     margin-block: 4rem;
     margin-inline: auto;
@@ -179,7 +179,7 @@ const swiperText2 = "Thank you for viewing my site.";
     position: relative;
     overflow: hidden;
     border-radius: 0.5rem;
-    box-shadow: 0 8px 16px 0 rgb(0 0 0 / 0.6);
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
     padding-block-start: 4rem;
     padding-block-end: 4rem;
   }
@@ -196,8 +196,7 @@ const swiperText2 = "Thank you for viewing my site.";
     animation: rotation 32s ease-in-out infinite;
     /* パフォーマンス最適化: GPUアクセラレーションを有効化 */
     will-change: transform;
-    /* パフォーマンス最適化: コンポジタレイヤーを分離 */
-    contain: layout style paint;
+    /* contain: layout style paint は画像表示を妨げる可能性があるため削除 */
   }
   @keyframes rotation {
     from {
@@ -225,8 +224,8 @@ const swiperText2 = "Thank you for viewing my site.";
     z-index: 20;
     /* パフォーマンス最適化: GPUアクセラレーションを有効化 */
     transform: rotateY(calc((var(--position) - 1) * (360 / var(--total)) * 1deg)) translateZ(600px) scale(-1, 1);
-    /* パフォーマンス最適化: コンポジタレイヤーを分離 */
-    contain: layout style paint;
+    transform-style: preserve-3d;
+    /* contain: layout style paint は画像表示を妨げる可能性があるため削除 */
     /* パフォーマンス最適化: will-changeはJavaScriptで動的に管理 */
   }
   .swipers-slide::before {
@@ -298,10 +297,11 @@ const swiperText2 = "Thank you for viewing my site.";
     position: absolute;
     top: 0%;
     left: calc(50% - 160px);
-    z-index: -1;
+    z-index: 1;
     overflow: hidden;
     transform-style: preserve-3d;
-    transform: perspective(40px) scale(0.96);
+    /* 親要素の3D変換と競合しないように、transformを削除 */
+    transform: scale(0.96);
     pointer-events: none;
     padding: 0.5rem;
   }

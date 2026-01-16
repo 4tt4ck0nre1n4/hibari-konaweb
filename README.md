@@ -10,7 +10,7 @@
 
 - 📝 **ブログ機能**: WordPress REST APIから取得した記事を表示
 - 🎨 **Works紹介**: 作品一覧と詳細ページ
-- 📧 **お問い合わせフォーム**: Contact Form 7との連携
+- 📧 **お問い合わせフォーム**: Contact Form 7との連携（reCAPTCHA v3、レート制限対応）
 - 🔍 **サイト内検索**: Pagefindによる全文検索機能
 - 📊 **Google Analytics 4**: アクセス解析の統合
 - 🎬 **アニメーション**: GSAP、Rive、Particles.jsを使用したリッチなUI
@@ -148,6 +148,7 @@ hibari-konaweb/
 | 変数名                     | 説明                       |
 | -------------------------- | -------------------------- |
 | `PUBLIC_WPCF7_*`           | Contact Form 7の設定       |
+| `PUBLIC_RECAPTCHA_SITE_KEY` | Google reCAPTCHAのサイトキー（セキュリティ対策） |
 | `PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4の測定ID |
 
 詳細は [`docs/guides/NETLIFY_ENV_SETUP.md`](./docs/guides/NETLIFY_ENV_SETUP.md) を参照してください。
@@ -180,11 +181,24 @@ npx netlify deploy --prod --dir=dist
 
 詳細は [`docs/guides/QUICK_DEPLOY_GUIDE.md`](./docs/guides/QUICK_DEPLOY_GUIDE.md) を参照してください。
 
+## 🔒 セキュリティ対策
+
+お問い合わせフォームには以下のセキュリティ対策を実装しています：
+
+- **SSL化（HTTPS）**: すべての通信を暗号化
+- **reCAPTCHA v3**: ボット対策（ユーザーに気づかれない形で動作）
+- **レート制限**: 短時間での連続送信を防止（1分間に最大3回）
+- **バリデーション**: クライアント側・サーバー側の二重バリデーション
+- **CSRF対策**: Contact Form 7による自動的なCSRF対策
+
+詳細は [`docs/guides/SECURITY_SETUP_GUIDE.md`](./docs/guides/SECURITY_SETUP_GUIDE.md) を参照してください。
+
 ## 📚 ドキュメント
 
 プロジェクトの詳細なドキュメントは [`docs/`](./docs/) ディレクトリにあります。
 
 - 📖 [セットアップ・デプロイガイド](./docs/guides/)
+- 🔒 [セキュリティ対策ガイド](./docs/guides/SECURITY_SETUP_GUIDE.md)
 - ⚡ [最適化ガイド](./docs/optimization/)
 - 🔧 [トラブルシューティング](./docs/troubleshooting/)
 - 🎨 [機能・使用方法ガイド](./docs/features/)

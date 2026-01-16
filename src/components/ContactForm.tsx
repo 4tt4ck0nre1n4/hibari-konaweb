@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import PrivacyConsent from "./PrivacyConsent.tsx";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,24 @@ import { CONTACT_WPCF7_API, wpcf7Id, wpcf7UnitTag, wpcf7PostId } from "../api/he
 
 const requiredMark = "【必須】";
 const THANKS_URL = "/contact/thanks";
+
+// reCAPTCHA設定
+const RECAPTCHA_SITE_KEY = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY as string | undefined;
+const RECAPTCHA_SCRIPT_URL = "https://www.google.com/recaptcha/api.js?render=";
+
+// レート制限設定（1分間に最大3回まで送信可能）
+const RATE_LIMIT_MAX_REQUESTS = 3;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1分
+
+// reCAPTCHAの型定義
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready: (callback: () => void) => void;
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+    };
+  }
+}
 
 type FormValues = {
   name: string;
@@ -37,6 +55,12 @@ export default function ContactForm() {
 
   const [hoveredSubmit, setHoveredSubmit] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+
+  // レート制限用の送信履歴
+  const submissionHistoryRef = useRef<number[]>([]);
+
   const {
     register,
     handleSubmit,
@@ -46,9 +70,107 @@ export default function ContactForm() {
     resolver: zodResolver(validationSchema),
   });
 
+  // reCAPTCHAスクリプトの読み込み
+  useEffect(() => {
+    if (RECAPTCHA_SITE_KEY === undefined || RECAPTCHA_SITE_KEY === null || RECAPTCHA_SITE_KEY.trim() === "") {
+      console.warn("⚠️ [Contact Form] reCAPTCHA site key is not set. reCAPTCHA protection is disabled.");
+      return;
+    }
+
+    // 既にスクリプトが読み込まれているか確認
+    if (window.grecaptcha) {
+      return;
+    }
+
+    // スクリプトが既に追加されているか確認
+    const existingScript = document.querySelector(`script[src^="${RECAPTCHA_SCRIPT_URL}"]`);
+    if (existingScript) {
+      return;
+    }
+
+    // reCAPTCHAスクリプトを動的に読み込む
+    const script = document.createElement("script");
+    script.src = `${RECAPTCHA_SCRIPT_URL}${RECAPTCHA_SITE_KEY}`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+
+    return () => {
+      // クリーンアップ（通常は不要だが、念のため）
+      const scriptToRemove = document.querySelector(`script[src^="${RECAPTCHA_SCRIPT_URL}"]`);
+      if (scriptToRemove) {
+        scriptToRemove.remove();
+      }
+    };
+  }, []);
+
+  // レート制限チェック
+  const checkRateLimit = (): boolean => {
+    const now = Date.now();
+    const recentSubmissions = submissionHistoryRef.current.filter(
+      (timestamp) => now - timestamp < RATE_LIMIT_WINDOW_MS
+    );
+
+    if (recentSubmissions.length >= RATE_LIMIT_MAX_REQUESTS) {
+      const firstSubmission = recentSubmissions[0];
+      if (firstSubmission === undefined) {
+        return false;
+      }
+      const remainingSeconds = Math.ceil((RATE_LIMIT_WINDOW_MS - (now - firstSubmission)) / 1000);
+      setRateLimitError(`送信回数が多すぎます。${remainingSeconds}秒後に再度お試しください。`);
+      return false;
+    }
+
+    setRateLimitError(null);
+    return true;
+  };
+
+  // reCAPTCHAトークンの取得
+  const getRecaptchaToken = async (): Promise<string | null> => {
+    if (RECAPTCHA_SITE_KEY === undefined || RECAPTCHA_SITE_KEY === null || RECAPTCHA_SITE_KEY.trim() === "") {
+      console.warn("⚠️ [Contact Form] reCAPTCHA site key is not set. Skipping reCAPTCHA verification.");
+      return null;
+    }
+
+    const grecaptcha = window.grecaptcha;
+    if (grecaptcha === undefined || grecaptcha === null) {
+      console.warn("⚠️ [Contact Form] reCAPTCHA is not loaded. Skipping reCAPTCHA verification.");
+      return null;
+    }
+
+    try {
+      return new Promise((resolve, reject) => {
+        grecaptcha.ready(() => {
+          grecaptcha
+            .execute(RECAPTCHA_SITE_KEY, { action: "submit" })
+            .then((token) => {
+              resolve(token);
+            })
+            .catch((error) => {
+              console.error("❌ [Contact Form] reCAPTCHA execution failed:", error);
+              reject(error instanceof Error ? error : new Error(String(error)));
+            });
+        });
+      });
+    } catch (error) {
+      console.error("❌ [Contact Form] Failed to get reCAPTCHA token:", error);
+      return null;
+    }
+  };
+
   const onSubmit = handleSubmit(async (data: FormValues, event) => {
     if (!privacyAccepted) {
       alert("プライバシーポリシーに同意してください。");
+      return;
+    }
+
+    // レート制限チェック
+    if (!checkRateLimit()) {
+      return;
+    }
+
+    // 送信中の重複送信を防ぐ
+    if (isSubmitting) {
       return;
     }
 
@@ -56,6 +178,9 @@ export default function ContactForm() {
     if (!target) return;
 
     event?.preventDefault();
+    setIsSubmitting(true);
+    setRateLimitError(null);
+
     const formData = new FormData(target);
     formData.append("your-name", data.name);
     formData.append("your-email", data.email);
@@ -63,6 +188,15 @@ export default function ContactForm() {
     formData.append("_wpcf7_unit_tag", data.wpcf7_unit_tag);
 
     try {
+      // reCAPTCHAトークンの取得と追加
+      const recaptchaToken = await getRecaptchaToken();
+      if (recaptchaToken !== null && recaptchaToken !== undefined && recaptchaToken.trim() !== "") {
+        formData.append("g-recaptcha-response", recaptchaToken);
+        console.log("✅ [Contact Form] reCAPTCHA token obtained");
+      } else {
+        console.warn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
+      }
+
       // デバッグ用: 送信先のエンドポイントをログ出力
       console.log("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
 
@@ -70,6 +204,9 @@ export default function ContactForm() {
         method: "POST",
         body: formData,
       });
+
+      // 送信履歴に記録
+      submissionHistoryRef.current.push(Date.now());
 
       // ステータスコードを確認
       if (!response.ok) {
@@ -142,6 +279,8 @@ export default function ContactForm() {
           "ネットワーク接続を確認し、しばらく時間をおいて再度お試しください。\n" +
           "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
       );
+    } finally {
+      setIsSubmitting(false);
     }
   });
 
@@ -250,11 +389,18 @@ export default function ContactForm() {
           </div>
           <PrivacyConsent isChecked={privacyAccepted} onChange={setPrivacyAccepted} />
 
+          {rateLimitError !== null && rateLimitError !== undefined && rateLimitError.trim() !== "" && (
+            <p role="alert" className={styles.error__message}>
+              {rateLimitError}
+            </p>
+          )}
+
           <input
             className={styles.submit}
             type="submit"
-            value={`${hoveredSubmit ? "送信" : "Submit"}`}
-            aria-label={hoveredSubmit ? "送信" : "Submit"}
+            value={isSubmitting ? (hoveredSubmit ? "送信中..." : "Submitting...") : hoveredSubmit ? "送信" : "Submit"}
+            aria-label={isSubmitting ? (hoveredSubmit ? "送信中" : "Submitting") : hoveredSubmit ? "送信" : "Submit"}
+            disabled={isSubmitting}
             onMouseEnter={() => setHoveredSubmit(true)}
             onMouseLeave={() => setHoveredSubmit(false)}
           />
