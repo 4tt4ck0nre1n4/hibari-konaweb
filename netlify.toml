@@ -21,24 +21,38 @@
   # 圧縮を有効化（デフォルトでtrueですが、明示的に設定）
   # Netlifyは自動的にgzip/brotli圧縮を適用します
 
+# ============================================
 # 環境変数の設定
-# 以下の環境変数をNetlify UIで設定してください：
+# ============================================
+# ⚠️ 重要: 以下のコメント内の値は「例示」です。
+# 実際の環境変数は Netlify UI で設定してください：
 # Site Settings → Environment Variables
 #
-# 必須:
+# このファイル内のコメントはドキュメントとしての役割のみで、
+# 実行時には使用されません。そのまま残しておいて問題ありません。
+#
+# 必須環境変数（Netlify UIで設定）:
 #   PUBLIC_API_URL = https://your-production-wordpress-url.com
+#     （例示: 実際のWordPressサイトのURLに置き換えてください）
 #   PUBLIC_API_PREFIX = /wp-json/wp/v2/
+#     （通常はこの値のままで問題ありません）
 #
-# オプション（Contact Form 7を使用する場合）:
+# オプション環境変数（Contact Form 7を使用する場合）:
 #   PUBLIC_WPCF7_API_PREFIX = contact-form-7/v1/contact-forms/
+#     （通常はこの値のままで問題ありません）
 #   PUBLIC_WPCF7_API_ID = 123
+#     （例示: 実際のContact Form 7のIDに置き換えてください）
 #   PUBLIC_WPCF7_ID = 123
+#     （例示: 実際のContact Form 7のIDに置き換えてください）
 #   PUBLIC_WPCF7_UNIT_TAG = wpcf7-f123-p456-o1
+#     （例示: 実際のユニットタグに置き換えてください）
 #   PUBLIC_WPCF7_POST_ID = 456
+#     （例示: 実際の投稿IDに置き換えてください）
 #
-# オプション（セキュリティ対策 - reCAPTCHA）:
+# オプション環境変数（セキュリティ対策 - reCAPTCHA）:
 #   PUBLIC_RECAPTCHA_SITE_KEY = your_recaptcha_site_key_here
-#   注意: これは公開されても問題ないサイトキーです。シークレットキーは設定しないでください
+#     （例示: Google reCAPTCHA管理画面で取得したサイトキーに置き換えてください）
+#     ⚠️ 注意: これは公開されても問題ないサイトキーです。シークレットキーは設定しないでください
 
 # ============================================
 # キャッシュヘッダーの設定（PageSpeed Insights最適化）
@@ -208,3 +222,15 @@
   for = "/sitemap.xml"
   [headers.values]
     Cache-Control = "public, max-age=86400, must-revalidate"
+
+# ============================================
+# Content-Security-Policy（CSP）設定
+# ============================================
+# 注意: HTTPヘッダーとmetaタグの両方で設定した場合、
+# HTTPヘッダーが優先されます（metaタグはフォールバックとして機能）
+# 本番環境のCSP（Google AnalyticsとreCAPTCHA対応）
+# 開発環境ではmetaタグのCSPが使用されます（localhost対応のため）
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://hibari-konaweb.netlify.app https://hibari-konaweb.com https://www.googletagmanager.com https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: http://hibari-konaweb.local https://cdn.jsdelivr.net https://hibari-konaweb.com https://hibari-konaweb.netlify.app https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' blob: data: https://unpkg.com https://cdn.jsdelivr.net https://api.iconify.design https://hibari-konaweb.com https://hibari-konaweb.netlify.app https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.google.com; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none';"

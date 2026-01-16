@@ -13,6 +13,33 @@ const THANKS_URL = "/contact/thanks";
 const RECAPTCHA_SITE_KEY = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY as string | undefined;
 const RECAPTCHA_SCRIPT_URL = "https://www.google.com/recaptcha/api.js?render=";
 
+// 開発環境判定
+const isDev =
+  typeof window !== "undefined" &&
+  ((window as Window & { __DEV__?: boolean }).__DEV__ === true ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.endsWith(".local"));
+
+// 開発環境でのみコンソール出力
+const devLog = (...args: unknown[]): void => {
+  if (isDev) {
+    console.log(...args);
+  }
+};
+
+const devWarn = (...args: unknown[]): void => {
+  if (isDev) {
+    console.warn(...args);
+  }
+};
+
+const devError = (...args: unknown[]): void => {
+  if (isDev) {
+    console.error(...args);
+  }
+};
+
 // レート制限設定（1分間に最大3回まで送信可能）
 const RATE_LIMIT_MAX_REQUESTS = 3;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1分
@@ -73,7 +100,7 @@ export default function ContactForm() {
   // reCAPTCHAスクリプトの読み込み
   useEffect(() => {
     if (RECAPTCHA_SITE_KEY === undefined || RECAPTCHA_SITE_KEY === null || RECAPTCHA_SITE_KEY.trim() === "") {
-      console.warn("⚠️ [Contact Form] reCAPTCHA site key is not set. reCAPTCHA protection is disabled.");
+      devWarn("⚠️ [Contact Form] reCAPTCHA site key is not set. reCAPTCHA protection is disabled.");
       return;
     }
 
@@ -128,13 +155,13 @@ export default function ContactForm() {
   // reCAPTCHAトークンの取得
   const getRecaptchaToken = async (): Promise<string | null> => {
     if (RECAPTCHA_SITE_KEY === undefined || RECAPTCHA_SITE_KEY === null || RECAPTCHA_SITE_KEY.trim() === "") {
-      console.warn("⚠️ [Contact Form] reCAPTCHA site key is not set. Skipping reCAPTCHA verification.");
+      devWarn("⚠️ [Contact Form] reCAPTCHA site key is not set. Skipping reCAPTCHA verification.");
       return null;
     }
 
     const grecaptcha = window.grecaptcha;
     if (grecaptcha === undefined || grecaptcha === null) {
-      console.warn("⚠️ [Contact Form] reCAPTCHA is not loaded. Skipping reCAPTCHA verification.");
+      devWarn("⚠️ [Contact Form] reCAPTCHA is not loaded. Skipping reCAPTCHA verification.");
       return null;
     }
 
@@ -147,13 +174,13 @@ export default function ContactForm() {
               resolve(token);
             })
             .catch((error) => {
-              console.error("❌ [Contact Form] reCAPTCHA execution failed:", error);
+              devError("❌ [Contact Form] reCAPTCHA execution failed:", error);
               reject(error instanceof Error ? error : new Error(String(error)));
             });
         });
       });
     } catch (error) {
-      console.error("❌ [Contact Form] Failed to get reCAPTCHA token:", error);
+      devError("❌ [Contact Form] Failed to get reCAPTCHA token:", error);
       return null;
     }
   };
@@ -192,13 +219,13 @@ export default function ContactForm() {
       const recaptchaToken = await getRecaptchaToken();
       if (recaptchaToken !== null && recaptchaToken !== undefined && recaptchaToken.trim() !== "") {
         formData.append("g-recaptcha-response", recaptchaToken);
-        console.log("✅ [Contact Form] reCAPTCHA token obtained");
+        devLog("✅ [Contact Form] reCAPTCHA token obtained");
       } else {
-        console.warn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
+        devWarn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
       }
 
-      // デバッグ用: 送信先のエンドポイントをログ出力
-      console.log("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
+      // デバッグ用: 送信先のエンドポイントをログ出力（開発環境のみ）
+      devLog("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
 
       const response = await fetch(CONTACT_WPCF7_API, {
         method: "POST",
@@ -211,7 +238,7 @@ export default function ContactForm() {
       // ステータスコードを確認
       if (!response.ok) {
         const responseText = await response.text();
-        console.error("❌ [Contact Form] HTTP Error Response:", {
+        devError("❌ [Contact Form] HTTP Error Response:", {
           status: response.status,
           statusText: response.statusText,
           url: CONTACT_WPCF7_API,
@@ -237,17 +264,17 @@ export default function ContactForm() {
           throw new Error("Invalid response format");
         }
       } catch (parseError) {
-        console.error("Failed to parse response:", responseText);
+        devError("Failed to parse response:", responseText);
         throw new Error("サーバーからの応答が正しくありません。");
       }
 
-      // レスポンスをコンソールに出力（デバッグ用）
-      console.log("Contact Form 7 Response:", responseData);
+      // レスポンスをコンソールに出力（デバッグ用、開発環境のみ）
+      devLog("Contact Form 7 Response:", responseData);
 
       // Contact Form 7のレスポンスステータスを確認
       if (responseData.status === "mail_sent") {
         // メール送信成功時のみリダイレクト
-        console.log("Mail sent successfully. Redirecting to thanks page...");
+        devLog("Mail sent successfully. Redirecting to thanks page...");
         window.location.replace(THANKS_URL);
       } else if (responseData.status === "validation_failed") {
         // バリデーションエラー
@@ -259,21 +286,21 @@ export default function ContactForm() {
         alert(errorMessages);
       } else if (responseData.status === "mail_failed") {
         // メール送信失敗
-        console.error("Mail sending failed:", responseData);
+        devError("Mail sending failed:", responseData);
         alert(
           "メール送信に失敗しました。しばらく時間をおいて再度お試しください。\n" +
             "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
         );
       } else {
         // その他のエラー
-        console.error("Unexpected response status:", responseData);
+        devError("Unexpected response status:", responseData);
         alert(
           "送信処理中にエラーが発生しました。\n" +
             "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
         );
       }
     } catch (error) {
-      console.error("Error:", error);
+      devError("Error:", error);
       alert(
         "送信処理中にエラーが発生しました。\n" +
           "ネットワーク接続を確認し、しばらく時間をおいて再度お試しください。\n" +
