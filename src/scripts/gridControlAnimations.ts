@@ -80,6 +80,12 @@ function initializeApp(): void {
   const tweens: any[] = [];
 
   function createTween(gsapInstance: typeof gsap, selector: string, props: Record<string, unknown>): void {
+    // 要素が存在するかチェック（GSAPの警告を防ぐため）
+    const element = document.querySelector(selector);
+    if (!element) {
+      // 要素が存在しない場合は静かに終了（警告を出力しない）
+      return;
+    }
     const tween = gsapInstance.to(selector, {
       ...props,
       paused: true,

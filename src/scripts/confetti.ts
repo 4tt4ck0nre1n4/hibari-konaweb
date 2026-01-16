@@ -237,12 +237,9 @@ function initConfetti() {
       }
     });
   } else {
-    if (!canvasElement) {
-      devError("Full-screen canvas element (#canvas) not found!");
-    }
-    if (!textCanvasElement) {
-      devError("Text canvas element (#confetti-text-canvas) not found!");
-    }
+    // 要素が存在しない場合は静かに終了（エラーを出力しない）
+    // これらの要素は特定のページにのみ存在するため、エラーとして扱わない
+    return;
   }
 }
 

@@ -587,8 +587,8 @@ const menuItems: MenuItem[] = [
     const menuItems = document.querySelectorAll(".navi-card__menu_item") as NodeListOf<HTMLLIElement>;
     const glitchContainer = document.querySelector(".glitch-container") as HTMLElement;
 
+    // 要素が存在しない場合は静かに終了（エラーを出力しない）
     if (!button || !menu || !menuItems.length) {
-      console.error("NaviCard: Required elements not found!");
       return;
     }
 

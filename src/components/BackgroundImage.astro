@@ -60,12 +60,8 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
       const backgroundButton = document.getElementById("toggleBackgroundButton");
       const ariaLiveStatus = document.getElementById("ariaLiveStatus__background");
 
+      // 要素が存在しない場合は静かに終了（エラーを出力しない）
       if (!mainBackground || !backgroundButton || !ariaLiveStatus) {
-        devError("BackgroundImage: 必要な要素が見つかりません", {
-          mainBackground: !!mainBackground,
-          backgroundButton: !!backgroundButton,
-          ariaLiveStatus: !!ariaLiveStatus,
-        });
         return;
       }
 
@@ -73,11 +69,8 @@ const onBackgroundIcon = "fluent-emoji:mobile-phone";
       const offIcon = backgroundButton.querySelector(".offBackgroundIcon");
       const onIcon = backgroundButton.querySelector(".onBackgroundIcon");
 
+      // アイコンが存在しない場合は静かに終了（エラーを出力しない）
       if (!offIcon || !onIcon) {
-        devError("BackgroundImage: アイコンが見つかりません", {
-          offIcon: !!offIcon,
-          onIcon: !!onIcon,
-        });
         return;
       }
 

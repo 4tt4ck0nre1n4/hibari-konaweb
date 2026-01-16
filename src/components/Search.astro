@@ -179,13 +179,19 @@
   };
 
   function initSearch() {
+    // #search要素が存在するかチェック
+    const searchElement = document.querySelector("#search");
+    if (!searchElement) {
+      // 要素が存在しない場合は静かに終了（エラーを出力しない）
+      return;
+    }
+
     // CSSの読み込みを確実にする（View Transitions後も）
     loadPagefindCSS();
 
     // 既存のインスタンスを破棄
     if (pagefindUIInstance) {
       // PagefindUIにはdestroyメソッドがないため、要素をクリア
-      const searchElement = document.querySelector("#search");
       if (searchElement) {
         searchElement.innerHTML = "";
       }
@@ -207,11 +213,17 @@
     // 検索コンテナの基本スタイルを先に適用（PagefindUI初期化前）
     ensureContainerStyle();
 
-    // 新しいPagefindUIインスタンスを作成
-    pagefindUIInstance = new PagefindUI({
-      element: "#search",
-      showImages: true,
-    });
+    // 新しいPagefindUIインスタンスを作成（エラーハンドリング付き）
+    try {
+      pagefindUIInstance = new PagefindUI({
+        element: "#search",
+        showImages: true,
+      });
+    } catch (error) {
+      // PagefindUIの初期化に失敗した場合は静かに終了（エラーを出力しない）
+      // 要素が存在しない、またはPagefindUIが利用できない場合など
+      return;
+    }
 
     // 検索コンテナのスタイルを確実に適用（初期化直後）
     ensureContainerStyle();
