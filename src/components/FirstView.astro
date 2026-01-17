@@ -14,12 +14,15 @@ const { fvBackgroundImageSrc, fvAnimeImageSrc } = Astro.props;
 <div class="fv">
   <div class="fv__wrapper">
     <!-- LCP最適化: 背景画像を<img>タグとして使用し、fetchpriority="high"を設定 -->
+    <!-- width/height属性を追加してレンダリングの遅延を削減（CLS対策も兼ねる） -->
     <img
       src={fvBackgroundImageSrc}
       alt=""
       class="fv__background-image"
+      width="1920"
+      height="1080"
       fetchpriority="high"
-      decoding="async"
+      decoding="sync"
       loading="eager"
     />
     <div class="background-container">

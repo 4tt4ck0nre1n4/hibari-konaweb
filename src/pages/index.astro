@@ -18,10 +18,12 @@ import fvAnimeImageSrc from "../assets/fvAnimeImage.webp";
 
 const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 // LCP最適化: FirstViewの背景画像を最優先でプリロード
+// qualityを75に下げてファイルサイズを削減（リソース読み込み時間の短縮）
 const fvBackgroundImage = await getImage({
   src: fvBackgroundImageSrc,
   width: 1920,
-  quality: 85,
+  height: 1080,
+  quality: 75,
   format: "webp",
 });
 const fvAnimeImage = await getImage({

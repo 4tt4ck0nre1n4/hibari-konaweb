@@ -30,7 +30,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
             {cardBody}
           </p>
           <div class="card__item_image">
-            <RiveComponent src={src} stateMachines={stateMachines} minWidth={300} minHeight={200} client:load />
+            <RiveComponent src={src} stateMachines={stateMachines} minWidth={300} minHeight={200} client:visible />
           </div>
           <button class="card__flip_arrow" type="button" aria-label="詳細を見る" title="詳細を見る">
             <svg
