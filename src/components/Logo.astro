@@ -42,19 +42,39 @@ const gradientTitle = "My Portfolio";
   const LOADING_DURATION = 3000; // 3秒間のローディング表示
 
   // 初回読み込みかどうかを判定（Astroのトランジション時はスキップ）
+  // シークレットモードやLighthouse実行環境でも動作するように、sessionStorageアクセスを安全に処理
   function isInitialLoad(): boolean {
-    // sessionStorageを使用して初回読み込みを判定
-    const hasVisited = sessionStorage.getItem("hasVisited");
+    try {
+      // sessionStorageが使用可能かどうかを確認
+      if (typeof sessionStorage === "undefined" || sessionStorage === null) {
+        // sessionStorageが使用できない場合は、初回読み込みとして扱う（ローディングを表示）
+        return true;
+      }
 
-    // 初回読み込みの場合のみローディングを表示
-    // トップページに戻った場合でも、既に訪問済みの場合はローディングをスキップ
-    if (!hasVisited) {
-      sessionStorage.setItem("hasVisited", "true");
+      // sessionStorageを使用して初回読み込みを判定
+      const hasVisited = sessionStorage.getItem("hasVisited");
+
+      // 初回読み込みの場合のみローディングを表示
+      // トップページに戻った場合でも、既に訪問済みの場合はローディングをスキップ
+      if (!hasVisited) {
+        try {
+          sessionStorage.setItem("hasVisited", "true");
+        } catch (e) {
+          // sessionStorageへの書き込みが失敗した場合（例：シークレットモードの制限）
+          // 初回読み込みとして扱う
+          console.warn("Failed to write to sessionStorage:", e);
+        }
+        return true;
+      }
+
+      // 既に訪問済みの場合はローディングをスキップ（フリーズを防ぐため）
+      return false;
+    } catch (error) {
+      // sessionStorageへのアクセスが失敗した場合（例：シークレットモードの制限、Lighthouse実行環境）
+      // 初回読み込みとして扱う（ローディングを表示）
+      console.warn("Failed to access sessionStorage, treating as initial load:", error);
       return true;
     }
-
-    // 既に訪問済みの場合はローディングをスキップ（フリーズを防ぐため）
-    return false;
   }
 
   // ローディングスクリーンを即座に非表示にする（ページ遷移時用）

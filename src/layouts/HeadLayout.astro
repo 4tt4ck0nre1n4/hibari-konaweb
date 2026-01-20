@@ -917,9 +917,31 @@ const cspContent = isDev
     <script is:inline>
       // 初回読み込みかどうかを判定（AstroのView Transitions時はスキップ）
       // View Transitions使用時は、ページ遷移時に自動的に処理されるため、初回のみ実行
-      const isInitialLoad = !sessionStorage.getItem("hasVisitedHead");
+      // シークレットモードやLighthouse実行環境でも動作するように、sessionStorageアクセスを安全に処理
+      let isInitialLoad = true;
+      try {
+        // sessionStorageが使用可能かどうかを確認
+        if (typeof sessionStorage !== "undefined" && sessionStorage !== null) {
+          const hasVisitedHead = sessionStorage.getItem("hasVisitedHead");
+          isInitialLoad = !hasVisitedHead;
+          if (isInitialLoad) {
+            try {
+              sessionStorage.setItem("hasVisitedHead", "true");
+            } catch (e) {
+              // sessionStorageへの書き込みが失敗した場合（例：シークレットモードの制限）
+              // 初回読み込みとして扱う
+              console.warn("Failed to write to sessionStorage:", e);
+            }
+          }
+        }
+      } catch (error) {
+        // sessionStorageへのアクセスが失敗した場合（例：シークレットモードの制限、Lighthouse実行環境）
+        // 初回読み込みとして扱う
+        console.warn("Failed to access sessionStorage, treating as initial load:", error);
+        isInitialLoad = true;
+      }
+
       if (isInitialLoad) {
-        sessionStorage.setItem("hasVisitedHead", "true");
         // bodyが読み込まれる前に実行されるため、html要素を非表示にする
         document.documentElement.style.visibility = "hidden";
 
