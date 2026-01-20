@@ -135,11 +135,13 @@ const gradientTitle = "My Portfolio";
       return;
     }
 
+    // フェーズ1: すべてのDOM読み取りを一度に実行
     const loadingScreen = document.getElementById("loading-screen") as HTMLElement;
     // AstroのImageコンポーネントはimg要素を生成するので、imgタグを直接検索
     const logoImage = document.querySelector("#loading-screen img") as HTMLElement;
     const title = document.querySelector("#loading-screen .title") as HTMLElement;
     const spinner = document.querySelector("#loading-screen .spinner") as HTMLElement;
+    const docElement = document.documentElement;
 
     if (!loadingScreen || !logoImage || !title || !spinner) {
       console.warn("Loading animation elements not found", {
@@ -159,13 +161,9 @@ const gradientTitle = "My Portfolio";
     // 単一のrequestAnimationFrameで統合（ネストを削減）
     // バッチ処理でスタイル変更をまとめて実行し、強制リフローを最小化
     requestAnimationFrame(() => {
+      // フェーズ2: すべてのGSAP書き込みを一度に実行（リフローを最小化）
       // ページ読み込み中はスクロールを無効化（CLSを防ぐためbodyではなくhtmlに設定）
       // 強制リフローを避けるため、GSAPを使用
-      const docElement = document.documentElement;
-
-      // バッチ処理で初期状態を一度に設定（強制リフローを最小化）
-      // GSAPの設定を最適化：force3Dを使用してGPUアクセラレーションを有効化
-      // autoAlphaを使用してopacityとvisibilityを同時に制御（レイアウトをトリガーしない）
       gsap.set(docElement, {
         overflow: "hidden",
         immediateRender: true,

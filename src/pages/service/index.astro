@@ -150,6 +150,10 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   import "swiper/css/bundle";
 
   const initSwiper2 = () => {
+    // フェーズ1: DOM読み取りを実行（可能な限り事前に読み取る）
+    const swiperElement = document.querySelector("#swiper2");
+    if (!swiperElement) return;
+
     new Swiper("#swiper2", {
       direction: "horizontal",
       modules: [Navigation, Autoplay],
@@ -166,15 +170,25 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
       },
       on: {
         slideChangeTransitionStart: function () {
-          document.querySelectorAll(".swiper-slide img").forEach((img) => {
-            img.classList.remove("active");
+          // フェーズ1: すべてのDOM読み取りを一度に実行
+          const allImages = document.querySelectorAll(".swiper-slide img");
+
+          // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+          requestAnimationFrame(() => {
+            allImages.forEach((img) => {
+              img.classList.remove("active");
+            });
           });
         },
         slideChangeTransitionEnd: function () {
+          // フェーズ1: DOM読み取りを実行
           const activeSlide = document.querySelector(".swiper-slide-active img");
 
+          // フェーズ2: 書き込みを実行（リフローを最小化）
           if (activeSlide) {
-            activeSlide.classList.add("active");
+            requestAnimationFrame(() => {
+              activeSlide.classList.add("active");
+            });
           }
         },
       },

@@ -471,11 +471,13 @@ const mouseItem = {
   let lastMouseMoveSecond: number | null = null;
 
   const triggerMouseMove = () => {
+    // フェーズ1: DOM読み取りを実行
     const mouse = document.getElementById("js-mouse");
     if (!mouse) {
       return;
     }
 
+    // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
     // 強制リフローを避けるため、requestAnimationFrameを2回使用
     requestAnimationFrame(() => {
       mouse.classList.remove("js-mouseMove");
@@ -491,6 +493,11 @@ const mouseItem = {
   };
 
   function initSwiperMenu() {
+    // フェーズ1: すべてのDOM読み取りを一度に実行
+    const swiperElement = document.querySelector("#swiper1");
+    const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
+    const mouseButton = document.getElementById("js-mouseButton");
+
     // 既存のSwiperインスタンスを破棄
     if (swiperInstance) {
       swiperInstance.destroy(true, true);
@@ -504,7 +511,6 @@ const mouseItem = {
     }
 
     // Swiperを初期化
-    const swiperElement = document.querySelector("#swiper1");
     if (swiperElement && typeof window !== "undefined") {
       swiperInstance = new Swiper("#swiper1", {
         direction: "vertical",
@@ -522,15 +528,25 @@ const mouseItem = {
         },
         on: {
           slideChangeTransitionStart: function () {
-            document.querySelectorAll(".swiper-slide img").forEach((img) => {
-              img.classList.remove("active");
+            // フェーズ1: すべてのDOM読み取りを一度に実行
+            const allImages = document.querySelectorAll(".swiper-slide img");
+
+            // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+            requestAnimationFrame(() => {
+              allImages.forEach((img) => {
+                img.classList.remove("active");
+              });
             });
           },
           slideChangeTransitionEnd: function () {
+            // フェーズ1: DOM読み取りを実行
             const activeSlide = document.querySelector(".swiper-slide-active img");
 
+            // フェーズ2: 書き込みを実行（リフローを最小化）
             if (activeSlide) {
-              activeSlide.classList.add("active");
+              requestAnimationFrame(() => {
+                activeSlide.classList.add("active");
+              });
             }
           },
         },
@@ -548,24 +564,27 @@ const mouseItem = {
       }
     }, 1000);
 
-    // マウス画像の読み込み処理
+    // マウス画像の読み込み処理（既に読み取り済みのmouseImageを使用）
     const handleMouseImageLoad = () => {
-      const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
       if (mouseImage) {
-        mouseImage.style.display = "block";
-        mouseImage.style.visibility = "visible";
+        // フェーズ2: 書き込みを実行（リフローを最小化）
+        requestAnimationFrame(() => {
+          mouseImage.style.display = "block";
+          mouseImage.style.visibility = "visible";
+        });
       }
     };
 
     const handleMouseImageError = () => {
-      const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
       if (mouseImage) {
-        mouseImage.style.display = "none";
+        // フェーズ2: 書き込みを実行（リフローを最小化）
+        requestAnimationFrame(() => {
+          mouseImage.style.display = "none";
+        });
       }
     };
 
-    // マウス画像のイベントリスナーを追加
-    const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
+    // マウス画像のイベントリスナーを追加（既に読み取り済みのmouseImageを使用）
     if (mouseImage) {
       // 既存のリスナーを削除してから追加
       mouseImage.removeEventListener("load", handleMouseImageLoad);
@@ -574,8 +593,7 @@ const mouseItem = {
       mouseImage.addEventListener("error", handleMouseImageError);
     }
 
-    // マウスボタンのクリック音処理
-    const mouseButton = document.getElementById("js-mouseButton");
+    // マウスボタンのクリック音処理（既に読み取り済みのmouseButtonを使用）
     if (mouseButton) {
       // 既存のリスナーを削除するために、ボタンをクローン
       const newMouseButton = mouseButton.cloneNode(true);

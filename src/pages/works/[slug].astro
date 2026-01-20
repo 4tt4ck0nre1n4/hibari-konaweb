@@ -1222,8 +1222,35 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     gsap: typeof import("gsap").gsap,
     ScrollTrigger: typeof import("gsap/ScrollTrigger").ScrollTrigger
   ) {
+    // フェーズ1: すべてのDOM読み取りを一度に実行
     const containers = document.querySelectorAll(".split__container");
     const isMobile = window.innerWidth <= 768;
+
+    // すべてのコンテナの要素を一度に読み取る
+    const containerData = Array.from(containers).map((container) => {
+      const left = container.querySelector(".left");
+      const right = container.querySelector(".right");
+      const rightHeader = right?.querySelector(".right__header") || null;
+      const rightText = right?.querySelector(".right__text") || null;
+      const spImage = right?.querySelector(".right__spImage") || null;
+      const rightLink = right?.querySelector(".right__link") || null;
+      const iconMenuItems = right?.querySelectorAll(".right__iconMenu_item") || null;
+      const leftInner = left?.querySelector(".left__inner") || null;
+      const leftImage = left?.querySelector(".left__image") || null;
+
+      return {
+        container,
+        left,
+        right,
+        rightHeader,
+        rightText,
+        spImage,
+        rightLink,
+        iconMenuItems,
+        leftInner,
+        leftImage,
+      };
+    });
 
     // ネストされた関数からもアクセスできるようにクロージャとして保持
     function fadeInElement(element: Element | null) {
@@ -1269,43 +1296,46 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       });
     }
 
-    containers.forEach((container) => {
-      const splitElement = {
-        containers: container,
-        left: container.querySelector(".left"),
-        right: container.querySelector(".right"),
-        rightHeader: container.querySelector(".right__header"),
-        rightText: container.querySelector(".right__text"),
-        spImage: container.querySelector(".right__spImage"),
-        rightLink: container.querySelector(".right__link"),
-        iconMenuItems: container.querySelectorAll(".right__iconMenu_item"),
-      };
+    // フェーズ2: すべてのGSAP書き込みを一度に実行（リフローを最小化）
+    const gsapWrites: Array<() => void> = [];
 
+    containerData.forEach((splitElement) => {
       // 既存のホバークラスをクリア（ページ遷移時の状態をリセット）
-      container.classList.remove("hover-left", "hover-right");
+      splitElement.container.classList.remove("hover-left", "hover-right");
 
       // 要素の初期状態をリセット（ページ遷移時の状態をクリア）
-      if (splitElement.left) {
-        const leftInner = splitElement.left.querySelector(".left__inner");
-        const leftImage = splitElement.left.querySelector(".left__image");
-        if (leftInner) {
-          gsap.set(leftInner, { opacity: 0 });
-        }
-        if (leftImage) {
-          gsap.set(leftImage, { opacity: 1 });
-        }
+      if (splitElement.leftInner) {
+        gsapWrites.push(() => {
+          gsap.set(splitElement.leftInner, { opacity: 0 });
+        });
       }
-      if (splitElement.right) {
-        if (splitElement.spImage) {
+      if (splitElement.leftImage) {
+        gsapWrites.push(() => {
+          gsap.set(splitElement.leftImage, { opacity: 1 });
+        });
+      }
+      if (splitElement.spImage) {
+        gsapWrites.push(() => {
           gsap.set(splitElement.spImage, { opacity: 0 });
-        }
-        if (splitElement.rightText) {
-          gsap.set(splitElement.rightText, { opacity: 0 });
-        }
-        if (splitElement.rightLink) {
-          gsap.set(splitElement.rightLink, { opacity: 0 });
-        }
+        });
       }
+      if (splitElement.rightText) {
+        gsapWrites.push(() => {
+          gsap.set(splitElement.rightText, { opacity: 0 });
+        });
+      }
+      if (splitElement.rightLink) {
+        gsapWrites.push(() => {
+          gsap.set(splitElement.rightLink, { opacity: 0 });
+        });
+      }
+    });
+
+    // すべての書き込みを一度に実行
+    gsapWrites.forEach((write) => write());
+
+    // フェーズ3: 各コンテナの処理を実行
+    containerData.forEach((splitElement) => {
 
       // スマホサイズの場合、パララックス効果とスクロールアニメーション
       if (isMobile) {
@@ -1328,9 +1358,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
         if (splitElement.left) {
           gsap.set(splitElement.left, { opacity: 1, y: 0 });
 
-          const leftInner = splitElement.left.querySelector(".left__inner");
-          if (leftInner) {
-            gsap.set(leftInner, { opacity: 1, y: 0 });
+          // 既に読み取り済みのleftInnerを使用（再読み取りを避ける）
+          if (splitElement.leftInner) {
+            gsap.set(splitElement.leftInner, { opacity: 1, y: 0 });
           }
 
           ScrollTrigger.create({
@@ -1340,8 +1370,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
             scrub: true,
             onUpdate: (self) => {
               const progress = self.progress;
-              if (leftInner) {
-                gsap.set(leftInner, {
+              // 既に読み取り済みのleftInnerを使用
+              if (splitElement.leftInner) {
+                gsap.set(splitElement.leftInner, {
                   opacity: progress,
                   y: 30 * (1 - progress),
                   force3D: true,
@@ -1350,15 +1381,15 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
             },
           });
 
-          const leftImage = splitElement.left.querySelector(".left__image");
-          if (leftImage) {
+          // 既に読み取り済みのleftImageを使用（再読み取りを避ける）
+          if (splitElement.leftImage) {
             ScrollTrigger.create({
               trigger: splitElement.left,
               start: "top bottom",
               end: "bottom top",
               scrub: true,
               onUpdate: (self) => {
-                gsap.set(leftImage, {
+                gsap.set(splitElement.leftImage, {
                   y: -20 * self.progress,
                   force3D: true,
                 });
@@ -1369,13 +1400,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
       } else {
         // デスクトップサイズの場合、ホバーアニメーションを有効化
         if (splitElement.left) {
-          const leftImage = splitElement.left.querySelector(".left__image");
+          // 既に読み取り済みのleftImageとleftInnerを使用（再読み取りを避ける）
 
           splitElement.left.addEventListener("mouseenter", () => {
-            container.classList.add("hover-left");
+            splitElement.container.classList.add("hover-left");
             // 画像をフェードアウト（もう少し表示させてから）
-            if (leftImage) {
-              gsap.to(leftImage, {
+            if (splitElement.leftImage) {
+              gsap.to(splitElement.leftImage, {
                 opacity: 0,
                 duration: 0.6,
                 ease: "power1.out",
@@ -1383,26 +1414,28 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
               });
             }
             // テキスト部分をフェードイン（画像が消えてから）
-            setTimeout(() => fadeInElement(splitElement.left?.querySelector(".left__inner")), 2200);
+            // 既に読み取り済みのleftInnerを使用
+            setTimeout(() => fadeInElement(splitElement.leftInner), 2200);
           });
 
           splitElement.left.addEventListener("mouseleave", () => {
-            container.classList.remove("hover-left");
+            splitElement.container.classList.remove("hover-left");
             // 画像をフェードイン
-            if (leftImage) {
-              gsap.to(leftImage, {
+            if (splitElement.leftImage) {
+              gsap.to(splitElement.leftImage, {
                 opacity: 1,
                 duration: 0.4,
                 ease: "power1.out",
               });
             }
-            fadeOutElement(splitElement.left?.querySelector(".left__inner"));
+            // 既に読み取り済みのleftInnerを使用
+            fadeOutElement(splitElement.leftInner);
           });
         }
 
         if (splitElement.right) {
           splitElement.right.addEventListener("mouseenter", () => {
-            container.classList.add("hover-right");
+            splitElement.container.classList.add("hover-right");
 
             if (splitElement.spImage) setTimeout(() => fadeInElement(splitElement.spImage), 800);
             if (splitElement.rightHeader) addStyledText(splitElement.rightHeader, 200);
@@ -1416,7 +1449,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
           });
 
           splitElement.right.addEventListener("mouseleave", () => {
-            container.classList.remove("hover-right");
+            splitElement.container.classList.remove("hover-right");
 
             if (splitElement.spImage) fadeOutElement(splitElement.spImage);
             if (splitElement.rightText) fadeOutElement(splitElement.rightText);

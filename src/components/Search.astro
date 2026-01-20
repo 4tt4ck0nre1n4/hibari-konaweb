@@ -84,6 +84,15 @@
       height: 100%;
     }
   }
+
+  /* JavaScriptで制御する最小限のスタイル調整用クラス */
+  #search.pagefind-ready .pagefind-ui {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 </style>
 
 <script>
@@ -122,59 +131,181 @@
     return window.innerWidth <= 480 && window.devicePixelRatio >= 2;
   };
 
-  // 検索コンテナの基本スタイルを確実に適用
-  const ensureContainerStyle = () => {
-    const searchContainer = document.querySelector("#search") as HTMLElement;
-    if (searchContainer) {
-      const isSmallScreen = window.innerWidth <= 480;
-      const isIPhoneDevice = isIPhone();
+  // スタイル更新用のインターフェース
+  interface StyleUpdates {
+    searchContainer?: {
+      minHeight?: string;
+      padding?: string;
+      addReadyClass?: boolean;
+    };
+    pagefindUI?: {
+      width?: string;
+      display?: string;
+      flexDirection?: string;
+      alignItems?: string;
+      justifyContent?: string;
+    };
+    searchInput?: {
+      border?: string;
+      borderColor?: string;
+      removeBorder?: boolean;
+    };
+  }
 
-      // 検索コンテナの基本スタイルを常に維持（CSSで定義されているスタイルも明示的に設定）
-      searchContainer.style.width = "100%";
-      searchContainer.style.height = "auto";
-      searchContainer.style.minHeight = isIPhoneDevice ? "14vh" : isSmallScreen ? "12vh" : "14vh";
-      searchContainer.style.background = "#f1f5f9";
-      searchContainer.style.borderRadius = "1rem";
-      searchContainer.style.border = "1px solid #808080";
-      searchContainer.style.transitionDuration = "300ms";
-      searchContainer.style.display = "flex";
-      searchContainer.style.flexDirection = "column";
-      searchContainer.style.alignItems = "center";
-      searchContainer.style.justifyContent = "center";
-      searchContainer.style.padding = isSmallScreen ? "0.25rem" : "0.5rem";
-      searchContainer.style.boxSizing = "border-box";
-      searchContainer.style.position = "relative";
+  // すべてのDOM要素を一度に読み取る（読み取りフェーズ）
+  const readDOMState = (): {
+    searchContainer: HTMLElement | null;
+    pagefindUI: HTMLElement | null;
+    searchInput: HTMLInputElement | null;
+    windowWidth: number;
+    isSmallScreen: boolean;
+    isIPhoneDevice: boolean;
+  } => {
+    const windowWidth = window.innerWidth;
+    const isSmallScreen = windowWidth <= 480;
+    const isIPhoneDevice = isIPhone();
+
+    return {
+      searchContainer: document.querySelector("#search") as HTMLElement | null,
+      pagefindUI: document.querySelector("#search .pagefind-ui") as HTMLElement | null,
+      searchInput: document.querySelector("#search .pagefind-ui__search-input") as HTMLInputElement | null,
+      windowWidth,
+      isSmallScreen,
+      isIPhoneDevice,
+    };
+  };
+
+  // 必要なスタイル更新を計算（読み取りフェーズ）
+  const calculateStyleUpdates = (state: ReturnType<typeof readDOMState>): StyleUpdates => {
+    const updates: StyleUpdates = {};
+
+    if (state.searchContainer) {
+      // 基本スタイルはCSSで定義されているため、最小限の調整のみ
+      const expectedMinHeight = state.isIPhoneDevice ? "14vh" : state.isSmallScreen ? "12vh" : "14vh";
+      const expectedPadding = state.isSmallScreen ? "0.25rem" : "0.5rem";
+      const currentMinHeight = state.searchContainer.style.minHeight;
+      const currentPadding = state.searchContainer.style.padding;
+      const hasReadyClass = state.searchContainer.classList.contains("pagefind-ready");
+
+      // クラスベースの制御を優先
+      if (!hasReadyClass && state.pagefindUI) {
+        updates.searchContainer = {
+          addReadyClass: true,
+        };
+      }
+
+      // レスポンシブな調整が必要な場合のみ更新
+      if (currentMinHeight !== expectedMinHeight || currentPadding !== expectedPadding) {
+        updates.searchContainer = {
+          ...updates.searchContainer,
+          minHeight: currentMinHeight !== expectedMinHeight ? expectedMinHeight : undefined,
+          padding: currentPadding !== expectedPadding ? expectedPadding : undefined,
+        };
+      }
     }
 
-    // PagefindUIのコンテナスタイルを維持
-    const pagefindUI = document.querySelector("#search .pagefind-ui") as HTMLElement;
-    if (pagefindUI) {
-      pagefindUI.style.width = "100%";
-      pagefindUI.style.display = "flex";
-      pagefindUI.style.flexDirection = "column";
-      pagefindUI.style.alignItems = "center";
-      pagefindUI.style.justifyContent = "center";
+    // pagefindUIのスタイルはCSSクラスで制御するため、JavaScriptでの直接操作は最小限に
+    // ただし、PagefindUIが動的に生成する要素に対しては必要に応じて調整
+    if (state.pagefindUI && !state.searchContainer?.classList.contains("pagefind-ready")) {
+      // クラスが追加されればCSSで制御されるため、ここでは最小限の確認のみ
+      const requiredStyles = {
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      };
+
+      const style = state.pagefindUI.style;
+      const needsUpdate =
+        style.width !== requiredStyles.width ||
+        style.display !== requiredStyles.display ||
+        style.flexDirection !== requiredStyles.flexDirection ||
+        style.alignItems !== requiredStyles.alignItems ||
+        style.justifyContent !== requiredStyles.justifyContent;
+
+      if (needsUpdate) {
+        updates.pagefindUI = requiredStyles;
+      }
+    }
+
+    // 検索入力欄のborderはモバイルでのみ必要（CSSで定義されているが、動的要素のため調整が必要）
+    if (state.searchInput) {
+      const needsBorder = state.isSmallScreen;
+      const currentBorder = state.searchInput.style.border;
+      const hasBorder = currentBorder.includes("#00ffff") || currentBorder.includes("rgb(0, 255, 255)");
+
+      if (needsBorder && !hasBorder) {
+        updates.searchInput = {
+          border: "1px solid #00ffff",
+          borderColor: "#00ffff",
+        };
+      } else if (!needsBorder && hasBorder) {
+        updates.searchInput = {
+          removeBorder: true,
+        };
+      }
+    }
+
+    return updates;
+  };
+
+  // 計算された更新を一括で適用（書き込みフェーズ）
+  const applyStyleUpdates = (
+    state: ReturnType<typeof readDOMState>,
+    updates: StyleUpdates
+  ): void => {
+    // すべての書き込みを一度に実行（リフローを最小化）
+    if (updates.searchContainer && state.searchContainer) {
+      // クラスベースの制御を優先（リフローを削減）
+      if (updates.searchContainer.addReadyClass) {
+        state.searchContainer.classList.add("pagefind-ready");
+      }
+
+      // レスポンシブな調整が必要な場合のみ更新
+      if (updates.searchContainer.minHeight !== undefined) {
+        state.searchContainer.style.minHeight = updates.searchContainer.minHeight;
+      }
+      if (updates.searchContainer.padding !== undefined) {
+        state.searchContainer.style.padding = updates.searchContainer.padding;
+      }
+    }
+
+    // pagefindUIのスタイルはクラス追加後はCSSで制御されるため、必要最小限のみ
+    if (updates.pagefindUI && state.pagefindUI && !state.searchContainer?.classList.contains("pagefind-ready")) {
+      const style = state.pagefindUI.style;
+      if (updates.pagefindUI.width) style.width = updates.pagefindUI.width;
+      if (updates.pagefindUI.display) style.display = updates.pagefindUI.display;
+      if (updates.pagefindUI.flexDirection) style.flexDirection = updates.pagefindUI.flexDirection;
+      if (updates.pagefindUI.alignItems) style.alignItems = updates.pagefindUI.alignItems;
+      if (updates.pagefindUI.justifyContent) style.justifyContent = updates.pagefindUI.justifyContent;
+    }
+
+    // 検索入力欄のborder調整（動的要素のため必要）
+    if (updates.searchInput && state.searchInput) {
+      if (updates.searchInput.removeBorder) {
+        state.searchInput.style.border = "";
+        state.searchInput.style.borderColor = "";
+        state.searchInput.style.removeProperty("border");
+      } else if (updates.searchInput.border) {
+        state.searchInput.style.setProperty("border", updates.searchInput.border, "important");
+        state.searchInput.style.borderColor = updates.searchInput.borderColor || "";
+      }
     }
   };
 
-  // スマホサイズでのみ検索ボックスのborderを強制的に設定
-  const applyBorderStyle = () => {
-    // コンテナスタイルを先に適用
-    ensureContainerStyle();
+  // 読み取りと書き込みを分離したスタイル更新関数
+  const updateStyles = (): void => {
+    // フェーズ1: すべての読み取りを一度に実行
+    const state = readDOMState();
 
-    const searchInput = document.querySelector("#search .pagefind-ui__search-input") as HTMLInputElement;
-    if (searchInput) {
-      // スマホサイズかどうかをチェック
-      if (window.innerWidth <= 480) {
-        searchInput.style.border = "1px solid #00ffff";
-        searchInput.style.borderColor = "#00ffff";
-        searchInput.style.setProperty("border", "1px solid #00ffff", "important");
-      } else {
-        // パソコンサイズではborderをリセット
-        searchInput.style.border = "";
-        searchInput.style.borderColor = "";
-        searchInput.style.removeProperty("border");
-      }
+    // フェーズ2: 必要な更新を計算
+    const updates = calculateStyleUpdates(state);
+
+    // 更新が必要な場合のみ書き込みを実行
+    if (Object.keys(updates).length > 0) {
+      // フェーズ3: すべての書き込みを一度に実行
+      applyStyleUpdates(state, updates);
     }
   };
 
@@ -211,7 +342,7 @@
     }
 
     // 検索コンテナの基本スタイルを先に適用（PagefindUI初期化前）
-    ensureContainerStyle();
+    updateStyles();
 
     // 新しいPagefindUIインスタンスを作成（エラーハンドリング付き）
     try {
@@ -225,18 +356,23 @@
       return;
     }
 
-    // 検索コンテナのスタイルを確実に適用（初期化直後）
-    ensureContainerStyle();
-
     // requestAnimationFrameでバッチ処理（メインスレッド処理の最適化）
     let rafScheduled = false;
+    let pendingUpdate = false;
     const scheduleStyleUpdate = () => {
-      if (rafScheduled) return;
+      if (rafScheduled) {
+        pendingUpdate = true;
+        return;
+      }
       rafScheduled = true;
       requestAnimationFrame(() => {
-        ensureContainerStyle();
-        applyBorderStyle();
+        updateStyles();
         rafScheduled = false;
+        // 待機中の更新があれば再スケジュール
+        if (pendingUpdate) {
+          pendingUpdate = false;
+          scheduleStyleUpdate();
+        }
       });
     };
 
@@ -244,36 +380,50 @@
     const searchContainer = document.querySelector("#search");
     if (searchContainer) {
       let checkCount = 0;
-      const maxChecks = 10; // 最大10回までチェック（約1秒）
+      const maxChecks = 5; // 最大チェック回数を5回に削減（不要な更新を削減）
 
-      // MutationObserverでDOMの変更を監視（デバウンス付き）
-      mutationObserver = new MutationObserver(() => {
-        checkCount++;
-        if (checkCount <= maxChecks) {
-          scheduleStyleUpdate();
-        } else {
-          // 最大チェック回数に達したら監視を停止
-          mutationObserver?.disconnect();
-          mutationObserver = null;
+      // MutationObserverでDOMの変更を監視（最適化: 必要な要素のみ監視）
+      mutationObserver = new MutationObserver((mutations) => {
+        // 検索入力欄が追加された場合のみ更新をスケジュール
+        const hasRelevantChange = mutations.some((mutation) => {
+          if (mutation.type === "childList") {
+            return Array.from(mutation.addedNodes).some(
+              (node) =>
+                node.nodeType === Node.ELEMENT_NODE &&
+                ((node as Element).classList.contains("pagefind-ui__search-input") ||
+                  (node as Element).querySelector?.(".pagefind-ui__search-input"))
+            );
+          }
+          return false;
+        });
+
+        if (hasRelevantChange) {
+          checkCount++;
+          if (checkCount <= maxChecks) {
+            scheduleStyleUpdate();
+          } else {
+            // 最大チェック回数に達したら監視を停止
+            mutationObserver?.disconnect();
+            mutationObserver = null;
+          }
         }
       });
 
+      // 監視範囲を最適化: 子要素の追加のみ監視（attributes監視を削除）
       mutationObserver.observe(searchContainer, {
         childList: true,
         subtree: true,
-        attributes: true,
-        attributeFilter: ["class"],
       });
 
       // 初期スタイル適用（即座に1回）
       scheduleStyleUpdate();
 
-      // フォールバック: 500ms後に最終確認（最大チェック回数に達していない場合）
+      // フォールバック: 300ms後に最終確認（タイムアウトを短縮）
       setTimeout(() => {
         if (checkCount < maxChecks) {
           scheduleStyleUpdate();
         }
-      }, 500);
+      }, 300);
     }
 
     // ウィンドウリサイズ時にスタイルを再適用（デバウンス付き）
@@ -284,7 +434,7 @@
       }
       resizeTimer = setTimeout(() => {
         scheduleStyleUpdate();
-      }, 150); // デバウンス時間を150msに短縮
+      }, 200); // デバウンス時間を200msに調整（リフロー削減のため）
     };
     window.addEventListener("resize", resizeHandler, { passive: true });
   }

@@ -438,6 +438,7 @@ const swiperText2 = "Thank you for viewing my site.";
 <script>
   // パフォーマンス最適化: ビューポート外ではアニメーションを一時停止
   (function () {
+    // フェーズ1: すべてのDOM読み取りを一度に実行
     const swiperSection = document.getElementById("swiper");
     const swiperWrapper = swiperSection?.querySelector<HTMLElement>(".swipers-wrapper");
     const swiperSlides = swiperSection?.querySelectorAll<HTMLElement>(".swipers-slide");
@@ -447,24 +448,43 @@ const swiperText2 = "Thank you for viewing my site.";
     // Intersection Observerでビューポート内かどうかを監視
     const observer = new IntersectionObserver(
       (entries) => {
+        // フェーズ1: すべての読み取りを一度に実行
+        const updates: Array<{ element: HTMLElement; action: "add" | "remove"; className: string }> = [];
+        const styleUpdates: Array<{ element: HTMLElement; property: string; value: string }> = [];
+
         entries.forEach((entry) => {
           const isVisible = entry.isIntersecting && entry.intersectionRatio > 0.1;
 
           if (isVisible) {
             // ビューポート内: アニメーションを再開
-            swiperWrapper.classList.remove("paused");
-            swiperWrapper.style.willChange = "transform";
+            updates.push({ element: swiperWrapper, action: "remove", className: "paused" });
+            styleUpdates.push({ element: swiperWrapper, property: "willChange", value: "transform" });
             swiperSlides.forEach((slide) => {
-              slide.classList.remove("paused");
+              updates.push({ element: slide, action: "remove", className: "paused" });
             });
           } else {
             // ビューポート外: アニメーションを一時停止
-            swiperWrapper.classList.add("paused");
-            swiperWrapper.style.willChange = "auto";
+            updates.push({ element: swiperWrapper, action: "add", className: "paused" });
+            styleUpdates.push({ element: swiperWrapper, property: "willChange", value: "auto" });
             swiperSlides.forEach((slide) => {
-              slide.classList.add("paused");
+              updates.push({ element: slide, action: "add", className: "paused" });
             });
           }
+        });
+
+        // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+        requestAnimationFrame(() => {
+          updates.forEach((update) => {
+            if (update.action === "add") {
+              update.element.classList.add(update.className);
+            } else {
+              update.element.classList.remove(update.className);
+            }
+          });
+
+          styleUpdates.forEach((styleUpdate) => {
+            styleUpdate.element.style.willChange = styleUpdate.value;
+          });
         });
       },
       {
@@ -477,20 +497,21 @@ const swiperText2 = "Thank you for viewing my site.";
 
     // ページが非表示になった時（別タブに切り替え等）も一時停止
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) {
-        swiperWrapper.classList.add("paused");
-        swiperWrapper.style.willChange = "auto";
-        swiperSlides.forEach((slide) => {
-          slide.classList.add("paused");
-        });
-      } else {
-        // ページが再表示された時、Intersection Observerが自動的に処理
-        // 念のため、ビューポート内か確認して再開
-        // 強制リフローを避けるため、Intersection Observerの結果を優先使用
-        // getBoundingClientRectの呼び出しを削減
-        requestAnimationFrame(() => {
-          // Intersection Observerが既に監視しているため、追加のgetBoundingClientRectは不要
-          // 代わりに、Intersection Observerの結果を信頼する
+      // フェーズ1: 状態を読み取る
+      const isHidden = document.hidden;
+
+      // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+      requestAnimationFrame(() => {
+        if (isHidden) {
+          swiperWrapper.classList.add("paused");
+          swiperWrapper.style.willChange = "auto";
+          swiperSlides.forEach((slide) => {
+            slide.classList.add("paused");
+          });
+        } else {
+          // ページが再表示された時、Intersection Observerが自動的に処理
+          // 念のため、ビューポート内か確認して再開
+          // 強制リフローを避けるため、Intersection Observerの結果を優先使用
           if (swiperSection && observer) {
             // 既存のIntersection Observerが自動的に処理するため、ここでは最小限の処理のみ
             swiperWrapper.classList.remove("paused");
@@ -499,8 +520,8 @@ const swiperText2 = "Thank you for viewing my site.";
               slide.classList.remove("paused");
             });
           }
-        });
-      }
+        }
+      });
     });
   })();
 </script>

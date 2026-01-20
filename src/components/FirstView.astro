@@ -5,26 +5,35 @@ import Glitch from "./Glitch.astro";
 // 画像URLはpropsとして受け取る
 interface Props {
   fvBackgroundImageSrc: string;
+  spFvBackgroundImageSrc: string;
   fvAnimeImageSrc: string;
 }
 
-const { fvBackgroundImageSrc, fvAnimeImageSrc } = Astro.props;
+const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.props;
 ---
 
 <div class="fv">
   <div class="fv__wrapper">
-    <!-- LCP最適化: 背景画像を<img>タグとして使用し、fetchpriority="high"を設定 -->
+    <!-- LCP最適化: レスポンシブ画像を<picture>要素で実装 -->
+    <!-- 画面幅1024px以上はデスクトップ画像、1024px以下はモバイル画像を使用 -->
     <!-- width/height属性を追加してレンダリングの遅延を削減（CLS対策も兼ねる） -->
-    <img
-      src={fvBackgroundImageSrc}
-      alt=""
-      class="fv__background-image"
-      width="1920"
-      height="1080"
-      fetchpriority="high"
-      decoding="sync"
-      loading="eager"
-    />
+    <picture>
+      <!-- モバイル用画像（1024px以下） -->
+      <source media="(max-width: 1024px)" srcset={spFvBackgroundImageSrc} type="image/webp" />
+      <!-- デスクトップ用画像（1024px超） -->
+      <source media="(min-width: 1025px)" srcset={fvBackgroundImageSrc} type="image/webp" />
+      <!-- フォールバック画像 -->
+      <img
+        src={fvBackgroundImageSrc}
+        alt=""
+        class="fv__background-image"
+        width="1920"
+        height="1080"
+        fetchpriority="high"
+        decoding="sync"
+        loading="eager"
+      />
+    </picture>
     <div class="background-container">
       <div class="background-rotated" style={`background-image: url(${fvAnimeImageSrc})`}></div>
       <div class="background"></div>

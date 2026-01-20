@@ -565,44 +565,59 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
     const { gsap } = await gsapPromise;
     const cards = document.querySelectorAll(".card__item");
 
-    cards.forEach((card) => {
+    // フェーズ1: すべてのDOM要素を一度に読み取る
+    const cardData = Array.from(cards).map((card) => {
       const flipContainer = card.querySelector(".card__flip-container");
       const frontLink = card.querySelector(".card__front .card__item_link");
       const backButton = card.querySelector(".card__flip_back");
       const backOverlay = card.querySelector(".card__back_overlay");
+      const windowWidth = window.innerWidth;
 
-      // シンプルな状態管理
-      let isFlipped = false;
-      let isAnimating = false;
+      return {
+        card,
+        flipContainer,
+        frontLink,
+        backButton,
+        backOverlay,
+        windowWidth,
+        isFlipped: false,
+        isAnimating: false,
+      };
+    });
 
-      // フリップ実行関数
+    // フェーズ2: 各カードにイベントリスナーを設定
+    cardData.forEach((data) => {
+      if (!data.flipContainer) return;
+
+      // フリップ実行関数（読み取りと書き込みを分離）
       const flipCard = (toFlipped: boolean) => {
-        if (isAnimating || !flipContainer) return;
+        if (data.isAnimating) return;
 
         // 既に目的の状態の場合は何もしない
-        if (isFlipped === toFlipped) return;
+        if (data.isFlipped === toFlipped) return;
 
-        isAnimating = true;
-        isFlipped = toFlipped;
+        data.isAnimating = true;
+        data.isFlipped = toFlipped;
 
-        // アニメーション設定
-        const duration = window.innerWidth <= 768 ? 0.3 : 0.4;
+        // アニメーション設定（読み取り済みの値を使用）
+        const duration = data.windowWidth <= 768 ? 0.3 : 0.4;
 
-        gsap.to(flipContainer, {
+        // フェーズ3: GSAP書き込みを実行
+        gsap.to(data.flipContainer, {
           rotationY: toFlipped ? 180 : 0,
           duration: duration,
           ease: "power2.inOut",
           force3D: true,
           onComplete: () => {
-            isAnimating = false;
+            data.isAnimating = false;
           },
         });
 
-        // クラス状態を更新
+        // フェーズ4: クラス状態を更新（書き込み）
         if (toFlipped) {
-          flipContainer.classList.add("flipped");
+          data.flipContainer.classList.add("flipped");
         } else {
-          flipContainer.classList.remove("flipped");
+          data.flipContainer.classList.remove("flipped");
         }
       };
 
@@ -610,7 +625,7 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       const handleFrontClick = (e: Event) => {
         e.preventDefault();
         e.stopPropagation();
-        flipCard(!isFlipped);
+        flipCard(!data.isFlipped);
       };
 
       // 裏面クリック処理
@@ -621,9 +636,9 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
       };
 
       // イベントリスナー設定（iPhone対応強化版）
-      if (frontLink) {
+      if (data.frontLink) {
         // タッチデバイス用（touchstart + touchend）
-        frontLink.addEventListener(
+        data.frontLink.addEventListener(
           "touchstart",
           (e) => {
             e.preventDefault();
@@ -631,14 +646,14 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
           { passive: false }
         );
 
-        frontLink.addEventListener("touchend", handleFrontClick, { passive: false });
+        data.frontLink.addEventListener("touchend", handleFrontClick, { passive: false });
 
         // マウス用
-        frontLink.addEventListener("click", handleFrontClick);
+        data.frontLink.addEventListener("click", handleFrontClick);
       }
 
-      if (backButton) {
-        backButton.addEventListener(
+      if (data.backButton) {
+        data.backButton.addEventListener(
           "touchstart",
           (e) => {
             e.preventDefault();
@@ -646,12 +661,12 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
           { passive: false }
         );
 
-        backButton.addEventListener("touchend", handleBackClick, { passive: false });
-        backButton.addEventListener("click", handleBackClick);
+        data.backButton.addEventListener("touchend", handleBackClick, { passive: false });
+        data.backButton.addEventListener("click", handleBackClick);
       }
 
-      if (backOverlay) {
-        backOverlay.addEventListener(
+      if (data.backOverlay) {
+        data.backOverlay.addEventListener(
           "touchstart",
           (e) => {
             e.preventDefault();
@@ -659,8 +674,8 @@ const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMen
           { passive: false }
         );
 
-        backOverlay.addEventListener("touchend", handleBackClick, { passive: false });
-        backOverlay.addEventListener("click", handleBackClick);
+        data.backOverlay.addEventListener("touchend", handleBackClick, { passive: false });
+        data.backOverlay.addEventListener("click", handleBackClick);
       }
     });
   }

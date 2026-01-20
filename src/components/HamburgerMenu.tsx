@@ -86,6 +86,7 @@ const HamburgerMenu = () => {
     if (!isOpen) return;
 
     const updateOverlayMetrics = () => {
+      // フェーズ1: すべてのDOM読み取りを一度に実行
       const menuEl = menuRef.current;
       const overlayEl = overlayRef.current;
 
@@ -97,10 +98,13 @@ const HamburgerMenu = () => {
       const width = Math.max(rect.width, 0);
       const height = Math.max(rect.height, 0);
 
-      overlayEl.style.setProperty("--menu-top", `${top}px`);
-      overlayEl.style.setProperty("--menu-left", `${left}px`);
-      overlayEl.style.setProperty("--menu-width", `${width}px`);
-      overlayEl.style.setProperty("--menu-height", `${height}px`);
+      // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+      requestAnimationFrame(() => {
+        overlayEl.style.setProperty("--menu-top", `${top}px`);
+        overlayEl.style.setProperty("--menu-left", `${left}px`);
+        overlayEl.style.setProperty("--menu-width", `${width}px`);
+        overlayEl.style.setProperty("--menu-height", `${height}px`);
+      });
     };
 
     const handleResize = () => {
@@ -141,12 +145,19 @@ const HamburgerMenu = () => {
   };
 
   useEffect(() => {
-    if (buttonRef.current) {
-      buttonRef.current.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    }
-    if (menuRef.current) {
-      menuRef.current.setAttribute("aria-hidden", isOpen ? "false" : "true");
-    }
+    // フェーズ1: すべてのDOM読み取りを一度に実行
+    const buttonEl = buttonRef.current;
+    const menuEl = menuRef.current;
+
+    // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+    requestAnimationFrame(() => {
+      if (buttonEl) {
+        buttonEl.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      }
+      if (menuEl) {
+        menuEl.setAttribute("aria-hidden", isOpen ? "false" : "true");
+      }
+    });
   }, [isOpen]);
 
   useEffect(() => {
@@ -178,6 +189,7 @@ const HamburgerMenu = () => {
       if (e.key === "Escape") closeMenu();
 
       if (e.key === "Tab" && isOpen) {
+        // フェーズ1: すべてのDOM読み取りを一度に実行
         const focusable = getMenuFocusableElements();
 
         if (focusable.length === 0) return;
@@ -193,24 +205,33 @@ const HamburgerMenu = () => {
           activeElement && menuElement && (menuElement.contains(activeElement) || activeElement === buttonRef.current)
         );
 
+        // フェーズ2: フォーカス操作を実行（リフローを最小化）
         if (!e.shiftKey && !isFocusInMenu) {
           e.preventDefault();
-          preferredFirst?.focus({ preventScroll: true });
+          requestAnimationFrame(() => {
+            preferredFirst?.focus({ preventScroll: true });
+          });
           return;
         }
 
         if (!e.shiftKey && activeElement === buttonRef.current) {
           e.preventDefault();
-          preferredFirst?.focus({ preventScroll: true });
+          requestAnimationFrame(() => {
+            preferredFirst?.focus({ preventScroll: true });
+          });
           return;
         }
 
         if (e.shiftKey && activeElement === preferredFirst) {
           e.preventDefault();
-          lastElement?.focus();
+          requestAnimationFrame(() => {
+            lastElement?.focus();
+          });
         } else if (!e.shiftKey && activeElement === lastElement) {
           e.preventDefault();
-          preferredFirst?.focus();
+          requestAnimationFrame(() => {
+            preferredFirst?.focus();
+          });
         }
       }
     };
@@ -219,35 +240,44 @@ const HamburgerMenu = () => {
     document.addEventListener("keydown", handleKeyDown);
 
     // スクロールロック: メニューが開いている時は背景のスクロールを防ぐ
-    if (isOpen) {
-      // 現在のスクロール位置を保存
-      scrollPositionRef.current =
-        window.scrollY !== undefined && window.scrollY !== null ? window.scrollY : document.documentElement.scrollTop;
+    // フェーズ1: すべての読み取りを一度に実行
+    const scrollPosition: number = isOpen
+      ? window.scrollY !== undefined && window.scrollY !== null
+        ? window.scrollY
+        : document.documentElement.scrollTop
+      : 0;
 
-      // htmlとbodyの両方にoverflow: hiddenを設定（確実にスクロールを防ぐ）
-      document.documentElement.style.overflow = "hidden";
-      document.documentElement.style.position = "fixed";
-      document.documentElement.style.top = `-${scrollPositionRef.current}px`;
-      document.documentElement.style.width = "100%";
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.top = `-${scrollPositionRef.current}px`;
-      document.body.style.width = "100%";
-    } else {
-      // スクロールロックを解除
-      document.documentElement.style.overflow = "";
-      document.documentElement.style.position = "";
-      document.documentElement.style.top = "";
-      document.documentElement.style.width = "";
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.top = "";
-      document.body.style.width = "";
+    // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+    requestAnimationFrame(() => {
+      if (isOpen) {
+        // 現在のスクロール位置を保存
+        scrollPositionRef.current = scrollPosition;
 
-      // 保存したスクロール位置に復元
-      window.scrollTo(0, scrollPositionRef.current);
-      scrollPositionRef.current = 0;
-    }
+        // htmlとbodyの両方にoverflow: hiddenを設定（確実にスクロールを防ぐ）
+        document.documentElement.style.overflow = "hidden";
+        document.documentElement.style.position = "fixed";
+        document.documentElement.style.top = `-${scrollPositionRef.current}px`;
+        document.documentElement.style.width = "100%";
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+        document.body.style.top = `-${scrollPositionRef.current}px`;
+        document.body.style.width = "100%";
+      } else {
+        // スクロールロックを解除
+        document.documentElement.style.overflow = "";
+        document.documentElement.style.position = "";
+        document.documentElement.style.top = "";
+        document.documentElement.style.width = "";
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+
+        // 保存したスクロール位置に復元
+        window.scrollTo(0, scrollPositionRef.current);
+        scrollPositionRef.current = 0;
+      }
+    });
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);

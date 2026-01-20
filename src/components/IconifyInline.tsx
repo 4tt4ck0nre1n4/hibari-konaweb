@@ -1,18 +1,8 @@
 import type { ReactElement } from "react";
+import { useState, useEffect } from "react";
 
-// アイコンセット（必要なものだけ）をローカルJSONから読み込み
+// アイコンセットを動的インポートで遅延読み込み（クリティカルパスを短縮）
 // 文字列指定の @iconify/react は外部（api.iconify.design）フェッチが発生し得るため避ける
-import biRaw from "@iconify-json/bi/icons.json";
-import deviconRaw from "@iconify-json/devicon/icons.json";
-import fa6solidRaw from "@iconify-json/fa6-solid/icons.json";
-import flatColorIconsRaw from "@iconify-json/flat-color-icons/icons.json";
-import fluentEmojiRaw from "@iconify-json/fluent-emoji/icons.json";
-import fluentEmojiFlatRaw from "@iconify-json/fluent-emoji-flat/icons.json";
-import fluentEmojiHighContrastRaw from "@iconify-json/fluent-emoji-high-contrast/icons.json";
-import icRaw from "@iconify-json/ic/icons.json";
-import streamlineUltimateColorRaw from "@iconify-json/streamline-ultimate-color/icons.json";
-import twemojiRaw from "@iconify-json/twemoji/icons.json";
-import vscodeIconsRaw from "@iconify-json/vscode-icons/icons.json";
 
 type IconifyIcon = {
   body: string;
@@ -28,31 +18,67 @@ type IconifyIconsJSON = {
   // aliases 等は必要になったら対応（現状利用アイコンは icons の直指定想定）
 };
 
-// JSONインポートの型を明示的に指定
-const bi = biRaw as IconifyIconsJSON;
-const devicon = deviconRaw as IconifyIconsJSON;
-const fa6solid = fa6solidRaw as IconifyIconsJSON;
-const flatColorIcons = flatColorIconsRaw as IconifyIconsJSON;
-const fluentEmoji = fluentEmojiRaw as IconifyIconsJSON;
-const fluentEmojiFlat = fluentEmojiFlatRaw as IconifyIconsJSON;
-const fluentEmojiHighContrast = fluentEmojiHighContrastRaw as IconifyIconsJSON;
-const ic = icRaw as IconifyIconsJSON;
-const streamlineUltimateColor = streamlineUltimateColorRaw as IconifyIconsJSON;
-const twemoji = twemojiRaw as IconifyIconsJSON;
-const vscodeIcons = vscodeIconsRaw as IconifyIconsJSON;
+// アイコンセットのキャッシュ（一度読み込んだら再利用）
+const iconSetCache = new Map<string, IconifyIconsJSON>();
 
-const ICON_SETS: Record<string, IconifyIconsJSON> = {
-  [bi.prefix]: bi,
-  [devicon.prefix]: devicon,
-  [fa6solid.prefix]: fa6solid,
-  [flatColorIcons.prefix]: flatColorIcons,
-  [fluentEmoji.prefix]: fluentEmoji,
-  [fluentEmojiFlat.prefix]: fluentEmojiFlat,
-  [fluentEmojiHighContrast.prefix]: fluentEmojiHighContrast,
-  [ic.prefix]: ic,
-  [streamlineUltimateColor.prefix]: streamlineUltimateColor,
-  [twemoji.prefix]: twemoji,
-  [vscodeIcons.prefix]: vscodeIcons,
+// アイコンセットを動的に読み込む関数
+const loadIconSet = async (prefix: string): Promise<IconifyIconsJSON | null> => {
+  // キャッシュをチェック
+  if (iconSetCache.has(prefix)) {
+    return iconSetCache.get(prefix) ?? null;
+  }
+
+  try {
+    let iconSet: IconifyIconsJSON | null = null;
+
+    // 必要なアイコンセットのみを動的インポート
+    switch (prefix) {
+      case "bi":
+        iconSet = (await import("@iconify-json/bi/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "devicon":
+        iconSet = (await import("@iconify-json/devicon/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "fa6-solid":
+        iconSet = (await import("@iconify-json/fa6-solid/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "flat-color-icons":
+        iconSet = (await import("@iconify-json/flat-color-icons/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "fluent-emoji":
+        iconSet = (await import("@iconify-json/fluent-emoji/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "fluent-emoji-flat":
+        iconSet = (await import("@iconify-json/fluent-emoji-flat/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "fluent-emoji-high-contrast":
+        iconSet = (await import("@iconify-json/fluent-emoji-high-contrast/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "ic":
+        iconSet = (await import("@iconify-json/ic/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "streamline-ultimate-color":
+        iconSet = (await import("@iconify-json/streamline-ultimate-color/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "twemoji":
+        iconSet = (await import("@iconify-json/twemoji/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "vscode-icons":
+        iconSet = (await import("@iconify-json/vscode-icons/icons.json")).default as IconifyIconsJSON;
+        break;
+      default:
+        return null;
+    }
+
+    if (iconSet !== null) {
+      iconSetCache.set(prefix, iconSet);
+    }
+
+    return iconSet;
+  } catch (error) {
+    console.warn(`Failed to load icon set: ${prefix}`, error);
+    return null;
+  }
 };
 
 function parseIconName(icon: string): { prefix: string; name: string } | null {
@@ -80,17 +106,54 @@ export default function IconifyInline({
   title,
   "aria-hidden": ariaHidden = true,
 }: IconifyInlineProps): ReactElement | null {
+  const [iconData, setIconData] = useState<IconifyIcon | null>(null);
+  const [iconSet, setIconSet] = useState<IconifyIconsJSON | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const parsed = parseIconName(icon);
-  if (!parsed) return null;
 
-  const set = ICON_SETS[parsed.prefix];
-  if (!set) return null;
+  useEffect(() => {
+    if (!parsed) {
+      setIsLoading(false);
+      return;
+    }
 
-  const iconData = set.icons[parsed.name];
-  if (!iconData) return null;
+    // アイコンセットを動的に読み込む
+    loadIconSet(parsed.prefix)
+      .then((set) => {
+        if (set) {
+          setIconSet(set);
+          const data = set.icons[parsed.name];
+          setIconData(data ?? null);
+        }
+        setIsLoading(false);
+      })
+      .catch(() => {
+        setIsLoading(false);
+      });
+  }, [icon, parsed]);
 
-  const vbW = iconData.width ?? set.width ?? 16;
-  const vbH = iconData.height ?? set.height ?? 16;
+  if (!parsed || isLoading || !iconSet || !iconData) {
+    // ローディング中は空のSVGを返す（レイアウトシフトを防ぐ）
+    const placeholderProps: React.SVGProps<SVGSVGElement> = {
+      className,
+      width,
+      height,
+      viewBox: "0 0 16 16",
+      xmlns: "http://www.w3.org/2000/svg",
+      role: "presentation",
+      focusable: "false",
+    };
+
+    if (ariaHidden) {
+      placeholderProps["aria-hidden"] = "true";
+    }
+
+    return <svg {...placeholderProps} />;
+  }
+
+  const vbW = iconData.width ?? iconSet.width ?? 16;
+  const vbH = iconData.height ?? iconSet.height ?? 16;
 
   // titleがある場合はimgロール、ない場合はpresentationロール
   const hasTitle = title != null && title !== "";
