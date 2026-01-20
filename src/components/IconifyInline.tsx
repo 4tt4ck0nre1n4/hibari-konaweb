@@ -6,7 +6,9 @@ import biRaw from "@iconify-json/bi/icons.json";
 import deviconRaw from "@iconify-json/devicon/icons.json";
 import fa6solidRaw from "@iconify-json/fa6-solid/icons.json";
 import flatColorIconsRaw from "@iconify-json/flat-color-icons/icons.json";
+import fluentEmojiRaw from "@iconify-json/fluent-emoji/icons.json";
 import fluentEmojiFlatRaw from "@iconify-json/fluent-emoji-flat/icons.json";
+import fluentEmojiHighContrastRaw from "@iconify-json/fluent-emoji-high-contrast/icons.json";
 import icRaw from "@iconify-json/ic/icons.json";
 import streamlineUltimateColorRaw from "@iconify-json/streamline-ultimate-color/icons.json";
 import twemojiRaw from "@iconify-json/twemoji/icons.json";
@@ -31,7 +33,9 @@ const bi = biRaw as IconifyIconsJSON;
 const devicon = deviconRaw as IconifyIconsJSON;
 const fa6solid = fa6solidRaw as IconifyIconsJSON;
 const flatColorIcons = flatColorIconsRaw as IconifyIconsJSON;
+const fluentEmoji = fluentEmojiRaw as IconifyIconsJSON;
 const fluentEmojiFlat = fluentEmojiFlatRaw as IconifyIconsJSON;
+const fluentEmojiHighContrast = fluentEmojiHighContrastRaw as IconifyIconsJSON;
 const ic = icRaw as IconifyIconsJSON;
 const streamlineUltimateColor = streamlineUltimateColorRaw as IconifyIconsJSON;
 const twemoji = twemojiRaw as IconifyIconsJSON;
@@ -42,7 +46,9 @@ const ICON_SETS: Record<string, IconifyIconsJSON> = {
   [devicon.prefix]: devicon,
   [fa6solid.prefix]: fa6solid,
   [flatColorIcons.prefix]: flatColorIcons,
+  [fluentEmoji.prefix]: fluentEmoji,
   [fluentEmojiFlat.prefix]: fluentEmojiFlat,
+  [fluentEmojiHighContrast.prefix]: fluentEmojiHighContrast,
   [ic.prefix]: ic,
   [streamlineUltimateColor.prefix]: streamlineUltimateColor,
   [twemoji.prefix]: twemoji,
