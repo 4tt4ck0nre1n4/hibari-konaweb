@@ -374,8 +374,8 @@ const { fvBackgroundImageSrc, fvAnimeImageSrc } = Astro.props;
 
     // LCP最適化: マウス追従の初期化を遅延させずに即座に実行（ローディングスクリーンの待機は最小限に）
     function waitForInit() {
-      // ローディングスクリーンの待機を最適化: 最大500msまで待機（リソース読み込みの遅延を削減）
-      const MAX_WAIT_TIME = 500;
+      // ローディングスクリーンの待機を最適化: 最大3000msまで待機（Lighthouse実行時でも確実に初期化されるように）
+      const MAX_WAIT_TIME = 3000;
       const startTime = Date.now();
 
       const tryInit = () => {
@@ -388,27 +388,53 @@ const { fvBackgroundImageSrc, fvAnimeImageSrc } = Astro.props;
           !loadingScreen ||
           elapsed >= MAX_WAIT_TIME ||
           loadingScreen.style.display === "none" ||
-          loadingScreen.style.visibility === "hidden"
+          loadingScreen.style.visibility === "hidden" ||
+          loadingScreen.style.opacity === "0"
         ) {
+          devLog("✅ Initializing mouse follow (loading screen check passed)");
           initBackgroundMouseFollow();
           return;
         }
 
         // インラインスタイルで判定できない場合のみ、requestAnimationFrame内でgetComputedStyleを呼ぶ
-        if (loadingScreen.style.display === "" && loadingScreen.style.visibility === "") {
+        if (loadingScreen.style.display === "" && loadingScreen.style.visibility === "" && loadingScreen.style.opacity === "") {
           requestAnimationFrame(() => {
             const computedStyle = window.getComputedStyle(loadingScreen);
-            if (computedStyle.display === "none" || computedStyle.visibility === "hidden") {
+            const computedDisplay = computedStyle.display;
+            const computedVisibility = computedStyle.visibility;
+            const computedOpacity = computedStyle.opacity;
+
+            if (
+              computedDisplay === "none" ||
+              computedVisibility === "hidden" ||
+              computedOpacity === "0"
+            ) {
+              devLog("✅ Initializing mouse follow (computed style check passed)");
               initBackgroundMouseFollow();
               return;
             }
+
+            // 最大待機時間を超えた場合は強制的に初期化（Lighthouse実行時のフォールバック）
+            if (elapsed >= MAX_WAIT_TIME) {
+              devWarn("⚠️ Max wait time exceeded, initializing mouse follow anyway");
+              initBackgroundMouseFollow();
+              return;
+            }
+
             // まだローディング中の場合は再試行
             setTimeout(tryInit, 50);
           });
           return;
         }
 
-        // まだローディング中の場合は50ms後に再試行（100msから短縮）
+        // 最大待機時間を超えた場合は強制的に初期化
+        if (elapsed >= MAX_WAIT_TIME) {
+          devWarn("⚠️ Max wait time exceeded, initializing mouse follow anyway");
+          initBackgroundMouseFollow();
+          return;
+        }
+
+        // まだローディング中の場合は50ms後に再試行
         setTimeout(tryInit, 50);
       };
 
