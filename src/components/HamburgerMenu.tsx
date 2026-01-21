@@ -1,10 +1,11 @@
+import type { ComponentType } from "react";
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import hamburgerStyles from "../styles/hamburgerStyles.module.css";
 import ReactDOM from "react-dom";
 import SnsLink from "./SnsLink";
 import { twitter, github_sns, contact, mail } from "../scripts/constSns";
 import HamburgerMenuLogo from "./HamburgerMenuLogo";
-import IconifyInline from "./IconifyInline";
+import type { IconifyInlineProps } from "./IconifyInline";
 
 const title = "My Portfolio Site";
 const menuItems = [
@@ -54,6 +55,7 @@ const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffec
 
 const HamburgerMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [IconifyInline, setIconifyInline] = useState<ComponentType<IconifyInlineProps> | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const overlayRef = useRef<HTMLDivElement | null>(null);
@@ -68,6 +70,18 @@ const HamburgerMenu = () => {
     if (!isOpen) {
       previouslyFocusedElementRef.current =
         document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+      // メニューを開くタイミングでアイコン描画用のコンポーネントを遅延ロード
+      if (!IconifyInline) {
+        void import("./IconifyInline")
+          .then((mod) => {
+            setIconifyInline(() => mod.default);
+          })
+          .catch(() => {
+            // 失敗時はアイコン無しで動作（メニュー自体は開ける）
+            setIconifyInline(null);
+          });
+      }
     }
     setIsOpen((prev) => !prev);
   };
@@ -387,7 +401,7 @@ const HamburgerMenu = () => {
                 title={ariaTitle}
                 ref={index === 0 ? firstMenuLinkRef : undefined}
               >
-                {typeof icon === "string" && icon?.trim() !== "" ? (
+                {typeof icon === "string" && icon?.trim() !== "" && isOpen && IconifyInline ? (
                   <IconifyInline
                     icon={icon}
                     className={hamburgerStyles.hamburger__menu_icon}

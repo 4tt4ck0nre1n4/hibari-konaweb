@@ -1,4 +1,6 @@
-import IconifyInline from "./IconifyInline";
+import type { ComponentType } from "react";
+import { useEffect, useState } from "react";
+import type { IconifyInlineProps } from "./IconifyInline";
 
 export interface SnsLinkProps {
   itemClassName?: string;
@@ -23,6 +25,7 @@ const SnsLink = ({
 }: SnsLinkProps) => {
   const snsIconWidth = 28;
   const snsIconHeight = 28;
+  const [IconifyInline, setIconifyInline] = useState<ComponentType<IconifyInlineProps> | null>(null);
 
   const isSvgAsset =
     typeof snsIconSvg === "string" &&
@@ -30,6 +33,22 @@ const SnsLink = ({
     (snsIconSvg.endsWith(".svg") || snsIconSvg.startsWith("/") || snsIconSvg.startsWith("."));
 
   const hasIconName = snsIconName != null && snsIconName.trim() !== "";
+
+  // アイコンがSVGアセットでない場合のみ、IconifyInlineを遅延ロード
+  useEffect(() => {
+    if (isSvgAsset) return;
+    if (IconifyInline) return;
+    if (typeof snsIconSvg !== "string" || snsIconSvg.trim() === "") return;
+
+    void import("./IconifyInline")
+      .then((mod) => {
+        setIconifyInline(() => mod.default);
+      })
+      .catch(() => {
+        // 失敗時はアイコン無しで表示（リンク自体は機能させる）
+        setIconifyInline(null);
+      });
+  }, [IconifyInline, isSvgAsset, snsIconSvg]);
 
   return (
     <li className={itemClassName}>
@@ -65,7 +84,9 @@ const SnsLink = ({
             />
           )
         ) : (
-          <IconifyInline icon={snsIconSvg ?? ""} width={snsIconWidth} height={snsIconHeight} aria-hidden />
+          IconifyInline ? (
+            <IconifyInline icon={snsIconSvg ?? ""} width={snsIconWidth} height={snsIconHeight} aria-hidden />
+          ) : null
         )}
         {hasIconName ? <span className="sns-icon__name">{snsIconName}</span> : null}
       </a>

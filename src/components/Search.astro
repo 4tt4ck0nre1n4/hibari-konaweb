@@ -96,7 +96,8 @@
 </style>
 
 <script>
-  import { PagefindUI } from "@pagefind/default-ui";
+  // Pagefind UI は「検索が画面内に入った時」に dynamic import して初期化する。
+  // 初期表示のクリティカルリクエストチェーンを短くする狙い。
 
   // CSSの遅延読み込み: requestIdleCallbackが利用可能な場合はそれを使用、そうでなければsetTimeout
   const loadPagefindCSS = () => {
@@ -125,6 +126,14 @@
   let pagefindUIInstance: PagefindUI | null = null;
   let mutationObserver: MutationObserver | null = null;
   let resizeHandler: (() => void) | null = null;
+  let intersectionObserver: IntersectionObserver | null = null;
+  let isLoadingPagefind = false;
+  let hasInitialized = false;
+
+  type PagefindUIModule = typeof import("@pagefind/default-ui");
+  type PagefindUI = PagefindUIModule["PagefindUI"] extends new (...args: any[]) => any ? InstanceType<PagefindUIModule["PagefindUI"]> : any;
+  type PagefindUIConstructor = PagefindUIModule["PagefindUI"] extends new (...args: any[]) => any ? PagefindUIModule["PagefindUI"] : any;
+  let PagefindUIClass: PagefindUIConstructor | null = null;
 
   // iPhone判定のヘルパー関数
   const isIPhone = (): boolean => {
@@ -309,30 +318,17 @@
     }
   };
 
-  function initSearch() {
-    // #search要素が存在するかチェック
-    const searchElement = document.querySelector("#search");
-    if (!searchElement) {
-      // 要素が存在しない場合は静かに終了（エラーを出力しない）
-      return;
-    }
-
-    // CSSの読み込みを確実にする（View Transitions後も）
-    loadPagefindCSS();
-
-    // 既存のインスタンスを破棄
-    if (pagefindUIInstance) {
-      // PagefindUIにはdestroyメソッドがないため、要素をクリア
-      if (searchElement) {
-        searchElement.innerHTML = "";
-      }
-      pagefindUIInstance = null;
-    }
-
+  const destroySearch = (): void => {
     // 既存のMutationObserverを破棄
     if (mutationObserver) {
       mutationObserver.disconnect();
       mutationObserver = null;
+    }
+
+    // 既存のIntersectionObserverを破棄
+    if (intersectionObserver) {
+      intersectionObserver.disconnect();
+      intersectionObserver = null;
     }
 
     // 既存のリサイズハンドラーを削除
@@ -341,20 +337,64 @@
       resizeHandler = null;
     }
 
-    // 検索コンテナの基本スタイルを先に適用（PagefindUI初期化前）
+    // 既存のインスタンスを破棄（PagefindUIにdestroyがないためDOMを掃除）
+    const searchElement = document.querySelector("#search") as HTMLElement | null;
+    if (searchElement) {
+      searchElement.innerHTML = "";
+    }
+    pagefindUIInstance = null;
+    hasInitialized = false;
+    isLoadingPagefind = false;
+  };
+
+  const ensurePagefindLoaded = async (): Promise<void> => {
+    if (hasInitialized || isLoadingPagefind) return;
+    isLoadingPagefind = true;
+
+    // CSSの読み込みを確実にする（View Transitions後も）
+    loadPagefindCSS();
+
+    // コンテナの基本スタイルを先に適用（PagefindUI初期化前）
     updateStyles();
 
-    // 新しいPagefindUIインスタンスを作成（エラーハンドリング付き）
     try {
-      pagefindUIInstance = new PagefindUI({
+      if (!PagefindUIClass) {
+        const mod = (await import("@pagefind/default-ui")) as PagefindUIModule;
+        PagefindUIClass = mod.PagefindUI as unknown as PagefindUIConstructor;
+      }
+
+      // #search要素が存在するかチェック
+      const searchElement = document.querySelector("#search") as HTMLElement | null;
+      if (!searchElement) return;
+
+      // 念のため初期化前にDOMをクリア
+      searchElement.innerHTML = "";
+
+      pagefindUIInstance = new (PagefindUIClass as any)({
         element: "#search",
         showImages: true,
       });
-    } catch (error) {
+
+      hasInitialized = true;
+    } catch (_error) {
       // PagefindUIの初期化に失敗した場合は静かに終了（エラーを出力しない）
-      // 要素が存在しない、またはPagefindUIが利用できない場合など
+      pagefindUIInstance = null;
+      hasInitialized = false;
+    } finally {
+      isLoadingPagefind = false;
+    }
+  };
+
+  function initSearch() {
+    // #search要素が存在するかチェック
+    const searchElement = document.querySelector("#search");
+    if (!searchElement) {
+      // 要素が存在しない場合は静かに終了（エラーを出力しない）
       return;
     }
+
+    // すでに初期化済みなら何もしない
+    if (hasInitialized) return;
 
     // requestAnimationFrameでバッチ処理（メインスレッド処理の最適化）
     let rafScheduled = false;
@@ -376,55 +416,8 @@
       });
     };
 
-    // PagefindUIのDOM生成を待つ（MutationObserverで効率的に監視）
-    const searchContainer = document.querySelector("#search");
-    if (searchContainer) {
-      let checkCount = 0;
-      const maxChecks = 5; // 最大チェック回数を5回に削減（不要な更新を削減）
-
-      // MutationObserverでDOMの変更を監視（最適化: 必要な要素のみ監視）
-      mutationObserver = new MutationObserver((mutations) => {
-        // 検索入力欄が追加された場合のみ更新をスケジュール
-        const hasRelevantChange = mutations.some((mutation) => {
-          if (mutation.type === "childList") {
-            return Array.from(mutation.addedNodes).some(
-              (node) =>
-                node.nodeType === Node.ELEMENT_NODE &&
-                ((node as Element).classList.contains("pagefind-ui__search-input") ||
-                  (node as Element).querySelector?.(".pagefind-ui__search-input"))
-            );
-          }
-          return false;
-        });
-
-        if (hasRelevantChange) {
-          checkCount++;
-          if (checkCount <= maxChecks) {
-            scheduleStyleUpdate();
-          } else {
-            // 最大チェック回数に達したら監視を停止
-            mutationObserver?.disconnect();
-            mutationObserver = null;
-          }
-        }
-      });
-
-      // 監視範囲を最適化: 子要素の追加のみ監視（attributes監視を削除）
-      mutationObserver.observe(searchContainer, {
-        childList: true,
-        subtree: true,
-      });
-
-      // 初期スタイル適用（即座に1回）
-      scheduleStyleUpdate();
-
-      // フォールバック: 300ms後に最終確認（タイムアウトを短縮）
-      setTimeout(() => {
-        if (checkCount < maxChecks) {
-          scheduleStyleUpdate();
-        }
-      }, 300);
-    }
+    // 初期スタイル適用（PagefindUIをまだ読み込まない）
+    scheduleStyleUpdate();
 
     // ウィンドウリサイズ時にスタイルを再適用（デバウンス付き）
     let resizeTimer: ReturnType<typeof setTimeout> | null = null;
@@ -437,6 +430,82 @@
       }, 200); // デバウンス時間を200msに調整（リフロー削減のため）
     };
     window.addEventListener("resize", resizeHandler, { passive: true });
+
+    // 画面内に入ったら Pagefind をロードして初期化（クリティカルチェーン回避）
+    const startLoading = async () => {
+      await ensurePagefindLoaded();
+
+      // PagefindUIのDOM生成を待つ（MutationObserverで効率的に監視）
+      const searchContainer = document.querySelector("#search");
+      if (searchContainer) {
+        let checkCount = 0;
+        const maxChecks = 5; // 最大チェック回数を5回に削減（不要な更新を削減）
+
+        // MutationObserverでDOMの変更を監視（最適化: 必要な要素のみ監視）
+        mutationObserver = new MutationObserver((mutations) => {
+          // 検索入力欄が追加された場合のみ更新をスケジュール
+          const hasRelevantChange = mutations.some((mutation) => {
+            if (mutation.type === "childList") {
+              return Array.from(mutation.addedNodes).some(
+                (node) =>
+                  node.nodeType === Node.ELEMENT_NODE &&
+                  ((node as Element).classList.contains("pagefind-ui__search-input") ||
+                    (node as Element).querySelector?.(".pagefind-ui__search-input"))
+              );
+            }
+            return false;
+          });
+
+          if (hasRelevantChange) {
+            checkCount++;
+            if (checkCount <= maxChecks) {
+              scheduleStyleUpdate();
+            } else {
+              // 最大チェック回数に達したら監視を停止
+              mutationObserver?.disconnect();
+              mutationObserver = null;
+            }
+          }
+        });
+
+        // 監視範囲を最適化: 子要素の追加のみ監視（attributes監視を削除）
+        mutationObserver.observe(searchContainer, {
+          childList: true,
+          subtree: true,
+        });
+
+        // 初期スタイル適用（即座に1回）
+        scheduleStyleUpdate();
+
+        // フォールバック: 300ms後に最終確認（タイムアウトを短縮）
+        setTimeout(() => {
+          if (checkCount < maxChecks) {
+            scheduleStyleUpdate();
+          }
+        }, 300);
+      }
+    };
+
+    if ("IntersectionObserver" in window) {
+      intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          const isVisible = entries.some((e) => e.isIntersecting);
+          if (!isVisible) return;
+          intersectionObserver?.disconnect();
+          intersectionObserver = null;
+          void startLoading();
+        },
+        {
+          // ちょい手前でロード開始して体感遅延を減らす
+          rootMargin: "200px 0px",
+          threshold: 0.01,
+        }
+      );
+      intersectionObserver.observe(searchElement);
+    } else {
+      // フォールバック（古いブラウザ等）: 従来通り即時ロード
+      void startLoading();
+    }
   }
 
   // DOMContentLoadedで初期化
@@ -448,9 +517,9 @@
 
   // View Transitions対応: ページ遷移時に再初期化
   document.addEventListener("astro:after-swap", () => {
-    // CSS読み込みを確実にするため、少し遅延してから初期化
-    // DOMの更新とCSSの読み込み完了を待つ
     setTimeout(() => {
+      // ルーティング後にDOMが再構築されるため、監視/ハンドラを作り直す
+      destroySearch();
       initSearch();
     }, 0);
   });
