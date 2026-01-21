@@ -16,9 +16,11 @@ if (import.meta.env.PUBLIC_API_PREFIX === undefined) {
 export const headlessCmsUrl = import.meta.env["PUBLIC_API_URL"] as string;
 export const headlessCmsApiPrefix = (import.meta.env.PUBLIC_API_PREFIX ?? "/wp-json/wp/v2/") as string;
 
-// ビルド時に環境変数をログ出力（デバッグ用）
-console.log("🔧 [API Config] WordPress API URL:", headlessCmsUrl);
-console.log("🔧 [API Config] API Prefix:", headlessCmsApiPrefix);
+// ビルド時に環境変数をログ出力（開発環境のみ）
+if (import.meta.env.DEV) {
+  console.log("🔧 [API Config] WordPress API URL:", headlessCmsUrl);
+  console.log("🔧 [API Config] API Prefix:", headlessCmsApiPrefix);
+}
 
 export const worksPageApi = "works?context=embed&acf_format=standard&per_page=20";
 export const worksSlugApi = "works?context=embed&acf_format=standard&slug=";
@@ -78,10 +80,12 @@ export { wpcf7ApiPrefix, wpcf7ApiId };
 // headlessCmsApiPrefix (/wp-json/wp/v2/) は使用しない
 export const CONTACT_WPCF7_API = `${headlessCmsUrl}/wp-json/${wpcf7ApiPrefix}${wpcf7ApiId}/feedback`;
 
-// デバッグ用: Contact Form 7 APIエンドポイントをログ出力
-console.log("🔧 [API Config] Contact Form 7 API Prefix:", wpcf7ApiPrefix);
-console.log("🔧 [API Config] Contact Form 7 API ID:", wpcf7ApiId);
-console.log("🔧 [API Config] Contact Form 7 API Endpoint:", CONTACT_WPCF7_API);
+// デバッグ用: Contact Form 7 APIエンドポイントをログ出力（開発環境のみ）
+if (import.meta.env.DEV) {
+  console.log("🔧 [API Config] Contact Form 7 API Prefix:", wpcf7ApiPrefix);
+  console.log("🔧 [API Config] Contact Form 7 API ID:", wpcf7ApiId);
+  console.log("🔧 [API Config] Contact Form 7 API Endpoint:", CONTACT_WPCF7_API);
+}
 export const wpcf7Id = import.meta.env.PUBLIC_WPCF7_ID as string;
 export const wpcf7UnitTag = import.meta.env["PUBLIC_WPCF7_UNIT_TAG"] as string;
 export const wpcf7PostId = import.meta.env["PUBLIC_WPCF7_POST_ID"] as string;

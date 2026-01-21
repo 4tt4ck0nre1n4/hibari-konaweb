@@ -17,7 +17,7 @@
     "build": "npm run copy && astro build && pagefind --site dist",
     "build:check": "npm run copy && astro check && astro build && pagefind --site dist",
     "build:clean": "npm run clean && npm run build",
-    "build:safe": "npm run check-env && npm run copy && astro check && astro build --force && pagefind --site dist",
+    "build:safe": "npm run check-env && npm run copy && astro check && astro build && pagefind --site dist",
     "format": "prettier --write 'src/**/*.{js,ts,jsx,tsx,.d.ts,astro,css,scss}'",
     "eslint": "eslint . --config eslint.config.mjs",
     "stylelint": "stylelint 'src/**/*.{css,scss}'",
