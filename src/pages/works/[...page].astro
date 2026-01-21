@@ -68,28 +68,40 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<R
 }
 
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+  // 開発環境のみログ出力
+  const isDev = import.meta.env.DEV;
+  const devLog = (...args: unknown[]) => {
+    if (isDev) console.log(...args);
+  };
+  const devError = (...args: unknown[]) => {
+    if (isDev) console.error(...args);
+  };
+  const devWarn = (...args: unknown[]) => {
+    if (isDev) console.warn(...args);
+  };
+
   try {
-    console.log("🔍 [Works Pagination] Fetching works from:", WORKS_PAGE_API);
+    devLog("🔍 [Works Pagination] Fetching works from:", WORKS_PAGE_API);
 
     const worksData = await fetchWithRetry(WORKS_PAGE_API);
 
     if (!worksData.ok) {
-      console.error(`❌ [Works Pagination] Failed to fetch works: ${worksData.status} ${worksData.statusText}`);
-      console.error(`❌ [Works Pagination] API URL: ${WORKS_PAGE_API}`);
+      devError(`❌ [Works Pagination] Failed to fetch works: ${worksData.status} ${worksData.statusText}`);
+      devError(`❌ [Works Pagination] API URL: ${WORKS_PAGE_API}`);
       throw new Error(`Failed to fetch works: ${worksData.status} ${worksData.statusText}`);
     }
 
     const allWorks = (await worksData.json()) as WorkObject[];
-    console.log(`✅ [Works Pagination] Successfully fetched ${allWorks.length} works`);
+    devLog(`✅ [Works Pagination] Successfully fetched ${allWorks.length} works`);
 
     if (!Array.isArray(allWorks) || allWorks.length === 0) {
-      console.warn("⚠️ [Works Pagination] No works found. Returning empty paths.");
-      console.warn("⚠️ [Works Pagination] This will result in 404 errors for works pages.");
+      devWarn("⚠️ [Works Pagination] No works found. Returning empty paths.");
+      devWarn("⚠️ [Works Pagination] This will result in 404 errors for works pages.");
       return [];
     }
 
     const paginatedData = paginate(allWorks, { pageSize: 4 });
-    console.log(`📄 [Works Pagination] Generated ${paginatedData.length} paginated pages`);
+    devLog(`📄 [Works Pagination] Generated ${paginatedData.length} paginated pages`);
 
     const paths = paginatedData.map((path, index) => ({
       params: { page: String(index + 1) },
@@ -116,10 +128,11 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
       });
     }
 
-    console.log(`✅ [Works Pagination] Generated ${paths.length} total paths (including /works and /works/1)`);
+    devLog(`✅ [Works Pagination] Generated ${paths.length} total paths (including /works and /works/1)`);
 
     return paths;
   } catch (error) {
+    // エラーは常にログ出力（ビルド失敗の原因を特定するため）
     console.error("❌ [Works Pagination] Error in getStaticPaths:", error);
     console.error("❌ [Works Pagination] API URL:", WORKS_PAGE_API);
     if (error instanceof Error) {
@@ -129,11 +142,12 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
         console.error("❌ [Works Pagination] Error stack:", error.stack);
       }
       // 接続エラーの場合、より詳細な情報を出力
-      if (error.message.includes("fetch failed") || error.message.includes("ECONNREFUSED")) {
+      if (error.message.includes("fetch failed") || error.message.includes("ECONNREFUSED") || error.message.includes("timeout")) {
         console.error("❌ [Works Pagination] Connection error detected. Please check:");
         console.error("   1. WordPress API URL is accessible from Netlify build environment");
         console.error("   2. Environment variable PUBLIC_API_URL is set correctly");
         console.error("   3. WordPress site is not blocking requests from Netlify");
+        console.error("   4. WordPress API endpoint is responding correctly");
       }
     }
     // エラー時も空配列を返してビルドを継続（ビルド全体を停止しない）
