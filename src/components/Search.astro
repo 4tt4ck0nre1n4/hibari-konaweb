@@ -123,7 +123,6 @@
     loadPagefindCSS();
   }
 
-  let pagefindUIInstance: PagefindUI | null = null;
   let mutationObserver: MutationObserver | null = null;
   let resizeHandler: (() => void) | null = null;
   let intersectionObserver: IntersectionObserver | null = null;
@@ -131,7 +130,6 @@
   let hasInitialized = false;
 
   type PagefindUIModule = typeof import("@pagefind/default-ui");
-  type PagefindUI = PagefindUIModule["PagefindUI"] extends new (...args: any[]) => any ? InstanceType<PagefindUIModule["PagefindUI"]> : any;
   type PagefindUIConstructor = PagefindUIModule["PagefindUI"] extends new (...args: any[]) => any ? PagefindUIModule["PagefindUI"] : any;
   let PagefindUIClass: PagefindUIConstructor | null = null;
 
@@ -342,7 +340,6 @@
     if (searchElement) {
       searchElement.innerHTML = "";
     }
-    pagefindUIInstance = null;
     hasInitialized = false;
     isLoadingPagefind = false;
   };
@@ -370,7 +367,8 @@
       // 念のため初期化前にDOMをクリア
       searchElement.innerHTML = "";
 
-      pagefindUIInstance = new (PagefindUIClass as any)({
+      // PagefindUIインスタンスを作成（インスタンス自体は保持しない）
+      new (PagefindUIClass as any)({
         element: "#search",
         showImages: true,
       });
@@ -378,7 +376,6 @@
       hasInitialized = true;
     } catch (_error) {
       // PagefindUIの初期化に失敗した場合は静かに終了（エラーを出力しない）
-      pagefindUIInstance = null;
       hasInitialized = false;
     } finally {
       isLoadingPagefind = false;
