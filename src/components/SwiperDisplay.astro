@@ -48,12 +48,13 @@ try {
 }
 
 // WordPress画像を最適化（ビルド時に処理）
+// qualityを75に下げてファイルサイズを削減（レポートの推奨に従う）
 const optimizedSwiperImages = await Promise.all(
   swipers.slice(0, 10).map(async (swiper) => {
     const optimizedImage = await getOptimizedWordPressImage(swiper.acf?.swiper_image, {
       width: 240,
       height: 360,
-      quality: 85,
+      quality: 75,
       format: "webp",
     });
     // 最適化に失敗した場合は元のURLを使用
