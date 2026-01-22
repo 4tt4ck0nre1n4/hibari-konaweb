@@ -38,35 +38,6 @@ interface PageObject {
   lastPage: number;
 }
 
-// リトライ機構付きのフェッチ関数
-async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<Response> {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(url, {
-        // タイムアウトを設定（10秒）
-        signal: AbortSignal.timeout(10000),
-      });
-
-      // 5xx エラーの場合はリトライ
-      if (response.status >= 500 && i < retries - 1) {
-        console.warn(`⚠️ [Works Pagination] Server error ${response.status}, retrying... (${i + 1}/${retries})`);
-        await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
-        continue;
-      }
-
-      return response;
-    } catch (error) {
-      if (i < retries - 1) {
-        console.warn(`⚠️ [Works Pagination] Fetch failed, retrying... (${i + 1}/${retries})`, error);
-        await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
-        continue;
-      }
-      throw error;
-    }
-  }
-  throw new Error("Max retries reached");
-}
-
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
   // 開発環境のみログ出力
   const isDev = import.meta.env.DEV;
@@ -79,6 +50,35 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
   const devWarn = (...args: unknown[]) => {
     if (isDev) console.warn(...args);
   };
+
+  // リトライ機構付きのフェッチ関数（getStaticPaths内で定義）
+  async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<Response> {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, {
+          // タイムアウトを設定（10秒）
+          signal: AbortSignal.timeout(10000),
+        });
+
+        // 5xx エラーの場合はリトライ
+        if (response.status >= 500 && i < retries - 1) {
+          console.warn(`⚠️ [Works Pagination] Server error ${response.status}, retrying... (${i + 1}/${retries})`);
+          await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
+          continue;
+        }
+
+        return response;
+      } catch (error) {
+        if (i < retries - 1) {
+          console.warn(`⚠️ [Works Pagination] Fetch failed, retrying... (${i + 1}/${retries})`, error);
+          await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
+          continue;
+        }
+        throw error;
+      }
+    }
+    throw new Error("Max retries reached");
+  }
 
   try {
     devLog("🔍 [Works Pagination] Fetching works from:", WORKS_PAGE_API);
