@@ -276,12 +276,20 @@ import pageTopIcon from "../assets/svg/top.svg";
         handleScroll();
       }, 100);
 
-      // リサイズ時にも再計算（FirstViewの高さが変わる可能性があるため）
-      const resizeHandler = () => {
-        devLog("📐 Window resized, recalculating");
-        handleScroll();
-      };
-      window.addEventListener("resize", resizeHandler, { passive: true });
+      // メインスレッド処理の最適化: デバウンスでリサイズイベントの実行頻度を制限
+      const debouncedResize = (() => {
+        let timeoutId: ReturnType<typeof setTimeout> | null = null;
+        return () => {
+          if (timeoutId !== null) {
+            clearTimeout(timeoutId);
+          }
+          timeoutId = setTimeout(() => {
+            devLog("📐 Window resized, recalculating");
+            handleScroll();
+          }, 200); // 200msでデバウンス
+        };
+      })();
+      window.addEventListener("resize", debouncedResize, { passive: true });
 
       isInitialized = true;
     }

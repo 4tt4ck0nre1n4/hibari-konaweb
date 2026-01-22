@@ -23,10 +23,26 @@ function devError(...args: unknown[]): void {
 }
 
 /**
+ * prefers-reduced-motionの設定を確認
+ */
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/**
  * GSAPとScrollTriggerの読み込みを待つ
  */
 function initializeApp(): void {
   devLog("🔍 Initializing grid control animations...");
+
+  // prefers-reduced-motionが有効な場合はアニメーションをスキップ
+  if (prefersReducedMotion()) {
+    devLog("⏭️ prefers-reduced-motion is enabled, skipping animations");
+    return;
+  }
 
   if (typeof gsap === "undefined") {
     devWarn("⚠️ GSAP not loaded yet, retrying in 100ms...");

@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect, useCallback } from "react";
 import hamburgerStyles from "../styles/hamburgerStyles.module.css";
 import ReactDOM from "react-dom";
 import SnsLink from "./SnsLink";
@@ -132,29 +132,39 @@ const HamburgerMenu = () => {
       });
     };
 
-    const handleResize = () => {
-      requestAnimationFrame(updateOverlayMetrics);
-    };
+    // メインスレッド処理の最適化: デバウンスでリサイズ/スクロールイベントの実行頻度を制限
+    const debouncedUpdate = (() => {
+      let timeoutId: ReturnType<typeof setTimeout> | null = null;
+      return () => {
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+          requestAnimationFrame(updateOverlayMetrics);
+        }, 150); // 150msでデバウンス
+      };
+    })();
 
     // 初期化時もrequestAnimationFrame内で実行（強制リフローを避ける）
     requestAnimationFrame(updateOverlayMetrics);
 
-    const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(handleResize) : null;
+    const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(debouncedUpdate) : null;
     if (resizeObserver && menuRef.current) {
       resizeObserver.observe(menuRef.current);
     }
 
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("scroll", handleResize, true);
+    window.addEventListener("resize", debouncedUpdate, { passive: true });
+    window.addEventListener("scroll", debouncedUpdate, { passive: true });
 
     return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleResize, true);
+      window.removeEventListener("resize", debouncedUpdate);
+      window.removeEventListener("scroll", debouncedUpdate);
       resizeObserver?.disconnect();
     };
   }, [isOpen]);
 
-  const getMenuFocusableElements = () => {
+  // メインスレッド処理の最適化: useCallbackでメモ化（不要な再作成を防止）
+  const getMenuFocusableElements = useCallback(() => {
     const elements: HTMLElement[] = [];
     if (menuRef.current) {
       elements.push(
@@ -167,7 +177,7 @@ const HamburgerMenu = () => {
       elements.push(buttonRef.current);
     }
     return elements;
-  };
+  }, []);
 
   useEffect(() => {
     // フェーズ1: すべてのDOM読み取りを一度に実行
@@ -320,7 +330,7 @@ const HamburgerMenu = () => {
         document.body.style.width = "";
       }
     };
-  }, [isOpen]);
+  }, [isOpen, getMenuFocusableElements]);
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {

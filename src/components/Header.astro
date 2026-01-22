@@ -143,8 +143,22 @@ const logo = {
     }
   }
 
+  // メインスレッド処理の最適化: スロットルでスクロールイベントの実行頻度を制限
+  const throttledScroll = (() => {
+    let inThrottle = false;
+    return () => {
+      if (!inThrottle) {
+        handleScroll();
+        inThrottle = true;
+        setTimeout(() => {
+          inThrottle = false;
+        }, 100); // 100msでスロットル
+      }
+    };
+  })();
+
   // イベントリスナーの設定
-  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("scroll", throttledScroll, { passive: true });
 
   // DOMが読み込まれた後に時計アニメーションを初期化
   document.addEventListener("DOMContentLoaded", initClockAnimation);

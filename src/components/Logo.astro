@@ -146,10 +146,24 @@ const gradientTitle = "My Portfolio";
     });
   }
 
+  // prefers-reduced-motionの設定を確認
+  function prefersReducedMotion(): boolean {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
   // DOM要素の取得とアニメーション初期化
   function initLoadingAnimation(gsap: typeof import("gsap").gsap) {
     // 初回読み込みでない場合は即座に非表示にして終了
     if (!isInitialLoad()) {
+      hideLoadingScreenImmediately(gsap);
+      return;
+    }
+
+    // prefers-reduced-motionが有効な場合はアニメーションをスキップ
+    if (prefersReducedMotion()) {
       hideLoadingScreenImmediately(gsap);
       return;
     }

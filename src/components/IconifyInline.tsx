@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, memo } from "react";
 
 // アイコンセットを動的インポートで遅延読み込み（クリティカルパスを短縮）
 // 文字列指定の @iconify/react は外部（api.iconify.design）フェッチが発生し得るため避ける
@@ -88,12 +88,28 @@ const loadIconSet = async (prefix: string): Promise<IconifyIconsJSON | null> => 
   }
 };
 
+// メインスレッド処理の最適化: parseIconNameをメモ化（同じアイコン名の再計算を避ける）
+const parseIconNameCache = new Map<string, { prefix: string; name: string } | null>();
+
 function parseIconName(icon: string): { prefix: string; name: string } | null {
+  // キャッシュをチェック
+  if (parseIconNameCache.has(icon)) {
+    return parseIconNameCache.get(icon) ?? null;
+  }
+
   const trimmed = icon.trim();
-  if (trimmed === "") return null;
+  if (trimmed === "") {
+    parseIconNameCache.set(icon, null);
+    return null;
+  }
   const idx = trimmed.indexOf(":");
-  if (idx <= 0 || idx === trimmed.length - 1) return null;
-  return { prefix: trimmed.slice(0, idx), name: trimmed.slice(idx + 1) };
+  if (idx <= 0 || idx === trimmed.length - 1) {
+    parseIconNameCache.set(icon, null);
+    return null;
+  }
+  const result = { prefix: trimmed.slice(0, idx), name: trimmed.slice(idx + 1) };
+  parseIconNameCache.set(icon, result);
+  return result;
 }
 
 export type IconifyInlineProps = {
@@ -105,7 +121,7 @@ export type IconifyInlineProps = {
   title?: string;
 };
 
-export default function IconifyInline({
+function IconifyInlineComponent({
   icon,
   width,
   height,
@@ -117,7 +133,8 @@ export default function IconifyInline({
   const [iconSet, setIconSet] = useState<IconifyIconsJSON | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const parsed = parseIconName(icon);
+  // メインスレッド処理の最適化: parseIconNameの結果をメモ化
+  const parsed = useMemo(() => parseIconName(icon), [icon]);
 
   useEffect(() => {
     if (!parsed) {
@@ -196,3 +213,8 @@ export default function IconifyInline({
 
   return <svg {...svgProps} />;
 }
+
+// メインスレッド処理の最適化: React.memoでコンポーネントをメモ化（不要な再レンダリングを防止）
+const IconifyInline = memo(IconifyInlineComponent);
+
+export default IconifyInline;

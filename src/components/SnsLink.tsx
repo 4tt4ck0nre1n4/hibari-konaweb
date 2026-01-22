@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, memo } from "react";
 import type { IconifyInlineProps } from "./IconifyInline";
 
 export interface SnsLinkProps {
@@ -27,12 +27,16 @@ const SnsLink = ({
   const snsIconHeight = 28;
   const [IconifyInline, setIconifyInline] = useState<ComponentType<IconifyInlineProps> | null>(null);
 
-  const isSvgAsset =
-    typeof snsIconSvg === "string" &&
-    snsIconSvg.trim() !== "" &&
-    (snsIconSvg.endsWith(".svg") || snsIconSvg.startsWith("/") || snsIconSvg.startsWith("."));
+  // メインスレッド処理の最適化: useMemoでメモ化（不要な再計算を防止）
+  const isSvgAsset = useMemo(
+    () =>
+      typeof snsIconSvg === "string" &&
+      snsIconSvg.trim() !== "" &&
+      (snsIconSvg.endsWith(".svg") || snsIconSvg.startsWith("/") || snsIconSvg.startsWith(".")),
+    [snsIconSvg]
+  );
 
-  const hasIconName = snsIconName != null && snsIconName.trim() !== "";
+  const hasIconName = useMemo(() => snsIconName != null && snsIconName.trim() !== "", [snsIconName]);
 
   // ネットワーク依存関係ツリー最適化: アイコンがSVGアセットでない場合のみ、IconifyInlineを遅延ロード
   useEffect(() => {
@@ -105,4 +109,7 @@ const SnsLink = ({
   );
 };
 
-export default SnsLink;
+// メインスレッド処理の最適化: React.memoでコンポーネントをメモ化
+const SnsLinkMemoized = memo(SnsLink);
+
+export default SnsLinkMemoized;

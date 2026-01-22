@@ -50,6 +50,18 @@ html.dark footer {
   background-color: transparent;
 }
 
+/* メインスレッド処理の最適化: prefers-reduced-motionに対応 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* パンくず */
 .breadcrumbs__wrapper {
   width: 100%;

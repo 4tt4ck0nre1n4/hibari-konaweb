@@ -1,11 +1,11 @@
 import type { ComponentType } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import type { IconifyInlineProps } from "./IconifyInline";
 
 const soundOn = "twemoji:speaker-high-volume";
 const soundOff = "twemoji:muted-speaker";
 
-const SoundToggle = () => {
+const SoundToggleComponent = () => {
   const [isSoundOn, setIsSoundOn] = useState(true);
   const [IconifyInline, setIconifyInline] = useState<ComponentType<IconifyInlineProps> | null>(null);
 
@@ -36,11 +36,12 @@ const SoundToggle = () => {
     }
   }, []);
 
-  const toggleSound = () => {
+  // メインスレッド処理の最適化: useCallbackでメモ化（不要な再作成を防止）
+  const toggleSound = useCallback(() => {
     const newValue = !isSoundOn;
     setIsSoundOn(newValue);
     localStorage.setItem("sound-enabled", newValue.toString());
-  };
+  }, [isSoundOn]);
 
   return (
     <button
@@ -58,5 +59,8 @@ const SoundToggle = () => {
     </button>
   );
 };
+
+// メインスレッド処理の最適化: React.memoでコンポーネントをメモ化
+const SoundToggle = memo(SoundToggleComponent);
 
 export default SoundToggle;
