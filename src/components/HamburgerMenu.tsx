@@ -71,16 +71,27 @@ const HamburgerMenu = () => {
       previouslyFocusedElementRef.current =
         document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
-      // メニューを開くタイミングでアイコン描画用のコンポーネントを遅延ロード
+      // ネットワーク依存関係ツリー最適化: メニューを開くタイミングでアイコン描画用のコンポーネントを遅延ロード
       if (!IconifyInline) {
-        void import("./IconifyInline")
-          .then((mod) => {
-            setIconifyInline(() => mod.default);
-          })
-          .catch(() => {
-            // 失敗時はアイコン無しで動作（メニュー自体は開ける）
-            setIconifyInline(null);
-          });
+        // クリティカルパスをブロックしないように、アイコン読み込みを非同期で実行
+        const loadIconify = () => {
+          import("./IconifyInline")
+            .then((mod) => {
+              setIconifyInline(() => mod.default);
+            })
+            .catch(() => {
+              // 失敗時はアイコン無しで動作（メニュー自体は開ける）
+              setIconifyInline(null);
+            });
+        };
+
+        // requestIdleCallbackで遅延読み込み（クリティカルパスをブロックしない）
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(loadIconify, { timeout: 3000 });
+        } else {
+          // フォールバック: setTimeoutで遅延読み込み
+          setTimeout(loadIconify, 200);
+        }
       }
     }
     setIsOpen((prev) => !prev);

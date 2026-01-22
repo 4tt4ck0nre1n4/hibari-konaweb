@@ -182,9 +182,42 @@ export default defineConfig({
             if (id.includes("node_modules/gsap")) {
               return "gsap";
             }
-            // Iconify関連のライブラリをまとめる（アイコンの読み込み最適化）
+            // Iconify関連のライブラリを細分化（ネットワーク依存関係ツリー最適化）
+            // コアライブラリとJSONデータを分離して、必要なものだけを読み込む
+            if (id.includes("node_modules/@iconify/react") || id.includes("node_modules/@iconify/types")) {
+              return "iconify-core";
+            }
+            // 各アイコンセットを個別のチャンクに分割（必要なものだけを読み込む）
+            if (id.includes("node_modules/@iconify-json/bi")) {
+              return "iconify-bi";
+            }
+            if (id.includes("node_modules/@iconify-json/devicon")) {
+              return "iconify-devicon";
+            }
+            if (id.includes("node_modules/@iconify-json/fa6")) {
+              return "iconify-fa6";
+            }
+            if (id.includes("node_modules/@iconify-json/fluent-emoji")) {
+              return "iconify-fluent";
+            }
+            if (id.includes("node_modules/@iconify-json/flat-color-icons")) {
+              return "iconify-flat";
+            }
+            if (id.includes("node_modules/@iconify-json/ic")) {
+              return "iconify-ic";
+            }
+            if (id.includes("node_modules/@iconify-json/streamline")) {
+              return "iconify-streamline";
+            }
+            if (id.includes("node_modules/@iconify-json/twemoji")) {
+              return "iconify-twemoji";
+            }
+            if (id.includes("node_modules/@iconify-json/vscode-icons")) {
+              return "iconify-vscode";
+            }
+            // その他のIconify関連（フォールバック）
             if (id.includes("node_modules/@iconify") || id.includes("node_modules/@iconify-json")) {
-              return "iconify";
+              return "iconify-other";
             }
             // tsParticles関連のライブラリをまとめる
             if (id.includes("node_modules/@tsparticles")) {

@@ -34,6 +34,7 @@
     color-mix(in srgb, var(--white) 15%, transparent) 90%,
     transparent 100%
   );
+
   /* --gradient-controller: linear-gradient(
     var(--angle),
     color-mix(in srgb, var(--white) 20%, transparent) 0%,

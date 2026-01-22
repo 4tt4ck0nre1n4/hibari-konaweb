@@ -57,14 +57,25 @@ export default function ParticlesComponent() {
       }
     })();
 
-    // IconifyInlineを動的に読み込む
-    import("./IconifyInline")
-      .then((mod) => {
-        setIconifyInline(() => mod.default);
-      })
-      .catch(() => {
-        setIconifyInline(null);
-      });
+    // ネットワーク依存関係ツリー最適化: IconifyInlineの読み込みをrequestIdleCallbackで遅延
+    // クリティカルパスをブロックしないように、アイコン読み込みを非同期で実行
+    const loadIconify = () => {
+      import("./IconifyInline")
+        .then((mod) => {
+          setIconifyInline(() => mod.default);
+        })
+        .catch(() => {
+          setIconifyInline(null);
+        });
+    };
+
+    // requestIdleCallbackで遅延読み込み（クリティカルパスをブロックしない）
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(loadIconify, { timeout: 3000 });
+    } else {
+      // フォールバック: setTimeoutで遅延読み込み
+      setTimeout(loadIconify, 200);
+    }
   }, []);
 
   const defaultOptions: ISourceOptions = useMemo(() => {

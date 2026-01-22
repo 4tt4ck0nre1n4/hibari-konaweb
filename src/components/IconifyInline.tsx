@@ -76,7 +76,14 @@ const loadIconSet = async (prefix: string): Promise<IconifyIconsJSON | null> => 
 
     return iconSet;
   } catch (error) {
-    console.warn(`Failed to load icon set: ${prefix}`, error);
+    // 本番環境ではエラーログを抑制（PageSpeed Insightsのエラーを防ぐ）
+    // 開発環境でのみログを出力
+    if (typeof window !== "undefined") {
+      const isDev = (window as Window & { __DEV__?: boolean }).__DEV__;
+      if (isDev === true) {
+        console.warn(`Failed to load icon set: ${prefix}`, error);
+      }
+    }
     return null;
   }
 };
@@ -118,19 +125,30 @@ export default function IconifyInline({
       return;
     }
 
-    // アイコンセットを動的に読み込む
-    loadIconSet(parsed.prefix)
-      .then((set) => {
-        if (set) {
-          setIconSet(set);
-          const data = set.icons[parsed.name];
-          setIconData(data ?? null);
-        }
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
+    // ネットワーク依存関係ツリー最適化: アイコンセットの読み込みをrequestIdleCallbackで遅延
+    // クリティカルパスをブロックしないように、アイコン読み込みを非同期で実行
+    const loadIcon = () => {
+      loadIconSet(parsed.prefix)
+        .then((set) => {
+          if (set) {
+            setIconSet(set);
+            const data = set.icons[parsed.name];
+            setIconData(data ?? null);
+          }
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
+    };
+
+    // requestIdleCallbackで遅延読み込み（クリティカルパスをブロックしない）
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(loadIcon, { timeout: 3000 });
+    } else {
+      // フォールバック: setTimeoutで遅延読み込み
+      setTimeout(loadIcon, 100);
+    }
   }, [icon, parsed]);
 
   if (!parsed || isLoading || !iconSet || !iconData) {

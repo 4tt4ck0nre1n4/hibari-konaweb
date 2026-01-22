@@ -869,6 +869,15 @@ const cspContent = isDev
         position: relative;
         z-index: 0;
         pointer-events: none;
+        /* CLS改善: 初期サイズを明示的に設定してレイアウトシフトを防止 */
+        min-height: 500px; /* Glitchコンポーネントの最小高さに合わせる */
+      }
+
+      /* モバイルサイズでのglitch-container最適化 */
+      @media (width <= 480px) {
+        .glitch-container {
+          min-height: 400px; /* モバイル用Glitchコンポーネントの高さに合わせる */
+        }
       }
 
       .glitch-container > * {
@@ -976,6 +985,7 @@ const cspContent = isDev
     </script>
 
     <!-- グローバルエラーハンドラー: 動的インポートのエラーを適切に処理 -->
+    <!-- is:inlineで即座に実行し、他のスクリプトより先にエラーハンドラーを設定 -->
     <script is:inline>
       // @ts-nocheck
       // IIFEでスコープを分離（重複宣言エラーを防ぐ）
@@ -999,6 +1009,7 @@ const cspContent = isDev
             const errorStack = error?.stack;
 
             // 動的インポートのエラーを特定（iconify、tsparticles、gsapなどのチャンク読み込みエラーを含む）
+            const errorString = String(error);
             const isDynamicImportError =
               errorMessage.includes("Failed to fetch dynamically imported module") ||
               errorMessage.includes("Failed to load resource") ||
@@ -1007,9 +1018,13 @@ const cspContent = isDev
               errorMessage.includes("ERR_INTERNET_DISCONNECTED") ||
               errorMessage.includes("Loading chunk") ||
               errorMessage.includes("Loading CSS chunk") ||
+              errorMessage.includes("ChunkLoadError") ||
               errorMessage.includes("/_astro/") ||
               errorMessage.includes("iconify") ||
-              errorMessage.includes("netlify.app");
+              errorMessage.includes("netlify.app") ||
+              errorString.includes("ERR_CONNECTION_FAILED") ||
+              errorString.includes("iconify") ||
+              errorString.includes("/_astro/");
 
             if (isDynamicImportError) {
               // 動的インポートのエラーは開発環境でのみログに記録
@@ -1031,38 +1046,58 @@ const cspContent = isDev
           // グローバルエラーハンドラー（ReferenceErrorなど）
           window.addEventListener("error", (event) => {
             const error = event.error;
-            const errorMessage = error?.message || event.message;
+            const errorMessage = error?.message || event.message || "";
             const errorStack = error?.stack;
+            const filename = event.filename || "";
+            const target = event.target;
 
             // 既に処理済みのエラーは無視
             if (event.defaultPrevented) {
               return;
             }
 
+            // リソース読み込みエラー（<script>、<link>、<img>などの読み込みエラー）を検出
+            const isResourceLoadError =
+              target &&
+              (target instanceof HTMLElement || target instanceof HTMLScriptElement || target instanceof HTMLLinkElement) &&
+              target.tagName &&
+              (target.tagName === "SCRIPT" || target.tagName === "LINK" || target.tagName === "IMG");
+
             // 動的インポート関連のエラーを特定（iconify、tsparticles、gsapなどのチャンク読み込みエラーを含む）
             const isDynamicImportError =
+              isResourceLoadError ||
               errorMessage.includes("Failed to fetch dynamically imported module") ||
               errorMessage.includes("Failed to load resource") ||
               errorMessage.includes("ERR_CONNECTION_FAILED") ||
               errorMessage.includes("ERR_NETWORK_CHANGED") ||
               errorMessage.includes("ERR_INTERNET_DISCONNECTED") ||
-              (event.filename &&
-                (event.filename.includes("/_astro/") ||
-                  event.filename.includes("iconify") ||
-                  event.filename.includes("netlify.app")));
+              errorMessage.includes("Loading chunk") ||
+              errorMessage.includes("Loading CSS chunk") ||
+              errorMessage.includes("ChunkLoadError") ||
+              filename.includes("/_astro/") ||
+              filename.includes("iconify") ||
+              filename.includes("netlify.app") ||
+              (target && target.src && (target.src.includes("/_astro/") || target.src.includes("iconify")));
 
             if (isDynamicImportError) {
-              devLog("Dynamic import error (suppressed in production):", {
+              // 動的インポートのエラーは開発環境でのみログに記録
+              devLog("Dynamic import/resource load error (suppressed in production):", {
                 message: errorMessage,
                 stack: errorStack,
-                filename: event.filename,
+                filename: filename,
+                target: target ? (target.tagName || target.nodeName) : null,
+                src: target && target.src ? target.src : null,
                 lineno: event.lineno,
                 colno: event.colno,
               });
-              // 本番環境ではエラーを抑制
+              // 本番環境ではエラーを抑制（PageSpeed Insightsのエラーを防ぐ）
               // ネットワークエラーはユーザーのネットワーク環境によるものであり、アプリケーションのエラーではない
               event.preventDefault();
               event.stopPropagation();
+              // リソース読み込みエラーの場合、イベントの伝播を停止
+              if (isResourceLoadError && target) {
+                target.onerror = null; // エラーハンドラーをクリアして再発を防ぐ
+              }
               return;
             }
 
@@ -1070,7 +1105,7 @@ const cspContent = isDev
             devLog("Global error:", {
               message: errorMessage,
               stack: errorStack,
-              filename: event.filename,
+              filename: filename,
               lineno: event.lineno,
               colno: event.colno,
             });

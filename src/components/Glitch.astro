@@ -28,6 +28,9 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     overflow: hidden;
     margin-inline: auto;
     z-index: 0 !important;
+    /* CLS改善: アスペクト比を明示的に設定してレイアウトシフトを防止 */
+    aspect-ratio: 1 / 1;
+    min-height: 500px; /* 初期高さを保証 */
   }
 
   @media (width <= 1280px) {
@@ -41,6 +44,7 @@ const glitchImage = await getImage({ src: glitchImageSrc });
     .glitch {
       max-width: 480px;
       height: 400px;
+      min-height: 400px; /* モバイル用の最小高さを保証 */
     }
   }
   .glitch-image {

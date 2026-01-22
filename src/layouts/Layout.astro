@@ -134,108 +134,150 @@ const shouldLoadGA: boolean =
 
           /**
            * デバイス判定と読み込み方法の条件分岐
+           * メインスレッド処理の最適化: Intersection Observerを使用してビューポートに入ったときに読み込む
            */
           function initGoogleAnalytics() {
             const screenWidth = getScreenWidth();
 
-            // ①スマホ・タブレット（768px以下）：スクロール検知後に実行
-            if (screenWidth <= 768) {
-              // スクロール閾値：50px以上スクロールした後に実行（誤検知を防ぐ）
-              const SCROLL_THRESHOLD = 50;
-              let hasScrolled = false;
+            // メインスレッド処理の最適化: Intersection Observerを使用（スクロールイベントより効率的）
+            if ("IntersectionObserver" in window) {
+              // ビューポートの下部にマーカー要素を作成（スクロールしてこの要素が見えたら読み込む）
+              const marker = document.createElement("div");
+              marker.style.position = "absolute";
+              marker.style.bottom = "200px"; // ビューポートの下部200px手前で読み込み開始
+              marker.style.width = "1px";
+              marker.style.height = "1px";
+              marker.style.pointerEvents = "none";
+              marker.style.visibility = "hidden";
+              document.body.appendChild(marker);
 
-              /**
-               * スクロールイベントハンドラー
-               * 50px以上スクロールした場合のみ実行
-               */
-              function handleScroll() {
-                const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+              const observer = new IntersectionObserver(
+                function (entries) {
+                  const isVisible = entries.some(function (entry) {
+                    return entry.isIntersecting;
+                  });
 
-                // 50px以上スクロールした場合のみ実行
-                if (!hasScrolled && scrollY >= SCROLL_THRESHOLD) {
-                  hasScrolled = true;
-                  loadGoogleAnalytics();
+                  if (isVisible && !isLoaded) {
+                    observer.disconnect();
+                    document.body.removeChild(marker);
+                    loadGoogleAnalytics();
+                  }
+                },
+                {
+                  rootMargin: "200px 0px", // 200px手前で読み込み開始
+                  threshold: 0.01,
                 }
-              }
+              );
 
-              // スクロール検知のためのイベントリスナーを設定
-              // パッシブリスナーを使用してパフォーマンスを最適化
-              const scrollHandler = { event: "scroll", handler: handleScroll };
-              const wheelHandler = { event: "wheel", handler: handleScroll };
-              const touchHandler = { event: "touchstart", handler: handleScroll };
-
-              window.addEventListener("scroll", handleScroll, { passive: true });
-              window.addEventListener("wheel", handleScroll, { passive: true });
-              window.addEventListener("touchstart", handleScroll, { passive: true });
-
-              scrollEventListeners.push(scrollHandler, wheelHandler, touchHandler);
-
-              // フォールバック: スクロールしない場合でも10秒後に読み込む
-              // 10秒は業界標準の中間値（5-15秒の範囲で一般的に使用）
-              timeoutId = setTimeout(function () {
-                if (!isLoaded) {
-                  loadGoogleAnalytics();
-                }
-              }, 10000); // 10秒後にフォールバック
-
-              // ページが既にスクロールされている場合（リロード時など）は即座に読み込む
-              const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-              if (currentScrollY >= SCROLL_THRESHOLD) {
-                loadGoogleAnalytics();
-              }
-            }
-            // ②パソコン（1024px以上）：ページ読み込み後すぐに実行
-            else if (screenWidth >= 1024) {
-              // DOMContentLoadedイベントで実行（ページ読み込み完了後）
-              if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", function () {
-                  loadGoogleAnalytics();
-                });
-              } else {
-                // 既に読み込み完了している場合は即座に実行
-                loadGoogleAnalytics();
-              }
+              observer.observe(marker);
 
               // フォールバック: 10秒後に読み込む（念のため）
               timeoutId = setTimeout(function () {
                 if (!isLoaded) {
+                  observer.disconnect();
+                  if (document.body.contains(marker)) {
+                    document.body.removeChild(marker);
+                  }
                   loadGoogleAnalytics();
                 }
               }, 10000);
             }
-            // ③中間サイズ（769px-1023px）：スクロール検知後に実行（スマホと同じ動作）
+            // フォールバック: Intersection Observerがサポートされていない場合
             else {
-              const SCROLL_THRESHOLD = 50;
-              let hasScrolled = false;
+              // ①スマホ・タブレット（768px以下）：スクロール検知後に実行
+              if (screenWidth <= 768) {
+                const SCROLL_THRESHOLD = 50;
+                let hasScrolled = false;
 
-              function handleScroll() {
-                const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+                function handleScroll() {
+                  const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
 
-                if (!hasScrolled && scrollY >= SCROLL_THRESHOLD) {
-                  hasScrolled = true;
+                  if (!hasScrolled && scrollY >= SCROLL_THRESHOLD) {
+                    hasScrolled = true;
+                    loadGoogleAnalytics();
+                  }
+                }
+
+                const scrollHandler = { event: "scroll", handler: handleScroll };
+                const wheelHandler = { event: "wheel", handler: handleScroll };
+                const touchHandler = { event: "touchstart", handler: handleScroll };
+
+                window.addEventListener("scroll", handleScroll, { passive: true });
+                window.addEventListener("wheel", handleScroll, { passive: true });
+                window.addEventListener("touchstart", handleScroll, { passive: true });
+
+                scrollEventListeners.push(scrollHandler, wheelHandler, touchHandler);
+
+                timeoutId = setTimeout(function () {
+                  if (!isLoaded) {
+                    loadGoogleAnalytics();
+                  }
+                }, 10000);
+
+                const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+                if (currentScrollY >= SCROLL_THRESHOLD) {
                   loadGoogleAnalytics();
                 }
               }
+              // ②パソコン（1024px以上）：requestIdleCallbackで遅延読み込み
+              else if (screenWidth >= 1024) {
+                if ("requestIdleCallback" in window) {
+                  requestIdleCallback(
+                    function () {
+                      loadGoogleAnalytics();
+                    },
+                    { timeout: 5000 }
+                  );
+                } else {
+                  if (document.readyState === "loading") {
+                    document.addEventListener("DOMContentLoaded", function () {
+                      loadGoogleAnalytics();
+                    });
+                  } else {
+                    loadGoogleAnalytics();
+                  }
+                }
 
-              const scrollHandler = { event: "scroll", handler: handleScroll };
-              const wheelHandler = { event: "wheel", handler: handleScroll };
-              const touchHandler = { event: "touchstart", handler: handleScroll };
+                timeoutId = setTimeout(function () {
+                  if (!isLoaded) {
+                    loadGoogleAnalytics();
+                  }
+                }, 10000);
+              }
+              // ③中間サイズ（769px-1023px）：スクロール検知後に実行
+              else {
+                const SCROLL_THRESHOLD = 50;
+                let hasScrolled = false;
 
-              window.addEventListener("scroll", handleScroll, { passive: true });
-              window.addEventListener("wheel", handleScroll, { passive: true });
-              window.addEventListener("touchstart", handleScroll, { passive: true });
+                function handleScroll() {
+                  const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
 
-              scrollEventListeners.push(scrollHandler, wheelHandler, touchHandler);
+                  if (!hasScrolled && scrollY >= SCROLL_THRESHOLD) {
+                    hasScrolled = true;
+                    loadGoogleAnalytics();
+                  }
+                }
 
-              timeoutId = setTimeout(function () {
-                if (!isLoaded) {
+                const scrollHandler = { event: "scroll", handler: handleScroll };
+                const wheelHandler = { event: "wheel", handler: handleScroll };
+                const touchHandler = { event: "touchstart", handler: handleScroll };
+
+                window.addEventListener("scroll", handleScroll, { passive: true });
+                window.addEventListener("wheel", handleScroll, { passive: true });
+                window.addEventListener("touchstart", handleScroll, { passive: true });
+
+                scrollEventListeners.push(scrollHandler, wheelHandler, touchHandler);
+
+                timeoutId = setTimeout(function () {
+                  if (!isLoaded) {
+                    loadGoogleAnalytics();
+                  }
+                }, 10000);
+
+                const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+                if (currentScrollY >= SCROLL_THRESHOLD) {
                   loadGoogleAnalytics();
                 }
-              }, 10000);
-
-              const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-              if (currentScrollY >= SCROLL_THRESHOLD) {
-                loadGoogleAnalytics();
               }
             }
           }

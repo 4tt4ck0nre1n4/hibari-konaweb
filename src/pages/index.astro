@@ -111,7 +111,9 @@ const fvAnimeImage = await getImage({
       </div>
     </main>
     <Footer />
-    <canvas id="canvas" class="canvas" width="800" height="600"></canvas>
+    <!-- CLS改善: canvas要素の初期サイズをレスポンシブに設定 -->
+    <!-- 1024px以上: 1350x940、1024px以下: 390x844（一般的なモバイルサイズ） -->
+    <canvas id="canvas" class="canvas" width="1350" height="940"></canvas>
   </div>
 </Layout>
 
@@ -266,8 +268,8 @@ const fvAnimeImage = await getImage({
   /* タブレットサイズでのcanvas最適化 */
   @media (width <= 1024px) and (width > 768px) {
     .canvas {
-      min-width: 1024px;
-      min-height: 768px;
+      min-width: 100vw;
+      min-height: 100vh;
     }
   }
 
@@ -403,6 +405,56 @@ const fvAnimeImage = await getImage({
   document.addEventListener("astro:after-swap", () => {
     loadGridControlAnimations();
   });
+</script>
+
+<!-- CLS改善: canvas要素の初期サイズをレスポンシブに設定 -->
+<script is:inline>
+  // @ts-nocheck
+  (() => {
+    // canvas要素の初期サイズを画面幅に応じて設定（レイアウトシフト防止）
+    function setCanvasInitialSize() {
+      const canvas = document.getElementById("canvas");
+      if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        return;
+      }
+
+      // 画面幅に応じて初期サイズを設定
+      const screenWidth = window.innerWidth;
+      let initialWidth, initialHeight;
+
+      if (screenWidth >= 1024) {
+        // 1024px以上: 1350x940
+        initialWidth = 1350;
+        initialHeight = 940;
+      } else if (screenWidth >= 768) {
+        // 768px-1024px: タブレットサイズ
+        initialWidth = 768;
+        initialHeight = 1024;
+      } else if (screenWidth >= 480) {
+        // 480px-768px: スマホサイズ
+        initialWidth = 390;
+        initialHeight = 844;
+      } else {
+        // 480px以下: 超小型スマホサイズ
+        initialWidth = 375;
+        initialHeight = 667;
+      }
+
+      // HTML属性を設定（レイアウトシフト防止のため、JavaScriptでサイズ変更される前に設定）
+      canvas.width = initialWidth;
+      canvas.height = initialHeight;
+    }
+
+    // DOMContentLoadedまたは即座に実行
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", setCanvasInitialSize);
+    } else {
+      setCanvasInitialSize();
+    }
+
+    // リサイズ時にも更新（ただし、confetti.tsで動的に変更されるため、初期値のみ設定）
+    // 実際のサイズ変更はconfetti.tsで行われる
+  })();
 </script>
 
 <!-- ネットワーク依存関係ツリー最適化: 非クリティカルJavaScriptの遅延読み込み強化 -->

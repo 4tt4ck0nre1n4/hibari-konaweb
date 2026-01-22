@@ -34,20 +34,31 @@ const SnsLink = ({
 
   const hasIconName = snsIconName != null && snsIconName.trim() !== "";
 
-  // アイコンがSVGアセットでない場合のみ、IconifyInlineを遅延ロード
+  // ネットワーク依存関係ツリー最適化: アイコンがSVGアセットでない場合のみ、IconifyInlineを遅延ロード
   useEffect(() => {
     if (isSvgAsset) return;
     if (IconifyInline) return;
     if (typeof snsIconSvg !== "string" || snsIconSvg.trim() === "") return;
 
-    void import("./IconifyInline")
-      .then((mod) => {
-        setIconifyInline(() => mod.default);
-      })
-      .catch(() => {
-        // 失敗時はアイコン無しで表示（リンク自体は機能させる）
-        setIconifyInline(null);
-      });
+    // クリティカルパスをブロックしないように、アイコン読み込みを非同期で実行
+    const loadIconify = () => {
+      import("./IconifyInline")
+        .then((mod) => {
+          setIconifyInline(() => mod.default);
+        })
+        .catch(() => {
+          // 失敗時はアイコン無しで表示（リンク自体は機能させる）
+          setIconifyInline(null);
+        });
+    };
+
+    // requestIdleCallbackで遅延読み込み（クリティカルパスをブロックしない）
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(loadIconify, { timeout: 3000 });
+    } else {
+      // フォールバック: setTimeoutで遅延読み込み
+      setTimeout(loadIconify, 200);
+    }
   }, [IconifyInline, isSvgAsset, snsIconSvg]);
 
   return (

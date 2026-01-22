@@ -4,9 +4,11 @@ import pageTopIcon from "../assets/svg/top.svg";
 ---
 
 <button id="pageTopButton" class="page-top-button" aria-label="ページトップへ戻る">
-  <img src={pageTopImage.src} alt="" class="page-top-button__image" />
+  <!-- CLS改善: width/height属性を明示的に設定 -->
+  <img src={pageTopImage.src} alt="" class="page-top-button__image" width="60" height="90" />
   <div class="page-top-button__textInner">
-    <img src={pageTopIcon.src} alt="" class="page-top-button__icon" />
+    <!-- CLS改善: width/height属性を明示的に設定 -->
+    <img src={pageTopIcon.src} alt="" class="page-top-button__icon" width="16" height="16" />
     <span class="page-top-button__text">Page Top</span>
   </div>
 </button>
