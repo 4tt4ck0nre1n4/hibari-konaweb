@@ -27,13 +27,14 @@ const fvBackgroundImage = await getImage({
   quality: 75,
   format: "webp",
 });
-// モバイル用背景画像の最適化（1024px以下で使用）
+// LCP改善: モバイル用背景画像の最適化（1024px以下で使用）
 // モバイルでは適切なサイズの画像を使用することでLCPとCLSを改善
+// サイズを768pxに削減してファイルサイズを削減（Speed Index改善）
 const spFvBackgroundImage = await getImage({
   src: spFvBackgroundImageSrc,
-  width: 1024,
-  height: 576, // 16:9のアスペクト比を維持
-  quality: 75,
+  width: 768,
+  height: 432, // 16:9のアスペクト比を維持
+  quality: 70, // qualityを70に下げてファイルサイズを削減（視覚的影響を確認しながら）
   format: "webp",
 });
 const fvAnimeImage = await getImage({
@@ -368,8 +369,8 @@ const fvAnimeImage = await getImage({
     }
   }
 
+  // TBT改善: より積極的な遅延読み込み（10秒以上）
   // 動的インポートでモジュール読み込みを遅延（ネットワーク依存関係ツリー最適化）
-  // より積極的な遅延: requestIdleCallbackのタイムアウトを延長し、初期読み込みをブロックしない
   function loadGridControlAnimations() {
     if ("requestIdleCallback" in window) {
       requestIdleCallback(
@@ -379,7 +380,7 @@ const fvAnimeImage = await getImage({
           const { initGridControlAnimationsDeferred } = await import("../scripts/gridControlAnimations");
           initGridControlAnimationsDeferred();
         },
-        { timeout: 5000 } // タイムアウトを延長（2秒→5秒）してクリティカルパスへの影響を最小化
+        { timeout: 10000 } // タイムアウトを10秒に延長してクリティカルパスへの影響を最小化
       );
     } else {
       // フォールバック: より長い遅延でクリティカルパスをブロックしない
@@ -388,7 +389,7 @@ const fvAnimeImage = await getImage({
         await loadGSAP();
         const { initGridControlAnimationsDeferred } = await import("../scripts/gridControlAnimations");
         initGridControlAnimationsDeferred();
-      }, 2000); // 100ms→2000msに延長して初期読み込みをブロックしない
+      }, 10000); // 10秒に延長して初期読み込みをブロックしない
     }
   }
 
@@ -462,6 +463,7 @@ const fvAnimeImage = await getImage({
 <script>
   // 動的インポートでモジュール読み込みを遅延（ネットワーク依存関係ツリー最適化）
   // より積極的な遅延: requestIdleCallbackのタイムアウトを延長し、初期読み込みをブロックしない
+  // TBT改善: より積極的な遅延読み込み（10秒以上）
   function loadConfetti() {
     if ("requestIdleCallback" in window) {
       requestIdleCallback(
@@ -469,14 +471,14 @@ const fvAnimeImage = await getImage({
           const { initConfettiDeferred } = await import("../scripts/confetti");
           initConfettiDeferred();
         },
-        { timeout: 5000 } // タイムアウトを延長（2秒→5秒）してクリティカルパスへの影響を最小化
+        { timeout: 10000 } // タイムアウトを10秒に延長してクリティカルパスへの影響を最小化
       );
     } else {
       // フォールバック: より長い遅延でクリティカルパスをブロックしない
       setTimeout(async () => {
         const { initConfettiDeferred } = await import("../scripts/confetti");
         initConfettiDeferred();
-      }, 2000); // 100ms→2000msに延長して初期読み込みをブロックしない
+      }, 10000); // 10秒に延長して初期読み込みをブロックしない
     }
   }
 

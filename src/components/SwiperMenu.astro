@@ -462,13 +462,13 @@ const mouseItem = {
 </style>
 
 <script>
-  import Swiper from "swiper";
-  import { Navigation, Autoplay } from "swiper/modules";
-  import "swiper/css/bundle";
-
-  let swiperInstance: Swiper | null = null;
+  // TBT改善: Swiperライブラリを動的インポートで遅延読み込み
+  // Intersection Observerでビューポートに入った時に読み込む
+  let swiperInstance: typeof import("swiper").Swiper | null = null;
   let mouseMoveIntervalId: ReturnType<typeof setInterval> | null = null;
   let lastMouseMoveSecond: number | null = null;
+  let isSwiperLoaded = false;
+  let isInitializing = false;
 
   const triggerMouseMove = () => {
     // フェーズ1: DOM読み取りを実行
@@ -492,11 +492,48 @@ const mouseItem = {
     }, 1000);
   };
 
-  function initSwiperMenu() {
+  async function loadSwiperLibrary() {
+    if (isSwiperLoaded || isInitializing) {
+      return;
+    }
+
+    isInitializing = true;
+
+    try {
+      // 動的インポートでSwiperライブラリを読み込む
+      const [{ default: Swiper }, { Navigation, Autoplay }] = await Promise.all([
+        import("swiper"),
+        import("swiper/modules"),
+      ]);
+
+      isSwiperLoaded = true;
+      isInitializing = false;
+
+      return { Swiper, Navigation, Autoplay };
+    } catch (error) {
+      console.error("Failed to load Swiper library:", error);
+      isInitializing = false;
+      return null;
+    }
+  }
+
+  async function initSwiperMenu() {
     // フェーズ1: すべてのDOM読み取りを一度に実行
     const swiperElement = document.querySelector("#swiper1");
     const mouseImage = document.getElementById("js-mouse") as HTMLImageElement;
     const mouseButton = document.getElementById("js-mouseButton");
+
+    if (!swiperElement || typeof window === "undefined") {
+      return;
+    }
+
+    // Swiperライブラリを読み込む
+    const swiperLib = await loadSwiperLibrary();
+    if (!swiperLib) {
+      return;
+    }
+
+    const { Swiper, Navigation, Autoplay } = swiperLib;
 
     // 既存のSwiperインスタンスを破棄
     if (swiperInstance) {
@@ -511,47 +548,45 @@ const mouseItem = {
     }
 
     // Swiperを初期化
-    if (swiperElement && typeof window !== "undefined") {
-      swiperInstance = new Swiper("#swiper1", {
-        direction: "vertical",
-        modules: [Navigation, Autoplay],
-        loop: true,
-        effect: "creative",
-        speed: 1500,
-        allowTouchMove: false,
-        autoplay: {
-          delay: 3000,
-          disableOnInteraction: false,
-        },
-        navigation: {
-          nextEl: "#js-mouse",
-        },
-        on: {
-          slideChangeTransitionStart: function () {
-            // フェーズ1: すべてのDOM読み取りを一度に実行
-            const allImages = document.querySelectorAll(".swiper-slide img");
+    swiperInstance = new Swiper("#swiper1", {
+      direction: "vertical",
+      modules: [Navigation, Autoplay],
+      loop: true,
+      effect: "creative",
+      speed: 1500,
+      allowTouchMove: false,
+      autoplay: {
+        delay: 3000,
+        disableOnInteraction: false,
+      },
+      navigation: {
+        nextEl: "#js-mouse",
+      },
+      on: {
+        slideChangeTransitionStart: function () {
+          // フェーズ1: すべてのDOM読み取りを一度に実行
+          const allImages = document.querySelectorAll(".swiper-slide img");
 
-            // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
-            requestAnimationFrame(() => {
-              allImages.forEach((img) => {
-                img.classList.remove("active");
-              });
+          // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+          requestAnimationFrame(() => {
+            allImages.forEach((img) => {
+              img.classList.remove("active");
             });
-          },
-          slideChangeTransitionEnd: function () {
-            // フェーズ1: DOM読み取りを実行
-            const activeSlide = document.querySelector(".swiper-slide-active img");
-
-            // フェーズ2: 書き込みを実行（リフローを最小化）
-            if (activeSlide) {
-              requestAnimationFrame(() => {
-                activeSlide.classList.add("active");
-              });
-            }
-          },
+          });
         },
-      });
-    }
+        slideChangeTransitionEnd: function () {
+          // フェーズ1: DOM読み取りを実行
+          const activeSlide = document.querySelector(".swiper-slide-active img");
+
+          // フェーズ2: 書き込みを実行（リフローを最小化）
+          if (activeSlide) {
+            requestAnimationFrame(() => {
+              activeSlide.classList.add("active");
+            });
+          }
+        },
+      },
+    });
 
     // マウス移動インターバルを開始
     mouseMoveIntervalId = setInterval(() => {
@@ -619,16 +654,50 @@ const mouseItem = {
     }
   }
 
+  // TBT改善: Intersection Observerでビューポートに入った時にSwiperを初期化
   if (typeof window !== "undefined") {
-    if (document.readyState === "loading") {
-      window.addEventListener("load", initSwiperMenu);
+    const swiperContainer = document.querySelector(".swiper-menu__container");
+    if (swiperContainer) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !isSwiperLoaded && !isInitializing) {
+              // ビューポートに入った時にSwiperを初期化
+              initSwiperMenu();
+              observer.disconnect();
+            }
+          });
+        },
+        {
+          rootMargin: "100px", // 100px手前で読み込み開始
+          threshold: 0.01,
+        }
+      );
+
+      observer.observe(swiperContainer);
+
+      // フォールバック: 10秒後に読み込む（念のため）
+      setTimeout(() => {
+        if (!isSwiperLoaded && !isInitializing) {
+          initSwiperMenu();
+          observer.disconnect();
+        }
+      }, 10000);
     } else {
-      initSwiperMenu();
+      // フォールバック: コンテナが見つからない場合は通常通り読み込む
+      if (document.readyState === "loading") {
+        window.addEventListener("load", () => {
+          setTimeout(initSwiperMenu, 2000);
+        });
+      } else {
+        setTimeout(initSwiperMenu, 2000);
+      }
     }
   }
 
   // View Transitions対応: ページ遷移時に再初期化
   document.addEventListener("astro:after-swap", () => {
+    isSwiperLoaded = false;
     initSwiperMenu();
   });
 </script>
