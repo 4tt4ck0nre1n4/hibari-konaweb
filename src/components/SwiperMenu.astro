@@ -464,7 +464,7 @@ const mouseItem = {
 <script>
   // TBT改善: Swiperライブラリを動的インポートで遅延読み込み
   // Intersection Observerでビューポートに入った時に読み込む
-  let swiperInstance: typeof import("swiper").Swiper | null = null;
+  let swiperInstance: import("swiper").Swiper | null = null;
   let mouseMoveIntervalId: ReturnType<typeof setInterval> | null = null;
   let lastMouseMoveSecond: number | null = null;
   let isSwiperLoaded = false;
