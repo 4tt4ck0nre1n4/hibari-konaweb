@@ -20,8 +20,8 @@ import ConfettiButton from "./ConfettiButton.astro";
   <div class="particles-tools__container">
     <div class="particles__wrapper">
       <div class="particles__container">
-        <!-- TBT改善: ビューポートに入った時に読み込む（client:idle → client:visible） -->
-        <ParticlesComponent client:visible />
+        <!-- パフォーマンス最適化: ローディング画面が消えた後に読み込む -->
+        <ParticlesComponent client:idle />
       </div>
     </div>
     <div class="tools__wrapper">

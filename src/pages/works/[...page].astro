@@ -150,9 +150,34 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
         console.error("   4. WordPress API endpoint is responding correctly");
       }
     }
-    // エラー時も空配列を返してビルドを継続（ビルド全体を停止しない）
-    console.warn("⚠️ [Works Pagination] Returning empty paths to prevent build failure.");
-    return [];
+    // エラー時もフォールバックページを生成してビルドを継続（ビルド全体を停止しない）
+    console.warn("⚠️ [Works Pagination] API fetch failed. Generating fallback page.");
+    // フォールバック: 空のデータで/worksページを生成
+    const fallbackPageProps = {
+      page: {
+        data: [] as WorkObject[],
+        currentPage: 1,
+        lastPage: 1,
+        url: {
+          first: "",
+          prev: "",
+          current: "/works",
+          next: "",
+          last: "",
+          base: "/works",
+        },
+      },
+    };
+    return [
+      {
+        params: { page: "" },
+        props: fallbackPageProps,
+      },
+      {
+        params: { page: "1" },
+        props: fallbackPageProps,
+      },
+    ];
   }
 };
 

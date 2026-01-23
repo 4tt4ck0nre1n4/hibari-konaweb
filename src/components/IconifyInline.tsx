@@ -143,28 +143,38 @@ function IconifyInlineComponent({
     }
 
     // アイコンはユーザーに見える重要な要素のため、即座に読み込む
-    // パフォーマンスへの影響は最小限（アイコンセットは軽量で、一度読み込まれたらキャッシュされる）
-    const loadIcon = () => {
-      loadIconSet(parsed.prefix)
-        .then((set) => {
-          if (set) {
-            setIconSet(set);
-            const data = set.icons[parsed.name];
-            setIconData(data ?? null);
+    // 優先度を上げるため、Promise.resolve()で即座に実行
+    void Promise.resolve()
+      .then(() => loadIconSet(parsed.prefix))
+      .then((set) => {
+        if (set) {
+          setIconSet(set);
+          const data = set.icons[parsed.name];
+          setIconData(data ?? null);
+        }
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        // デバッグ用: エラーをログに出力
+        if (typeof window !== "undefined") {
+          const isDev = (window as Window & { __DEV__?: boolean }).__DEV__;
+          if (isDev === true) {
+            console.error(`Failed to load icon: ${icon}`, error);
           }
-          setIsLoading(false);
-        })
-        .catch(() => {
-          setIsLoading(false);
-        });
-    };
-
-    // 即座に読み込み（アイコンは重要なUI要素）
-    loadIcon();
+        }
+        setIsLoading(false);
+      });
   }, [icon, parsed]);
 
   if (!parsed || isLoading || !iconSet || !iconData) {
     // ローディング中は空のSVGを返す（レイアウトシフトを防ぐ）
+    // デバッグ用: 開発環境でのみログを出力
+    if (typeof window !== "undefined") {
+      const isDev = (window as Window & { __DEV__?: boolean }).__DEV__;
+      if (isDev === true) {
+        console.log(`IconifyInline loading: icon=${icon}, parsed=${!!parsed}, isLoading=${isLoading}, iconSet=${!!iconSet}, iconData=${!!iconData}`);
+      }
+    }
     const placeholderProps: React.SVGProps<SVGSVGElement> = {
       className,
       width,

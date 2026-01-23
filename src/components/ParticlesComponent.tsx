@@ -1,9 +1,8 @@
-import type { ComponentType } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { Container, Engine, ISourceOptions } from "@tsparticles/engine";
 import type { IParticlesProps } from "@tsparticles/react";
 import { tsparticlesOptions } from "../scripts/tsparticlesOptions";
-import type { IconifyInlineProps } from "./IconifyInline";
+import IconifyInline from "./IconifyInline";
 import particlesStyles from "../styles/particlesStyles.module.css";
 import type React from "react";
 import { devLog, devError } from "../util/logger";
@@ -25,7 +24,6 @@ declare global {
 export default function ParticlesComponent() {
   const [ready, setReady] = useState(false);
   const [ParticlesLib, setParticlesLib] = useState<React.FC<IParticlesProps> | null>(null);
-  const [IconifyInline, setIconifyInline] = useState<ComponentType<IconifyInlineProps> | null>(null);
 
   useEffect(() => {
     // Initialize audio only in browser
@@ -57,15 +55,6 @@ export default function ParticlesComponent() {
       }
     })();
 
-    // アイコンはユーザーに見える重要な要素のため、即座に読み込む
-    // パフォーマンスへの影響は最小限（IconifyInlineコンポーネント自体が軽量）
-    import("./IconifyInline")
-      .then((mod) => {
-        setIconifyInline(() => mod.default);
-      })
-      .catch(() => {
-        setIconifyInline(null);
-      });
   }, []);
 
   const defaultOptions: ISourceOptions = useMemo(() => {
@@ -148,20 +137,6 @@ export default function ParticlesComponent() {
   // IconifyInlineを使用してアイコンを表示（外部APIリクエストを完全に排除）
   const renderIcon = (iconName: string, className?: string) => {
     const iconClassName = className ?? particlesStyles.particles__icon;
-    if (!IconifyInline) {
-      return (
-        <svg
-          width="56"
-          height="56"
-          viewBox="0 0 16 16"
-          xmlns="http://www.w3.org/2000/svg"
-          className={iconClassName}
-          aria-hidden="true"
-          role="presentation"
-          focusable="false"
-        />
-      );
-    }
     // IconifyInline はデフォルトで aria-hidden を付与するため、ここでは指定しない
     return <IconifyInline icon={iconName} width="56" height="56" className={iconClassName} />;
   };
