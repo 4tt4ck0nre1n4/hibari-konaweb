@@ -57,25 +57,15 @@ export default function ParticlesComponent() {
       }
     })();
 
-    // ネットワーク依存関係ツリー最適化: IconifyInlineの読み込みをrequestIdleCallbackで遅延
-    // クリティカルパスをブロックしないように、アイコン読み込みを非同期で実行
-    const loadIconify = () => {
-      import("./IconifyInline")
-        .then((mod) => {
-          setIconifyInline(() => mod.default);
-        })
-        .catch(() => {
-          setIconifyInline(null);
-        });
-    };
-
-    // requestIdleCallbackで遅延読み込み（クリティカルパスをブロックしない）
-    if ("requestIdleCallback" in window) {
-      requestIdleCallback(loadIconify, { timeout: 3000 });
-    } else {
-      // フォールバック: setTimeoutで遅延読み込み
-      setTimeout(loadIconify, 200);
-    }
+    // アイコンはユーザーに見える重要な要素のため、即座に読み込む
+    // パフォーマンスへの影響は最小限（IconifyInlineコンポーネント自体が軽量）
+    import("./IconifyInline")
+      .then((mod) => {
+        setIconifyInline(() => mod.default);
+      })
+      .catch(() => {
+        setIconifyInline(null);
+      });
   }, []);
 
   const defaultOptions: ISourceOptions = useMemo(() => {
