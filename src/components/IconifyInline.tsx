@@ -142,8 +142,8 @@ function IconifyInlineComponent({
       return;
     }
 
-    // ネットワーク依存関係ツリー最適化: アイコンセットの読み込みをrequestIdleCallbackで遅延
-    // クリティカルパスをブロックしないように、アイコン読み込みを非同期で実行
+    // アイコンはユーザーに見える重要な要素のため、即座に読み込む
+    // パフォーマンスへの影響は最小限（アイコンセットは軽量で、一度読み込まれたらキャッシュされる）
     const loadIcon = () => {
       loadIconSet(parsed.prefix)
         .then((set) => {
@@ -159,13 +159,8 @@ function IconifyInlineComponent({
         });
     };
 
-    // requestIdleCallbackで遅延読み込み（クリティカルパスをブロックしない）
-    if ("requestIdleCallback" in window) {
-      requestIdleCallback(loadIcon, { timeout: 3000 });
-    } else {
-      // フォールバック: setTimeoutで遅延読み込み
-      setTimeout(loadIcon, 100);
-    }
+    // 即座に読み込み（アイコンは重要なUI要素）
+    loadIcon();
   }, [icon, parsed]);
 
   if (!parsed || isLoading || !iconSet || !iconData) {
