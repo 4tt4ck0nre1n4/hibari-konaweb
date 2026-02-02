@@ -1,7 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import revisionDatesJson from "../../data/revisionDates.json";
@@ -77,13 +75,10 @@ const googlePrivacypolicyLinks = {
   twitterTitle={globalText.privacy.title}
   twitterDescription={globalText.privacy.description}
 >
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
-      <div class="privacy__wrapper">
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="privacy__wrapper">
         <h1 class="privacy__title">
           {privacyTitle}
         </h1>
@@ -387,9 +382,6 @@ const googlePrivacypolicyLinks = {
           </p>
         </section>
       </div>
-    </main>
-    <Footer />
-  </div>
 </Layout>
 
 <style>

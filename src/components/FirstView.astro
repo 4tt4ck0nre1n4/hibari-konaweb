@@ -150,7 +150,41 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
     }
 
     // マウス追従の実際の初期化処理
+    // グローバルスコープでイベントハンドラーを保持（重複防止のため）
+    let mouseMoveHandler = null;
+    let mouseLeaveHandler = null;
+    let touchStartHandler = null;
+    let touchMoveHandler = null;
+    let touchEndHandler = null;
+    let resizeHandler = null;
+
     function initializeMouseFollow(backgroundContainer, fvWrapper) {
+      // 既存のイベントリスナーを削除（重複防止）
+      if (mouseMoveHandler) {
+        window.removeEventListener("mousemove", mouseMoveHandler);
+        mouseMoveHandler = null;
+      }
+      if (mouseLeaveHandler) {
+        window.removeEventListener("mouseleave", mouseLeaveHandler);
+        mouseLeaveHandler = null;
+      }
+      if (touchStartHandler) {
+        window.removeEventListener("touchstart", touchStartHandler);
+        touchStartHandler = null;
+      }
+      if (touchMoveHandler) {
+        window.removeEventListener("touchmove", touchMoveHandler);
+        touchMoveHandler = null;
+      }
+      if (touchEndHandler) {
+        window.removeEventListener("touchend", touchEndHandler);
+        touchEndHandler = null;
+      }
+      if (resizeHandler) {
+        window.removeEventListener("resize", resizeHandler);
+        resizeHandler = null;
+      }
+
       // デバッグログ追加（開発環境のみ）
       // 強制リフローを避けるため、requestAnimationFrame内でgetComputedStyleを実行
       requestAnimationFrame(() => {
@@ -203,26 +237,24 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
       if (!isTouchDevice) {
         devLog("🖱️ Setting up desktop mouse tracking...");
         // window全体でマウス移動を監視（画面全体を追従）
-        window.addEventListener(
-          "mousemove",
-          (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
+        mouseMoveHandler = (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
 
-            // requestAnimationFrameで更新を最適化
-            if (rafId === null) {
-              rafId = requestAnimationFrame(updateMaskPosition);
-            }
-          },
-          { passive: true }
-        );
+          // requestAnimationFrameで更新を最適化
+          if (rafId === null) {
+            rafId = requestAnimationFrame(updateMaskPosition);
+          }
+        };
+        window.addEventListener("mousemove", mouseMoveHandler, { passive: true });
 
         devLog("✅ Desktop mouse tracking event listener attached");
 
         // マウスが画面外に出た場合も追従（画面端でも反応するように）
-        window.addEventListener("mouseleave", () => {
+        mouseLeaveHandler = () => {
           // マウスが画面外に出た場合は最後の位置を保持
-        });
+        };
+        window.addEventListener("mouseleave", mouseLeaveHandler);
       } else {
         // スマホ/タブレット: タッチイベントと自動アニメーションの組み合わせ
 
@@ -231,48 +263,39 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
         let touchY = 0;
         let isTouching = false;
 
-        window.addEventListener(
-          "touchstart",
-          (e) => {
-            if (e.touches.length > 0) {
-              isTouching = true;
-              touchX = e.touches[0].clientX;
-              touchY = e.touches[0].clientY;
-              mouseX = touchX;
-              mouseY = touchY;
+        touchStartHandler = (e) => {
+          if (e.touches.length > 0) {
+            isTouching = true;
+            touchX = e.touches[0].clientX;
+            touchY = e.touches[0].clientY;
+            mouseX = touchX;
+            mouseY = touchY;
 
-              if (rafId === null) {
-                rafId = requestAnimationFrame(updateMaskPosition);
-              }
+            if (rafId === null) {
+              rafId = requestAnimationFrame(updateMaskPosition);
             }
-          },
-          { passive: true }
-        );
+          }
+        };
+        window.addEventListener("touchstart", touchStartHandler, { passive: true });
 
-        window.addEventListener(
-          "touchmove",
-          (e) => {
-            if (e.touches.length > 0 && isTouching) {
-              touchX = e.touches[0].clientX;
-              touchY = e.touches[0].clientY;
-              mouseX = touchX;
-              mouseY = touchY;
+        touchMoveHandler = (e) => {
+          if (e.touches.length > 0 && isTouching) {
+            touchX = e.touches[0].clientX;
+            touchY = e.touches[0].clientY;
+            mouseX = touchX;
+            mouseY = touchY;
 
-              if (rafId === null) {
-                rafId = requestAnimationFrame(updateMaskPosition);
-              }
+            if (rafId === null) {
+              rafId = requestAnimationFrame(updateMaskPosition);
             }
-          },
-          { passive: true }
-        );
+          }
+        };
+        window.addEventListener("touchmove", touchMoveHandler, { passive: true });
 
-        window.addEventListener(
-          "touchend",
-          () => {
-            isTouching = false;
-          },
-          { passive: true }
-        );
+        touchEndHandler = () => {
+          isTouching = false;
+        };
+        window.addEventListener("touchend", touchEndHandler, { passive: true });
 
         // 2. 自動アニメーション（タッチ操作がない場合の代替）
         // パルスアニメーション: 定期的に位置を変更して視覚的な動きを提供
@@ -366,19 +389,16 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
 
       // リサイズ時にキャッシュをクリア
       let resizeCacheTimer = null;
-      window.addEventListener(
-        "resize",
-        () => {
-          if (resizeCacheTimer) {
-            clearTimeout(resizeCacheTimer);
-          }
-          resizeCacheTimer = setTimeout(() => {
-            cachedRect = null;
-            lastRectUpdate = 0;
-          }, 150);
-        },
-        { passive: true }
-      );
+      resizeHandler = () => {
+        if (resizeCacheTimer) {
+          clearTimeout(resizeCacheTimer);
+        }
+        resizeCacheTimer = setTimeout(() => {
+          cachedRect = null;
+          lastRectUpdate = 0;
+        }, 150);
+      };
+      window.addEventListener("resize", resizeHandler, { passive: true });
     }
 
     // LCP最適化: マウス追従の初期化を遅延させずに即座に実行（ローディングスクリーンの待機は最小限に）
@@ -461,5 +481,18 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
 
     // 即座にも試行（既に読み込まれている場合）
     waitForInit();
+
+    // View Transitions対応: ページ遷移時に再初期化
+    // トップページ（/）に遷移した場合のみマウス追従を初期化
+    document.addEventListener("astro:after-swap", () => {
+      // 現在のページがトップページかどうかを確認
+      if (window.location.pathname === "/" || window.location.pathname === "/index.html") {
+        devLog("🔄 Page swapped to index, reinitializing mouse follow...");
+        // 少し遅延させてDOMの更新を待つ
+        setTimeout(() => {
+          waitForInit();
+        }, 100);
+      }
+    });
   })();
 </script>

@@ -1,7 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import { Image } from "astro:assets";
 import sorryImage from "/public/assets/sorry.webp";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
@@ -31,30 +29,24 @@ const sorryImageMeta = {
 >
   <link slot="head" rel="preload" href={sorryImage.src} as="image" fetchpriority="low" />
 
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
-      <div class="sorry__wrapper">
-        <h1 class="sorry__header">
-          {errorText.sorry.title}
-        </h1>
-        {errorText.sorry.body.map(({ text }) => <p class="sorry__body">{text}</p>)}
-        <Image
-          class="sorry__image"
-          src={sorryImage}
-          alt={sorryImageMeta.alt}
-          width={sorryImageMeta.width}
-          height={sorryImageMeta.height}
-          loading="lazy"
-          decoding="async"
-        />
-        <p class="sorry__body" set:html={errorText.sorry.link} />
-      </div>
-    </main>
-    <Footer />
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="sorry__wrapper">
+    <h1 class="sorry__header">
+      {errorText.sorry.title}
+    </h1>
+    {errorText.sorry.body.map(({ text }) => <p class="sorry__body">{text}</p>)}
+    <Image
+      class="sorry__image"
+      src={sorryImage}
+      alt={sorryImageMeta.alt}
+      width={sorryImageMeta.width}
+      height={sorryImageMeta.height}
+      loading="lazy"
+      decoding="async"
+    />
+    <p class="sorry__body" set:html={errorText.sorry.link} />
   </div>
 </Layout>
 

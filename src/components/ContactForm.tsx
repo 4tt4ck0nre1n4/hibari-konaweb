@@ -227,9 +227,11 @@ export default function ContactForm() {
       // デバッグ用: 送信先のエンドポイントをログ出力（開発環境のみ）
       devLog("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
 
+      // タイムアウト設定（30秒）- メール送信処理を考慮
       const response = await fetch(CONTACT_WPCF7_API, {
         method: "POST",
         body: formData,
+        signal: AbortSignal.timeout(30000), // 30秒タイムアウト
       });
 
       // 送信履歴に記録
@@ -300,12 +302,47 @@ export default function ContactForm() {
         );
       }
     } catch (error) {
-      devError("Error:", error);
-      alert(
-        "送信処理中にエラーが発生しました。\n" +
-          "ネットワーク接続を確認し、しばらく時間をおいて再度お試しください。\n" +
-          "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
-      );
+      // エラーの種類に応じて適切なメッセージを表示
+      if (error instanceof Error) {
+        // タイムアウトエラーの場合
+        if (error.name === "AbortError" || error.message.includes("timeout")) {
+          devError("❌ [Contact Form] Request timeout:", error);
+          alert(
+            "送信処理がタイムアウトしました。\n" +
+              "サーバー側の処理に時間がかかっている可能性があります。\n" +
+              "しばらく時間をおいて再度お試しください。\n" +
+              "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
+          );
+        } else if (
+          error.message.includes("fetch failed") ||
+          error.message.includes("network") ||
+          error.message.includes("Failed to fetch")
+        ) {
+          // ネットワークエラーの場合
+          devError("❌ [Contact Form] Network error:", error);
+          alert(
+            "ネットワークエラーが発生しました。\n" +
+              "インターネット接続を確認し、しばらく時間をおいて再度お試しください。\n" +
+              "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
+          );
+        } else {
+          // その他のエラー
+          devError("❌ [Contact Form] Error:", error);
+          alert(
+            "送信処理中にエラーが発生しました。\n" +
+              "しばらく時間をおいて再度お試しください。\n" +
+              "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
+          );
+        }
+      } else {
+        // 予期しないエラー形式
+        devError("❌ [Contact Form] Unexpected error:", error);
+        alert(
+          "送信処理中に予期しないエラーが発生しました。\n" +
+            "しばらく時間をおいて再度お試しください。\n" +
+            "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }

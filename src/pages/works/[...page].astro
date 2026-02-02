@@ -1,7 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import type { GetStaticPaths } from "astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
@@ -246,13 +244,10 @@ const worksPagination = {
   twitterTitle={globalText.works.title}
   twitterDescription={globalText.works.description}
 >
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
-      <div class="works">
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="works">
         <div class="works__wrapper">
           <div class="scrollImage">
             <ul class="scrollImage__menu">
@@ -446,9 +441,6 @@ const worksPagination = {
           }
         </div>
       </div>
-    </main>
-    <Footer />
-  </div>
 </Layout>
 
 <style>

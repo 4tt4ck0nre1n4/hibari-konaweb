@@ -1,7 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import type { GetStaticPaths } from "astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import globalText from "../../data/globalText.json";
@@ -183,139 +181,133 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   twitterDescription={globalText.blog.description}
   jsonLd={jsonLd}
 >
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
-      <div class="blog-detail__wrapper">
-        <div class="blog-detail__container">
-          <article id={postId.toString()} class="blog-detail__article">
-            <header class="blog-detail__header">
-              <h1 class="blog-detail__title" set:html={title} />
-              <div class="blog-detail__meta">
-                <div class="blog-detail__times">
-                  <SafeIcon name={dateIcon.icon} width={dateIcon.width} height={dateIcon.height} />
-                  <span class="blog-detail__datetime_span screenReader-only">{datetime}</span>
-                  {
-                    postDate !== "" && (
-                      <time
-                        class="blog-detail__dateTime"
-                        datetime={new Date(postDate)
-                          .toLocaleDateString("ja-JP", {
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                          })
-                          .replaceAll("/", "-")}
-                      >
-                        {new Date(postDate).toLocaleDateString("ja-JP", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        })}
-                      </time>
-                    )
-                  }
-                </div>
-                <div class="blog-detail__category">
-                  {
-                    Array.isArray(post?.cat_info) && post.cat_info.length > 0 ? (
-                      <a
-                        class="blog-detail__category-link"
-                        href={`/blog/category/${decodeURIComponent(post.cat_info[0]?.slug ?? "")}`}
-                        aria-label={`${post.cat_info[0]?.name}${categoryAriaLabel}`}
-                        title={`${post.cat_info[0]?.name}${categoryAriaTitle}`}
-                      >
-                        <SafeIcon name={categoryIcon.icon} width={categoryIcon.width} height={categoryIcon.height} />
-                        <span class="blog-detail__category_span screenReader-only">{categoryLabel}</span>
-                        <span class="blog-detail__category-link_span">{post.cat_info[0]?.name}</span>
-                      </a>
-                    ) : (
-                      <span>{errorCategoryText}</span>
-                    )
-                  }
-                </div>
-              </div>
-            </header>
-
-            <!-- 広告エリア（上部） -->
-            <div class="blog-detail__ad-top" id="ad-top">
-              <!-- 将来的な広告表示エリア -->
-            </div>
-
-            <!-- メインコンテンツ -->
-            <div class="blog-detail__content" set:html={content} />
-
-            <!-- 広告エリア（コンテンツ中） -->
-            <div class="blog-detail__ad-middle" id="ad-middle">
-              <!-- 将来的な広告表示エリア -->
-            </div>
-
-            <!-- フッター情報 -->
-            <footer class="blog-detail__footer">
-              <div class="blog-detail__share">
-                <h2 class="blog-detail__share-title">シェアする</h2>
-                <div class="blog-detail__share-buttons">
-                  <a
-                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(title)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="blog-detail__share-button blog-detail__share-button--twitter"
-                    aria-label="Twitterでシェア"
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="blog-detail__wrapper">
+    <div class="blog-detail__container">
+      <article id={postId.toString()} class="blog-detail__article">
+        <header class="blog-detail__header">
+          <h1 class="blog-detail__title" set:html={title} />
+          <div class="blog-detail__meta">
+            <div class="blog-detail__times">
+              <SafeIcon name={dateIcon.icon} width={dateIcon.width} height={dateIcon.height} />
+              <span class="blog-detail__datetime_span screenReader-only">{datetime}</span>
+              {
+                postDate !== "" && (
+                  <time
+                    class="blog-detail__dateTime"
+                    datetime={new Date(postDate)
+                      .toLocaleDateString("ja-JP", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })
+                      .replaceAll("/", "-")}
                   >
-                    Twitter
-                  </a>
+                    {new Date(postDate).toLocaleDateString("ja-JP", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    })}
+                  </time>
+                )
+              }
+            </div>
+            <div class="blog-detail__category">
+              {
+                Array.isArray(post?.cat_info) && post.cat_info.length > 0 ? (
                   <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="blog-detail__share-button blog-detail__share-button--facebook"
-                    aria-label="Facebookでシェア"
+                    class="blog-detail__category-link"
+                    href={`/blog/category/${decodeURIComponent(post.cat_info[0]?.slug ?? "")}`}
+                    aria-label={`${post.cat_info[0]?.name}${categoryAriaLabel}`}
+                    title={`${post.cat_info[0]?.name}${categoryAriaTitle}`}
                   >
-                    Facebook
+                    <SafeIcon name={categoryIcon.icon} width={categoryIcon.width} height={categoryIcon.height} />
+                    <span class="blog-detail__category_span screenReader-only">{categoryLabel}</span>
+                    <span class="blog-detail__category-link_span">{post.cat_info[0]?.name}</span>
                   </a>
-                  <a
-                    href={`https://b.hatena.ne.jp/add?mode=confirm&url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(title)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="blog-detail__share-button blog-detail__share-button--hatena"
-                    aria-label="はてなブックマークに追加"
-                  >
-                    はてブ
-                  </a>
-                </div>
-              </div>
-            </footer>
-          </article>
-
-          <!-- サイドバー -->
-          <aside class="blog-detail__sidebar">
-            <!-- 広告エリア（サイドバー上部） -->
-            <div class="blog-detail__ad-sidebar-top" id="ad-sidebar-top">
-              <!-- 将来的な広告表示エリア -->
+                ) : (
+                  <span>{errorCategoryText}</span>
+                )
+              }
             </div>
+          </div>
+        </header>
 
-            <!-- 目次エリア（将来的に追加可能） -->
-            <div class="blog-detail__toc" id="table-of-contents">
-              <!-- 将来的に目次を自動生成 -->
-            </div>
-
-            <!-- 関連記事エリア（将来的に追加可能） -->
-            <div class="blog-detail__related" id="related-posts">
-              <!-- 将来的に関連記事を表示 -->
-            </div>
-
-            <!-- 広告エリア（サイドバー下部） -->
-            <div class="blog-detail__ad-sidebar-bottom" id="ad-sidebar-bottom">
-              <!-- 将来的な広告表示エリア -->
-            </div>
-          </aside>
+        <!-- 広告エリア（上部） -->
+        <div class="blog-detail__ad-top" id="ad-top">
+          <!-- 将来的な広告表示エリア -->
         </div>
-      </div>
-    </main>
-    <Footer />
+
+        <!-- メインコンテンツ -->
+        <div class="blog-detail__content" set:html={content} />
+
+        <!-- 広告エリア（コンテンツ中） -->
+        <div class="blog-detail__ad-middle" id="ad-middle">
+          <!-- 将来的な広告表示エリア -->
+        </div>
+
+        <!-- フッター情報 -->
+        <footer class="blog-detail__footer">
+          <div class="blog-detail__share">
+            <h2 class="blog-detail__share-title">シェアする</h2>
+            <div class="blog-detail__share-buttons">
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="blog-detail__share-button blog-detail__share-button--twitter"
+                aria-label="Twitterでシェア"
+              >
+                Twitter
+              </a>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="blog-detail__share-button blog-detail__share-button--facebook"
+                aria-label="Facebookでシェア"
+              >
+                Facebook
+              </a>
+              <a
+                href={`https://b.hatena.ne.jp/add?mode=confirm&url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="blog-detail__share-button blog-detail__share-button--hatena"
+                aria-label="はてなブックマークに追加"
+              >
+                はてブ
+              </a>
+            </div>
+          </div>
+        </footer>
+      </article>
+
+      <!-- サイドバー -->
+      <aside class="blog-detail__sidebar">
+        <!-- 広告エリア（サイドバー上部） -->
+        <div class="blog-detail__ad-sidebar-top" id="ad-sidebar-top">
+          <!-- 将来的な広告表示エリア -->
+        </div>
+
+        <!-- 目次エリア（将来的に追加可能） -->
+        <div class="blog-detail__toc" id="table-of-contents">
+          <!-- 将来的に目次を自動生成 -->
+        </div>
+
+        <!-- 関連記事エリア（将来的に追加可能） -->
+        <div class="blog-detail__related" id="related-posts">
+          <!-- 将来的に関連記事を表示 -->
+        </div>
+
+        <!-- 広告エリア（サイドバー下部） -->
+        <div class="blog-detail__ad-sidebar-bottom" id="ad-sidebar-bottom">
+          <!-- 将来的な広告表示エリア -->
+        </div>
+      </aside>
+    </div>
   </div>
 </Layout>
 

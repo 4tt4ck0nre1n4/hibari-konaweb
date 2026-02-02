@@ -1,7 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import Logo from "../components/Logo.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
 import Aside from "../components/Aside.astro";
@@ -79,43 +77,37 @@ const fvAnimeImage = await getImage({
   <!-- その他の画像のプリロード -->
   <link slot="head" rel="preload" href={gridBackgroundImage.src} as="image" fetchpriority="low" type="image/webp" />
 
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <Logo />
-      <div class="breadcrumbs__wrapper breadcrumbs__wrapper_top">
-        <Breadcrumbs crumbs={[]} />
-      </div>
-      <FirstView
-        fvBackgroundImageSrc={fvBackgroundImage.src}
-        spFvBackgroundImageSrc={spFvBackgroundImage.src}
-        fvAnimeImageSrc={fvAnimeImage.src}
-      />
-      <div class="swiper-display-container">
-        <SwiperDisplay />
-      </div>
-      <div id="main-background" class="main-background" style={`background-image: url(${gridBackgroundImage.src})`}>
-        <div class="main-content__wrapper">
-          <aside class="toolbar">
-            <Aside />
-          </aside>
-          <div id="js-grid" class="grid">
-            <div class="wrapper">
-              <GridMenu />
-              <ControlMenu />
-            </div>
-          </div>
-          <div class="sidebar">
-            <SwiperMenu />
-          </div>
+  <Logo />
+  <div class="breadcrumbs__wrapper breadcrumbs__wrapper_top">
+    <Breadcrumbs crumbs={[]} />
+  </div>
+  <FirstView
+    fvBackgroundImageSrc={fvBackgroundImage.src}
+    spFvBackgroundImageSrc={spFvBackgroundImage.src}
+    fvAnimeImageSrc={fvAnimeImage.src}
+  />
+  <div class="swiper-display-container">
+    <SwiperDisplay />
+  </div>
+  <div id="main-background" class="main-background" style={`background-image: url(${gridBackgroundImage.src})`}>
+    <div class="main-content__wrapper">
+      <aside class="toolbar">
+        <Aside />
+      </aside>
+      <div id="js-grid" class="grid">
+        <div class="wrapper">
+          <GridMenu />
+          <ControlMenu />
         </div>
       </div>
-    </main>
-    <Footer />
-    <!-- CLS改善: canvas要素の初期サイズをレスポンシブに設定 -->
-    <!-- 1024px以上: 1350x940、1024px以下: 390x844（一般的なモバイルサイズ） -->
-    <canvas id="canvas" class="canvas" width="1350" height="940"></canvas>
+      <div class="sidebar">
+        <SwiperMenu />
+      </div>
+    </div>
   </div>
+  <!-- CLS改善: canvas要素の初期サイズをレスポンシブに設定 -->
+  <!-- 1024px以上: 1350x940、1024px以下: 390x844（一般的なモバイルサイズ） -->
+  <canvas id="canvas" class="canvas" width="1350" height="940"></canvas>
 </Layout>
 
 <style is:global>

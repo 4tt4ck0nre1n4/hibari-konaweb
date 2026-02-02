@@ -1,7 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import globalText from "../../data/globalText.json";
 import contactText from "../../data/contactText.json";
@@ -37,47 +35,41 @@ const thanksLinks = {
   twitterTitle={globalText.thanks.title}
   twitterDescription={globalText.thanks.description}
 >
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
-      <div class="thanks__wrapper">
-        <h1 class="thanks__header text-gradient">
-          {contactText.thanks.title}
-        </h1>
-        <p class="thanks__body">
-          {contactText.thanks.body.text1}
-        </p>
-        <p class="thanks__body">
-          {contactText.thanks.body.text2}
-        </p>
-        <Image
-          class="thanks__image"
-          src={thanksImage}
-          alt={thanksPageImage.alt}
-          width={thanksPageImage.width}
-          height={thanksPageImage.height}
-          loading="lazy"
-          decoding="async"
-        />
-        <p class="thanks__body_secondary">
-          <a
-            class="thanks__link"
-            href={thanksLinks.href}
-            aria-label={thanksLinks.ariaLabel}
-            title={thanksLinks.ariaTitle}
-          >
-            {thanksLinks.label}
-          </a>
-          <span class="thanks__span">
-            {thanksLinks.span}
-          </span>
-        </p>
-      </div>
-    </main>
-    <Footer />
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="thanks__wrapper">
+    <h1 class="thanks__header text-gradient">
+      {contactText.thanks.title}
+    </h1>
+    <p class="thanks__body">
+      {contactText.thanks.body.text1}
+    </p>
+    <p class="thanks__body">
+      {contactText.thanks.body.text2}
+    </p>
+    <Image
+      class="thanks__image"
+      src={thanksImage}
+      alt={thanksPageImage.alt}
+      width={thanksPageImage.width}
+      height={thanksPageImage.height}
+      loading="lazy"
+      decoding="async"
+    />
+    <p class="thanks__body_secondary">
+      <a
+        class="thanks__link"
+        href={thanksLinks.href}
+        aria-label={thanksLinks.ariaLabel}
+        title={thanksLinks.ariaTitle}
+      >
+        {thanksLinks.label}
+      </a>
+      <span class="thanks__span">
+        {thanksLinks.span}
+      </span>
+    </p>
   </div>
 </Layout>
 

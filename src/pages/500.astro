@@ -1,7 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import type { GetStaticPaths } from "astro";
 
 import Breadcrumbs from "../components/Breadcrumbs.astro";
@@ -42,59 +40,53 @@ const serverErrorImageMeta = {
 >
   <link slot="head" rel="preload" href={serverErrorImage.src} as="image" fetchpriority="high" />
 
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
-      <div class="serverError__wrapper">
-        <h1 class="serverError__header">
-          {errorText.serverError.title}
-        </h1>
-        <p class="serverError__text">
-          {
-            import.meta.env.MODE === "development"
-              ? error instanceof Error
-                ? error.message
-                : "Unknown error"
-              : "An unexpected error occurred. Please try again later."
-          }
-        </p>
-        <div class="serverError__imageInner">
-          <Image
-            class="serverError__image"
-            src={serverErrorImage}
-            alt={serverErrorImageMeta.alt}
-            width={serverErrorImageMeta.width}
-            height={serverErrorImageMeta.height}
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="serverError__textInner">
-          <p class="serverError__body">
-            {errorText.serverError.body.text1}
-          </p>
-          <p class="serverError__body">
-            {errorText.serverError.body.text2}
-          </p>
-          <ul class="serverError__menu">
-            {
-              errorText.serverError.menu.map(({ href, ariaLabel, ariaTitle, text, textAfter }) => (
-                <li class="serverError__menu_item">
-                  <a class="serverError__menu_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
-                    {text}
-                  </a>
-                  {textAfter}
-                </li>
-              ))
-            }
-          </ul>
-          <p class="serverError__body" set:html={errorText.serverError.body.text3} />
-        </div>
-      </div>
-    </main>
-    <Footer />
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="serverError__wrapper">
+    <h1 class="serverError__header">
+      {errorText.serverError.title}
+    </h1>
+    <p class="serverError__text">
+      {
+        import.meta.env.MODE === "development"
+          ? error instanceof Error
+            ? error.message
+            : "Unknown error"
+          : "An unexpected error occurred. Please try again later."
+      }
+    </p>
+    <div class="serverError__imageInner">
+      <Image
+        class="serverError__image"
+        src={serverErrorImage}
+        alt={serverErrorImageMeta.alt}
+        width={serverErrorImageMeta.width}
+        height={serverErrorImageMeta.height}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
+    <div class="serverError__textInner">
+      <p class="serverError__body">
+        {errorText.serverError.body.text1}
+      </p>
+      <p class="serverError__body">
+        {errorText.serverError.body.text2}
+      </p>
+      <ul class="serverError__menu">
+        {
+          errorText.serverError.menu.map(({ href, ariaLabel, ariaTitle, text, textAfter }) => (
+            <li class="serverError__menu_item">
+              <a class="serverError__menu_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
+                {text}
+              </a>
+              {textAfter}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="serverError__body" set:html={errorText.serverError.body.text3} />
+    </div>
   </div>
 </Layout>

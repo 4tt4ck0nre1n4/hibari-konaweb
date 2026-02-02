@@ -1,12 +1,12 @@
 ---
-import FooterHeader from "./FooterHeader.astro";
+import FooterHeader from "../components/FooterHeader.astro";
 import FooterSns from "../components/Sns.astro";
-import FooterIcon from "./FooterIcon.astro";
-import FooterSupport from "./FooterSupport.astro";
-import FooterLinks from "./FooterLinks.astro";
-import FooterCopyright from "./FooterCopyright.astro";
+import FooterIcon from "../components/FooterIcon.astro";
+import FooterSupport from "../components/FooterSupport.astro";
+import FooterLinks from "../components/FooterLinks.astro";
+import FooterCopyright from "../components/FooterCopyright.astro";
 import footerText from "../data/footerText.json";
-import { twitter, github_sns, instagram, about, contact, mail } from "../scripts/constSns";
+import { twitter, github_sns, instagram, about, contact, mail } from "../data/constSns";
 
 interface ContactType {
   className: {

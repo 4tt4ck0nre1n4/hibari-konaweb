@@ -1,7 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import ContactForm from "../../components/ContactForm";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
@@ -43,32 +41,26 @@ export const prerender = true;
 >
   <link slot="head" rel="preload" href={contactBackgroundImage.src} as="image" fetchpriority="high" />
 
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="contact" style={`background-image: url(${contactBackgroundImage.src})`}>
+    <div class="contact__wrapper">
+      <h1 class="contact__title" id="contact-form-title">
+        {pageTitle}
+      </h1>
+      {
+        contactText.contact.body.map(({ text }) => (
+          <p id="contact-form-description" class="contact__body" set:html={text} />
+        ))
+      }
+      <p id="contact-form-description" class="contact__body">
+        <span class="contact__body--required">【必須】</span>のついた項目は必ずご記入ください。
+      </p>
+      <div class="contactForm">
+        <ContactForm client:visible />
       </div>
-      <div class="contact" style={`background-image: url(${contactBackgroundImage.src})`}>
-        <div class="contact__wrapper">
-          <h1 class="contact__title" id="contact-form-title">
-            {pageTitle}
-          </h1>
-          {
-            contactText.contact.body.map(({ text }) => (
-              <p id="contact-form-description" class="contact__body" set:html={text} />
-            ))
-          }
-          <p id="contact-form-description" class="contact__body">
-            <span class="contact__body--required">【必須】</span>のついた項目は必ずご記入ください。
-          </p>
-          <div class="contactForm">
-            <ContactForm client:visible />
-          </div>
-        </div>
-      </div>
-    </main>
-    <Footer />
+    </div>
   </div>
 </Layout>
 

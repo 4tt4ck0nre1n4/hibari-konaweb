@@ -1,7 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import type { GetStaticPaths, PaginateFunction } from "astro";
 import SafeIcon from "../../components/SafeIcon.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
@@ -173,13 +171,10 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   twitterTitle={globalText.blog.title}
   twitterDescription={globalText.blog.description}
 >
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
-      <div id="main-container">
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div id="main-container">
         <div class="blog__wrapper">
           <FlowingLinesWrapper>
             <h1 class="blog__title">
@@ -362,9 +357,6 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
         </div>
         <!-- </div> -->
       </div>
-      <Footer />
-    </main>
-  </div>
 </Layout>
 
 <style>

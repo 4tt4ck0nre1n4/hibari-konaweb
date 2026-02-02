@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useLayoutEffect, useCallback } from "react
 import hamburgerStyles from "../styles/hamburgerStyles.module.css";
 import ReactDOM from "react-dom";
 import SnsLink from "./SnsLink";
-import { twitter, github_sns, contact, mail } from "../scripts/constSns";
+import { twitter, github_sns, contact, mail } from "../data/constSns";
 import HamburgerMenuLogo from "./HamburgerMenuLogo";
 import type { IconifyInlineProps } from "./IconifyInline";
 

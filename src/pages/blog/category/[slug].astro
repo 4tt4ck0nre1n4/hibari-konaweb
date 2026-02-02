@@ -1,7 +1,5 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
-import Header from "../../../components/Header.astro";
-import Footer from "../../../components/Footer.astro";
 import type { GetStaticPaths } from "astro";
 import { Icon } from "astro-icon/components";
 import { generateBreadcrumbs } from "../../../util/generateBreadcrumbs";
@@ -158,13 +156,10 @@ const datetime = "投稿日:";
   twitterTitle={title}
   twitterDescription={description ?? ""}
 >
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
-      <div class="category__wrapper">
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="category__wrapper">
         <div class="flowingLines">
           <h1 class="category__title">
             {`${categoryTitle}${title}`}
@@ -242,9 +237,6 @@ const datetime = "投稿日:";
           </a>
         </p>
       </div>
-    </main>
-    <Footer />
-  </div>
 </Layout>
 
 <style>

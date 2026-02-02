@@ -1,5 +1,7 @@
 ---
 import HeadLayout from "./HeadLayout.astro";
+import Header from "./Header.astro";
+import Footer from "./Footer.astro";
 import PageTopButton from "../components/PageTopButton.astro";
 // クリティカルなフォントのみを読み込む（400のみ）
 import "@fontsource/poppins/400.css";
@@ -48,7 +50,13 @@ const shouldLoadGA: boolean =
   </HeadLayout>
   <body>
     <div id="overlay-root"></div>
-    <slot />
+    <div id="outer-container">
+      <Header />
+      <main id="page-wrap">
+        <slot />
+      </main>
+      <Footer />
+    </div>
     <PageTopButton />
 
     <!-- GSAPとScrollTriggerは必要なページでのみ動的インポートで読み込む -->

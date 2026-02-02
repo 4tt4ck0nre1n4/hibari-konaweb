@@ -10,7 +10,6 @@ export interface SnsProps {
   targetBlank: string;
 }
 
-// const logoSvg = "/logo_outline.svg";
 const logoSvg = "/favicon.svg";
 export const twitter = {
   className: "sns-icon__link",

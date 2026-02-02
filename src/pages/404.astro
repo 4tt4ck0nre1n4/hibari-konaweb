@@ -2,10 +2,8 @@
 import type { GetStaticPaths } from "astro";
 import Layout from "../layouts/Layout.astro";
 import { Image } from "astro:assets";
-import NotfoundImage from "../assets/image/404Cat.webp";
+import NotfoundImage from "../assets/image/404.webp";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
 import globalText from "../data/globalText.json";
 import errorText from "../data/errorText.json";
 
@@ -19,8 +17,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "404 Not Found Error" }];
 
 const notFoundImageMeta = {
   alt: "404 NotFound エラーを案内する猫の画像",
-  width: 200,
-  height: 200,
+  width: 280,
+  height: 280,
 };
 const notFoundLinks = {
   href: "/",
@@ -41,51 +39,45 @@ const notFoundLinks = {
 >
   <link slot="head" rel="preload" href={NotfoundImage.src} as="image" fetchpriority="high" type="image/webp" />
 
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
-      <div class="notFound__wrapper">
-        <h1 class="notFound__header">
-          {errorText.notFound.title}
-        </h1>
-        <p class="notFound__body">
-          {errorText.notFound.body.text1}
-        </p>
-        <Image
-          class="notFound__image"
-          src={NotfoundImage}
-          alt={notFoundImageMeta.alt}
-          width={notFoundImageMeta.width}
-          height={notFoundImageMeta.height}
-          loading="lazy"
-          decoding="async"
-        />
-        <p class="notFound__body">
-          {errorText.notFound.body.text2}
-        </p>
-        <p class="notFound__body">
-          {errorText.notFound.body.text3}
-        </p>
-        <p class="notFound__body">
-          {errorText.notFound.body.text4}
-        </p>
-        <p class="notFound__body">
-          <a
-            class="notFound__link"
-            href={notFoundLinks.href}
-            aria-label={notFoundLinks.ariaLabel}
-            title={notFoundLinks.ariaTitle}
-          >
-            {notFoundLinks.label}
-          </a>
-          {errorText.notFound.body.text5}
-        </p>
-      </div>
-    </main>
-    <Footer />
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="notFound__wrapper">
+    <h1 class="notFound__header">
+      {errorText.notFound.title}
+    </h1>
+    <p class="notFound__body">
+      {errorText.notFound.body.text1}
+    </p>
+    <Image
+      class="notFound__image"
+      src={NotfoundImage}
+      alt={notFoundImageMeta.alt}
+      width={notFoundImageMeta.width}
+      height={notFoundImageMeta.height}
+      loading="lazy"
+      decoding="async"
+    />
+    <p class="notFound__body">
+      {errorText.notFound.body.text2}
+    </p>
+    <p class="notFound__body">
+      {errorText.notFound.body.text3}
+    </p>
+    <p class="notFound__body">
+      {errorText.notFound.body.text4}
+    </p>
+    <p class="notFound__body">
+      <a
+        class="notFound__link"
+        href={notFoundLinks.href}
+        aria-label={notFoundLinks.ariaLabel}
+        title={notFoundLinks.ariaTitle}
+      >
+        {notFoundLinks.label}
+      </a>
+      {errorText.notFound.body.text5}
+    </p>
   </div>
 </Layout>
 
@@ -105,23 +97,20 @@ const notFoundLinks = {
     color: var(--color-red);
     text-align: center;
     text-transform: uppercase;
-    margin-block-start: 3rem;
+    margin-block-start: 2.5rem;
   }
 
   .notFound__body {
     font-size: 1rem;
-    line-height: 1.8;
     letter-spacing: 0.12em;
     color: inherit;
-    /* text-align: center; */
-    margin-block-start: 1rem;
+    margin-block-start: 0.5rem;
   }
 
   .notFound__body:nth-of-type(1) {
     font-weight: 700;
     letter-spacing: 0.2em;
     text-align: center;
-    margin-block-start: 1rem;
   }
   @media (width <= 480px) {
     .notFound__body {
@@ -130,15 +119,11 @@ const notFoundLinks = {
   }
 
   .notFound__image {
-    display: block;
-    width: 200px;
-    height: 200px;
-    border-radius: 20%;
+    aspect-ratio: 1 / 1;
     object-fit: contain;
-    margin-block-start: 1rem;
+    margin-block-start: 0.5rem;
     margin-inline: auto;
-    padding-block: 1rem;
-    padding-inline: 1rem;
+    padding-block: 0.5rem;
     animation: movingCat 2s alternate infinite;
   }
   @keyframes movingCat {

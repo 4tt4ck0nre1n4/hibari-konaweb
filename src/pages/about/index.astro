@@ -1,7 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import AboutHeading from "../../components/AboutHeading.astro";
@@ -24,7 +22,7 @@ interface AboutText {
   aboutLikeText: string;
 }
 import FlowingLinesWrapper from "../../components/FlowingLinesWrapper.astro";
-import { twitter, github_sns, mail, contact } from "../../scripts/constSns";
+import { twitter, github_sns, mail, contact } from "../../data/constSns";
 import {
   html,
   css,
@@ -46,7 +44,7 @@ import {
   github,
   cursor,
   vercel,
-} from "../../scripts/constSkills";
+} from "../../data/constSkills";
 
 // const twitter = "/sorry"; //https://twitter.com"
 // const github = "/sorry"; //"https://github.com"
@@ -105,12 +103,9 @@ const stateMachine = "State Machine 1";
   twitterTitle={globalText.about.title}
   twitterDescription={globalText.about.description}
 >
-  <div id="outer-container">
-    <Header />
-    <main id="page-wrap">
-      <div class="breadcrumbs__wrapper">
-        <Breadcrumbs {crumbs} />
-      </div>
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
       <section class="about" aria-labelledby={`${aboutMeTitle} ${aboutMeSubTitle}`}>
         <div class="about__wrapper">
           <FlowingLinesWrapper>
@@ -270,9 +265,6 @@ const stateMachine = "State Machine 1";
           </div>
         </div>
       </section>
-    </main>
-    <Footer />
-  </div>
 </Layout>
 
 <style is:global>
