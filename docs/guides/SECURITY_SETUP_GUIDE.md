@@ -48,9 +48,18 @@ Contact Form 7 v5.1以降では、reCAPTCHA機能が標準で含まれていま�
 3. 以下の設定を行います：
    - **ラベル**: サイト名（例: Hibari Konaweb Contact Form）
    - **reCAPTCHAタイプ**: reCAPTCHA v3（推奨）または reCAPTCHA v2
-   - **ドメイン**: 使用するドメイン（例: `hibari-konaweb.netlify.app`, `hibari-konaweb.com`）
+   - **ドメイン**: **両方のドメインを登録する必要があります**
+     - フロントエンド側: `hibari-konaweb.netlify.app`（reCAPTCHAトークンを生成する側）
+     - WordPress側: `hibari-konaweb.com`（reCAPTCHAトークンを検証する側）
+     - **重要**: WordPress側のドメイン（`hibari-konaweb.com`）が登録されていないと、WordPressからGoogleへの検証リクエストが拒否され、spamとして判定されます
 4. 「送信」をクリック
 5. **サイトキー**と**シークレットキー**をコピー（後で使用します）
+
+**注意**: 既にサイトを登録している場合でも、後からドメインを追加できます：
+1. サイトを選択
+2. 「設定」を開く
+3. 「ドメイン」セクションで「+ ドメインを追加します」をクリック
+4. `hibari-konaweb.com`を入力して追加
 
 #### 3. WordPress管理画面でreCAPTCHAを設定
 
@@ -133,15 +142,45 @@ Contact Form 7は自動的に入力値をサニタイズ（無害化）します
 
    - `.env`ファイルの`PUBLIC_RECAPTCHA_SITE_KEY`を確認
    - Netlifyの環境変数が正しく設定されているか確認
+   - WordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」でサイトキーが一致しているか確認
 
-2. **ドメインが正しく登録されているか確認**
+2. **シークレットキーを再設定（重要）**
+
+   - Google reCAPTCHA管理画面（https://www.google.com/recaptcha/admin）でシークレットキーを再取得
+   - **重要**: サイトキーとシークレットキーは同じreCAPTCHAサイトのペアである必要があります
+   - WordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」で：
+     - シークレットキーを一度削除（「キーを削除」ボタンをクリック）
+     - 再度シークレットキーを入力
+     - 「変更を保存」をクリック
+   - 設定後、数分待ってから再度フォーム送信を試す
+
+3. **ドメインが正しく登録されているか確認**
 
    - Google reCAPTCHA管理画面で、使用しているドメインが登録されているか確認
-   - ローカル開発環境（`localhost`）も登録が必要な場合があります
+   - 本番環境の場合：`hibari-konaweb.com`が登録されているか確認
+   - 必要に応じてドメインを追加
 
-3. **ブラウザのコンソールでエラーを確認**
+4. **ブラウザのコンソールでエラーを確認**
    - ブラウザの開発者ツール（F12）でコンソールエラーを確認
    - ネットワークタブでreCAPTCHA APIへのリクエストが成功しているか確認
+   - `g-recaptcha-response`がFormDataに含まれているか確認
+
+5. **WordPress側のデバッグログを確認**
+   - `wp-content/debug.log`を確認（エラーがあれば生成されます）
+   - reCAPTCHA関連のエラーメッセージがないか確認
+   - `wp-config.php`で`WP_DEBUG_LOG`が`true`に設定されているか確認
+
+6. **Contact Form 7のフォームテンプレートを確認**
+   - フォームテンプレートに`[recaptcha]`タグが含まれているか確認
+   - REST API経由で送信する場合は、`[recaptcha]`タグが必要です
+
+7. **一時的にreCAPTCHAを無効化してテスト（原因特定用）**
+   - WordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」で「キーを削除」をクリック
+   - フォームテンプレートから`[recaptcha]`タグを削除
+   - フォーム送信が成功するか確認
+   - **成功する場合**: reCAPTCHA設定に問題があることが確定
+   - **成功しない場合**: reCAPTCHA以外の問題（SMTP設定など）の可能性
+   - **注意**: テスト後は必ずreCAPTCHAを再有効化してください
 
 ### SSL証明書の問題
 

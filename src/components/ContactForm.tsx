@@ -245,6 +245,7 @@ export default function ContactForm() {
 
     try {
       // reCAPTCHAトークンの取得と追加
+      // 注意: 一時的にreCAPTCHAを無効化してテストする場合は、以下のブロックをコメントアウトしてください
       console.log("🔄 [Contact Form] Attempting to get reCAPTCHA token...");
       const recaptchaToken = await getRecaptchaToken();
 
@@ -255,6 +256,11 @@ export default function ContactForm() {
         console.warn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
         console.warn("⚠️ [Contact Form] This may cause the submission to be marked as spam");
         console.warn("⚠️ [Contact Form] FormData will be sent without g-recaptcha-response field");
+      }
+
+      // デバッグ用: reCAPTCHAトークンの値をログ出力（最初の50文字のみ）
+      if (recaptchaToken !== null && recaptchaToken !== undefined && recaptchaToken.trim() !== "") {
+        console.log("🔍 [Contact Form] reCAPTCHA token (first 50 chars):", recaptchaToken.substring(0, 50));
       }
 
       // FormDataの内容を確認（デバッグ用）
