@@ -34,6 +34,18 @@ PUBLIC_WPCF7_UNIT_TAG=wpcf7-f123-p456-o1
 PUBLIC_WPCF7_POST_ID=456
 ```
 
+**重要**: `PUBLIC_API_URL`は、Contact Form 7のAPIエンドポイントとしても使用されます。  
+フォーム送信時に`https://hibari-konaweb.com`に接続できない場合は、`PUBLIC_API_URL`の設定を確認してください。
+
+reCAPTCHAを使用している場合：
+
+```
+PUBLIC_RECAPTCHA_SITE_KEY=your_recaptcha_site_key_here
+```
+
+**重要**: reCAPTCHAのサイトキーは公開されても問題ありませんが、シークレットキーは**絶対に**環境変数に設定しないでください。  
+シークレットキーはWordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」で設定してください。
+
 ### 4. 再デプロイ
 
 環境変数を設定後、`Deploys` → `Trigger deploy` → `Deploy site` をクリック
@@ -78,3 +90,43 @@ netlify deploy --prod --dir=dist
 - `https://your-domain.com/blog`
 - `https://your-domain.com/blog/2`
 - `https://your-domain.com/works/your-slug`
+
+## トラブルシューティング
+
+### お問い合わせフォームが「spam」ステータスで失敗する場合
+
+1. **Netlifyの環境変数を確認**
+   - `Site settings` → `Environment variables`で以下を確認：
+     - `PUBLIC_API_URL`が正しく設定されているか
+     - `PUBLIC_RECAPTCHA_SITE_KEY`が設定されているか
+
+2. **WordPress側のreCAPTCHA設定を確認**
+   - WordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」で：
+     - サイトキーが`PUBLIC_RECAPTCHA_SITE_KEY`と一致しているか
+     - シークレットキーが正しく設定されているか
+
+3. **Google reCAPTCHA管理画面でドメインを確認**
+   - https://www.google.com/recaptcha/admin にアクセス
+   - 使用しているreCAPTCHAサイトを選択
+   - 「ドメイン」セクションで、`hibari-konaweb.netlify.app`が登録されているか確認
+
+4. **ブラウザのコンソールで確認**
+   - 開発者ツール（F12）のコンソールタブを開く
+   - フォーム送信時に以下のログを確認：
+     - `✅ [Contact Form] reCAPTCHA token obtained`が表示されているか
+     - `📋 [Contact Form] FormData keys:`に`g-recaptcha-response`が含まれているか
+     - `📤 [Contact Form] Sending POST request to:`で送信先URLを確認
+
+### ネットワークエラー（ERR_INTERNET_DISCONNECTED）が発生する場合
+
+1. **`PUBLIC_API_URL`の設定を確認**
+   - Netlifyの環境変数で、`PUBLIC_API_URL`が正しいWordPress URLに設定されているか確認
+   - 本番環境では、`https://hibari-konaweb.com`などの公開アクセス可能なURLを設定
+
+2. **WordPressサイトが公開されているか確認**
+   - `PUBLIC_API_URL`で指定したURLにブラウザで直接アクセスできるか確認
+   - REST APIが有効になっているか確認（`/wp-json/`にアクセスして確認）
+
+3. **CORS設定を確認**
+   - WordPress側でCORSが適切に設定されているか確認
+   - 必要に応じて、WordPressの`.htaccess`またはプラグインでCORS設定を追加

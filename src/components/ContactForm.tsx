@@ -260,8 +260,9 @@ export default function ContactForm() {
       // FormDataの内容を確認（デバッグ用）
       console.log("📋 [Contact Form] FormData keys:", Array.from(formData.keys()));
 
-      // デバッグ用: 送信先のエンドポイントをログ出力（開発環境のみ）
-      devLog("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
+      // デバッグ用: 送信先のエンドポイントをログ出力（常に表示）
+      console.log("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
+      console.log("📤 [Contact Form] API URL source:", import.meta.env.PUBLIC_API_URL);
 
       // タイムアウト設定（30秒）- メール送信処理を考慮
       const response = await fetchWithTimeout(
@@ -350,6 +351,12 @@ export default function ContactForm() {
       } else if (responseData.status === "spam") {
         // スパムとして判定された場合
         console.error("❌ [Contact Form] Submission marked as spam:", responseData);
+        console.error("❌ [Contact Form] Full response:", JSON.stringify(responseData, null, 2));
+
+        // FormDataにreCAPTCHAトークンが含まれているか確認
+        const hasRecaptchaToken = formData.has("g-recaptcha-response");
+        console.log("🔍 [Contact Form] g-recaptcha-response in FormData:", hasRecaptchaToken);
+
         const spamMessage =
           responseData.message !== undefined && responseData.message.trim() !== ""
             ? responseData.message
@@ -357,9 +364,16 @@ export default function ContactForm() {
 
         let alertMessage = `${spamMessage}\n\n`;
         alertMessage += "考えられる原因:\n";
-        alertMessage += "1. reCAPTCHAの検証が失敗している可能性があります\n";
-        alertMessage += "2. WordPress側のreCAPTCHA設定（シークレットキー）を確認してください\n";
-        alertMessage += "3. ブラウザの開発者ツール（F12）のコンソールでエラーを確認してください\n\n";
+
+        if (!hasRecaptchaToken) {
+          alertMessage += "⚠️ reCAPTCHAトークンがFormDataに含まれていません\n";
+        } else {
+          alertMessage += "✅ reCAPTCHAトークンは送信されています\n";
+        }
+
+        alertMessage += "1. WordPress側のreCAPTCHA設定（シークレットキー）を確認してください\n";
+        alertMessage += "2. Google reCAPTCHA管理画面で、ドメインが正しく登録されているか確認してください\n";
+        alertMessage += "3. ブラウザの開発者ツール（F12）のコンソールで詳細を確認してください\n\n";
         alertMessage += "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。";
 
         alert(alertMessage);
