@@ -63,13 +63,28 @@ Contact Form 7 v5.1以降では、reCAPTCHA機能が標準で含まれていま�
 
 #### 4. Contact Form 7のフォームにreCAPTCHAを追加
 
+**重要**: reCAPTCHA v3を使用している場合でも、REST API経由でフォームを送信する場合は、フォームテンプレートに`[recaptcha]`タグを追加する必要があります。
+
 Contact Form 7のフォーム編集画面で、フォームタグに以下を追加：
 
 ```
 [recaptcha]
 ```
 
-または、reCAPTCHA v3を使用する場合（推奨）、フォームタグは不要です。v3は自動的に動作します。
+このタグは、送信ボタンの前（通常は最後）に配置してください：
+
+```
+<label> 氏名
+[text* your-name autocomplete:name] </label>
+<label> メールアドレス
+[email* your-email autocomplete:email] </label>
+<label> メッセージ本文(任意)
+[textarea your-message] </label>
+[recaptcha]
+[submit "送信"]
+```
+
+**注意**: 通常のWordPressフォーム（REST APIを使用しない場合）では、reCAPTCHA v3は自動的に動作するため`[recaptcha]`タグは不要ですが、REST API経由で送信する場合は必要です。
 
 ### Astro側の設定
 
@@ -155,22 +170,3 @@ Contact Form 7は自動的に入力値をサニタイズ（無害化）します
 - [Contact Form 7公式ドキュメント](https://contactform7.com/)
 - [Google reCAPTCHA公式ドキュメント](https://developers.google.com/recaptcha)
 - [Netlify SSL/TLS設定](https://docs.netlify.com/domains-https/https-ssl/)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
