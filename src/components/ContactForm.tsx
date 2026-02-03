@@ -173,33 +173,43 @@ export default function ContactForm() {
 
   // reCAPTCHAトークンの取得
   const getRecaptchaToken = async (): Promise<string | null> => {
+    console.log("🔍 [Contact Form] Starting reCAPTCHA token retrieval...");
+
     if (RECAPTCHA_SITE_KEY === undefined || RECAPTCHA_SITE_KEY === null || RECAPTCHA_SITE_KEY.trim() === "") {
-      devWarn("⚠️ [Contact Form] reCAPTCHA site key is not set. Skipping reCAPTCHA verification.");
+      console.warn("⚠️ [Contact Form] reCAPTCHA site key is not set. Skipping reCAPTCHA verification.");
+      console.warn("⚠️ [Contact Form] Check if PUBLIC_RECAPTCHA_SITE_KEY is set in environment variables.");
       return null;
     }
 
+    console.log("✅ [Contact Form] reCAPTCHA site key found:", `${RECAPTCHA_SITE_KEY.substring(0, 10)}...`);
+
     const grecaptcha = window.grecaptcha;
     if (grecaptcha === undefined || grecaptcha === null) {
-      devWarn("⚠️ [Contact Form] reCAPTCHA is not loaded. Skipping reCAPTCHA verification.");
+      console.warn("⚠️ [Contact Form] reCAPTCHA is not loaded. Skipping reCAPTCHA verification.");
+      console.warn("⚠️ [Contact Form] Check if reCAPTCHA script is loaded correctly.");
       return null;
     }
+
+    console.log("✅ [Contact Form] reCAPTCHA object found, executing...");
 
     try {
       return new Promise((resolve, reject) => {
         grecaptcha.ready(() => {
+          console.log("✅ [Contact Form] reCAPTCHA ready, executing with site key...");
           grecaptcha
             .execute(RECAPTCHA_SITE_KEY, { action: "submit" })
             .then((token) => {
+              console.log("✅ [Contact Form] reCAPTCHA token generated successfully");
               resolve(token);
             })
             .catch((error) => {
-              devError("❌ [Contact Form] reCAPTCHA execution failed:", error);
+              console.error("❌ [Contact Form] reCAPTCHA execution failed:", error);
               reject(error instanceof Error ? error : new Error(String(error)));
             });
         });
       });
     } catch (error) {
-      devError("❌ [Contact Form] Failed to get reCAPTCHA token:", error);
+      console.error("❌ [Contact Form] Failed to get reCAPTCHA token:", error);
       return null;
     }
   };
@@ -235,13 +245,20 @@ export default function ContactForm() {
 
     try {
       // reCAPTCHAトークンの取得と追加
+      console.log("🔄 [Contact Form] Attempting to get reCAPTCHA token...");
       const recaptchaToken = await getRecaptchaToken();
+
       if (recaptchaToken !== null && recaptchaToken !== undefined && recaptchaToken.trim() !== "") {
         formData.append("g-recaptcha-response", recaptchaToken);
-        devLog("✅ [Contact Form] reCAPTCHA token obtained");
+        console.log("✅ [Contact Form] reCAPTCHA token obtained and added to form data:", `${recaptchaToken.substring(0, 20)}...`);
       } else {
-        devWarn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
+        console.warn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
+        console.warn("⚠️ [Contact Form] This may cause the submission to be marked as spam");
+        console.warn("⚠️ [Contact Form] FormData will be sent without g-recaptcha-response field");
       }
+
+      // FormDataの内容を確認（デバッグ用）
+      console.log("📋 [Contact Form] FormData keys:", Array.from(formData.keys()));
 
       // デバッグ用: 送信先のエンドポイントをログ出力（開発環境のみ）
       devLog("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
@@ -330,8 +347,24 @@ export default function ContactForm() {
             "SMTPプラグインの設定を確認してください。\n" +
             "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
         );
+      } else if (responseData.status === "spam") {
+        // スパムとして判定された場合
+        console.error("❌ [Contact Form] Submission marked as spam:", responseData);
+        const spamMessage =
+          responseData.message !== undefined && responseData.message.trim() !== ""
+            ? responseData.message
+            : "メッセージがスパムとして判定されました。";
+
+        let alertMessage = `${spamMessage}\n\n`;
+        alertMessage += "考えられる原因:\n";
+        alertMessage += "1. reCAPTCHAの検証が失敗している可能性があります\n";
+        alertMessage += "2. WordPress側のreCAPTCHA設定（シークレットキー）を確認してください\n";
+        alertMessage += "3. ブラウザの開発者ツール（F12）のコンソールでエラーを確認してください\n\n";
+        alertMessage += "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。";
+
+        alert(alertMessage);
       } else {
-        // その他のエラー（aborted, spam など）
+        // その他のエラー（aborted など）
         console.error("❌ [Contact Form] Unexpected response status:", responseData);
         const statusMessage =
           responseData.message !== undefined && responseData.message.trim() !== ""
