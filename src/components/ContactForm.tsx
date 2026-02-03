@@ -358,15 +358,39 @@ export default function ContactForm() {
         } else if (
           error.message.includes("fetch failed") ||
           error.message.includes("network") ||
-          error.message.includes("Failed to fetch")
+          error.message.includes("Failed to fetch") ||
+          error.message.includes("ERR_INTERNET_DISCONNECTED") ||
+          error.message.includes("ERR_NETWORK_CHANGED") ||
+          error.message.includes("ERR_CONNECTION_REFUSED") ||
+          error.message.includes("ERR_CONNECTION_RESET")
         ) {
           // ネットワークエラーの場合
-          devError("❌ [Contact Form] Network error:", error);
-          alert(
-            "ネットワークエラーが発生しました。\n" +
-              "インターネット接続を確認し、しばらく時間をおいて再度お試しください。\n" +
-              "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
-          );
+          console.error("❌ [Contact Form] Network error:", error);
+          const isLocalDev = window.location.hostname === "localhost" || window.location.hostname.endsWith(".local");
+          const apiUrl = CONTACT_WPCF7_API;
+
+          let errorMessage: string;
+
+          if (isLocalDev && apiUrl.includes("hibari-konaweb.com")) {
+            errorMessage = `ネットワークエラーが発生しました。
+
+⚠️ ローカル環境から本番環境のWordPress APIに接続しようとしています。
+ローカル開発環境では、.envファイルにローカルのWordPress URLを設定してください。
+例: PUBLIC_API_URL=http://hibari-konaweb.local
+
+現在のAPI URL: ${apiUrl}
+
+問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。`;
+          } else {
+            errorMessage = `ネットワークエラーが発生しました。
+インターネット接続を確認し、しばらく時間をおいて再度お試しください。
+
+接続先: ${apiUrl}
+
+問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。`;
+          }
+
+          alert(errorMessage);
         } else {
           // その他のエラー
           console.error("❌ [Contact Form] Error:", error);
