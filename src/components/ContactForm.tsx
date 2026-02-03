@@ -274,6 +274,10 @@ export default function ContactForm() {
       const responseText = await response.text();
       let responseData: WPCF7Response;
 
+      // レスポンスの生データを常にログ出力（デバッグ用）
+      console.log("📥 [Contact Form] Raw server response:", responseText);
+      console.log("📥 [Contact Form] Response status:", response.status, response.statusText);
+
       try {
         const parsed = JSON.parse(responseText) as unknown;
         // 基本的な型チェック
@@ -285,15 +289,20 @@ export default function ContactForm() {
         ) {
           responseData = parsed as WPCF7Response;
         } else {
+          console.error("❌ [Contact Form] Invalid response format:", parsed);
           throw new Error("Invalid response format");
         }
       } catch (parseError) {
-        devError("Failed to parse response:", responseText);
-        throw new Error("サーバーからの応答が正しくありません。");
+        console.error("❌ [Contact Form] Failed to parse response:", {
+          error: parseError,
+          responseText: responseText,
+          status: response.status,
+        });
+        throw new Error(`サーバーからの応答が正しくありません。ステータス: ${response.status}`);
       }
 
-      // レスポンスをコンソールに出力（デバッグ用、開発環境のみ）
-      devLog("Contact Form 7 Response:", responseData);
+      // レスポンスをコンソールに出力（デバッグ用）
+      console.log("📋 [Contact Form] Parsed response data:", responseData);
 
       // Contact Form 7のレスポンスステータスを確認
       if (responseData.status === "mail_sent") {
@@ -310,16 +319,27 @@ export default function ContactForm() {
         alert(errorMessages);
       } else if (responseData.status === "mail_failed") {
         // メール送信失敗
-        devError("Mail sending failed:", responseData);
+        console.error("❌ [Contact Form] Mail sending failed:", responseData);
+        const errorMessage =
+          responseData.message !== undefined && responseData.message.trim() !== ""
+            ? responseData.message
+            : "メール送信に失敗しました。";
         alert(
-          "メール送信に失敗しました。しばらく時間をおいて再度お試しください。\n" +
+          `${errorMessage}\n` +
+            "WordPressのメール送信機能が正常に動作していない可能性があります。\n" +
+            "SMTPプラグインの設定を確認してください。\n" +
             "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
         );
       } else {
-        // その他のエラー
-        devError("Unexpected response status:", responseData);
+        // その他のエラー（aborted, spam など）
+        console.error("❌ [Contact Form] Unexpected response status:", responseData);
+        const statusMessage =
+          responseData.message !== undefined && responseData.message.trim() !== ""
+            ? responseData.message
+            : "送信処理中にエラーが発生しました。";
         alert(
-          "送信処理中にエラーが発生しました。\n" +
+          `${statusMessage}\n` +
+            `ステータス: ${responseData.status}\n` +
             "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
         );
       }
@@ -349,10 +369,16 @@ export default function ContactForm() {
           );
         } else {
           // その他のエラー
-          devError("❌ [Contact Form] Error:", error);
+          console.error("❌ [Contact Form] Error:", error);
+          console.error("❌ [Contact Form] Error details:", {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          });
           alert(
-            "送信処理中にエラーが発生しました。\n" +
-              "しばらく時間をおいて再度お試しください。\n" +
+            `送信処理中にエラーが発生しました。\n` +
+              `エラー: ${error.message}\n` +
+              "ブラウザの開発者ツール（F12）のコンソールタブで詳細を確認できます。\n" +
               "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。"
           );
         }
