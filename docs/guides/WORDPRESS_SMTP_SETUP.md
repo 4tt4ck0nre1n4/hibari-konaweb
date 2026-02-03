@@ -233,12 +233,18 @@ SMTP設定を行う前に、以下を準備してください：
   - ポート番号が正しいか確認
   - ファイアウォールでブロックされていないか確認
 
-#### "Authentication failed"
+#### "Authentication failed" / "SMTP アカウントを認証できませんでした"
 
-- **原因**: 認証情報が間違っている
+- **原因**: 認証情報が間違っている、またはSMTP設定が正しくない
 - **対処法**: 
   - メールアドレスとパスワードが正しいか確認
   - メールアドレスのパスワードをリセットして再設定
+  - **SMTP認証方式の確認**: ConoHa WINGでは通常、通常のメールアドレス/パスワード認証を使用します
+  - **ポートと暗号化の組み合わせを確認**:
+    - ポート587 → TLS/STARTTLS
+    - ポート465 → SSL
+  - **送信者メールアドレスの確認**: WP Mail SMTPの「送信者メールアドレス」が、SMTP認証で使用しているメールアドレスと一致しているか確認
+  - **ConoHa WINGのメールアカウント設定を確認**: メールアカウントが正しく作成され、有効になっているか確認
 
 #### "Could not instantiate mail function"
 
@@ -253,12 +259,23 @@ SMTP設定を行う前に、以下を準備してください：
    - メールアカウントが正しく作成されているか確認
    - メールボックスの容量が上限に達していないか確認
 
-2. **WordPressのデバッグモード**
+2. **WordPressのデバッグモード（WP Mail SMTP無料版でもエラーログを確認可能）**
+
    - `wp-config.php`でデバッグモードを有効にしてエラーログを確認
+
    ```php
    define('WP_DEBUG', true);
    define('WP_DEBUG_LOG', true);
+   define('WP_DEBUG_DISPLAY', false); // 本番環境ではfalseに設定（エラーを画面に表示しない）
    ```
+
+   - エラーログは `wp-content/debug.log` に記録されます
+   - SMTP送信時のエラーもこのログに記録されるため、WP Mail SMTP Proがなくてもエラー内容を確認できます
+   - ログファイルの場所: `wp-content/debug.log`
+   - ログを確認する方法:
+     1. WordPressのファイルマネージャーまたはFTPで `wp-content/debug.log` を開く
+     2. 最新のエラーメッセージを確認（SMTP関連のエラーを検索）
+     3. エラーメッセージから原因を特定（例: "Authentication failed"、"Connection refused" など）
 
 3. **プラグインの更新**
    - SMTPプラグインが最新版か確認
