@@ -54,6 +54,25 @@ declare global {
   }
 }
 
+const fetchWithTimeout = async (
+  input: RequestInfo | URL,
+  init: RequestInit,
+  timeoutMs: number
+): Promise<Response> => {
+  // AbortSignal.timeout が使える環境ではそれを優先（実装が最適化されていることが多い）
+  if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+    return await fetch(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+  }
+
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+};
+
 type FormValues = {
   name: string;
   email: string;
@@ -228,11 +247,14 @@ export default function ContactForm() {
       devLog("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
 
       // タイムアウト設定（30秒）- メール送信処理を考慮
-      const response = await fetch(CONTACT_WPCF7_API, {
-        method: "POST",
-        body: formData,
-        signal: AbortSignal.timeout(30000), // 30秒タイムアウト
-      });
+      const response = await fetchWithTimeout(
+        CONTACT_WPCF7_API,
+        {
+          method: "POST",
+          body: formData,
+        },
+        30000
+      );
 
       // 送信履歴に記録
       submissionHistoryRef.current.push(Date.now());
