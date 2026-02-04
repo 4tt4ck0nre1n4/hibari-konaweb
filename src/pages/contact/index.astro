@@ -43,7 +43,7 @@ export const prerender = true;
   jsonLd={jsonLd}
 >
   <link slot="head" rel="preload" href={contactBackgroundImage.src} as="image" fetchpriority="high" />
-  {RECAPTCHA_SITE_KEY && (
+  {RECAPTCHA_SITE_KEY !== undefined && RECAPTCHA_SITE_KEY.trim() !== "" && (
     <script
       slot="head"
       src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`}
