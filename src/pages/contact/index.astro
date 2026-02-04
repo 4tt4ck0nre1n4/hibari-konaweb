@@ -15,6 +15,9 @@ interface Props {
 
 const pageTitle = "Contact";
 
+// reCAPTCHA設定
+const RECAPTCHA_SITE_KEY = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY as string | undefined;
+
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "ContactPage",
@@ -40,6 +43,14 @@ export const prerender = true;
   jsonLd={jsonLd}
 >
   <link slot="head" rel="preload" href={contactBackgroundImage.src} as="image" fetchpriority="high" />
+  {RECAPTCHA_SITE_KEY && (
+    <script
+      slot="head"
+      src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`}
+      async
+      defer
+    />
+  )}
 
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />

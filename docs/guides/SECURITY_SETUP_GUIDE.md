@@ -182,6 +182,13 @@ Contact Form 7は自動的に入力値をサニタイズ（無害化）します
    - **成功しない場合**: reCAPTCHA以外の問題（SMTP設定など）の可能性
    - **注意**: テスト後は必ずreCAPTCHAを再有効化してください
 
+8. **Contact Form 7のREST API経由での送信でreCAPTCHAが検証されない問題**
+   - Contact Form 7のREST API経由での送信では、reCAPTCHAの検証方法が通常のフォーム送信と異なる可能性があります
+   - この場合、以下のいずれかの対応が必要です：
+     - **オプションA**: reCAPTCHAを無効化して、他のセキュリティ対策（レート制限など）で対応
+     - **オプションB**: Contact Form 7の通常のフォーム送信方式に変更（REST APIを使用しない）
+     - **オプションC**: Contact Form 7のプラグインを更新して、REST API経由でのreCAPTCHA検証に対応しているか確認
+
 ### SSL証明書の問題
 
 1. **証明書が発行されていない場合**

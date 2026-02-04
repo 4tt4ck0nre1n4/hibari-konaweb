@@ -197,7 +197,7 @@ export default function ContactForm() {
         grecaptcha.ready(() => {
           console.log("✅ [Contact Form] reCAPTCHA ready, executing with site key...");
           grecaptcha
-            .execute(RECAPTCHA_SITE_KEY, { action: "submit" })
+            .execute(RECAPTCHA_SITE_KEY, { action: "contact" })
             .then((token) => {
               console.log("✅ [Contact Form] reCAPTCHA token generated successfully");
               resolve(token);
@@ -250,12 +250,15 @@ export default function ContactForm() {
       const recaptchaToken = await getRecaptchaToken();
 
       if (recaptchaToken !== null && recaptchaToken !== undefined && recaptchaToken.trim() !== "") {
+        // Contact Form 7のREST APIは_wpcf7_recaptcha_responseフィールド名を期待する
+        formData.append("_wpcf7_recaptcha_response", recaptchaToken);
+        // 互換性のため、g-recaptcha-responseも追加
         formData.append("g-recaptcha-response", recaptchaToken);
         console.log("✅ [Contact Form] reCAPTCHA token obtained and added to form data:", `${recaptchaToken.substring(0, 20)}...`);
       } else {
         console.warn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
         console.warn("⚠️ [Contact Form] This may cause the submission to be marked as spam");
-        console.warn("⚠️ [Contact Form] FormData will be sent without g-recaptcha-response field");
+        console.warn("⚠️ [Contact Form] FormData will be sent without _wpcf7_recaptcha_response field");
       }
 
       // デバッグ用: reCAPTCHAトークンの値をログ出力（最初の50文字のみ）
@@ -360,8 +363,9 @@ export default function ContactForm() {
         console.error("❌ [Contact Form] Full response:", JSON.stringify(responseData, null, 2));
 
         // FormDataにreCAPTCHAトークンが含まれているか確認
-        const hasRecaptchaToken = formData.has("g-recaptcha-response");
-        console.log("🔍 [Contact Form] g-recaptcha-response in FormData:", hasRecaptchaToken);
+        const hasRecaptchaToken = formData.has("_wpcf7_recaptcha_response") || formData.has("g-recaptcha-response");
+        console.log("🔍 [Contact Form] _wpcf7_recaptcha_response in FormData:", formData.has("_wpcf7_recaptcha_response"));
+        console.log("🔍 [Contact Form] g-recaptcha-response in FormData:", formData.has("g-recaptcha-response"));
 
         const spamMessage =
           responseData.message !== undefined && responseData.message.trim() !== ""
