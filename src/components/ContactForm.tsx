@@ -76,6 +76,7 @@ const fetchWithTimeout = async (
 type FormValues = {
   name: string;
   email: string;
+  company?: string;
   message: string;
   wpcf7_unit_tag: string;
 };
@@ -97,7 +98,7 @@ type WPCF7Response = {
 export default function ContactForm() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
 
-  const [hoveredField, setHoveredField] = useState<"name" | "email" | "message" | null>(null);
+  const [hoveredField, setHoveredField] = useState<"name" | "company" | "email" | "message" | null>(null);
 
   const [hoveredSubmit, setHoveredSubmit] = useState(false);
 
@@ -240,6 +241,9 @@ export default function ContactForm() {
     const formData = new FormData(target);
     formData.append("your-name", data.name);
     formData.append("your-email", data.email);
+    if (data.company !== undefined && data.company.trim() !== "") {
+      formData.append("your-company", data.company);
+    }
     formData.append("your-message", data.message);
     formData.append("_wpcf7_unit_tag", data.wpcf7_unit_tag);
 
@@ -485,10 +489,9 @@ export default function ContactForm() {
           aria-labelledby="contact-form-title"
           aria-describedby="contact-form-description"
         >
-          <div className={styles.form_hidden}>
+          <div className={styles.form__hidden}>
             <input type="hidden" name="_wpcf7" value={wpcf7Id} />
-            <input type="hidden" name="_wpcf7_version" value="5.9.7" />
-            <input type="hidden" name="_wpcf7_local" value="ja" />
+            <input type="hidden" name="_wpcf7_locale" value="ja" />
             <input type="hidden" name="_wpcf7_unit_tag" value={wpcf7UnitTag} />
             <input type="hidden" name="_wpcf7_container_post" value={wpcf7PostId} />
           </div>
@@ -498,12 +501,12 @@ export default function ContactForm() {
                 <span
                   className={`${styles.label__text}${hoveredField === "name" ? "" : styles["label__text--active"]}`}
                 >
-                  Name
+                  お名前
                 </span>
                 <span
                   className={`${styles.label__text}${hoveredField === "name" ? styles["label__text--active"] : ""}`}
                 >
-                  お名前
+                  Name
                 </span>
               </span>
               <span className={styles.required}>{requiredMark}</span>
@@ -522,17 +525,48 @@ export default function ContactForm() {
             {Boolean(errors.name?.message) && <p role="alert">{errors.name?.message}</p>}
           </div>
           <div className={styles.form__box}>
+            <label className={styles.label__company} htmlFor="company">
+              <span className={styles.label__field}>
+                <span
+                  className={`${styles.label__text}${
+                    hoveredField === "company" ? "" : styles["label__text--active"]
+                  }`}
+                >
+                  会社名
+                </span>
+                <span
+                  className={`${styles.label__text}${
+                    hoveredField === "company" ? styles["label__text--active"] : ""
+                  }`}
+                >
+                  Company Name
+                </span>
+              </span>
+            </label>
+            <input
+              id="company"
+              className={styles.input__company}
+              type="text"
+              {...register("company")}
+              autoComplete="organization"
+              placeholder="Your Company Name"
+              aria-required="false"
+              onMouseEnter={() => setHoveredField("company")}
+              onMouseLeave={() => setHoveredField(null)}
+            />
+          </div>
+          <div className={styles.form__box}>
             <label className={styles.label__email} htmlFor="email">
               <span className={styles.label__field}>
                 <span
                   className={`${styles.label__text}${hoveredField === "email" ? "" : styles["label__text--active"]}`}
                 >
-                  Email
+                  メール
                 </span>
                 <span
                   className={`${styles.label__text}${hoveredField === "email" ? styles["label__text--active"] : ""}`}
                 >
-                  メール
+                  Email
                 </span>
               </span>
               <span className={styles.required}>{requiredMark}</span>
@@ -556,12 +590,12 @@ export default function ContactForm() {
                 <span
                   className={`${styles.label__text}${hoveredField === "message" ? "" : styles["label__text--active"]}`}
                 >
-                  Message
+                  お問い合わせ
                 </span>
                 <span
                   className={`${styles.label__text}${hoveredField === "message" ? styles["label__text--active"] : ""}`}
                 >
-                  お問い合わせ
+                  Message
                 </span>
               </span>
               <span className={styles.required}>{requiredMark}</span>
