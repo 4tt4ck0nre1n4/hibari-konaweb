@@ -86,6 +86,9 @@ type WPCF7InvalidField = {
   message: string;
   idref: string | null;
   error_id: string;
+  // Contact Form 7 REST API が返す追加情報（環境やバージョンで有無がある）
+  field?: string;
+  into?: string;
 };
 
 type WPCF7Response = {
@@ -350,9 +353,17 @@ export default function ContactForm() {
       } else if (responseData.status === "validation_failed") {
         // バリデーションエラー
         const errorMessages = responseData.invalid_fields
-          ? responseData.invalid_fields.map((field) => field.message).join("\n")
-          : responseData.message !== ""
-            ? responseData.message
+          ? responseData.invalid_fields
+              .map((field) => {
+                const fieldName =
+                  field.field !== undefined && field.field !== null && String(field.field).trim() !== ""
+                    ? String(field.field).trim()
+                    : null;
+                return fieldName !== null ? `${fieldName}: ${field.message}` : field.message;
+              })
+              .join("\n")
+          : responseData.message !== undefined && responseData.message !== null && responseData.message.trim() !== ""
+            ? responseData.message.trim()
             : "入力内容に誤りがあります。";
         alert(errorMessages);
       } else if (responseData.status === "mail_failed") {
