@@ -302,12 +302,20 @@ export default function ContactForm() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const responseText = await response.text();
+      let responseText = await response.text();
       let responseData: WPCF7Response;
 
       // レスポンスの生データを常にログ出力（デバッグ用）
       console.log("📥 [Contact Form] Raw server response:", responseText);
       console.log("📥 [Contact Form] Response status:", response.status, response.statusText);
+
+      // レスポンスの先頭から余分な文字列（functions.php等）を削除
+      // JSONの開始位置（{）を探す
+      const jsonStartIndex = responseText.indexOf("{");
+      if (jsonStartIndex > 0) {
+        console.warn("⚠️ [Contact Form] Response contains extra text before JSON, removing:", responseText.substring(0, jsonStartIndex));
+        responseText = responseText.substring(jsonStartIndex);
+      }
 
       try {
         const parsed = JSON.parse(responseText) as unknown;
