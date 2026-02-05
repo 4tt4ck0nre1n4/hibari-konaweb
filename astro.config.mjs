@@ -72,6 +72,7 @@ export default defineConfig({
           "astro",
           "vscode",
           "vercel",
+          "filezilla"
         ],
         logos: ["wordpress-icon", "greensock-icon", "netlify-icon", "gulp"],
         "fa6-solid": ["cat", "envelope"],

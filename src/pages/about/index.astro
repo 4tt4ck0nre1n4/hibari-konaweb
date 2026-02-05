@@ -44,13 +44,8 @@ import {
   github,
   cursor,
   vercel,
+  filezilla,
 } from "../../data/constSkills";
-
-// const twitter = "/sorry"; //https://twitter.com"
-// const github = "/sorry"; //"https://github.com"
-// const notion = "/sorry"; //"https://notion.so"
-// const instagram = "/sorry"; //"https://instagram.com"
-// const mail = "mailto:webengineer@hibari-konaweb.com";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 const href = "/service";
@@ -210,6 +205,7 @@ const stateMachine = "State Machine 1";
               <SkillsIcon className={netlify.className} iconSvg={netlify.icon} iconName={netlify.item} />
               <SkillsIcon className={vercel.className} iconSvg={vercel.icon} iconName={vercel.item} />
               <SkillsIcon className={github.className} iconSvg={github.icon} iconName={github.item} />
+              <SkillsIcon className={filezilla.className} iconSvg={filezilla.icon} iconName={filezilla.item} />
             </ul>
           </div>
         </div>

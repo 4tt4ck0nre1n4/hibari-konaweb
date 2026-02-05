@@ -104,3 +104,8 @@ export const vercel = {
   icon: "devicon:vercel",
   item: "Vercel",
 };
+export const filezilla = {
+  className: "filezilla",
+  icon: "devicon:filezilla",
+  item: "FileZilla",
+};
