@@ -241,9 +241,8 @@ export default function ContactForm() {
     const formData = new FormData(target);
     formData.append("your-name", data.name);
     formData.append("your-email", data.email);
-    if (data.company !== undefined && data.company.trim() !== "") {
-      formData.append("your-company", data.company);
-    }
+    // 会社名は必須項目ではないため、空文字列でも送信する
+    formData.append("your-company", data.company !== undefined && data.company !== null ? data.company : "");
     formData.append("your-message", data.message);
     formData.append("_wpcf7_unit_tag", data.wpcf7_unit_tag);
 
