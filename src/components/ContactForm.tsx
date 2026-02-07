@@ -177,43 +177,43 @@ export default function ContactForm() {
 
   // reCAPTCHAトークンの取得
   const getRecaptchaToken = async (): Promise<string | null> => {
-    console.log("🔍 [Contact Form] Starting reCAPTCHA token retrieval...");
+    devLog("🔍 [Contact Form] Starting reCAPTCHA token retrieval...");
 
     if (RECAPTCHA_SITE_KEY === undefined || RECAPTCHA_SITE_KEY === null || RECAPTCHA_SITE_KEY.trim() === "") {
-      console.warn("⚠️ [Contact Form] reCAPTCHA site key is not set. Skipping reCAPTCHA verification.");
-      console.warn("⚠️ [Contact Form] Check if PUBLIC_RECAPTCHA_SITE_KEY is set in environment variables.");
+      devWarn("⚠️ [Contact Form] reCAPTCHA site key is not set. Skipping reCAPTCHA verification.");
+      devWarn("⚠️ [Contact Form] Check if PUBLIC_RECAPTCHA_SITE_KEY is set in environment variables.");
       return null;
     }
 
-    console.log("✅ [Contact Form] reCAPTCHA site key found:", `${RECAPTCHA_SITE_KEY.substring(0, 10)}...`);
+    devLog("✅ [Contact Form] reCAPTCHA site key found:", `${RECAPTCHA_SITE_KEY.substring(0, 10)}...`);
 
     const grecaptcha = window.grecaptcha;
     if (grecaptcha === undefined || grecaptcha === null) {
-      console.warn("⚠️ [Contact Form] reCAPTCHA is not loaded. Skipping reCAPTCHA verification.");
-      console.warn("⚠️ [Contact Form] Check if reCAPTCHA script is loaded correctly.");
+      devWarn("⚠️ [Contact Form] reCAPTCHA is not loaded. Skipping reCAPTCHA verification.");
+      devWarn("⚠️ [Contact Form] Check if reCAPTCHA script is loaded correctly.");
       return null;
     }
 
-    console.log("✅ [Contact Form] reCAPTCHA object found, executing...");
+    devLog("✅ [Contact Form] reCAPTCHA object found, executing...");
 
     try {
       return new Promise((resolve, reject) => {
         grecaptcha.ready(() => {
-          console.log("✅ [Contact Form] reCAPTCHA ready, executing with site key...");
+          devLog("✅ [Contact Form] reCAPTCHA ready, executing with site key...");
           grecaptcha
             .execute(RECAPTCHA_SITE_KEY, { action: "contact" })
             .then((token) => {
-              console.log("✅ [Contact Form] reCAPTCHA token generated successfully");
+              devLog("✅ [Contact Form] reCAPTCHA token generated successfully");
               resolve(token);
             })
             .catch((error) => {
-              console.error("❌ [Contact Form] reCAPTCHA execution failed:", error);
+              devError("❌ [Contact Form] reCAPTCHA execution failed:", error);
               reject(error instanceof Error ? error : new Error(String(error)));
             });
         });
       });
     } catch (error) {
-      console.error("❌ [Contact Form] Failed to get reCAPTCHA token:", error);
+      devError("❌ [Contact Form] Failed to get reCAPTCHA token:", error);
       return null;
     }
   };
@@ -252,7 +252,7 @@ export default function ContactForm() {
     try {
       // reCAPTCHAトークンの取得と追加
       // 注意: 一時的にreCAPTCHAを無効化してテストする場合は、以下のブロックをコメントアウトしてください
-      console.log("🔄 [Contact Form] Attempting to get reCAPTCHA token...");
+      devLog("🔄 [Contact Form] Attempting to get reCAPTCHA token...");
       const recaptchaToken = await getRecaptchaToken();
 
       if (recaptchaToken !== null && recaptchaToken !== undefined && recaptchaToken.trim() !== "") {
@@ -260,24 +260,27 @@ export default function ContactForm() {
         formData.append("_wpcf7_recaptcha_response", recaptchaToken);
         // 互換性のため、g-recaptcha-responseも追加
         formData.append("g-recaptcha-response", recaptchaToken);
-        console.log("✅ [Contact Form] reCAPTCHA token obtained and added to form data:", `${recaptchaToken.substring(0, 20)}...`);
+        devLog(
+          "✅ [Contact Form] reCAPTCHA token obtained and added to form data:",
+          `${recaptchaToken.substring(0, 20)}...`
+        );
       } else {
-        console.warn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
-        console.warn("⚠️ [Contact Form] This may cause the submission to be marked as spam");
-        console.warn("⚠️ [Contact Form] FormData will be sent without _wpcf7_recaptcha_response field");
+        devWarn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
+        devWarn("⚠️ [Contact Form] This may cause the submission to be marked as spam");
+        devWarn("⚠️ [Contact Form] FormData will be sent without _wpcf7_recaptcha_response field");
       }
 
       // デバッグ用: reCAPTCHAトークンの値をログ出力（最初の50文字のみ）
       if (recaptchaToken !== null && recaptchaToken !== undefined && recaptchaToken.trim() !== "") {
-        console.log("🔍 [Contact Form] reCAPTCHA token (first 50 chars):", recaptchaToken.substring(0, 50));
+        devLog("🔍 [Contact Form] reCAPTCHA token (first 50 chars):", recaptchaToken.substring(0, 50));
       }
 
       // FormDataの内容を確認（デバッグ用）
-      console.log("📋 [Contact Form] FormData keys:", Array.from(formData.keys()));
+      devLog("📋 [Contact Form] FormData keys:", Array.from(formData.keys()));
 
       // デバッグ用: 送信先のエンドポイントをログ出力（常に表示）
-      console.log("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
-      console.log("📤 [Contact Form] API URL source:", import.meta.env.PUBLIC_API_URL);
+      devLog("📤 [Contact Form] Sending POST request to:", CONTACT_WPCF7_API);
+      devLog("📤 [Contact Form] API URL source:", import.meta.env.PUBLIC_API_URL);
 
       // タイムアウト設定（30秒）- メール送信処理を考慮
       const response = await fetchWithTimeout(
@@ -308,14 +311,17 @@ export default function ContactForm() {
       let responseData: WPCF7Response;
 
       // レスポンスの生データを常にログ出力（デバッグ用）
-      console.log("📥 [Contact Form] Raw server response:", responseText);
-      console.log("📥 [Contact Form] Response status:", response.status, response.statusText);
+      devLog("📥 [Contact Form] Raw server response:", responseText);
+      devLog("📥 [Contact Form] Response status:", response.status, response.statusText);
 
       // レスポンスの先頭から余分な文字列（functions.php等）を削除
       // JSONの開始位置（{）を探す
       const jsonStartIndex = responseText.indexOf("{");
       if (jsonStartIndex > 0) {
-        console.warn("⚠️ [Contact Form] Response contains extra text before JSON, removing:", responseText.substring(0, jsonStartIndex));
+        devWarn(
+          "⚠️ [Contact Form] Response contains extra text before JSON, removing:",
+          responseText.substring(0, jsonStartIndex)
+        );
         responseText = responseText.substring(jsonStartIndex);
       }
 
@@ -330,11 +336,11 @@ export default function ContactForm() {
         ) {
           responseData = parsed as WPCF7Response;
         } else {
-          console.error("❌ [Contact Form] Invalid response format:", parsed);
+          devError("❌ [Contact Form] Invalid response format:", parsed);
           throw new Error("Invalid response format");
         }
       } catch (parseError) {
-        console.error("❌ [Contact Form] Failed to parse response:", {
+        devError("❌ [Contact Form] Failed to parse response:", {
           error: parseError,
           responseText: responseText,
           status: response.status,
@@ -343,7 +349,7 @@ export default function ContactForm() {
       }
 
       // レスポンスをコンソールに出力（デバッグ用）
-      console.log("📋 [Contact Form] Parsed response data:", responseData);
+      devLog("📋 [Contact Form] Parsed response data:", responseData);
 
       // Contact Form 7のレスポンスステータスを確認
       if (responseData.status === "mail_sent") {
@@ -368,7 +374,7 @@ export default function ContactForm() {
         alert(errorMessages);
       } else if (responseData.status === "mail_failed") {
         // メール送信失敗
-        console.error("❌ [Contact Form] Mail sending failed:", responseData);
+        devError("❌ [Contact Form] Mail sending failed:", responseData);
         const errorMessage =
           responseData.message !== undefined && responseData.message.trim() !== ""
             ? responseData.message
@@ -381,13 +387,16 @@ export default function ContactForm() {
         );
       } else if (responseData.status === "spam") {
         // スパムとして判定された場合
-        console.error("❌ [Contact Form] Submission marked as spam:", responseData);
-        console.error("❌ [Contact Form] Full response:", JSON.stringify(responseData, null, 2));
+        devError("❌ [Contact Form] Submission marked as spam:", responseData);
+        devError("❌ [Contact Form] Full response:", JSON.stringify(responseData, null, 2));
 
         // FormDataにreCAPTCHAトークンが含まれているか確認
         const hasRecaptchaToken = formData.has("_wpcf7_recaptcha_response") || formData.has("g-recaptcha-response");
-        console.log("🔍 [Contact Form] _wpcf7_recaptcha_response in FormData:", formData.has("_wpcf7_recaptcha_response"));
-        console.log("🔍 [Contact Form] g-recaptcha-response in FormData:", formData.has("g-recaptcha-response"));
+        devLog(
+          "🔍 [Contact Form] _wpcf7_recaptcha_response in FormData:",
+          formData.has("_wpcf7_recaptcha_response")
+        );
+        devLog("🔍 [Contact Form] g-recaptcha-response in FormData:", formData.has("g-recaptcha-response"));
 
         const spamMessage =
           responseData.message !== undefined && responseData.message.trim() !== ""
@@ -411,7 +420,7 @@ export default function ContactForm() {
         alert(alertMessage);
       } else {
         // その他のエラー（aborted など）
-        console.error("❌ [Contact Form] Unexpected response status:", responseData);
+        devError("❌ [Contact Form] Unexpected response status:", responseData);
         const statusMessage =
           responseData.message !== undefined && responseData.message.trim() !== ""
             ? responseData.message
@@ -444,7 +453,7 @@ export default function ContactForm() {
           error.message.includes("ERR_CONNECTION_RESET")
         ) {
           // ネットワークエラーの場合
-          console.error("❌ [Contact Form] Network error:", error);
+          devError("❌ [Contact Form] Network error:", error);
           const isLocalDev = window.location.hostname === "localhost" || window.location.hostname.endsWith(".local");
           const apiUrl = CONTACT_WPCF7_API;
 
@@ -472,8 +481,8 @@ export default function ContactForm() {
           alert(errorMessage);
         } else {
           // その他のエラー
-          console.error("❌ [Contact Form] Error:", error);
-          console.error("❌ [Contact Form] Error details:", {
+          devError("❌ [Contact Form] Error:", error);
+          devError("❌ [Contact Form] Error details:", {
             name: error.name,
             message: error.message,
             stack: error.stack,

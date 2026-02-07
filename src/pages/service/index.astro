@@ -4,10 +4,11 @@ import globalText from "../../data/globalText.json";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import AboutHeading from "../../components/AboutHeading.astro";
+import { PricingSimulator } from "../../components/PricingSimulator";
 // import ServiceCard from "../../components/ServiceCard.astro";
-import serviceText from "../../data/serviceText.json";
-import { Image } from "astro:assets";
-import sorryImage from "/public/assets/sorry.webp";
+// import serviceText from "../../data/serviceText.json";
+// import { Image } from "astro:assets";
+// import sorryImage from "/public/assets/sorry.webp";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
@@ -32,7 +33,7 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   <div class="pricePage">
     <div class="pricePage__wrapper">
       <AboutHeading aboutTitle="Price" aboutSubTitle="料金について" />
-      {serviceText.price.body.map(({ text }) => <p class="price__body">{text}</p>)}
+      <!-- {serviceText.price.body.map(({ text }) => <p class="price__body">{text}</p>)}
       <Image
         class="price__image"
         src={sorryImage}
@@ -42,15 +43,18 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
         decoding="async"
         loading="lazy"
       />
-      {serviceText.price.footer.map(({ text }) => <p class="price__body" set:html={text} />)}
+      {serviceText.price.footer.map(({ text }) => <p class="price__body" set:html={text} />)} -->
+    </div>
+    <div class="pricing-simulator-wrapper">
+      <PricingSimulator client:load />
     </div>
   </div>
 </Layout>
 
 <style is:global>
   .pricePage {
-    margin-block-start: 3rem;
-    padding-block: 3rem;
+    margin-block-start: 1rem;
+    padding-block: 1rem;
   }
   .pricePage__wrapper {
     width: 100%;
@@ -88,7 +92,6 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     margin-block-start: 2rem;
   }
   .price__image {
-    display: block;
     width: 200px;
     height: 200px;
     border-radius: 20%;
@@ -133,6 +136,24 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   .price__link_secondary:is(:hover, :focus-within) {
     color: var(--color-red);
     text-decoration: none;
+  }
+
+  /* 印刷時のスタイル */
+  @media print {
+    .about-heading,
+    .about__title,
+    .about__subTitle,
+    hgroup,
+    .pricePage__wrapper > .price__body,
+    .pricePage__wrapper > .price__image {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
   }
 </style>
 

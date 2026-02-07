@@ -330,3 +330,23 @@ html.dark .nav-links a {
   color: var(--color-red);
   text-decoration: none;
 }
+
+/* 印刷時のグローバルスタイル */
+@media print {
+  header,
+  footer,
+  .breadcrumbs__wrapper,
+  nav,
+  .about-heading,
+  hgroup,
+  .about__title,
+  .about__subTitle {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+}

@@ -133,6 +133,49 @@ import pageTopIcon from "../assets/svg/top.svg";
       height: 12px;
     }
   }
+
+  /* 印刷時のスタイル */
+  @media print {
+    .page-top-button {
+      position: fixed !important;
+      bottom: 1cm !important;
+      right: 1cm !important;
+      display: block !important;
+      width: 60px !important;
+      height: 90px !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+      z-index: 9999 !important;
+      pointer-events: none !important;
+    }
+
+    .page-top-button__image {
+      display: block !important;
+      width: 60px !important;
+      height: 90px !important;
+      filter: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      position: relative !important;
+    }
+
+    .page-top-button__textInner,
+    .page-top-button__icon,
+    .page-top-button__text {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+  }
 </style>
 
 <script>

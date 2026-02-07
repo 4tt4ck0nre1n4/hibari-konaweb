@@ -45,12 +45,15 @@ import {
   cursor,
   vercel,
   filezilla,
+  type SkillsProps,
 } from "../../data/constSkills";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 const href = "/service";
 
 const typedAboutText = aboutText as AboutText;
+const typedGithub = github as SkillsProps;
+const typedFilezilla = filezilla as SkillsProps;
 
 interface ContactType {
   className: {
@@ -204,8 +207,8 @@ const stateMachine = "State Machine 1";
               <SkillsIcon className={cursor.className} iconSvg={cursor.icon} iconName={cursor.item} />
               <SkillsIcon className={netlify.className} iconSvg={netlify.icon} iconName={netlify.item} />
               <SkillsIcon className={vercel.className} iconSvg={vercel.icon} iconName={vercel.item} />
-              <SkillsIcon className={github.className} iconSvg={github.icon} iconName={github.item} />
-              <SkillsIcon className={filezilla.className} iconSvg={filezilla.icon} iconName={filezilla.item} />
+              <SkillsIcon className={typedGithub.className} iconSvg={typedGithub.icon} iconName={typedGithub.item} />
+              <SkillsIcon className={typedFilezilla.className} iconSvg={typedFilezilla.icon} iconName={typedFilezilla.item} />
             </ul>
           </div>
         </div>

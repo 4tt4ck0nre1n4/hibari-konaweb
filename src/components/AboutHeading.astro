@@ -36,4 +36,19 @@ const { aboutTitle, aboutSubTitle } = Astro.props as AboutProps;
       letter-spacing: 0.04em;
     }
   }
+
+  /* 印刷時は完全に非表示 */
+  @media print {
+    hgroup,
+    .about__title,
+    .about__subTitle {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+  }
 </style>
