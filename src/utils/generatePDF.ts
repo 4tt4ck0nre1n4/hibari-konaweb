@@ -1,25 +1,7 @@
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import type { EstimateData } from '../types/pricing';
 import { COMPANY_INFO } from '../config/companyInfo';
-
-// jsPDF-AutoTableの型定義を拡張
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: {
-      startY?: number;
-      head?: string[][];
-      body?: string[][];
-      theme?: string;
-      styles?: Record<string, unknown>;
-      headStyles?: Record<string, unknown>;
-      columnStyles?: Record<number, Record<string, unknown>>;
-    }) => jsPDF;
-    lastAutoTable?: {
-      finalY: number;
-    };
-  }
-}
 
 /**
  * 金額フォーマット
@@ -105,7 +87,7 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
     `${formatPrice(item.totalPrice)}円`,
   ]);
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: currentY,
     head: [['品名', '単価', '数量', '金額']],
     body: [['コーディング料金', '', '', ''], ...tableData],
@@ -129,11 +111,11 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
   });
 
   // テーブルの終了位置を取得
-  const finalY = doc.lastAutoTable?.finalY ?? currentY + 50;
+  const finalY = (doc as any).lastAutoTable?.finalY ?? currentY + 50;
   currentY = finalY + 10;
 
   // 税別内訳テーブル
-  doc.autoTable({
+  autoTable(doc, {
     startY: currentY,
     head: [['税別内訳', '小計（税抜金額）', '小計（税のみ）']],
     body: [
@@ -158,7 +140,7 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
     },
   });
 
-  const taxTableFinalY = doc.lastAutoTable?.finalY ?? currentY + 30;
+  const taxTableFinalY = (doc as any).lastAutoTable?.finalY ?? currentY + 30;
   currentY = taxTableFinalY + 10;
 
   // 金額サマリー
