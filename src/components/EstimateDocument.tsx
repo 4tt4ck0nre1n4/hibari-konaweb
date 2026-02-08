@@ -1,6 +1,7 @@
+import { useRef } from 'react';
 import type { EstimateData } from '../types/pricing';
 import { COMPANY_INFO } from '../config/companyInfo';
-import { generateEstimatePDF, downloadPDF, getPDFBlob, validateEstimateData } from '../utils/generatePDF';
+import { generateEstimatePDFFromHTML } from '../utils/generatePDF';
 import '../styles/pricing/EstimateDocument.css';
 
 interface EstimateDocumentProps {
@@ -8,6 +9,8 @@ interface EstimateDocumentProps {
 }
 
 export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
+  const documentRef = useRef<HTMLDivElement>(null);
+
   const formatPrice = (price: number): string => {
     return `¥${price.toLocaleString()}`;
   };
@@ -16,35 +19,66 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
     window.print();
   };
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     try {
-      // データのバリデーション
-      if (!validateEstimateData(estimateData)) {
-        alert('見積データが不正です。');
+      if (!documentRef.current) {
+        alert('見積書要素が見つかりません。');
         return;
       }
 
+      // ボタンを一時的に非表示
+      const buttons = documentRef.current.querySelector('.estimate-document__actions');
+      if (buttons) {
+        (buttons as HTMLElement).style.display = 'none';
+      }
+
       // PDF生成
-      const pdf = generateEstimatePDF(estimateData);
-      const filename = `estimate_${estimateData.estimateNumber}.pdf`;
-      downloadPDF(pdf, filename);
+      const blob = await generateEstimatePDFFromHTML(
+        documentRef.current,
+        estimateData.estimateNumber
+      );
+
+      // ボタンを再表示
+      if (buttons) {
+        (buttons as HTMLElement).style.display = '';
+      }
+
+      // ダウンロード
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `estimate_${estimateData.estimateNumber}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error('PDF生成エラー:', error);
       alert('PDFの生成に失敗しました。');
     }
   };
 
-  const handleContact = () => {
+  const handleContact = async () => {
     try {
-      // データのバリデーション
-      if (!validateEstimateData(estimateData)) {
-        alert('見積データが不正です。');
+      if (!documentRef.current) {
+        alert('見積書要素が見つかりません。');
         return;
       }
 
+      // ボタンを一時的に非表示
+      const buttons = documentRef.current.querySelector('.estimate-document__actions');
+      if (buttons) {
+        (buttons as HTMLElement).style.display = 'none';
+      }
+
       // PDF生成
-      const pdf = generateEstimatePDF(estimateData);
-      const pdfBlob = getPDFBlob(pdf);
+      const blob = await generateEstimatePDFFromHTML(
+        documentRef.current,
+        estimateData.estimateNumber
+      );
+
+      // ボタンを再表示
+      if (buttons) {
+        (buttons as HTMLElement).style.display = '';
+      }
 
       // BlobをBase64に変換してSessionStorageに保存
       const reader = new FileReader();
@@ -56,7 +90,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
         // お問い合わせページへ遷移
         window.location.href = '/contact';
       };
-      reader.readAsDataURL(pdfBlob);
+      reader.readAsDataURL(blob);
     } catch (error) {
       console.error('PDF生成エラー:', error);
       alert('PDFの生成に失敗しました。');
@@ -64,7 +98,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
   };
 
   return (
-    <div className="estimate-document">
+    <div className="estimate-document" ref={documentRef}>
       <div className="estimate-document__header">
         <h1 className="estimate-document__title">概算見積書</h1>
       </div>
@@ -244,14 +278,14 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
         <button
           type="button"
           className="estimate-document__button estimate-document__button--download"
-          onClick={handleDownloadPDF}
+          onClick={() => void handleDownloadPDF()}
         >
           PDFダウンロード
         </button>
         <button
           type="button"
           className="estimate-document__button estimate-document__button--contact"
-          onClick={handleContact}
+          onClick={() => void handleContact()}
         >
           お問い合わせ
         </button>

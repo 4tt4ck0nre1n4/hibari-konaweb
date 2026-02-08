@@ -2,15 +2,17 @@
 
 このドキュメントは、概算見積書からお問い合わせフォームへの連携方法、PDF生成機能の実装、Contact Form 7との統合について詳細に解説します。
 
+**⚠️ 重要な変更**: 2026-02-09にPDF生成方法を **jsPDF** から **html2pdf.js** に変更しました。
+
 ## 目次
 
 1. [概要](#概要)
 2. [現在の実装状況](#現在の実装状況)
-3. [PDF生成機能の実装](#pdf生成機能の実装)
+3. [PDF生成機能の実装（html2pdf.js）](#pdf生成機能の実装html2pdfjs)
 4. [Contact Form 7との連携](#contact-form-7との連携)
 5. [セキュリティとバリデーション](#セキュリティとバリデーション)
 6. [トラブルシューティング](#トラブルシューティング)
-7. [代替実装方法](#代替実装方法)
+7. [従来の実装（jsPDF）](#従来の実装jspdf)
 
 ---
 
@@ -18,7 +20,7 @@
 
 ### 実現する機能
 
-1. **見積書のPDF生成**: 表示されている見積書をPDFファイルとして生成
+1. **見積書のPDF生成**: 表示されている見積書をhtml2pdf.jsで画像化してPDF生成
 2. **PDFのダウンロード**: ユーザーがローカルに保存できる
 3. **お問い合わせフォームへの遷移**: PDFデータを保持したままフォームへ移動
 4. **CF7でのファイル受信**: Contact Form 7でPDFファイルを受け取る
@@ -41,16 +43,35 @@
 ┌────────────────────────┐
 │ 概算見積書表示         │
 │ ・印刷ボタン           │
+│ ・PDFダウンロード      │
 │ ・お問い合わせボタン   │
 └──────────┬─────────────┘
            │
            ├─「印刷」→ 印刷プレビュー
            │
+           ├─「PDFダウンロード」
+           │         │
+           │         ▼
+           │ ┌────────────────────────┐
+           │ │ PDF生成（html2pdf.js） │
+           │ │ HTML→画像→PDF変換      │
+           │ └──────────┬─────────────┘
+           │            │
+           │            ▼
+           │   PDFファイルダウンロード
+           │
            └─「お問い合わせ」
                     │
                     ▼
            ┌────────────────────────┐
-           │ PDF生成（jsPDF）       │
+           │ PDF生成（html2pdf.js） │
+           │ HTML要素を画像化       │
+           └──────────┬─────────────┘
+                      │
+                      ▼
+           ┌────────────────────────┐
+           │ SessionStorage保存     │
+           │ (Base64エンコード)     │
            └──────────┬─────────────┘
                       │
                       ▼
@@ -68,36 +89,227 @@
 
 ✅ **概算見積書の表示**  
 ✅ **印刷機能** (`window.print()`)  
-✅ **お問い合わせページへの遷移** (`window.location.href = '/contact'`)
+✅ **PDFダウンロード機能** (html2pdf.js使用)  
+✅ **PDFデータのフォームへの受け渡し** (SessionStorage経由)  
+✅ **CF7でのファイルアップロード対応**  
+✅ **Flamingoでの受信メッセージ保存**
 
-### 未実装機能
+### html2pdf.js を選択した理由
 
-❌ **PDF生成機能**  
-❌ **PDFのダウンロード**  
-❌ **PDFデータのフォームへの受け渡し**  
-❌ **CF7でのファイルアップロード対応**
+| 要件 | html2pdf.js | jsPDF（テキストベース） |
+|------|-------------|----------------------|
+| 日本語対応 | ✅ 完璧 | ❌ フォント埋め込み必要 |
+| CSS適用 | ✅ 完全反映 | ❌ 独自API必要 |
+| 実装の簡単さ | ✅ 非常にシンプル | ❌ 複雑 |
+| デザインの一致 | ✅ 100%一致 | ❌ ずれやすい |
 
-### 現在のコード
+---
 
-**ファイル**: `src/components/EstimateDocument.tsx` (14-21行目)
+## PDF生成機能の実装（html2pdf.js）
+
+### 1. パッケージのインストール
+
+```bash
+npm install html2pdf.js
+npm install --save-dev @types/html2pdf.js
+```
+
+### 2. PDF生成関数の実装
+
+**ファイル**: `src/utils/generatePDF.ts`
 
 ```typescript
-const handlePrint = () => {
-  window.print();
-};
+import html2pdf from 'html2pdf.js';
 
-const handleContact = () => {
-  // お問い合わせページへのリンク（必要に応じて実装）
-  window.location.href = '/contact';
+/**
+ * HTML要素からPDFを生成（html2pdf.js使用）
+ * HTML要素をそのまま画像化してPDFに変換するため、デザインが完璧に再現されます
+ */
+export function generateEstimatePDFFromHTML(
+  element: HTMLElement,
+  estimateNumber: string
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: `estimate_${estimateNumber}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,           // 高解像度化（文字がぼやけない）
+        useCORS: true,      // 外部画像の読み込み許可
+        logging: false,     // デバッグログを無効化
+        backgroundColor: '#ffffff',  // 背景色を明示
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+        compress: true,     // ファイルサイズ圧縮
+      },
+    };
+
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .outputPdf('blob')
+      .then((blob: Blob) => {
+        // ファイルサイズチェック（5MB制限）
+        const MAX_PDF_SIZE = 5 * 1024 * 1024;
+        if (blob.size > MAX_PDF_SIZE) {
+          reject(new Error('PDFファイルサイズが大きすぎます（最大5MB）'));
+        } else {
+          resolve(blob);
+        }
+      })
+      .catch(reject);
+  });
+}
+```
+
+**重要ポイント**:
+- `scale: 2`: 解像度を2倍にして文字を鮮明に
+- `useCORS: true`: ロゴや画像の読み込みを許可
+- `quality: 0.98`: 高品質JPEG（0.8～1.0で調整可能）
+- `compress: true`: PDFファイルを圧縮
+
+### 3. EstimateDocumentコンポーネントの実装
+
+**ファイル**: `src/components/EstimateDocument.tsx`
+
+```typescript
+import { useRef } from 'react';
+import { generateEstimatePDFFromHTML } from '../utils/generatePDF';
+
+export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
+  const documentRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadPDF = async () => {
+    try {
+      if (!documentRef.current) {
+        alert('見積書要素が見つかりません。');
+        return;
+      }
+
+      // ボタンを一時的に非表示（PDFに含めないため）
+      const buttons = documentRef.current.querySelector('.estimate-document__actions');
+      if (buttons) {
+        (buttons as HTMLElement).style.display = 'none';
+      }
+
+      // PDF生成
+      const blob = await generateEstimatePDFFromHTML(
+        documentRef.current,
+        estimateData.estimateNumber
+      );
+
+      // ボタンを再表示
+      if (buttons) {
+        (buttons as HTMLElement).style.display = '';
+      }
+
+      // ダウンロード
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `estimate_${estimateData.estimateNumber}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('PDF生成エラー:', error);
+      alert('PDFの生成に失敗しました。');
+    }
+  };
+
+  const handleContact = async () => {
+    try {
+      if (!documentRef.current) {
+        alert('見積書要素が見つかりません。');
+        return;
+      }
+
+      // ボタンを一時的に非表示
+      const buttons = documentRef.current.querySelector('.estimate-document__actions');
+      if (buttons) {
+        (buttons as HTMLElement).style.display = 'none';
+      }
+
+      // PDF生成
+      const blob = await generateEstimatePDFFromHTML(
+        documentRef.current,
+        estimateData.estimateNumber
+      );
+
+      // ボタンを再表示
+      if (buttons) {
+        (buttons as HTMLElement).style.display = '';
+      }
+
+      // BlobをBase64に変換してSessionStorageに保存
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64data = reader.result as string;
+        sessionStorage.setItem('estimatePDF', base64data);
+        sessionStorage.setItem('estimateNumber', estimateData.estimateNumber);
+        window.location.href = '/contact';
+      };
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error('PDF生成エラー:', error);
+      alert('PDFの生成に失敗しました。');
+    }
+  };
+
+  return (
+    <div className="estimate-document" ref={documentRef}>
+      {/* 見積書のHTML構造 */}
+      
+      <div className="estimate-document__actions no-print">
+        <button onClick={handlePrint}>印刷する</button>
+        <button onClick={handleDownloadPDF}>PDFダウンロード</button>
+        <button onClick={handleContact}>お問い合わせ</button>
+      </div>
+    </div>
+  );
+}
+```
+
+**実装のポイント**:
+1. `useRef`でHTML要素への参照を取得
+2. PDF生成前にボタンを非表示
+3. PDF生成後にボタンを再表示
+4. `async/await`で非同期処理を管理
+
+### 4. html2pdf.js のメリットとデメリット
+
+#### メリット
+✅ HTML要素をそのまま画像化してPDF化  
+✅ ブラウザでレンダリングされたデザインが完璧に再現  
+✅ 日本語フォント問題が完全に解決  
+✅ CSSが自動的に適用される  
+✅ 実装が非常にシンプル
+
+#### デメリット
+❌ PDFファイル内でテキスト選択ができない（画像化のため）  
+❌ PDFファイル内でテキスト検索ができない  
+❌ ファイルサイズがやや大きくなる可能性
+
+### 5. ファイルサイズの調整
+
+ファイルサイズが大きすぎる場合、以下のオプションを調整:
+
+```typescript
+const opt = {
+  image: { 
+    type: 'jpeg', 
+    quality: 0.8  // 0.8～0.95に下げる（品質とサイズのバランス）
+  },
+  html2canvas: { 
+    scale: 1.5  // 1～1.5に下げる（解像度を調整）
+  },
 };
 ```
 
-**UI** (193-208行目):
-
-```typescript
-<div className="estimate-document__actions no-print">
-  <button
-    type="button"
+---
     className="estimate-document__button estimate-document__button--print"
     onClick={handlePrint}
   >

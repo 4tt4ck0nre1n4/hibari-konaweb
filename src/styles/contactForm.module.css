@@ -268,6 +268,15 @@
   margin-top: 1rem;
 }
 
+.pdf__attachment {
+  margin-bottom: 1rem;
+}
+
+.pdf__attachment__text {
+  font-size: 0.9rem;
+  color: var(--color-gray, #666);
+}
+
 .form__inner p {
   font-size: 1rem;
   color: var(--color-red);

@@ -4,6 +4,13 @@ import type { EstimateData } from '../types/pricing';
 import { COMPANY_INFO } from '../config/companyInfo';
 
 /**
+ * autoTable の lastAutoTable プロパティの型定義
+ */
+interface AutoTableDoc {
+  lastAutoTable?: { finalY: number };
+}
+
+/**
  * 金額フォーマット
  */
 function formatPrice(price: number): string {
@@ -111,7 +118,7 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
   });
 
   // テーブルの終了位置を取得
-  const finalY = (doc as any).lastAutoTable?.finalY ?? currentY + 50;
+  const finalY = ((doc as unknown as AutoTableDoc).lastAutoTable?.finalY ?? currentY) + 50;
   currentY = finalY + 10;
 
   // 税別内訳テーブル
@@ -140,7 +147,7 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
     },
   });
 
-  const taxTableFinalY = (doc as any).lastAutoTable?.finalY ?? currentY + 30;
+  const taxTableFinalY = ((doc as unknown as AutoTableDoc).lastAutoTable?.finalY ?? currentY) + 30;
   currentY = taxTableFinalY + 10;
 
   // 金額サマリー
@@ -271,4 +278,51 @@ export function validateEstimateData(estimateData: EstimateData): boolean {
   }
 
   return true;
+}
+
+/**
+ * HTML要素からPDFを生成（html2pdf.js使用）
+ * HTML要素をそのまま画像化してPDFに変換するため、デザインが完璧に再現されます
+ */
+export async function generateEstimatePDFFromHTML(
+  element: HTMLElement,
+  estimateNumber: string
+): Promise<Blob> {
+  // 動的インポートでhtml2pdf.jsを読み込み（ブラウザ環境のみ）
+  const html2pdf = (await import('html2pdf.js')).default;
+
+  return new Promise((resolve, reject) => {
+    const opt = {
+      margin: [10, 10, 10, 10] as [number, number, number, number],
+      filename: `estimate_${estimateNumber}.pdf`,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      },
+      jsPDF: {
+        unit: 'mm' as const,
+        format: 'a4' as const,
+        orientation: 'portrait' as const,
+        compress: true,
+      },
+    };
+
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .outputPdf('blob')
+      .then((blob: Blob) => {
+        // ファイルサイズチェック（5MB制限）
+        const MAX_PDF_SIZE = 5 * 1024 * 1024;
+        if (blob.size > MAX_PDF_SIZE) {
+          reject(new Error('PDFファイルサイズが大きすぎます（最大5MB）'));
+        } else {
+          resolve(blob);
+        }
+      })
+      .catch(reject);
+  });
 }

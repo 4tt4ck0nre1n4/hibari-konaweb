@@ -29,7 +29,7 @@
 
 /* プラン選択 */
 .pricing-simulator__plans {
-  margin-block-start: 3rem;
+  margin-block-start: 1rem;
 }
 
 .pricing-simulator__plan-grid {
@@ -37,6 +37,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   max-width: 800px;
+  margin-block-start: 1rem;
   margin-inline: auto;
 }
 
@@ -58,6 +59,13 @@
   background-color: var(--color-gray-light, #f5f5f5);
 }
 
+.pricing-plan-button:is(:hover, :focus-visible) {
+  border-color: var(--color-purple, #8b5cf6);
+  transform: translateY(-0.125rem);
+  outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
+  outline-offset: 0.125rem;
+}
+
 html.dark .pricing-plan-button--disabled {
   background-color: var(--color-gray-dark, #1a1a1a);
 }
@@ -65,13 +73,6 @@ html.dark .pricing-plan-button--disabled {
 html.dark .pricing-plan-button {
   background-color: var(--color-blue, #0d0950);
   border-color: var(--color-gray, #404040);
-}
-
-.pricing-plan-button:is(:hover, :focus-visible) {
-  border-color: var(--color-purple, #8b5cf6);
-  transform: translateY(-0.125rem);
-  outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
-  outline-offset: 0.125rem;
 }
 
 .pricing-plan-button--active {
@@ -82,13 +83,14 @@ html.dark .pricing-plan-button {
 
 /* 項目グリッド */
 .pricing-simulator__items {
-  margin-block-start: 2rem;
+  margin-block-start: 1rem;
 }
 
 .pricing-simulator__item-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
+  margin-block-start: 1rem;
 }
 
 /* アクションボタン */
@@ -171,16 +173,16 @@ html.dark .pricing-plan-button {
   gap: 0.5rem;
 }
 
-html.dark .page-count-option {
-  background-color: var(--color-blue, #0d0950);
-  border-color: var(--color-gray, #404040);
-}
-
 .page-count-option:is(:hover, :focus-visible) {
   border-color: var(--color-purple, #8b5cf6);
   background-color: #f9fafb;
   outline: var(--color-purple, #8b5cf6) 0.125rem solid;
   outline-offset: 0.125rem;
+}
+
+html.dark .page-count-option {
+  background-color: var(--color-blue, #0d0950);
+  border-color: var(--color-gray, #404040);
 }
 
 html.dark .page-count-option:is(:hover, :focus-visible) {

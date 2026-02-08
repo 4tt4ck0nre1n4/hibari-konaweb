@@ -164,7 +164,7 @@ export default function ContactForm() {
       const pdfData = sessionStorage.getItem('estimatePDF');
       const estNumber = sessionStorage.getItem('estimateNumber');
 
-      if (pdfData && estNumber) {
+      if (pdfData !== null && pdfData.trim() !== '' && estNumber !== null && estNumber.trim() !== '') {
         devLog('✅ [Contact Form] PDF data found in SessionStorage');
 
         // Base64からBlobに変換
@@ -291,7 +291,7 @@ export default function ContactForm() {
     }
 
     // 見積番号がある場合は追加
-    if (estimateNumber) {
+    if (estimateNumber !== null && estimateNumber.trim() !== '') {
       formData.append("estimate-number", estimateNumber);
       devLog(`✅ [Contact Form] Estimate number added: ${estimateNumber}`);
     }
@@ -690,9 +690,9 @@ export default function ContactForm() {
           </div>
           <PrivacyConsent isChecked={privacyAccepted} onChange={setPrivacyAccepted} />
 
-          {pdfFile && estimateNumber && (
-            <div className={styles.form__box} style={{ marginBottom: '1rem' }}>
-              <p style={{ fontSize: '0.9rem', color: 'var(--color-gray, #666)' }}>
+          {pdfFile !== null && estimateNumber !== null && estimateNumber.trim() !== '' && (
+            <div className={`${styles.form__box} ${styles.pdf__attachment}`}>
+              <p className={styles.pdf__attachment__text}>
                 📎 見積書PDF添付: <strong>{pdfFile.name}</strong> ({Math.round(pdfFile.size / 1024)}KB)
                 <br />
                 見積番号: <strong>{estimateNumber}</strong>

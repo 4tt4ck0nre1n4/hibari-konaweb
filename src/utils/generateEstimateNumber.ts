@@ -30,6 +30,3 @@ export function calculateExpiryDate(issueDate: Date, validityDays: number): Date
   expiryDate.setDate(expiryDate.getDate() + validityDays);
   return expiryDate;
 }
-
-
-

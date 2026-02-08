@@ -10,7 +10,7 @@ export function calculatePagePrice(
   quantity: number,
   multiplier?: number
 ): number {
-  if (!multiplier || multiplier <= 1) {
+  if (multiplier === undefined || multiplier === null || multiplier <= 1) {
     return basePrice * quantity;
   }
   return Math.round(basePrice * quantity * multiplier);
@@ -25,7 +25,9 @@ export function calculatePrice(
 ): PriceCalculation {
   const items = selectedItems.map(item => {
     const pricingItem = PRICING_ITEMS.find(p => p.id === item.itemId);
-    const name = pricingItem?.name || item.itemId;
+    const name = (pricingItem?.name !== undefined && pricingItem.name !== null && pricingItem.name.trim() !== '')
+      ? pricingItem.name
+      : item.itemId;
     const unitPrice = item.price / item.quantity;
 
     return {
@@ -53,6 +55,3 @@ export function calculatePrice(
     items,
   };
 }
-
-
-

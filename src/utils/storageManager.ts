@@ -20,7 +20,7 @@ export function saveState(state: SavedState): void {
 export function loadState(): SavedState | null {
   try {
     const serialized = localStorage.getItem(STORAGE_KEY);
-    if (!serialized) {
+    if (serialized === null || serialized.trim() === '') {
       return null;
     }
     return JSON.parse(serialized) as SavedState;
@@ -40,6 +40,3 @@ export function clearState(): void {
     console.error('Failed to clear state:', error);
   }
 }
-
-
-
