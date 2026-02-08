@@ -300,7 +300,7 @@ export async function generateEstimatePDFFromHTML(
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f1f5f9',
       },
       jsPDF: {
         unit: 'mm' as const,
