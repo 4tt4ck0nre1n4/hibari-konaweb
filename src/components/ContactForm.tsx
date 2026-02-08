@@ -111,6 +111,10 @@ export default function ContactForm() {
   // レート制限用の送信履歴
   const submissionHistoryRef = useRef<number[]>([]);
 
+  // PDF添付用の状態
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [estimateNumber, setEstimateNumber] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -152,6 +156,37 @@ export default function ContactForm() {
         scriptToRemove.remove();
       }
     };
+  }, []);
+
+  // SessionStorageからPDFデータを取得
+  useEffect(() => {
+    try {
+      const pdfData = sessionStorage.getItem('estimatePDF');
+      const estNumber = sessionStorage.getItem('estimateNumber');
+
+      if (pdfData && estNumber) {
+        devLog('✅ [Contact Form] PDF data found in SessionStorage');
+
+        // Base64からBlobに変換
+        const base64Response = fetch(pdfData);
+        base64Response.then(res => res.blob()).then(blob => {
+          const file = new File([blob], `estimate_${estNumber}.pdf`, { type: 'application/pdf' });
+          setPdfFile(file);
+          setEstimateNumber(estNumber);
+          devLog(`✅ [Contact Form] PDF file created: ${file.name}, size: ${file.size} bytes`);
+        }).catch(err => {
+          devError('❌ [Contact Form] Failed to convert PDF data:', err);
+        });
+
+        // 使用後はSessionStorageをクリア
+        sessionStorage.removeItem('estimatePDF');
+        sessionStorage.removeItem('estimateNumber');
+      } else {
+        devLog('ℹ️ [Contact Form] No PDF data in SessionStorage');
+      }
+    } catch (error) {
+      devError('❌ [Contact Form] Error loading PDF from SessionStorage:', error);
+    }
   }, []);
 
   // レート制限チェック
@@ -248,6 +283,18 @@ export default function ContactForm() {
     formData.append("your-company", data.company !== undefined && data.company !== null ? data.company : "");
     formData.append("your-message", data.message);
     formData.append("_wpcf7_unit_tag", data.wpcf7_unit_tag);
+
+    // PDFファイルがある場合は添付
+    if (pdfFile) {
+      formData.append("estimate-pdf", pdfFile, pdfFile.name);
+      devLog(`✅ [Contact Form] PDF file attached: ${pdfFile.name}`);
+    }
+
+    // 見積番号がある場合は追加
+    if (estimateNumber) {
+      formData.append("estimate-number", estimateNumber);
+      devLog(`✅ [Contact Form] Estimate number added: ${estimateNumber}`);
+    }
 
     try {
       // reCAPTCHAトークンの取得と追加
@@ -642,6 +689,16 @@ export default function ContactForm() {
             {Boolean(errors.message?.message) && <p role="alert">{errors.message?.message}</p>}
           </div>
           <PrivacyConsent isChecked={privacyAccepted} onChange={setPrivacyAccepted} />
+
+          {pdfFile && estimateNumber && (
+            <div className={styles.form__box} style={{ marginBottom: '1rem' }}>
+              <p style={{ fontSize: '0.9rem', color: 'var(--color-gray, #666)' }}>
+                📎 見積書PDF添付: <strong>{pdfFile.name}</strong> ({Math.round(pdfFile.size / 1024)}KB)
+                <br />
+                見積番号: <strong>{estimateNumber}</strong>
+              </p>
+            </div>
+          )}
 
           {rateLimitError !== null && rateLimitError !== undefined && rateLimitError.trim() !== "" && (
             <p role="alert" className={styles.error__message}>

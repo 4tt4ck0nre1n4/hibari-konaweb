@@ -1,5 +1,6 @@
 import type { EstimateData } from '../types/pricing';
 import { COMPANY_INFO } from '../config/companyInfo';
+import { generateEstimatePDF, downloadPDF, getPDFBlob, validateEstimateData } from '../utils/generatePDF';
 import '../styles/pricing/EstimateDocument.css';
 
 interface EstimateDocumentProps {
@@ -15,9 +16,51 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
     window.print();
   };
 
+  const handleDownloadPDF = () => {
+    try {
+      // データのバリデーション
+      if (!validateEstimateData(estimateData)) {
+        alert('見積データが不正です。');
+        return;
+      }
+
+      // PDF生成
+      const pdf = generateEstimatePDF(estimateData);
+      const filename = `estimate_${estimateData.estimateNumber}.pdf`;
+      downloadPDF(pdf, filename);
+    } catch (error) {
+      console.error('PDF生成エラー:', error);
+      alert('PDFの生成に失敗しました。');
+    }
+  };
+
   const handleContact = () => {
-    // お問い合わせページへのリンク（必要に応じて実装）
-    window.location.href = '/contact';
+    try {
+      // データのバリデーション
+      if (!validateEstimateData(estimateData)) {
+        alert('見積データが不正です。');
+        return;
+      }
+
+      // PDF生成
+      const pdf = generateEstimatePDF(estimateData);
+      const pdfBlob = getPDFBlob(pdf);
+
+      // BlobをBase64に変換してSessionStorageに保存
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64data = reader.result as string;
+        sessionStorage.setItem('estimatePDF', base64data);
+        sessionStorage.setItem('estimateNumber', estimateData.estimateNumber);
+
+        // お問い合わせページへ遷移
+        window.location.href = '/contact';
+      };
+      reader.readAsDataURL(pdfBlob);
+    } catch (error) {
+      console.error('PDF生成エラー:', error);
+      alert('PDFの生成に失敗しました。');
+    }
   };
 
   return (
@@ -197,6 +240,13 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
           onClick={handlePrint}
         >
           印刷する
+        </button>
+        <button
+          type="button"
+          className="estimate-document__button estimate-document__button--download"
+          onClick={handleDownloadPDF}
+        >
+          PDFダウンロード
         </button>
         <button
           type="button"

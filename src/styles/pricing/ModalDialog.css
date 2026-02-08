@@ -4,12 +4,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgb(0 0 0 / 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 1rem;
+  padding-block: 1rem;
+  padding-inline: 1rem;
   animation: modalFadeIn 0.3s ease;
 }
 
@@ -17,19 +18,20 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
 
 .modal-content {
-  background-color: var(--color-white, #ffffff);
-  border-radius: 16px;
+  background-color: var(--color-white, #f1f5f9);
+  border-radius: 1rem;
   max-width: 600px;
   width: 100%;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1.25rem 3.75rem rgb(0 0 0 / 0.3);
   animation: modalSlideUp 0.3s ease;
 }
 
@@ -39,9 +41,10 @@ html.dark .modal-content {
 
 @keyframes modalSlideUp {
   from {
-    transform: translateY(30px);
+    transform: translateY(1.875rem);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -52,8 +55,9 @@ html.dark .modal-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid var(--color-gray, #e0e0e0);
+  padding-block: 1.5rem;
+  padding-inline: 2rem;
+  border-bottom: var(--color-gray-light, #e0e0e0) 1px solid;
 }
 
 html.dark .modal-header {
@@ -73,39 +77,38 @@ html.dark .modal-header {
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
-  color: var(--color-gray, #666);
+  color: var(--color-gray, #808080);
   padding: 0;
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   transition: all 0.2s ease;
 }
 
-.modal-close:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+.modal-close:is(:hover, :focus-visible) {
+  background-color: rgb(0 0 0 / 0.05);
   color: var(--color-red, #ff4f48);
+  outline: var(--color-purple, #8b5cf6) 0.125rem solid;
+  outline-offset: 0.125rem;
 }
 
-html.dark .modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.modal-close:focus-visible {
-  outline: 2px solid var(--color-purple, #8b5cf6);
-  outline-offset: 2px;
+html.dark .modal-close:is(:hover, :focus-visible) {
+  background-color: rgb(255 255 255 / 0.1);
 }
 
 .modal-body {
-  padding: 2rem;
+  padding-block: 2rem;
+  padding-inline: 2rem;
 }
 
 /* レスポンシブ対応 */
 @media (width <= 768px) {
   .modal-overlay {
-    padding: 0.5rem;
+    padding-block: 0.5rem;
+    padding-inline: 0.5rem;
   }
 
   .modal-content {
@@ -113,7 +116,8 @@ html.dark .modal-close:hover {
   }
 
   .modal-header {
-    padding: 1rem 1.25rem;
+    padding-block: 1rem;
+    padding-inline: 1.25rem;
   }
 
   .modal-title {
@@ -121,6 +125,7 @@ html.dark .modal-close:hover {
   }
 
   .modal-body {
-    padding: 1.25rem;
+    padding-block: 1.25rem;
+    padding-inline: 1.25rem;
   }
 }

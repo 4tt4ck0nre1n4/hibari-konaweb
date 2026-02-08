@@ -2,8 +2,8 @@
 export const COMPANY_INFO = {
   name: 'hibari-konaweb.com',
   website: 'https://hibari-konaweb.netlify.app',
-  registrationNumber: '',
-} as const;
+  registrationNumber: '' as string,
+};
 
 // 見積書設定
 export const ESTIMATE_CONFIG = {

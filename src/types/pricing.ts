@@ -40,4 +40,3 @@ export interface SavedState {
   selectedPlan: PlanType;
   isUrgent: boolean;
 }
-

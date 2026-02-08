@@ -2,12 +2,13 @@
   width: 100%;
   max-width: 1200px;
   margin-inline: auto;
-  padding: 3rem 2rem;
+  padding-block: 3rem;
+  padding-inline: 2rem;
 }
 
 .pricing-simulator__header {
   text-align: center;
-  margin-block-end: 3rem;
+  margin-block-start: 3rem;
 }
 
 .pricing-simulator__title {
@@ -22,13 +23,13 @@
   font-size: 1.5rem;
   font-weight: 700;
   text-align: center;
-  margin-block-end: 1.5rem;
+  margin-block-start: 1.5rem;
   color: inherit;
 }
 
 /* プラン選択 */
 .pricing-simulator__plans {
-  margin-block-end: 3rem;
+  margin-block-start: 3rem;
 }
 
 .pricing-simulator__plan-grid {
@@ -40,10 +41,11 @@
 }
 
 .pricing-plan-button {
-  padding: 1.25rem 1.5rem;
-  background-color: var(--color-white, #ffffff);
-  border: 2px solid var(--color-gray, #e0e0e0);
-  border-radius: 12px;
+  padding-block: 1.25rem;
+  padding-inline: 1.5rem;
+  background-color: var(--color-white, #f1f5f9);
+  border: var(--color-gray-light, #e0e0e0) 2px solid;
+  border-radius: 0.75rem;
   font-size: 1.125rem;
   font-weight: 600;
   cursor: pointer;
@@ -65,25 +67,22 @@ html.dark .pricing-plan-button {
   border-color: var(--color-gray, #404040);
 }
 
-.pricing-plan-button:hover {
+.pricing-plan-button:is(:hover, :focus-visible) {
   border-color: var(--color-purple, #8b5cf6);
-  transform: translateY(-2px);
-}
-
-.pricing-plan-button:focus-visible {
-  outline: 3px solid var(--color-purple, #8b5cf6);
-  outline-offset: 2px;
+  transform: translateY(-0.125rem);
+  outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
+  outline-offset: 0.125rem;
 }
 
 .pricing-plan-button--active {
   background-color: var(--color-purple, #8b5cf6);
   border-color: var(--color-purple, #8b5cf6);
-  color: var(--color-white, #ffffff);
+  color: var(--color-white, #f1f5f9);
 }
 
 /* 項目グリッド */
 .pricing-simulator__items {
-  margin-block-end: 2rem;
+  margin-block-start: 2rem;
 }
 
 .pricing-simulator__item-grid {
@@ -106,8 +105,9 @@ html.dark .pricing-plan-button {
 }
 
 .pricing-simulator__button {
-  padding: 1rem 2rem;
-  border-radius: 12px;
+  padding-block: 1rem;
+  padding-inline: 2rem;
+  border-radius: 0.75rem;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -125,28 +125,27 @@ html.dark .pricing-plan-button {
 }
 
 .pricing-simulator__button--reset {
-  background-color: var(--color-gray, #666);
-  color: var(--color-white, #ffffff);
+  background-color: var(--color-gray, #808080);
+  color: var(--color-white, #f1f5f9);
 }
 
-.pricing-simulator__button--reset:hover:not(:disabled) {
+.pricing-simulator__button--reset:is(:hover, :focus-visible):not(:disabled) {
   background-color: #555;
+  outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
+  outline-offset: 0.125rem;
 }
 
 .pricing-simulator__button--generate {
   background-color: var(--color-purple, #8b5cf6);
-  color: var(--color-white, #ffffff);
+  color: var(--color-white, #f1f5f9);
 }
 
-.pricing-simulator__button--generate:hover:not(:disabled) {
-  background-color: #7c3aed;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-}
-
-.pricing-simulator__button:focus-visible {
-  outline: 3px solid var(--color-purple, #8b5cf6);
-  outline-offset: 2px;
+.pricing-simulator__button--generate:is(:hover, :focus-visible):not(:disabled) {
+  background-color: var(--color-purple-dark, #7c3aed);
+  transform: translateY(-0.125rem);
+  box-shadow: 0 0.25rem 0.75rem rgb(139 92 246 / 0.4);
+  outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
+  outline-offset: 0.125rem;
 }
 
 /* ページ数選択 */
@@ -157,10 +156,11 @@ html.dark .pricing-plan-button {
 }
 
 .page-count-option {
-  padding: 1rem;
-  background-color: var(--color-white, #ffffff);
-  border: 2px solid var(--color-gray, #e0e0e0);
-  border-radius: 8px;
+  padding-block: 1rem;
+  padding-inline: 1rem;
+  background-color: var(--color-white, #f1f5f9);
+  border: var(--color-gray-light, #e0e0e0) 2px solid;
+  border-radius: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -176,18 +176,15 @@ html.dark .page-count-option {
   border-color: var(--color-gray, #404040);
 }
 
-.page-count-option:hover {
+.page-count-option:is(:hover, :focus-visible) {
   border-color: var(--color-purple, #8b5cf6);
   background-color: #f9fafb;
+  outline: var(--color-purple, #8b5cf6) 0.125rem solid;
+  outline-offset: 0.125rem;
 }
 
-html.dark .page-count-option:hover {
+html.dark .page-count-option:is(:hover, :focus-visible) {
   background-color: #1e293b;
-}
-
-.page-count-option:focus-visible {
-  outline: 2px solid var(--color-purple, #8b5cf6);
-  outline-offset: 2px;
 }
 
 .page-count-option__badge {
@@ -208,7 +205,8 @@ html.dark .page-count-option:hover {
   }
 
   .pricing-plan-button {
-    padding: 1rem 1.25rem;
+    padding-block: 1rem;
+    padding-inline: 1.25rem;
     font-size: 1rem;
   }
 }
@@ -216,7 +214,8 @@ html.dark .page-count-option:hover {
 /* レスポンシブ対応: 768px以下 */
 @media (width <= 768px) {
   .pricing-simulator {
-    padding: 2rem 1rem;
+    padding-block: 2rem;
+    padding-inline: 1rem;
   }
 
   .pricing-simulator__title {
@@ -242,7 +241,8 @@ html.dark .page-count-option:hover {
 
   .pricing-simulator__button {
     width: 100%;
-    padding: 0.875rem 1.5rem;
+    padding-block: 0.875rem;
+    padding-inline: 1.5rem;
     font-size: 0.9375rem;
   }
 
