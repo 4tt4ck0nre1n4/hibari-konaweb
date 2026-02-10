@@ -3,6 +3,11 @@ import type { EstimateData } from '../types/pricing';
 import { COMPANY_INFO } from '../config/companyInfo';
 import { generateEstimatePDFFromHTML } from '../utils/generatePDF';
 import '../styles/pricing/EstimateDocument.css';
+import IconifyInline from './IconifyInline';
+
+const pdfIcon = "vscode-icons:file-type-pdf2";
+const contactIcon = "ic:baseline-contact-mail";
+const printerIcon = "fxemoji:printer";
 
 interface EstimateDocumentProps {
   estimateData: EstimateData;
@@ -95,6 +100,13 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
       console.error('PDF生成エラー:', error);
       alert('PDFの生成に失敗しました。');
     }
+  };
+
+  // IconifyInlineを使用してアイコンを表示（外部APIリクエストを完全に排除）
+  const renderIcon = (iconName: string, className?: string) => {
+    const iconClassName = className ?? "estimate-document__icon";
+    // IconifyInline はデフォルトで aria-hidden を付与するため、ここでは指定しない
+    return <IconifyInline icon={iconName} width="32" height="32" className={iconClassName} />;
   };
 
   return (
@@ -273,13 +285,15 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
           className="estimate-document__button estimate-document__button--print"
           onClick={handlePrint}
         >
+          {renderIcon(printerIcon, "estimate-document__icon--print")}
           印刷する
         </button>
         <button
           type="button"
-          className="estimate-document__button estimate-document__button--download"
+          className="estimate-document__button estimate-document__button--pdf"
           onClick={() => void handleDownloadPDF()}
         >
+          {renderIcon(pdfIcon, "estimate-document__icon--pdf")}
           PDFダウンロード
         </button>
         <button
@@ -287,6 +301,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
           className="estimate-document__button estimate-document__button--contact"
           onClick={() => void handleContact()}
         >
+          {renderIcon(contactIcon, "estimate-document__icon--contact")}
           お問い合わせ
         </button>
       </div>

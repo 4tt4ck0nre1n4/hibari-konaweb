@@ -42,6 +42,9 @@ const loadIconSet = async (prefix: string): Promise<IconifyIconsJSON | null> => 
       case "fa6-solid":
         iconSet = (await import("@iconify-json/fa6-solid/icons.json")).default as IconifyIconsJSON;
         break;
+      case "fxemoji":
+        iconSet = (await import("@iconify-json/fxemoji/icons.json")).default as IconifyIconsJSON;
+        break;
       case "flat-color-icons":
         iconSet = (await import("@iconify-json/flat-color-icons/icons.json")).default as IconifyIconsJSON;
         break;
@@ -172,7 +175,7 @@ function IconifyInlineComponent({
     if (typeof window !== "undefined") {
       const isDev = (window as Window & { __DEV__?: boolean }).__DEV__;
       if (isDev === true) {
-        console.log(`IconifyInline loading: icon=${icon}, parsed=${!!parsed}, isLoading=${isLoading}, iconSet=${!!iconSet}, iconData=${!!iconData}`);
+        console.log(`IconifyInline loading: icon=${icon}, parsed=${Boolean(parsed)}, isLoading=${isLoading}, iconSet=${Boolean(iconSet)}, iconData=${Boolean(iconData)}`);
       }
     }
     const placeholderProps: React.SVGProps<SVGSVGElement> = {
