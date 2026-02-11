@@ -3,7 +3,8 @@ import { PricingItemButton } from './PricingItem';
 import { EstimateSummary } from './EstimateSummary';
 import { EstimateDocument } from './EstimateDocument';
 import { ModalDialog } from './ModalDialog';
-import { PRICING_ITEMS, PLANS, PAGE_COUNT_OPTIONS } from '../config/pricing';
+import IconifyInline from './IconifyInline';
+import { PRICING_ITEMS, PLANS, PAGE_COUNT_OPTIONS, ANIMATION_COUNT_OPTIONS } from '../config/pricing';
 import { ESTIMATE_CONFIG } from '../config/companyInfo';
 import { calculatePrice, calculatePagePrice } from '../utils/calculatePrice';
 import { saveState, loadState, clearState } from '../utils/storageManager';
@@ -231,7 +232,10 @@ export function PricingSimulator() {
               disabled={plan.id === 'design'}
               {...(selectedPlan === plan.id ? { 'aria-pressed': 'true' } : { 'aria-pressed': 'false' })}
             >
-              {plan.name}
+              {plan.icon !== undefined && plan.icon !== '' && (
+                <IconifyInline icon={plan.icon} width="24" height="24" />
+              )}
+              <span>{plan.name}</span>
             </button>
           ))}
         </div>
@@ -278,17 +282,31 @@ export function PricingSimulator() {
         </button>
       </div>
 
-      {/* ページ数選択モーダル */}
+      {/* ページ数／アニメーション数量選択モーダル */}
       <ModalDialog
         isOpen={isPageModalOpen}
         onClose={() => {
           setIsPageModalOpen(false);
           setCurrentPageItem(null);
         }}
-        title="ページ数を選択してください"
+        title={(() => {
+          if (currentPageItem === null) return 'ページ数を選択してください';
+          const item = PRICING_ITEMS.find(p => p.id === currentPageItem);
+          if (item === undefined) return 'ページ数を選択してください';
+          // アニメーション項目の判定
+          const isAnimation = item.id.includes('-animation');
+          return isAnimation ? 'アニメーションの数量を選択してください' : 'ページ数を選択してください';
+        })()}
       >
         <div className="page-count-options">
-          {PAGE_COUNT_OPTIONS.map(option => (
+          {(() => {
+            if (currentPageItem === null) return PAGE_COUNT_OPTIONS;
+            const item = PRICING_ITEMS.find(p => p.id === currentPageItem);
+            if (item === undefined) return PAGE_COUNT_OPTIONS;
+            // アニメーション項目の場合はアニメーション数量オプションを使用
+            const isAnimation = item.id.includes('-animation');
+            return isAnimation ? ANIMATION_COUNT_OPTIONS : PAGE_COUNT_OPTIONS;
+          })().map(option => (
             <button
               key={option.id}
               type="button"

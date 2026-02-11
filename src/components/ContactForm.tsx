@@ -693,9 +693,9 @@ export default function ContactForm() {
           {pdfFile !== null && estimateNumber !== null && estimateNumber.trim() !== '' && (
             <div className={`${styles.form__box} ${styles.pdf__attachment}`}>
               <p className={styles.pdf__attachment__text}>
-                📎 見積書PDF添付: <strong>{pdfFile.name}</strong> ({Math.round(pdfFile.size / 1024)}KB)
+                <span className={styles.pdf__attachment__emoji}>📋</span> 見積書PDF添付: <strong>{pdfFile.name}</strong> ({Math.round(pdfFile.size / 1024)}KB)
                 <br />
-                見積番号: <strong>{estimateNumber}</strong>
+                <span className={styles.pdf__attachment__emoji}>🏷️</span> 見積番号: <strong>{estimateNumber}</strong>
               </p>
             </div>
           )}
@@ -709,8 +709,8 @@ export default function ContactForm() {
           <input
             className={styles.submit}
             type="submit"
-            value={isSubmitting ? (hoveredSubmit ? "送信中..." : "Submitting...") : hoveredSubmit ? "送信" : "Submit"}
-            aria-label={isSubmitting ? (hoveredSubmit ? "送信中" : "Submitting") : hoveredSubmit ? "送信" : "Submit"}
+            value={isSubmitting ? (hoveredSubmit ? "Submitting..." : "送信中...") : hoveredSubmit ? "Submit" : "送信"}
+            aria-label={isSubmitting ? (hoveredSubmit ? "Submitting" : "送信中") : hoveredSubmit ? "Submit" : "送信"}
             disabled={isSubmitting}
             onMouseEnter={() => setHoveredSubmit(true)}
             onMouseLeave={() => setHoveredSubmit(false)}

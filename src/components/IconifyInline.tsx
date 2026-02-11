@@ -39,6 +39,9 @@ const loadIconSet = async (prefix: string): Promise<IconifyIconsJSON | null> => 
       case "devicon":
         iconSet = (await import("@iconify-json/devicon/icons.json")).default as IconifyIconsJSON;
         break;
+      case "emojione-v1":
+        iconSet = (await import("@iconify-json/emojione-v1/icons.json")).default as IconifyIconsJSON;
+        break;
       case "fa6-solid":
         iconSet = (await import("@iconify-json/fa6-solid/icons.json")).default as IconifyIconsJSON;
         break;
@@ -59,6 +62,27 @@ const loadIconSet = async (prefix: string): Promise<IconifyIconsJSON | null> => 
         break;
       case "ic":
         iconSet = (await import("@iconify-json/ic/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "icon-park":
+        iconSet = (await import("@iconify-json/icon-park/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "marketeq":
+        iconSet = (await import("@iconify-json/marketeq/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "material-icon-theme":
+        iconSet = (await import("@iconify-json/material-icon-theme/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "noto-v1":
+        iconSet = (await import("@iconify-json/noto-v1/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "streamline-color":
+        iconSet = (await import("@iconify-json/streamline-color/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "streamline-kameleon-color":
+        iconSet = (await import("@iconify-json/streamline-kameleon-color/icons.json")).default as IconifyIconsJSON;
+        break;
+      case "streamline-ultimate":
+        iconSet = (await import("@iconify-json/streamline-ultimate/icons.json")).default as IconifyIconsJSON;
         break;
       case "streamline-ultimate-color":
         iconSet = (await import("@iconify-json/streamline-ultimate-color/icons.json")).default as IconifyIconsJSON;

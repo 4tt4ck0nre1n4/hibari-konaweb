@@ -2,20 +2,26 @@
 
 ## 適用範囲
 
-このルールは `src/styles/pricing/` フォルダ内のCSSファイルに適用されます。
+このルールは `src/styles/` フォルダ内のCSSファイルに適用されます。
 
 ## ルール一覧
 
 ### 1. カラー値の統一
 
 #### ルール
+
 - `#ffffff` → `var(--color-white, #f1f5f9)` に変更
 - `var(--color-white, #ffffff)` → `var(--color-white, #f1f5f9)` に変更
 - `#000000` → `var(--color-black, #010101)` に変更
 - `var(--color-black, #000000)` → `var(--color-black, #010101)` に変更
 - `var(--color-gray, #666)` → `var(--color-gray, #808080)` に変更
+- `var(--color-white)` → `var(--color-white, #f1f5f9)` に変更
+- `var(--color-black)` → `var(--color-black, #010101)` に変更
+- `var(--color-purple)` → `var(--color-purple, #639)` に変更
+- `var(--color-red)` → `var(--color-purple, #ff4f48)` に変更
 
 #### 良い例
+
 ```css
 background-color: var(--color-white, #f1f5f9);
 color: var(--color-black, #010101);
@@ -107,7 +113,7 @@ padding: 2rem;
 ### 5. 単位の変換（px → rem）
 
 #### ルール
-`border-radius`、`top`、`right`、`outline-offset`、`transform` 内のpx値をremに変換します。
+`border-radius`のpx値をremに変換します。
 
 #### 変換表
 - `2px` → `0.125rem`
@@ -121,19 +127,11 @@ padding: 2rem;
 #### 良い例
 ```css
 border-radius: 0.5rem;
-top: 0.5rem;
-right: 0.5rem;
-outline-offset: 0.125rem;
-transform: translateY(-0.125rem);
 ```
 
 #### 悪い例
 ```css
 border-radius: 8px;
-top: 8px;
-right: 8px;
-outline-offset: 2px;
-transform: translateY(-2px);
 ```
 
 ---
@@ -260,6 +258,3 @@ border-color: #e0e0e0;
 
 - [CSS Logical Properties and Values](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Logical_Properties)
 - [Modern CSS Color Functions](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_function_syntax)
-
-
-
