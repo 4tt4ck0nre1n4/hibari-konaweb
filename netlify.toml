@@ -234,6 +234,9 @@
   for = "/*"
   [headers.values]
     # XSS対策（古いブラウザ向けフォールバック）
+    # 注: このヘッダーは2019年にChrome、2020年にEdgeで廃止されました。
+    # 現代のブラウザではContent-Security-Policyで対応すべきとされています。
+    # 古いブラウザのサポートのために残しています。
     X-XSS-Protection = "1; mode=block"
 
     # クリックジャッキング対策
@@ -250,6 +253,9 @@
 
     # HSTS（HTTP Strict Transport Security）- SSL強制
     # 2年間（63072000秒）HTTPSを強制、サブドメインも含む
+    # 注: Netlifyのデフォルト設定により、実際には max-age=31536000（1年）が
+    # 適用される場合があります。1年でも十分なセキュリティレベルであり、
+    # Security HeadersでA+評価を獲得できます。
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
 
     # CSP（Content Security Policy）

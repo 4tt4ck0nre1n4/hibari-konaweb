@@ -19,10 +19,11 @@
 <style>
   .skip-link {
     /* 画面外に配置（スクリーンリーダーには読み上げられる） */
-    position: absolute;
-    top: -40px;
+    position: fixed;
+    top: 0;
     left: 0;
     z-index: 9999;
+    transform: translateY(-120%);
 
     /* スタイリング */
     background-color: var(--color-black, #010101);
@@ -36,12 +37,12 @@
     box-shadow: 0 4px 6px rgb(0 0 0 / 0.3);
 
     /* トランジション */
-    transition: top 0.3s ease;
+    transition: transform 0.3s ease;
   }
 
   /* キーボードフォーカス時に表示 */
   .skip-link:focus {
-    top: 0;
+    transform: translateY(0);
     outline: var(--color-blue-light, #4a90e2) 3px solid;
     outline-offset: 2px;
   }

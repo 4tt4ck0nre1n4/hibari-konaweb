@@ -38,6 +38,8 @@
 **注意点**:
 - Netlifyへのデプロイ後に検証してください
 - 開発環境（localhost）では異なるCSPが適用されます
+- `X-XSS-Protection`は古いブラウザ向けの設定です。現代のブラウザではCSPで対応すべきとされており、Security Headersでの表示方法が変わっている場合があります（ヘッダー自体は送信されています）
+- `Strict-Transport-Security`の`max-age`は、Netlifyのデフォルト設定により`31536000`（1年）になる場合があります。1年でも十分なセキュリティレベルであり、A+評価を獲得できます
 
 ### 2. SSL Labs（ssllabs.com）
 
@@ -60,21 +62,52 @@
 - **Key Exchange**: 2048ビット以上のRSAキー
 - **Cipher Strength**: 128ビット以上
 
+**詳細レポートの見方**:
+1. スキャン完了後、**サマリーページ**が表示されます
+2. ページ下部の「Server」セクションに、サーバーのIPアドレスまたはホスト名が**青いリンク**で表示されます
+3. この青いリンクをクリックすると、**詳細レポートページ**に移動します
+4. 詳細レポートページで以下のセクションを確認:
+   - **Certificate #1**: 証明書情報（有効期限、発行者、信頼性等）
+   - **Configuration**: プロトコルとCipher Suiteのサポート状況
+   - **Protocol Details**: TLS 1.2/1.3のサポート状況、鍵交換方式
+   - **Cipher Suites**: 使用可能な暗号化方式の一覧
+
+**確認ポイントの詳細**:
+- **Certificate**セクション:
+  - "Trusted" が "Yes" になっているか確認
+  - "Valid from" と "Valid until" で有効期限を確認
+- **Configuration**セクション:
+  - "TLS 1.2" と "TLS 1.3" のみが "Yes"（緑色）
+  - 古い "SSL 2.0", "SSL 3.0", "TLS 1.0", "TLS 1.1" は "No"（赤色）
+- **Protocol Details**セクション:
+  - "Server Key and Cipher Suites" で "RSA 2048 bits" 以上を確認
+- **Cipher Suites**セクション:
+  - 128ビット以上の暗号化方式（AES_128_GCM、AES_256_GCM等）が使用されているか
+
 **注意点**:
 - NetlifyはデフォルトでLet's Encrypt証明書を提供
 - 自動更新されるため、手動での更新は不要
+- スキャンには2-3分かかります（複数のサーバーをテストするため）
 
 ### 3. Chrome DevTools Security Tab
 
-**手順**:
-1. サイトを開く
-2. F12キーで開発者ツールを開く
-3. 「Security」タブをクリック
-4. 以下を確認:
+**手順（詳細版）**:
+1. Google Chromeでサイトを開く（`https://hibari-konaweb.netlify.app`）
+2. **F12キー**（Windows）または **Cmd+Option+I**（Mac）で開発者ツールを開く
+3. 開発者ツール上部のタブ一覧で「**Security**」タブをクリック
+   - **タブが見当たらない場合**: タブエリアの右端にある「**>>**」（More tabs）アイコンをクリックし、ドロップダウンメニューから「**Security**」を選択
+4. Securityタブ内で「**Reload to view site information**」または「**Reload**」ボタンをクリックしてページを再読み込み
+5. セキュリティ概要が表示されるので、以下を確認:
    - ✅ **Origin**: Secure origin (HTTPS)
    - ✅ **Connection**: TLS 1.2 or TLS 1.3
    - ✅ **Certificate**: Valid and trusted
    - ✅ **Resources**: すべてHTTPSで読み込まれている（混合コンテンツなし）
+
+**表示されない・見つからない場合のトラブルシューティング**:
+- **開発者ツールのウィンドウを広げる**: タブが隠れている可能性があります
+- **Chromeを最新版にアップデート**: 古いバージョンではSecurityタブが利用できない場合があります
+- **HTTPSサイトでアクセスしているか確認**: `http://`ではなく`https://`でアクセスしてください（HTTPでは一部機能が制限されます）
+- **シークレットモードで試す**: 拡張機能の干渉がある場合があります
 
 ---
 
