@@ -1,0 +1,106 @@
+---
+/**
+ * Person構造化データ（JSON-LD）
+ *
+ * 個人事業主としてのプロフィール情報をGoogleなどの検索エンジンに提供
+ * Schema.org Person型を使用
+ *
+ * 用途:
+ * - 検索結果でのリッチリザルト表示
+ * - ナレッジグラフへの情報提供
+ * - SEO強化
+ */
+import globalText from "../data/globalText.json";
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": globalText.global.author,
+  "url": globalText.url,
+  "jobTitle": "Web Developer / Freelance Coder",
+  "description": globalText.og.description,
+
+  // プロフィール画像
+  "image": globalText.og.image,
+
+  // 所属組織（個人事業主として）
+  "worksFor": {
+    "@type": "Organization",
+    "name": globalText.global.author
+  },
+
+  // SNSリンク（実在証明・権威性向上）
+  "sameAs": [
+    "https://github.com/4tt4ck0nre1n4",
+    "https://twitter.com/your-account" // 実際のTwitterアカウントに置き換えてください
+  ],
+
+  // 連絡先情報
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer support",
+    "url": `${globalText.url}/contact`,
+    "availableLanguage": "Japanese"
+  },
+
+  // スキルセット（知識領域）
+  "knowsAbout": [
+    "Web Development",
+    "Astro",
+    "WordPress",
+    "TypeScript",
+    "JavaScript",
+    "React",
+    "HTML",
+    "CSS",
+    "Netlify",
+    "Vite",
+    "GSAP",
+    "Responsive Design",
+    "Web Accessibility",
+    "SEO Optimization"
+  ],
+
+  // 提供サービス
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Web制作サービス",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "ホームページ制作",
+          "description": "アクセシビリティ対応のWebサイト制作"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "WordPress開発",
+          "description": "WordPressを使用したCMS構築"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Webサイトリニューアル",
+          "description": "既存サイトの改善・最適化"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "コーディング代行",
+          "description": "デザインからの高品質なコーディング実装"
+        }
+      }
+    ]
+  }
+};
+---
+
+<script is:inline type="application/ld+json" set:html={JSON.stringify(personSchema)} />

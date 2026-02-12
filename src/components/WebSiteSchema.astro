@@ -1,0 +1,50 @@
+---
+/**
+ * WebSite構造化データ（JSON-LD）
+ *
+ * サイト全体の情報とサイト内検索機能を検索エンジンに提供
+ * Schema.org WebSite型を使用
+ *
+ * 用途:
+ * - Googleのサイトリンク検索ボックス表示
+ * - サイト全体の情報提供
+ * - SEO強化
+ */
+import globalText from "../data/globalText.json";
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": globalText.og.site_name,
+  "description": globalText.og.description,
+  "url": globalText.url,
+  "inLanguage": "ja-JP",
+
+  // サイト内検索機能（Pagefind使用）
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": `${globalText.url}/blog?search={search_term_string}`
+    },
+    "query-input": "required name=search_term_string"
+  },
+
+  // 運営者情報（Person）
+  "publisher": {
+    "@type": "Person",
+    "name": globalText.global.author,
+    "url": globalText.url
+  },
+
+  // サイトのロゴ
+  "logo": {
+    "@type": "ImageObject",
+    "url": `${globalText.url}/logo_outline.svg`,
+    "width": "512",
+    "height": "512"
+  }
+};
+---
+
+<script is:inline type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />

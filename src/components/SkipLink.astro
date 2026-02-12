@@ -1,0 +1,71 @@
+---
+/**
+ * スキップリンク（Skip Link）コンポーネント
+ *
+ * アクセシビリティ機能：キーボード操作ユーザーがヘッダー・ナビゲーションを
+ * スキップしてメインコンテンツに直接ジャンプできるようにする。
+ *
+ * WCAG 2.1準拠: 2.4.1 Bypass Blocks (Level A)
+ *
+ * 動作:
+ * - 通常時: 画面外に隠れている（視覚的に見えない）
+ * - キーボードフォーカス時: 画面上部に表示される
+ * - Enterキー押下: #page-wrap（メインコンテンツ）にジャンプ
+ */
+---
+
+<a href="#page-wrap" class="skip-link">メインコンテンツへスキップ</a>
+
+<style>
+  .skip-link {
+    /* 画面外に配置（スクリーンリーダーには読み上げられる） */
+    position: absolute;
+    top: -40px;
+    left: 0;
+    z-index: 9999;
+
+    /* スタイリング */
+    background-color: var(--color-black, #010101);
+    color: var(--color-white, #f1f5f9);
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding-block: 0.75rem;
+    padding-inline: 1.5rem;
+    border-radius: 0 0 0.5rem 0;
+    box-shadow: 0 4px 6px rgb(0 0 0 / 0.3);
+
+    /* トランジション */
+    transition: top 0.3s ease;
+  }
+
+  /* キーボードフォーカス時に表示 */
+  .skip-link:focus {
+    top: 0;
+    outline: var(--color-blue-light, #4a90e2) 3px solid;
+    outline-offset: 2px;
+  }
+
+  /* ホバー時のスタイル */
+  .skip-link:hover {
+    background-color: var(--color-gray, #808080);
+  }
+
+  /* 高コントラストモード対応 */
+  @media (prefers-contrast: more) {
+    .skip-link {
+      border: var(--color-white, #f1f5f9) 2px solid;
+    }
+
+    .skip-link:focus {
+      outline-width: 4px;
+    }
+  }
+
+  /* 印刷時は非表示 */
+  @media print {
+    .skip-link {
+      display: none;
+    }
+  }
+</style>

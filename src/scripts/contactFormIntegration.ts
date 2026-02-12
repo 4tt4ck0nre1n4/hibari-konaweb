@@ -6,7 +6,7 @@ export function attachPDFToContactForm(): void {
   const pdfData = sessionStorage.getItem('estimatePDF');
   const estimateNumber = sessionStorage.getItem('estimateNumber');
 
-  if (!pdfData || !estimateNumber) {
+  if (pdfData == null || estimateNumber == null || pdfData === '' || estimateNumber === '') {
     console.log('PDFデータがありません');
     return;
   }

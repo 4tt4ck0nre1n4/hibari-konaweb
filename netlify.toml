@@ -224,13 +224,33 @@
     Cache-Control = "public, max-age=86400, must-revalidate"
 
 # ============================================
-# Content-Security-Policy（CSP）設定
+# セキュリティヘッダー設定（OWASP推奨 + CSP）
 # ============================================
 # 注意: HTTPヘッダーとmetaタグの両方で設定した場合、
 # HTTPヘッダーが優先されます（metaタグはフォールバックとして機能）
-# 本番環境のCSP（Google AnalyticsとreCAPTCHA対応）
+# 本番環境のセキュリティヘッダー（Google AnalyticsとreCAPTCHA対応）
 # 開発環境ではmetaタグのCSPが使用されます（localhost対応のため）
 [[headers]]
   for = "/*"
   [headers.values]
+    # XSS対策（古いブラウザ向けフォールバック）
+    X-XSS-Protection = "1; mode=block"
+
+    # クリックジャッキング対策
+    X-Frame-Options = "SAMEORIGIN"
+
+    # MIMEタイプスニッフィング防止
+    X-Content-Type-Options = "nosniff"
+
+    # Referrer制御（プライバシー保護とセキュリティのバランス）
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+    # 不要なブラウザ機能を制限（Permissions Policy）
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=()"
+
+    # HSTS（HTTP Strict Transport Security）- SSL強制
+    # 2年間（63072000秒）HTTPSを強制、サブドメインも含む
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+
+    # CSP（Content Security Policy）
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://hibari-konaweb.netlify.app https://hibari-konaweb.com https://www.googletagmanager.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: blob: http://hibari-konaweb.local https://cdn.jsdelivr.net https://hibari-konaweb.com https://hibari-konaweb.netlify.app https://www.google-analytics.com https://www.googletagmanager.com https://www.gstatic.com; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' blob: data: https://unpkg.com https://cdn.jsdelivr.net https://api.iconify.design https://hibari-konaweb.com https://hibari-konaweb.netlify.app https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.google.com https://www.gstatic.com; frame-src 'self' https://www.google.com https://www.gstatic.com; worker-src 'self' blob:; media-src 'self' blob:; object-src 'none';"

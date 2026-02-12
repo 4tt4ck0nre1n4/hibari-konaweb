@@ -217,6 +217,17 @@ export function PricingSimulator() {
         <h2 className="pricing-simulator__title">料金シュミレーター</h2>
       </div>
 
+      {/* アクセシビリティ: 価格変更の通知（スクリーンリーダー用） */}
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="screenReader-only"
+      >
+        {selectedItems.length > 0 && (
+          `選択された項目: ${selectedItems.length}件、合計金額: ${calculation.total.toLocaleString()}円`
+        )}
+      </div>
+
       {/* プラン選択 */}
       <div className="pricing-simulator__plans">
         <h3 className="pricing-simulator__section-title">プラン</h3>

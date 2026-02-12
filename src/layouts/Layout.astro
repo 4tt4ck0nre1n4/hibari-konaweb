@@ -3,6 +3,7 @@ import HeadLayout from "./HeadLayout.astro";
 import Header from "./Header.astro";
 import Footer from "./Footer.astro";
 import PageTopButton from "../components/PageTopButton.astro";
+import SkipLink from "../components/SkipLink.astro";
 // クリティカルなフォントのみを読み込む（400のみ）
 import "@fontsource/poppins/400.css";
 
@@ -49,10 +50,14 @@ const shouldLoadGA: boolean =
     <slot name="head" slot="head" />
   </HeadLayout>
   <body>
+    <!-- アクセシビリティ: スキップリンク（キーボード操作ユーザー向け） -->
+    <SkipLink />
+
     <div id="overlay-root"></div>
     <div id="outer-container">
       <Header />
-      <main id="page-wrap">
+      <!-- WCAG 2.1準拠: main要素に明示的なrole属性とaria-label -->
+      <main id="page-wrap" role="main" aria-label="メインコンテンツ">
         <slot />
       </main>
       <Footer />
