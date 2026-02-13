@@ -69,9 +69,7 @@ const menuItems: MenuItem[] = [
     display: flex;
     align-items: center;
     justify-content: center;
-    /* position: relative; */
     overflow: hidden;
-    /* 洗練されたグラデーション背景 - カードと調和 */
     background-image: conic-gradient(
       from var(--angle),
       var(--color-white),
@@ -97,7 +95,6 @@ const menuItems: MenuItem[] = [
     animation:
       naviCardButtonAnimation 6s ease-in-out infinite,
       naviCardButtonGradientAnimation 3s linear infinite;
-    /* タッチデバイスでのアニメーション継続を保証 */
     animation-play-state: running;
     will-change: transform, --angle;
   }

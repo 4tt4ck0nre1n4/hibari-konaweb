@@ -33,57 +33,66 @@ const shouldLoadGA: boolean =
   <script is:inline define:vars={{ GA_MEASUREMENT_ID: GA_MEASUREMENT_ID }}>
     // headタグ内: 最小限の初期化のみ
     // dataLayerとgtag関数の定義（スクリプト読み込み前でも動作するように）
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
+    try {
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      window.gtag = gtag;
+      gtag("js", new Date());
+
+      // GA4 設定（スクリプト読み込みは遅延するため、ここでは設定のみ）
+      // 実際のスクリプト読み込みは</body>の直前でスクロール検知後に実行される
+      gtag("config", GA_MEASUREMENT_ID, {
+        // ページビューの自動送信
+        send_page_view: true,
+        // IPアドレスの匿名化（プライバシー保護）
+        anonymize_ip: true,
+        // デバッグモードの無効化
+        debug_mode: false,
+      });
+
+      // Consent Mode v2: GDPR対応のため、ユーザーの同意前はデフォルトで拒否設定
+      // 必要に応じて Cookie 同意バナーと連携してください
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: "denied",
+        functionality_storage: "denied",
+        personalization_storage: "denied",
+        security_storage: "granted", // セキュリティは常に許可
+        wait_for_update: 500,
+      });
+
+      // 日本国内向けの場合は analytics_storage を自動許可（オプション）
+      // プライバシーポリシーに応じて調整してください
+      gtag("consent", "update", {
+        analytics_storage: "granted",
+      });
+    } catch (error) {
+      console.warn("[Google Analytics] 初期化エラー:", error);
     }
-    gtag("js", new Date());
-
-    // GA4 設定（スクリプト読み込みは遅延するため、ここでは設定のみ）
-    // 実際のスクリプト読み込みは</body>の直前でスクロール検知後に実行される
-    gtag("config", GA_MEASUREMENT_ID, {
-      // ページビューの自動送信
-      send_page_view: true,
-      // IPアドレスの匿名化（プライバシー保護）
-      anonymize_ip: true,
-      // デバッグモードの無効化
-      debug_mode: false,
-    });
-
-    // Consent Mode v2: GDPR対応のため、ユーザーの同意前はデフォルトで拒否設定
-    // 必要に応じて Cookie 同意バナーと連携してください
-    gtag("consent", "default", {
-      ad_storage: "denied",
-      ad_user_data: "denied",
-      ad_personalization: "denied",
-      analytics_storage: "denied",
-      functionality_storage: "denied",
-      personalization_storage: "denied",
-      security_storage: "granted", // セキュリティは常に許可
-      wait_for_update: 500,
-    });
-
-    // 日本国内向けの場合は analytics_storage を自動許可（オプション）
-    // プライバシーポリシーに応じて調整してください
-    gtag("consent", "update", {
-      analytics_storage: "granted",
-    });
   </script>
 )}
 
 {typeof isDev === "boolean" && isDev && !shouldLoadGA && (
   <script is:inline>
-    console.info(
-      "%c[Google Analytics] 開発環境のため無効化されています",
-      "color: #4CAF50; font-weight: bold;"
-    );
-    // 開発環境用のモックgtag関数（エラー防止）
-    window.dataLayer = window.dataLayer || [];
-    window.gtag =
-      window.gtag ||
-      function () {
-        console.log("[GA Mock]", ...arguments);
-      };
+    try {
+      console.info(
+        "%c[Google Analytics] 開発環境のため無効化されています",
+        "color: #4CAF50; font-weight: bold;"
+      );
+      // 開発環境用のモックgtag関数（エラー防止）
+      window.dataLayer = window.dataLayer || [];
+      window.gtag =
+        window.gtag ||
+        function () {
+          console.log("[GA Mock]", ...arguments);
+        };
+    } catch (error) {
+      console.warn("[Google Analytics Mock] 初期化エラー:", error);
+    }
   </script>
 )}
 

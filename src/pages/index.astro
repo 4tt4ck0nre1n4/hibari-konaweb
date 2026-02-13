@@ -25,9 +25,10 @@ const fvBackgroundImage = await getImage({
   quality: 75,
   format: "webp",
 });
-// LCP改善: モバイル用背景画像の最適化（1024px以下で使用）
-// モバイルでは適切なサイズの画像を使用することでLCPとCLSを改善
+// LCP改善: モバイル用背景画像の最適化（768px以下のスマホで使用）
+// スマホでは適切なサイズの画像を使用することでLCPとCLSを改善
 // サイズを768pxに削減してファイルサイズを削減（Speed Index改善）
+// タブレット（769px以上）はデスクトップ用画像を使用
 const spFvBackgroundImage = await getImage({
   src: spFvBackgroundImageSrc,
   width: 768,
@@ -53,7 +54,7 @@ const fvAnimeImage = await getImage({
   twitterDescription={globalText.top.description}
 >
   <!-- LCP背景画像のプリロード（HeadLayoutのheadの最初に配置） -->
-  <!-- デスクトップ用画像のプリロード（1024px以上） -->
+  <!-- デスクトップ用画像のプリロード（769px以上・タブレット＋デスクトップ） -->
   <link
     slot="lcp-preload"
     rel="preload"
@@ -61,9 +62,9 @@ const fvAnimeImage = await getImage({
     as="image"
     fetchpriority="high"
     type="image/webp"
-    media="(min-width: 1025px)"
+    media="(min-width: 769px)"
   />
-  <!-- モバイル用画像のプリロード（1024px以下） -->
+  <!-- モバイル用画像のプリロード（768px以下・スマホのみ） -->
   <link
     slot="lcp-preload"
     rel="preload"
@@ -71,7 +72,7 @@ const fvAnimeImage = await getImage({
     as="image"
     fetchpriority="high"
     type="image/webp"
-    media="(max-width: 1024px)"
+    media="(max-width: 768px)"
   />
   <link slot="lcp-preload" rel="preload" href={fvAnimeImage.src} as="image" fetchpriority="low" type="image/webp" />
   <!-- その他の画像のプリロード -->

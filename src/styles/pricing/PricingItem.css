@@ -195,6 +195,7 @@ html.dark .pricing-item--selected {
   }
 
   .pricing-item__content {
+    flex-direction: column;
     gap: 0.5rem;
   }
 

@@ -107,17 +107,24 @@ const shouldLoadGA: boolean =
             const script = document.createElement("script");
             script.async = true;
             script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-            script.onerror = function () {
-              console.warn("[Google Analytics] スクリプトの読み込みに失敗しました");
+            
+            // エラーハンドリングを強化
+            script.onerror = function (error) {
+              console.warn("[Google Analytics] スクリプトの読み込みに失敗しました", error);
+              // エラーが発生してもページの動作には影響しないように処理を続行
             };
 
             // スクリプトが読み込まれた後の処理
             script.onload = function () {
-              // dataLayerとgtag関数は既にheadタグで初期化済み
-              // ここでは追加の設定があれば実行
-              if (window.dataLayer && window.gtag) {
-                // スクリプト読み込み完了を通知（既にheadタグで設定済みのため、ここでは不要）
-                // 必要に応じて追加の設定をここに記述
+              try {
+                // dataLayerとgtag関数は既にheadタグで初期化済み
+                // ここでは追加の設定があれば実行
+                if (window.dataLayer && window.gtag) {
+                  // スクリプト読み込み完了を通知（既にheadタグで設定済みのため、ここでは不要）
+                  // 必要に応じて追加の設定をここに記述
+                }
+              } catch (e) {
+                console.warn("[Google Analytics] 初期化中にエラーが発生しました", e);
               }
             };
 

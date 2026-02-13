@@ -15,14 +15,27 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
 <div class="fv">
   <div class="fv__wrapper">
     <!-- LCP最適化: レスポンシブ画像を<picture>要素で実装 -->
-    <!-- 画面幅1024px以上はデスクトップ画像、1024px以下はモバイル画像を使用 -->
+    <!-- 画面幅768px以下はモバイル画像、769px以上（タブレット・デスクトップ）はデスクトップ画像を使用 -->
+    <!-- iPad Pro（1024px）などタブレットサイズはデスクトップ用画像を使用 -->
     <!-- width/height属性を追加してレンダリングの遅延を削減（CLS対策も兼ねる） -->
     <picture>
-      <!-- モバイル用画像（1024px以下） -->
-      <source media="(max-width: 1024px)" srcset={spFvBackgroundImageSrc} type="image/webp" />
-      <!-- デスクトップ用画像（1024px超） -->
-      <source media="(min-width: 1025px)" srcset={fvBackgroundImageSrc} type="image/webp" />
-      <!-- フォールバック画像 -->
+      <!-- モバイル用画像（768px以下・スマホのみ） -->
+      <source
+        media="(max-width: 768px)"
+        srcset={spFvBackgroundImageSrc}
+        type="image/webp"
+        width="768"
+        height="432"
+      />
+      <!-- デスクトップ用画像（769px以上・タブレット＋デスクトップ） -->
+      <source
+        media="(min-width: 769px)"
+        srcset={fvBackgroundImageSrc}
+        type="image/webp"
+        width="1920"
+        height="1080"
+      />
+      <!-- フォールバック画像（デスクトップ用を使用） -->
       <img
         src={fvBackgroundImageSrc}
         alt="ファーストビューの背景画像"
@@ -32,18 +45,53 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
         fetchpriority="high"
         decoding="sync"
         loading="eager"
+        onerror="this.style.display='none';console.error('Failed to load background image:', this.src);"
       />
     </picture>
     <div class="background-container">
       <div class="background-rotated" style={`background-image: url(${fvAnimeImageSrc})`}></div>
       <div class="background"></div>
     </div>
+    <h2 class="site-title">My Portfolio Site</h2>
     <div class="glitch-container">
       <NaviCard />
       <Glitch />
     </div>
   </div>
 </div>
+
+<style is:global>
+  .site-title {
+    position: fixed;
+    top: 80px;
+    right: 168px;
+    font-family: "Marcellus", serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--color-white, #f1f5f9);
+    text-shadow:
+      0 0 40px rgb(147 51 234 / 0.8),
+      0 0 30px rgb(147 51 234 / 0.6),
+      0 0 20px rgb(255 255 255 / 0.9),
+      0 0 15px rgb(255 255 255 / 0.7),
+      0 4px 8px rgb(0 0 0 / 0.5),
+      0 2px 4px rgb(0 0 0 / 0.7);
+    z-index: 10000;
+    pointer-events: none;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  @media (width <= 850px) {
+    .site-title {
+      top: 20px;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      font-size: 1.5rem;
+    }
+  }
+</style>
 
 <script is:inline>
   // @ts-nocheck

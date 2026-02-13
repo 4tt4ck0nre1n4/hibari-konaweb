@@ -781,6 +781,26 @@ const cspContent = isDev
         object-position: center;
         z-index: 0;
         pointer-events: none; /* カードへのクリックを通過させる */
+        /* 画像読み込み中の背景色 */
+        background-color: #1d1f20;
+      }
+
+      /* スマホサイズ（768px以下）での背景画像最適化 */
+      @media (width <= 768px) {
+        .fv__background-image {
+          /* スマホ用画像のアスペクト比を維持しながら表示 */
+          object-fit: cover;
+          object-position: center center;
+        }
+      }
+
+      /* タブレットサイズ（769px-1024px）での背景画像最適化 */
+      @media (769px <= width <= 1024px) {
+        .fv__background-image {
+          /* タブレット用：デスクトップ画像を使用するため、適切にフィット */
+          object-fit: cover;
+          object-position: center center;
+        }
       }
 
       .fv__wrapper > * {
@@ -1079,9 +1099,9 @@ const cspContent = isDev
             // リソース読み込みエラー（<script>、<link>、<img>などの読み込みエラー）を検出
             const isResourceLoadError =
               target &&
-              (target instanceof HTMLElement || target instanceof HTMLScriptElement || target instanceof HTMLLinkElement) &&
+              (target instanceof HTMLElement || target instanceof HTMLScriptElement || target instanceof HTMLLinkElement || target instanceof HTMLImageElement) &&
               target.tagName &&
-              (target.tagName === "SCRIPT" || target.tagName === "LINK" || target.tagName === "IMG");
+              (target.tagName === "SCRIPT" || target.tagName === "LINK" || target.tagName === "IMG" || target.tagName === "SOURCE");
 
             // 動的インポート関連のエラーを特定（iconify、tsparticles、gsapなどのチャンク読み込みエラーを含む）
             const isDynamicImportError =
@@ -1107,6 +1127,8 @@ const cspContent = isDev
                 filename: filename,
                 target: target ? (target.tagName || target.nodeName) : null,
                 src: target && target.src ? target.src : null,
+                srcset: target && target.srcset ? target.srcset : null,
+                currentSrc: target && target.currentSrc ? target.currentSrc : null,
                 lineno: event.lineno,
                 colno: event.colno,
               });
@@ -1117,6 +1139,11 @@ const cspContent = isDev
               // リソース読み込みエラーの場合、イベントの伝播を停止
               if (isResourceLoadError && target) {
                 target.onerror = null; // エラーハンドラーをクリアして再発を防ぐ
+                // 画像要素の場合、代替表示を設定
+                if (target.tagName === "IMG" && !target.style.display) {
+                  target.style.opacity = "0";
+                  target.style.visibility = "hidden";
+                }
               }
               return;
             }

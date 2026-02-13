@@ -45,13 +45,13 @@ border-color: var(--color-gray, #666);
 #### 良い例
 ```css
 background-color: rgb(0 0 0 / 0.7);
-box-shadow: 0 1.25rem 3.75rem rgb(0 0 0 / 0.3);
+box-shadow: 0 4px 8px rgb(0 0 0 / 0.3);
 ```
 
 #### 悪い例
 ```css
 background-color: rgba(0, 0, 0, 0.7);
-box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 ```
 
 ---
