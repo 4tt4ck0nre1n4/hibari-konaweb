@@ -65,7 +65,7 @@ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 ```css
 .button:is(:hover, :focus-visible) {
   background-color: var(--color-purple, #8b5cf6);
-  outline: var(--color-purple, #8b5cf6) 0.125rem solid;
+  outline: var(--color-purple, #8b5cf6) 2px solid;
 }
 ```
 
@@ -76,7 +76,7 @@ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .button:focus-visible {
-  outline: var(--color-purple, #8b5cf6) 0.125rem solid;
+  outline: var(--color-purple, #8b5cf6) 2px solid;
 }
 ```
 

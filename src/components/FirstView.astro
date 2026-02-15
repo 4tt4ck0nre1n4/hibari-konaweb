@@ -19,14 +19,6 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
     <!-- iPad Pro（1024px）などタブレットサイズはデスクトップ用画像を使用 -->
     <!-- width/height属性を追加してレンダリングの遅延を削減（CLS対策も兼ねる） -->
     <picture>
-      <!-- モバイル用画像（768px以下・スマホのみ） -->
-      <source
-        media="(max-width: 768px)"
-        srcset={spFvBackgroundImageSrc}
-        type="image/webp"
-        width="768"
-        height="432"
-      />
       <!-- デスクトップ用画像（769px以上・タブレット＋デスクトップ） -->
       <source
         media="(min-width: 769px)"
@@ -34,6 +26,14 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
         type="image/webp"
         width="1920"
         height="1080"
+      />
+      <!-- モバイル用画像（768px以下・スマホのみ） -->
+      <source
+        media="(max-width: 768px)"
+        srcset={spFvBackgroundImageSrc}
+        type="image/webp"
+        width="768"
+        height="432"
       />
       <!-- フォールバック画像（デスクトップ用を使用） -->
       <img
@@ -45,7 +45,7 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
         fetchpriority="high"
         decoding="sync"
         loading="eager"
-        onerror="this.style.display='none';console.error('Failed to load background image:', this.src);"
+        onerror="console.error('Failed to load background image:', this.src);"
       />
     </picture>
     <div class="background-container">

@@ -230,7 +230,8 @@ html.dark .page-count-option:is(:hover, :focus-visible) {
 @media (width <= 768px) {
   .pricing-simulator {
     padding-block: 2rem;
-    padding-inline: 0.5rem;
+    padding-inline-start: max(0.5rem, env(safe-area-inset-left, 0px));
+    padding-inline-end: max(0.5rem, env(safe-area-inset-right, 0px));
   }
 
   .pricing-simulator__title {
@@ -263,5 +264,12 @@ html.dark .page-count-option:is(:hover, :focus-visible) {
 
   .page-count-options {
     grid-template-columns: 1fr;
+  }
+}
+
+/* レスポンシブ対応: 480px以下 */
+@media (width <= 480px) {
+  .pricing-simulator__item-grid {
+    gap: 0.5rem;
   }
 }
