@@ -56,3 +56,6 @@ sql/
 
 # Cursor editor files
 .cursor/
+
+# Local-only drafts (not for remote)
+_local/
