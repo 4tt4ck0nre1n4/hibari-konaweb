@@ -1,4 +1,4 @@
-import type { SavedState } from '../types/pricing';
+import type { SavedState, SelectedItem } from '../types/pricing';
 
 const STORAGE_KEY = 'pricing-simulator-state';
 
@@ -15,7 +15,7 @@ export function saveState(state: SavedState): void {
 }
 
 /**
- * 状態を読み込み
+ * 状態を読み込み（旧スキーマからのマイグレーション対応）
  */
 export function loadState(): SavedState | null {
   try {
@@ -23,7 +23,19 @@ export function loadState(): SavedState | null {
     if (serialized === null || serialized.trim() === '') {
       return null;
     }
-    return JSON.parse(serialized) as SavedState;
+    const parsed = JSON.parse(serialized) as Record<string, unknown>;
+
+    // 旧スキーマ（selectedItems）から新スキーマへのマイグレーション
+    if ('selectedItems' in parsed && !('codingItems' in parsed)) {
+      return {
+        codingItems: (parsed.selectedItems as SelectedItem[]) ?? [],
+        designItems: [],
+        selectedPlan: (parsed.selectedPlan as SavedState['selectedPlan']) ?? 'coding',
+        isUrgent: (parsed.isUrgent as boolean) ?? false,
+      };
+    }
+
+    return parsed as unknown as SavedState;
   } catch (error) {
     console.error('Failed to load state:', error);
     return null;

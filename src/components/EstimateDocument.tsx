@@ -188,17 +188,70 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td colSpan={4}>コーディング料金</td>
-            </tr>
-            {estimateData.calculation.items.map((item) => (
-              <tr key={item.itemId}>
-                <td>{item.name}</td>
-                <td>{formatPrice(item.unitPrice)}円</td>
-                <td>{item.quantity}</td>
-                <td>{formatPrice(item.totalPrice)}円</td>
-              </tr>
-            ))}
+            {/* パターン(a): ホームページ制作のみ */}
+            {estimateData.hasDesignItems && !estimateData.hasCodingItems && (
+              <>
+                <tr>
+                  <td colSpan={4}>ホームページ制作料金</td>
+                </tr>
+                {estimateData.calculation.designItems.map((item) => (
+                  <tr key={item.itemId}>
+                    <td>{item.name}</td>
+                    <td>{formatPrice(item.unitPrice)}円</td>
+                    <td>{item.quantity}</td>
+                    <td>{formatPrice(item.totalPrice)}円</td>
+                  </tr>
+                ))}
+              </>
+            )}
+
+            {/* パターン(b): コーディングのみ */}
+            {estimateData.hasCodingItems && !estimateData.hasDesignItems && (
+              <>
+                <tr>
+                  <td colSpan={4}>コーディング料金</td>
+                </tr>
+                {estimateData.calculation.codingItems.map((item) => (
+                  <tr key={item.itemId}>
+                    <td>{item.name}</td>
+                    <td>{formatPrice(item.unitPrice)}円</td>
+                    <td>{item.quantity}</td>
+                    <td>{formatPrice(item.totalPrice)}円</td>
+                  </tr>
+                ))}
+              </>
+            )}
+
+            {/* パターン(c): 両方 */}
+            {estimateData.hasDesignItems && estimateData.hasCodingItems && (
+              <>
+                <tr>
+                  <td colSpan={4}>ホームページ制作料金</td>
+                </tr>
+                <tr>
+                  <td colSpan={4}>ホームページ制作</td>
+                </tr>
+                {estimateData.calculation.designItems.map((item) => (
+                  <tr key={item.itemId}>
+                    <td>{item.name}</td>
+                    <td>{formatPrice(item.unitPrice)}円</td>
+                    <td>{item.quantity}</td>
+                    <td>{formatPrice(item.totalPrice)}円</td>
+                  </tr>
+                ))}
+                <tr>
+                  <td colSpan={4}>コーディング</td>
+                </tr>
+                {estimateData.calculation.codingItems.map((item) => (
+                  <tr key={item.itemId}>
+                    <td>{item.name}</td>
+                    <td>{formatPrice(item.unitPrice)}円</td>
+                    <td>{item.quantity}</td>
+                    <td>{formatPrice(item.totalPrice)}円</td>
+                  </tr>
+                ))}
+              </>
+            )}
           </tbody>
         </table>
       </div>

@@ -126,6 +126,13 @@ html.dark .pricing-item--selected {
   filter: brightness(0) saturate(100%) invert(35%) sepia(90%) saturate(5600%) hue-rotate(350deg) brightness(90%) contrast(95%);
 }
 
+/* サイト運用・保守業務: 赤系 - 全状態で色固定 */
+.icon-maintenance,
+.pricing-item--selected .icon-maintenance,
+.pricing-item:is(:hover, :focus-visible) .icon-maintenance {
+  filter: brightness(0) saturate(100%) invert(35%) sepia(90%) saturate(5600%) hue-rotate(350deg) brightness(90%) contrast(95%);
+}
+
 .pricing-item--selected .pricing-item__icon {
   color: var(--color-white, #f1f5f9);
 

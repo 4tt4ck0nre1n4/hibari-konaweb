@@ -87,7 +87,12 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
 
-  const tableData = estimateData.calculation.items.map(item => [
+  // 両プランの明細を結合（ホームページ制作 → コーディングの順）
+  const allItems = [
+    ...estimateData.calculation.designItems,
+    ...estimateData.calculation.codingItems,
+  ];
+  const tableData = allItems.map(item => [
     item.name,
     `${formatPrice(item.unitPrice)}円`,
     item.quantity.toString(),
@@ -97,7 +102,7 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
   autoTable(doc, {
     startY: currentY,
     head: [['品名', '単価', '数量', '金額']],
-    body: [['コーディング料金', '', '', ''], ...tableData],
+    body: tableData,
     theme: 'grid',
     styles: {
       font: 'helvetica',
@@ -271,8 +276,11 @@ export function validateEstimateData(estimateData: EstimateData): boolean {
     return false;
   }
 
-  // 項目数のチェック
-  if (estimateData.calculation.items.length === 0) {
+  // 項目数のチェック（コーディング・ホームページ制作のいずれかに項目があればOK）
+  const totalItems =
+    estimateData.calculation.codingItems.length +
+    estimateData.calculation.designItems.length;
+  if (totalItems === 0) {
     console.error('項目が選択されていません');
     return false;
   }

@@ -95,6 +95,13 @@ npm run dev
 
 ブラウザで `http://localhost:4321` にアクセスします。
 
+### 6. Chrome DevToolsの設定
+
+開発時に背景画像を正しく表示するため、DevToolsの設定が必要です。
+詳細は[Chrome DevTools設定ガイド](docs/guides/DEVTOOLS_SETUP.md)を参照してください。
+
+**重要**: Networkタブで「Disable cache」のチェックを外してください。
+
 ## 📜 利用可能なコマンド
 
 | コマンド             | 説明                                   |

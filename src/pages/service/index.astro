@@ -5,10 +5,7 @@ import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import AboutHeading from "../../components/AboutHeading.astro";
 import { PricingSimulator } from "../../components/PricingSimulator";
-// import ServiceCard from "../../components/ServiceCard.astro";
-// import serviceText from "../../data/serviceText.json";
-// import { Image } from "astro:assets";
-// import sorryImage from "/public/assets/sorry.webp";
+// import Subscription from "../../components/Subscription.astro";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
@@ -31,21 +28,14 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     <Breadcrumbs {crumbs} />
   </div>
   <div class="pricePage">
+    <div class="subscription-wrapper">
+      <!-- <AboutHeading aboutTitle="Service" aboutSubTitle="サービスについて" /> -->
+      <!-- <Subscription client:load /> -->
+    </div>
     <div class="pricePage__wrapper">
-      <AboutHeading aboutTitle="Price" aboutSubTitle="料金について" />
-      <!-- {serviceText.price.body.map(({ text }) => <p class="price__body">{text}</p>)}
-      <Image
-        class="price__image"
-        src={sorryImage}
-        alt={serviceText.price.imageAlt}
-        width="200"
-        height="200"
-        decoding="async"
-        loading="lazy"
-      />
-      {serviceText.price.footer.map(({ text }) => <p class="price__body" set:html={text} />)} -->
     </div>
     <div class="pricing-simulator-wrapper">
+      <AboutHeading aboutTitle="Price" aboutSubTitle="料金について" />
       <PricingSimulator client:load />
     </div>
   </div>

@@ -69,6 +69,9 @@ const loadIconSet = async (prefix: string): Promise<IconifyIconsJSON | null> => 
       case "marketeq":
         iconSet = (await import("@iconify-json/marketeq/icons.json")).default as IconifyIconsJSON;
         break;
+      case "mdi":
+        iconSet = (await import("@iconify-json/mdi/icons.json")).default as IconifyIconsJSON;
+        break;
       case "material-icon-theme":
         iconSet = (await import("@iconify-json/material-icon-theme/icons.json")).default as IconifyIconsJSON;
         break;
@@ -146,6 +149,8 @@ export type IconifyInlineProps = {
   className?: string;
   "aria-hidden"?: boolean;
   title?: string;
+  colorReplace?: Record<string, string>;
+  cssColor?: string;
 };
 
 function IconifyInlineComponent({
@@ -155,6 +160,8 @@ function IconifyInlineComponent({
   className,
   title,
   "aria-hidden": ariaHidden = true,
+  colorReplace,
+  cssColor,
 }: IconifyInlineProps): ReactElement | null {
   const [iconData, setIconData] = useState<IconifyIcon | null>(null);
   const [iconSet, setIconSet] = useState<IconifyIconsJSON | null>(null);
@@ -222,6 +229,14 @@ function IconifyInlineComponent({
   const vbW = iconData.width ?? iconSet.width ?? 16;
   const vbH = iconData.height ?? iconSet.height ?? 16;
 
+  // 色置換（colorReplaceが指定されている場合にSVGボディの色を差し替え）
+  let svgBody = iconData.body;
+  if (colorReplace !== undefined) {
+    for (const [from, to] of Object.entries(colorReplace)) {
+      svgBody = svgBody.split(from).join(to);
+    }
+  }
+
   // titleがある場合はimgロール、ない場合はpresentationロール
   const hasTitle = title != null && title !== "";
 
@@ -235,7 +250,8 @@ function IconifyInlineComponent({
     xmlns: "http://www.w3.org/2000/svg",
     role: hasTitle ? "img" : "presentation",
     focusable: "false",
-    dangerouslySetInnerHTML: { __html: iconData.body },
+    style: cssColor !== undefined ? { color: cssColor } : undefined,
+    dangerouslySetInnerHTML: { __html: svgBody },
   };
 
   // aria-hiddenはtrueの場合のみ設定（falseの場合は属性を省略）
