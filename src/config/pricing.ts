@@ -121,7 +121,7 @@ export const HOMEPAGE_PRICING_ITEMS: PricingItem[] = [
   },
   {
     id: 'top-design-responsive',
-    name: 'トップページレスポンシブ対応デザイン',
+    name: 'トップページ レスポンシブ対応デザイン',
     basePrice: 10000,
     isQuantifiable: false,
     icon: 'streamline-ultimate-color:responsive-design-1',
@@ -136,7 +136,7 @@ export const HOMEPAGE_PRICING_ITEMS: PricingItem[] = [
   },
   {
     id: 'sub-design-responsive',
-    name: '下層ページレスポンシブ対応デザイン',
+    name: '下層ページ レスポンシブ対応デザイン',
     basePrice: 5000,
     isQuantifiable: true,
     icon: 'streamline-ultimate-color:responsive-design-1',
