@@ -71,6 +71,22 @@ export const prerender = true;
       <div class="contactForm">
         <ContactForm client:visible />
       </div>
+      {
+        contactText.contact.footer.map(({ note }) => (
+          <p id="contact-form-description" class="contact__footer" set:html={note} />
+        ))
+      }
+      <!-- <p id="contact-form-description" class="contact__footer" set:html={contactText.contact.footer.note} /> -->
+          <!-- <p id="contact-form-description" class="contact__footer" set:html={contactText.contact.footer.note} /> -->
+          <!-- <ul class="contact__footer_list">
+            {
+              footerList.map(({ item }) => (
+                <li>
+                  <p id="contact-form-description" class="contact__footer_item" set:html={item} />
+                </li>
+              ))
+            }
+          </ul> -->
     </div>
   </div>
 </Layout>
@@ -103,7 +119,7 @@ export const prerender = true;
   }
   .contact__body {
     width: 100%;
-    max-width: 312px;
+    max-width: 380px;
     display: block;
     font-size: 0.9375rem;
     line-height: 1.8;
@@ -124,5 +140,38 @@ export const prerender = true;
   }
   .contact__body--required {
     color: var(--color-red);
+  }
+
+  .contact__footer {
+    width: 100%;
+    max-width: 380px;
+    display: block;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    letter-spacing: 0.06em;
+    text-align: left;
+    margin-block-start: 0.5rem;
+    margin-inline: auto;
+  }
+
+  .contact__footer:first-of-type {
+    margin-block-start: 1rem;
+  }
+
+  .contact__footer_list {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    list-style: disc;
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+    margin-inline: auto;
+    padding-inline-start: 1.5rem;
+  }
+  .contact__footer_item {
+    font-size: 0.8125rem;
+    text-align: left;
   }
 </style>

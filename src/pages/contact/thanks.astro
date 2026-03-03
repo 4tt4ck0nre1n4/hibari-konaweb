@@ -11,6 +11,8 @@ export const prerender = true;
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
+const footerList = contactText.thanks.footer.list as Array<{ item: string }>;
+
 const thanksPageImage = {
   alt: "お問い合わせありがとうございます。感謝の猫の画像",
   width: 200,
@@ -48,6 +50,20 @@ const thanksLinks = {
     <p class="thanks__body">
       {contactText.thanks.body.text2}
     </p>
+    <div class="thanks__inquiry-info" id="inquiry-info" style="display: none;">
+      <div class="thanks__inquiry-box">
+        <p class="thanks__inquiry-label">お問い合わせ番号</p>
+        <p class="thanks__inquiry-number" id="inquiry-number">-</p>
+      </div>
+      <div class="thanks__inquiry-box">
+        <p class="thanks__inquiry-label">お問い合わせ日時</p>
+        <p class="thanks__inquiry-date" id="inquiry-date">-</p>
+      </div>
+      <p class="thanks__inquiry-note">
+        ※ お問い合わせ番号は、お問い合わせ内容を照会する際に使用します。<br>
+        お問い合わせの際にお伝えください。
+      </p>
+    </div>
     <Image
       class="thanks__image"
       src={thanksImage}
@@ -70,8 +86,56 @@ const thanksLinks = {
         {thanksLinks.span}
       </span>
     </p>
+    <p class="thanks__footer" set:html={contactText.thanks.footer.note} />
+    <ul class="thanks__footer_list">
+      {
+        footerList.map(({ item }) => (
+          <li class="thanks__footer_item">{item}</li>
+        ))
+      }
+    </ul>
+    <p class="thanks__footer_secondary">
+      <span class="thanks__span">
+        {contactText.thanks.footer.link.span1}
+      </span>
+      <a class="thanks__footer_link" href={contactText.thanks.footer.link.mail}>
+        {contactText.thanks.footer.link.mail}
+      </a>
+      <span class="thanks__span">
+        {contactText.thanks.footer.link.span2}
+      </span>
+    </p>
+    <!-- <p class="thanks__body">
+      {contactText.thanks.body.text3}
+    </p>
+    <p class="thanks__body">
+      {contactText.thanks.body.text4}
+    </p> -->
   </div>
 </Layout>
+
+<script>
+  // お問い合わせ番号と日時を表示
+  const inquiryNumber = sessionStorage.getItem('inquiryNumber');
+  const inquiryDate = sessionStorage.getItem('inquiryDate');
+
+  if (inquiryNumber && inquiryDate) {
+    // 表示エリアを表示
+    const infoElement = document.getElementById('inquiry-info');
+    const numberElement = document.getElementById('inquiry-number');
+    const dateElement = document.getElementById('inquiry-date');
+
+    if (infoElement && numberElement && dateElement) {
+      numberElement.textContent = inquiryNumber;
+      dateElement.textContent = inquiryDate;
+      infoElement.style.display = 'block';
+    }
+
+    // 使用後はSessionStorageをクリア
+    sessionStorage.removeItem('inquiryNumber');
+    sessionStorage.removeItem('inquiryDate');
+  }
+</script>
 
 <style>
   .thanks__wrapper {
@@ -90,8 +154,9 @@ const thanksLinks = {
   }
   .thanks__header {
     font-size: 1.5rem;
+    letter-spacing: 0.06em;
     color: inherit;
-    margin-block: 3rem;
+    margin-block-start: 3rem;
   }
   .text-gradient {
     background-image: var(--gradient-text);
@@ -114,11 +179,14 @@ const thanksLinks = {
     }
   }
   .thanks__body {
-    font-size: 1rem;
-    line-height: 2;
-    letter-spacing: 0.16em;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    letter-spacing: 0.06em;
     text-align: left;
     margin-block-start: 0.5rem;
+  }
+  .thanks__body:first-of-type {
+    margin-block-start: 1.5rem;
   }
   .thanks__image {
     display: block;
@@ -126,7 +194,7 @@ const thanksLinks = {
     height: 200px;
     border-radius: 20%;
     object-fit: contain;
-    margin-block-start: 1rem;
+    margin-block-start: 2rem;
     margin-inline: auto;
     padding-block: 1rem;
     padding-inline: 1rem;
@@ -143,9 +211,9 @@ const thanksLinks = {
   .thanks__body_secondary {
     display: flex;
     justify-content: center;
-    font-size: 1rem;
-    line-height: 2;
-    letter-spacing: 0.2em;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    letter-spacing: 0.06em;
     margin-block-start: 1rem;
   }
   .thanks__link {
@@ -153,9 +221,131 @@ const thanksLinks = {
     color: var(--color-purple);
     text-align: center;
     text-decoration: underline;
+    transition: all 0.7s ease;
   }
   .thanks__link:is(:hover, :focus-visible) {
-    color: var(--color-red);
+    color: var(--color-blue-light);
     text-decoration: none;
+  }
+
+  .thanks__footer {
+    width: 100%;
+    max-width: 380px;
+    display: block;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    letter-spacing: 0.06em;
+    color: var(--color-red);
+    text-align: left;
+    margin-block-start: 2rem;
+    margin-inline: auto;
+  }
+
+  .contact__footer:first-of-type {
+    margin-block-start: 1rem;
+  }
+
+  .thanks__footer_list {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-block-start: 0.5rem;
+    margin-inline: auto;
+  }
+  .thanks__footer_item {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    letter-spacing: 0.06em;
+    text-align: left;
+  }
+  .thanks__footer_secondary {
+    width: 100%;
+    max-width: 380px;
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    letter-spacing: 0.06em;
+    text-align: left;
+    margin-block-start: 1rem;
+  }
+  .thanks__footer_link {
+    font-size: 0.8125rem;
+    color: var(--color-purple);
+    text-decoration: underline;
+    transition: all 0.7s ease;
+  }
+  .thanks__footer_link:is(:hover, :focus-visible) {
+    color: var(--color-blue-light);
+    text-decoration: none;
+  }
+
+  .thanks__inquiry-info {
+    width: 100%;
+    max-width: 500px;
+    margin-block-start: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (width <= 768px) {
+    .thanks__inquiry-info {
+      width: 90%;
+      padding: 1rem;
+    }
+  }
+
+  .thanks__inquiry-box {
+    margin-block-end: 1rem;
+  }
+
+  .thanks__inquiry-box:last-of-type {
+    margin-block-end: 1.5rem;
+  }
+
+  .thanks__inquiry-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-purple);
+    letter-spacing: 0.06em;
+    margin-block-end: 0.25rem;
+  }
+
+  .thanks__inquiry-number,
+  .thanks__inquiry-date {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--color-black);
+    letter-spacing: 0.05em;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    word-break: break-all;
+  }
+
+  .thanks__inquiry-note {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    text-align: left;
+    padding-block-start: 0.5rem;
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+  }
+
+  @media (width <= 480px) {
+    .thanks__inquiry-number,
+    .thanks__inquiry-date {
+      font-size: 0.9375rem;
+      padding: 0.4rem;
+    }
+
+    .thanks__inquiry-note {
+      font-size: 0.75rem;
+    }
   }
 </style>

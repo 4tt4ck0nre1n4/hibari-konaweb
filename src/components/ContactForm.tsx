@@ -402,6 +402,17 @@ export default function ContactForm() {
       if (responseData.status === "mail_sent") {
         // メール送信成功時のみリダイレクト
         devLog("Mail sent successfully. Redirecting to thanks page...");
+        
+        // お問い合わせ番号を生成 (メールと同じ形式)
+        const now = new Date();
+        const inquiryNumber = `INQ-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+        const inquiryDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        
+        // SessionStorageに保存
+        sessionStorage.setItem('inquiryNumber', inquiryNumber);
+        sessionStorage.setItem('inquiryDate', inquiryDate);
+        devLog("✅ [Contact Form] Inquiry number generated:", inquiryNumber);
+        
         window.location.replace(THANKS_URL);
       } else if (responseData.status === "validation_failed") {
         // バリデーションエラー
