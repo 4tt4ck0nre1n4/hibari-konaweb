@@ -206,31 +206,6 @@ export default function ContactForm() {
     }
 
     try {
-      // reCAPTCHAトークンの取得と追加
-      // 注意: 一時的にreCAPTCHAを無効化してテストする場合は、以下のブロックをコメントアウトしてください
-      devLog("🔄 [Contact Form] Attempting to get reCAPTCHA token...");
-      const recaptchaToken = await getRecaptchaToken();
-
-      if (recaptchaToken !== null && recaptchaToken !== undefined && recaptchaToken.trim() !== "") {
-        // Contact Form 7のREST APIは_wpcf7_recaptcha_responseフィールド名を期待する
-        formData.append("_wpcf7_recaptcha_response", recaptchaToken);
-        // 互換性のため、g-recaptcha-responseも追加
-        formData.append("g-recaptcha-response", recaptchaToken);
-        devLog(
-          "✅ [Contact Form] reCAPTCHA token obtained and added to form data:",
-          `${recaptchaToken.substring(0, 20)}...`
-        );
-      } else {
-        devWarn("⚠️ [Contact Form] reCAPTCHA token not available, but continuing with submission");
-        devWarn("⚠️ [Contact Form] This may cause the submission to be marked as spam");
-        devWarn("⚠️ [Contact Form] FormData will be sent without _wpcf7_recaptcha_response field");
-      }
-
-      // デバッグ用: reCAPTCHAトークンの値をログ出力（最初の50文字のみ）
-      if (recaptchaToken !== null && recaptchaToken !== undefined && recaptchaToken.trim() !== "") {
-        devLog("🔍 [Contact Form] reCAPTCHA token (first 50 chars):", recaptchaToken.substring(0, 50));
-      }
-
       // FormDataの内容を確認（デバッグ用）
       devLog("📋 [Contact Form] FormData keys:", Array.from(formData.keys()));
 
