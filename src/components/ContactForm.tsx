@@ -9,10 +9,6 @@ import { CONTACT_WPCF7_API, wpcf7Id, wpcf7UnitTag, wpcf7PostId } from "../api/he
 const requiredMark = "【必須】";
 const THANKS_URL = "/contact/thanks";
 
-// reCAPTCHA設定
-const RECAPTCHA_SITE_KEY = import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY as string | undefined;
-const RECAPTCHA_SCRIPT_URL = "https://www.google.com/recaptcha/api.js?render=";
-
 // 開発環境判定
 const isDev =
   typeof window !== "undefined" &&
@@ -43,16 +39,6 @@ const devError = (...args: unknown[]): void => {
 // レート制限設定（1分間に最大3回まで送信可能）
 const RATE_LIMIT_MAX_REQUESTS = 3;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1分
-
-// reCAPTCHAの型定義
-declare global {
-  interface Window {
-    grecaptcha?: {
-      ready: (callback: () => void) => void;
-      execute: (siteKey: string, options: { action: string }) => Promise<string>;
-    };
-  }
-}
 
 const fetchWithTimeout = async (
   input: RequestInfo | URL,
@@ -123,41 +109,7 @@ export default function ContactForm() {
     mode: "onChange",
     resolver: zodResolver(validationSchema),
   });
-
-  // reCAPTCHAスクリプトの読み込み
-  useEffect(() => {
-    if (RECAPTCHA_SITE_KEY === undefined || RECAPTCHA_SITE_KEY === null || RECAPTCHA_SITE_KEY.trim() === "") {
-      devWarn("⚠️ [Contact Form] reCAPTCHA site key is not set. reCAPTCHA protection is disabled.");
-      return;
-    }
-
-    // 既にスクリプトが読み込まれているか確認
-    if (window.grecaptcha) {
-      return;
-    }
-
-    // スクリプトが既に追加されているか確認
-    const existingScript = document.querySelector(`script[src^="${RECAPTCHA_SCRIPT_URL}"]`);
-    if (existingScript) {
-      return;
-    }
-
-    // reCAPTCHAスクリプトを動的に読み込む
-    const script = document.createElement("script");
-    script.src = `${RECAPTCHA_SCRIPT_URL}${RECAPTCHA_SITE_KEY}`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-
-    return () => {
-      // クリーンアップ（通常は不要だが、念のため）
-      const scriptToRemove = document.querySelector(`script[src^="${RECAPTCHA_SCRIPT_URL}"]`);
-      if (scriptToRemove) {
-        scriptToRemove.remove();
-      }
-    };
-  }, []);
-
+ 
   // SessionStorageからPDFデータを取得
   useEffect(() => {
     try {
@@ -208,49 +160,6 @@ export default function ContactForm() {
 
     setRateLimitError(null);
     return true;
-  };
-
-  // reCAPTCHAトークンの取得
-  const getRecaptchaToken = async (): Promise<string | null> => {
-    devLog("🔍 [Contact Form] Starting reCAPTCHA token retrieval...");
-
-    if (RECAPTCHA_SITE_KEY === undefined || RECAPTCHA_SITE_KEY === null || RECAPTCHA_SITE_KEY.trim() === "") {
-      devWarn("⚠️ [Contact Form] reCAPTCHA site key is not set. Skipping reCAPTCHA verification.");
-      devWarn("⚠️ [Contact Form] Check if PUBLIC_RECAPTCHA_SITE_KEY is set in environment variables.");
-      return null;
-    }
-
-    devLog("✅ [Contact Form] reCAPTCHA site key found:", `${RECAPTCHA_SITE_KEY.substring(0, 10)}...`);
-
-    const grecaptcha = window.grecaptcha;
-    if (grecaptcha === undefined || grecaptcha === null) {
-      devWarn("⚠️ [Contact Form] reCAPTCHA is not loaded. Skipping reCAPTCHA verification.");
-      devWarn("⚠️ [Contact Form] Check if reCAPTCHA script is loaded correctly.");
-      return null;
-    }
-
-    devLog("✅ [Contact Form] reCAPTCHA object found, executing...");
-
-    try {
-      return new Promise((resolve, reject) => {
-        grecaptcha.ready(() => {
-          devLog("✅ [Contact Form] reCAPTCHA ready, executing with site key...");
-          grecaptcha
-            .execute(RECAPTCHA_SITE_KEY, { action: "contact" })
-            .then((token) => {
-              devLog("✅ [Contact Form] reCAPTCHA token generated successfully");
-              resolve(token);
-            })
-            .catch((error) => {
-              devError("❌ [Contact Form] reCAPTCHA execution failed:", error);
-              reject(error instanceof Error ? error : new Error(String(error)));
-            });
-        });
-      });
-    } catch (error) {
-      devError("❌ [Contact Form] Failed to get reCAPTCHA token:", error);
-      return null;
-    }
   };
 
   const onSubmit = handleSubmit(async (data: FormValues, event) => {
@@ -448,14 +357,6 @@ export default function ContactForm() {
         devError("❌ [Contact Form] Submission marked as spam:", responseData);
         devError("❌ [Contact Form] Full response:", JSON.stringify(responseData, null, 2));
 
-        // FormDataにreCAPTCHAトークンが含まれているか確認
-        const hasRecaptchaToken = formData.has("_wpcf7_recaptcha_response") || formData.has("g-recaptcha-response");
-        devLog(
-          "🔍 [Contact Form] _wpcf7_recaptcha_response in FormData:",
-          formData.has("_wpcf7_recaptcha_response")
-        );
-        devLog("🔍 [Contact Form] g-recaptcha-response in FormData:", formData.has("g-recaptcha-response"));
-
         const spamMessage =
           responseData.message !== undefined && responseData.message.trim() !== ""
             ? responseData.message
@@ -463,15 +364,8 @@ export default function ContactForm() {
 
         let alertMessage = `${spamMessage}\n\n`;
         alertMessage += "考えられる原因:\n";
-
-        if (!hasRecaptchaToken) {
-          alertMessage += "⚠️ reCAPTCHAトークンがFormDataに含まれていません\n";
-        } else {
-          alertMessage += "✅ reCAPTCHAトークンは送信されています\n";
-        }
-
-        alertMessage += "1. WordPress側のreCAPTCHA設定（シークレットキー）を確認してください\n";
-        alertMessage += "2. Google reCAPTCHA管理画面で、ドメインが正しく登録されているか確認してください\n";
+        alertMessage += "1. 短時間に複数回送信していないか確認してください\n";
+        alertMessage += "2. 内容にスパムと誤認されやすい表現が含まれていないか確認してください\n";
         alertMessage += "3. ブラウザの開発者ツール（F12）のコンソールで詳細を確認してください\n\n";
         alertMessage += "問題が解決しない場合は、直接 webengineer@hibari-konaweb.com までご連絡ください。";
 
