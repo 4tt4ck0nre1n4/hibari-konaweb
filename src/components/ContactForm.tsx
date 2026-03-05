@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { validationSchema } from "../scripts/validationSchema.ts";
 import styles from "../styles/contactForm.module.css";
 import { CONTACT_WPCF7_API, wpcf7Id, wpcf7UnitTag, wpcf7PostId } from "../api/headlessCms.ts";
-import { Turnstile } from "@marsidev/react-turnstile";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 const requiredMark = "【必須】";
 const THANKS_URL = "/contact/thanks";
@@ -106,6 +106,7 @@ export default function ContactForm() {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileSiteKey =
     (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined)?.trim() ?? "";
+  const turnstileRef = useRef<TurnstileInstance | null>(null);
 
   const {
     register,
@@ -202,12 +203,13 @@ export default function ContactForm() {
     setIsSubmitting(true);
     setRateLimitError(null);
 
-    const formData = new FormData(target);
+    const formData = new FormData();
     formData.append("your-name", data.name);
     formData.append("your-email", data.email);
     // 会社名は必須項目ではないため、空文字列でも送信する
     formData.append("your-company", data.company !== undefined && data.company !== null ? data.company : "");
     formData.append("your-message", data.message);
+    formData.append("_wpcf7", wpcf7Id);
     formData.append("_wpcf7_unit_tag", data.wpcf7_unit_tag);
 
     // PDFファイルがある場合は添付
@@ -383,6 +385,7 @@ export default function ContactForm() {
       }
     } catch (error) {
       setTurnstileToken(null); // エラー時はトークンをリセット（再送信時に再取得）
+      turnstileRef.current?.reset(); // ウィジェットをリセットし新トークンを取得
       // エラーの種類に応じて適切なメッセージを表示
       if (error instanceof Error) {
         // タイムアウトエラーの場合
@@ -592,9 +595,13 @@ export default function ContactForm() {
 
           {turnstileSiteKey !== "" && (
             <Turnstile
+              ref={turnstileRef}
               siteKey={turnstileSiteKey}
               onSuccess={(token) => setTurnstileToken(token)}
-              onExpire={() => setTurnstileToken(null)}
+              onExpire={() => {
+                setTurnstileToken(null);
+                turnstileRef.current?.reset();
+              }}
               onError={() => setTurnstileToken(null)}
               options={{
                 theme: "light",
