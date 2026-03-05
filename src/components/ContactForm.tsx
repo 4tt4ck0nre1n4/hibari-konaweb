@@ -104,8 +104,10 @@ export default function ContactForm() {
 
   // Turnstileトークン（Site Key未設定時はウィジェット非表示・検証スキップ）
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const turnstileSiteKey =
-    (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined)?.trim() ?? "";
+  const [turnstileLoadError, setTurnstileLoadError] = useState(false);
+  const turnstileSiteKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined)?.trim() ?? "";
+  console.log("Current Site Key length:", turnstileSiteKey.length); // 実際のキーは出さず長さで存在確認
+  console.log("Current Site Key prefix:", turnstileSiteKey.substring(0, 5)); // 先頭5文字だけ確認
   const turnstileRef = useRef<TurnstileInstance | null>(null);
 
   const {
@@ -120,31 +122,34 @@ export default function ContactForm() {
   // SessionStorageからPDFデータを取得
   useEffect(() => {
     try {
-      const pdfData = sessionStorage.getItem('estimatePDF');
-      const estNumber = sessionStorage.getItem('estimateNumber');
+      const pdfData = sessionStorage.getItem("estimatePDF");
+      const estNumber = sessionStorage.getItem("estimateNumber");
 
-      if (pdfData !== null && pdfData.trim() !== '' && estNumber !== null && estNumber.trim() !== '') {
-        devLog('✅ [Contact Form] PDF data found in SessionStorage');
+      if (pdfData !== null && pdfData.trim() !== "" && estNumber !== null && estNumber.trim() !== "") {
+        devLog("✅ [Contact Form] PDF data found in SessionStorage");
 
         // Base64からBlobに変換
         const base64Response = fetch(pdfData);
-        base64Response.then(res => res.blob()).then(blob => {
-          const file = new File([blob], `estimate_${estNumber}.pdf`, { type: 'application/pdf' });
-          setPdfFile(file);
-          setEstimateNumber(estNumber);
-          devLog(`✅ [Contact Form] PDF file created: ${file.name}, size: ${file.size} bytes`);
-        }).catch(err => {
-          devError('❌ [Contact Form] Failed to convert PDF data:', err);
-        });
+        base64Response
+          .then((res) => res.blob())
+          .then((blob) => {
+            const file = new File([blob], `estimate_${estNumber}.pdf`, { type: "application/pdf" });
+            setPdfFile(file);
+            setEstimateNumber(estNumber);
+            devLog(`✅ [Contact Form] PDF file created: ${file.name}, size: ${file.size} bytes`);
+          })
+          .catch((err) => {
+            devError("❌ [Contact Form] Failed to convert PDF data:", err);
+          });
 
         // 使用後はSessionStorageをクリア
-        sessionStorage.removeItem('estimatePDF');
-        sessionStorage.removeItem('estimateNumber');
+        sessionStorage.removeItem("estimatePDF");
+        sessionStorage.removeItem("estimateNumber");
       } else {
-        devLog('ℹ️ [Contact Form] No PDF data in SessionStorage');
+        devLog("ℹ️ [Contact Form] No PDF data in SessionStorage");
       }
     } catch (error) {
-      devError('❌ [Contact Form] Error loading PDF from SessionStorage:', error);
+      devError("❌ [Contact Form] Error loading PDF from SessionStorage:", error);
     }
   }, []);
 
@@ -185,9 +190,12 @@ export default function ContactForm() {
       turnstileSiteKey !== "" &&
       (turnstileToken === null || turnstileToken === undefined || turnstileToken.trim() === "")
     ) {
-      alert(
-        "セキュリティ確認が完了していません。しばらくお待ちいただくか、ページを再読み込みしてください。"
-      );
+      const turnstileMessage = turnstileLoadError
+        ? "セキュリティ確認（Turnstile）の読み込みに失敗しています。\n\n" +
+          "【管理者向け】Cloudflare Turnstile の管理画面で、このサイトのドメイン（例: hibari-konaweb.com）が「許可するドメイン」に登録されているか確認してください。登録されていないと 401 エラーになり送信できません。\n\n" +
+          "ページを再読み込みして再度お試しください。"
+        : "セキュリティ確認が完了していません。しばらくお待ちいただくか、ページを再読み込みしてください。";
+      alert(turnstileMessage);
       return;
     }
 
@@ -209,7 +217,6 @@ export default function ContactForm() {
     // 会社名は必須項目ではないため、空文字列でも送信する
     formData.append("your-company", data.company !== undefined && data.company !== null ? data.company : "");
     formData.append("your-message", data.message);
-    formData.append("_wpcf7", wpcf7Id);
     formData.append("_wpcf7_unit_tag", data.wpcf7_unit_tag);
 
     // PDFファイルがある場合は添付
@@ -219,7 +226,7 @@ export default function ContactForm() {
     }
 
     // 見積番号がある場合は追加
-    if (estimateNumber !== null && estimateNumber.trim() !== '') {
+    if (estimateNumber !== null && estimateNumber.trim() !== "") {
       formData.append("estimate-number", estimateNumber);
       devLog(`✅ [Contact Form] Estimate number added: ${estimateNumber}`);
     }
@@ -313,12 +320,12 @@ export default function ContactForm() {
 
         // お問い合わせ番号を生成 (メールと同じ形式)
         const now = new Date();
-        const inquiryNumber = `INQ-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
-        const inquiryDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const inquiryNumber = `INQ-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`;
+        const inquiryDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
         // SessionStorageに保存
-        sessionStorage.setItem('inquiryNumber', inquiryNumber);
-        sessionStorage.setItem('inquiryDate', inquiryDate);
+        sessionStorage.setItem("inquiryNumber", inquiryNumber);
+        sessionStorage.setItem("inquiryDate", inquiryDate);
         devLog("✅ [Contact Form] Inquiry number generated:", inquiryNumber);
 
         setTurnstileToken(null); // トークンは1回限り有効のためリセット
@@ -594,21 +601,35 @@ export default function ContactForm() {
           <PrivacyConsent isChecked={privacyAccepted} onChange={setPrivacyAccepted} />
 
           {turnstileSiteKey !== "" && (
-            <Turnstile
-              ref={turnstileRef}
-              siteKey={turnstileSiteKey}
-              onSuccess={(token) => setTurnstileToken(token)}
-              onExpire={() => {
-                setTurnstileToken(null);
-                turnstileRef.current?.reset();
-              }}
-              onError={() => setTurnstileToken(null)}
-              options={{
-                theme: "light",
-                size: "normal",
-                language: "ja",
-              }}
-            />
+            <>
+              <Turnstile
+                ref={turnstileRef}
+                siteKey={turnstileSiteKey}
+                onSuccess={(token) => {
+                  setTurnstileToken(token);
+                  setTurnstileLoadError(false);
+                }}
+                onExpire={() => {
+                  setTurnstileToken(null);
+                  turnstileRef.current?.reset();
+                }}
+                onError={() => {
+                  setTurnstileToken(null);
+                  setTurnstileLoadError(true);
+                }}
+                options={{
+                  theme: "light",
+                  size: "compact",
+                  language: "ja",
+                }}
+              />
+              {turnstileLoadError && (
+                <p role="alert" className={styles.error__message}>
+                  セキュリティチェックの読み込みに失敗しました。ページを再読み込みするか、サイト管理者にドメイン設定（Cloudflare
+                  Turnstile）の確認を依頼してください。
+                </p>
+              )}
+            </>
           )}
 
           {pdfFile !== null && estimateNumber !== null && estimateNumber.trim() !== "" && (
