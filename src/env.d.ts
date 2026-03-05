@@ -11,6 +11,7 @@ interface ImportMetaEnv {
   readonly PUBLIC_WPCF7_UNIT_TAG;
   readonly PUBLIC_WPCF7_POST_ID;
   readonly PUBLIC_GA_MEASUREMENT_ID?: string;
+  readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
 }
 
 interface ImportMeta {

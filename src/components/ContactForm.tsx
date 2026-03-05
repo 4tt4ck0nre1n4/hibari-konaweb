@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { validationSchema } from "../scripts/validationSchema.ts";
 import styles from "../styles/contactForm.module.css";
 import { CONTACT_WPCF7_API, wpcf7Id, wpcf7UnitTag, wpcf7PostId } from "../api/headlessCms.ts";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 const requiredMark = "【必須】";
 const THANKS_URL = "/contact/thanks";
@@ -101,6 +102,11 @@ export default function ContactForm() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [estimateNumber, setEstimateNumber] = useState<string | null>(null);
 
+  // Turnstileトークン（Site Key未設定時はウィジェット非表示・検証スキップ）
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileSiteKey =
+    (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined)?.trim() ?? "";
+
   const {
     register,
     handleSubmit,
@@ -109,7 +115,7 @@ export default function ContactForm() {
     mode: "onChange",
     resolver: zodResolver(validationSchema),
   });
- 
+
   // SessionStorageからPDFデータを取得
   useEffect(() => {
     try {
@@ -173,6 +179,17 @@ export default function ContactForm() {
       return;
     }
 
+    // Turnstile検証（Site Key設定時はトークン必須）
+    if (
+      turnstileSiteKey !== "" &&
+      (turnstileToken === null || turnstileToken === undefined || turnstileToken.trim() === "")
+    ) {
+      alert(
+        "セキュリティ確認が完了していません。しばらくお待ちいただくか、ページを再読み込みしてください。"
+      );
+      return;
+    }
+
     // 送信中の重複送信を防ぐ
     if (isSubmitting) {
       return;
@@ -203,6 +220,11 @@ export default function ContactForm() {
     if (estimateNumber !== null && estimateNumber.trim() !== '') {
       formData.append("estimate-number", estimateNumber);
       devLog(`✅ [Contact Form] Estimate number added: ${estimateNumber}`);
+    }
+
+    // TurnstileトークンをFormDataに追加（CF7がcf-turnstile-responseを期待）
+    if (turnstileToken !== null && turnstileToken !== undefined && turnstileToken.trim() !== "") {
+      formData.append("cf-turnstile-response", turnstileToken);
     }
 
     try {
@@ -286,17 +308,18 @@ export default function ContactForm() {
       if (responseData.status === "mail_sent") {
         // メール送信成功時のみリダイレクト
         devLog("Mail sent successfully. Redirecting to thanks page...");
-        
+
         // お問い合わせ番号を生成 (メールと同じ形式)
         const now = new Date();
         const inquiryNumber = `INQ-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
         const inquiryDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        
+
         // SessionStorageに保存
         sessionStorage.setItem('inquiryNumber', inquiryNumber);
         sessionStorage.setItem('inquiryDate', inquiryDate);
         devLog("✅ [Contact Form] Inquiry number generated:", inquiryNumber);
-        
+
+        setTurnstileToken(null); // トークンは1回限り有効のためリセット
         window.location.replace(THANKS_URL);
       } else if (responseData.status === "validation_failed") {
         // バリデーションエラー
@@ -359,6 +382,7 @@ export default function ContactForm() {
         );
       }
     } catch (error) {
+      setTurnstileToken(null); // エラー時はトークンをリセット（再送信時に再取得）
       // エラーの種類に応じて適切なメッセージを表示
       if (error instanceof Error) {
         // タイムアウトエラーの場合
@@ -482,16 +506,12 @@ export default function ContactForm() {
             <label className={styles.label__company} htmlFor="company">
               <span className={styles.label__field}>
                 <span
-                  className={`${styles.label__text}${
-                    hoveredField === "company" ? "" : styles["label__text--active"]
-                  }`}
+                  className={`${styles.label__text}${hoveredField === "company" ? "" : styles["label__text--active"]}`}
                 >
                   会社名
                 </span>
                 <span
-                  className={`${styles.label__text}${
-                    hoveredField === "company" ? styles["label__text--active"] : ""
-                  }`}
+                  className={`${styles.label__text}${hoveredField === "company" ? styles["label__text--active"] : ""}`}
                 >
                   Company Name
                 </span>
@@ -570,10 +590,25 @@ export default function ContactForm() {
           </div>
           <PrivacyConsent isChecked={privacyAccepted} onChange={setPrivacyAccepted} />
 
-          {pdfFile !== null && estimateNumber !== null && estimateNumber.trim() !== '' && (
+          {turnstileSiteKey !== "" && (
+            <Turnstile
+              siteKey={turnstileSiteKey}
+              onSuccess={(token) => setTurnstileToken(token)}
+              onExpire={() => setTurnstileToken(null)}
+              onError={() => setTurnstileToken(null)}
+              options={{
+                theme: "light",
+                size: "normal",
+                language: "ja",
+              }}
+            />
+          )}
+
+          {pdfFile !== null && estimateNumber !== null && estimateNumber.trim() !== "" && (
             <div className={`${styles.form__box} ${styles.pdf__attachment}`}>
               <p className={styles.pdf__attachment__text}>
-                <span className={styles.pdf__attachment__emoji}>📋</span> 見積書PDF添付: <strong>{pdfFile.name}</strong> ({Math.round(pdfFile.size / 1024)}KB)
+                <span className={styles.pdf__attachment__emoji}>📋</span> 見積書PDF添付: <strong>{pdfFile.name}</strong>{" "}
+                ({Math.round(pdfFile.size / 1024)}KB)
                 <br />
                 <span className={styles.pdf__attachment__emoji}>🏷️</span> 見積番号: <strong>{estimateNumber}</strong>
               </p>
