@@ -233,7 +233,8 @@ export default function ContactForm() {
 
     // TurnstileトークンをFormDataに追加（CF7がcf-turnstile-responseを期待）
     if (turnstileToken !== null && turnstileToken !== undefined && turnstileToken.trim() !== "") {
-      formData.append("cf-turnstile-response", turnstileToken);
+      formData.append("_wpcf7_turnstile_response", turnstileToken);
+      // formData.append("cf-turnstile-response", turnstileToken);
     }
 
     try {
