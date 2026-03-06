@@ -240,7 +240,7 @@ export default function ContactForm() {
       devLog(`✅ [Contact Form] Estimate number added: ${estimateNumber}`);
     }
 
-    // TurnstileトークンをFormDataに追加（CF7がcf-turnstile-responseを期待）
+    // TurnstileトークンをFormDataに追加
     if (turnstileToken !== null && turnstileToken !== undefined && turnstileToken.trim() !== "") {
       formData.append("_wpcf7_turnstile_response", turnstileToken);
       // formData.append("cf-turnstile-response", turnstileToken);
@@ -615,7 +615,7 @@ export default function ContactForm() {
           <PrivacyConsent isChecked={privacyAccepted} onChange={setPrivacyAccepted} />
 
           {turnstileSiteKey !== "" && shouldShowTurnstile && (
-            <>
+            <div className={styles.turnstile__wrapper}>
               <Turnstile
                 ref={turnstileRef}
                 siteKey={turnstileSiteKey}
@@ -643,7 +643,7 @@ export default function ContactForm() {
                   Turnstile）の確認を依頼してください。
                 </p>
               )}
-            </>
+            </div>
           )}
 
           {pdfFile !== null && estimateNumber !== null && estimateNumber.trim() !== "" && (

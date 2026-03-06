@@ -264,6 +264,11 @@
   filter: drop-shadow(0 5px 10px rgb(0 255 255 / 0.6));
 }
 
+/* Turnstileウィジェット周りの余白 */
+.turnstile__wrapper {
+  margin-block: 1.25rem;
+}
+
 .error__message {
   color: var(--color-red, #ff4f48);
   margin-block-start: 1rem;
