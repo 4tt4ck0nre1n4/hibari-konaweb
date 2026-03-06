@@ -105,9 +105,9 @@ export default function ContactForm() {
   // Turnstileトークン（Site Key未設定時はウィジェット非表示・検証スキップ）
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileLoadError, setTurnstileLoadError] = useState(false);
+  // ページ表示直後のマウントを避け、フォーム操作時または遅延後にのみTurnstileを表示（コンソールのエラー・警告の連続を防ぐ）
+  const [shouldShowTurnstile, setShouldShowTurnstile] = useState(false);
   const turnstileSiteKey = (import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined)?.trim() ?? "";
-  console.log("Current Site Key length:", turnstileSiteKey.length); // 実際のキーは出さず長さで存在確認
-  console.log("Current Site Key prefix:", turnstileSiteKey.substring(0, 5)); // 先頭5文字だけ確認
   const turnstileRef = useRef<TurnstileInstance | null>(null);
 
   const {
@@ -152,6 +152,15 @@ export default function ContactForm() {
       devError("❌ [Contact Form] Error loading PDF from SessionStorage:", error);
     }
   }, []);
+
+  // Turnstileを遅延マウント：フォーム操作時または表示から2.5秒後に初めて表示（ページ表示直後のリトライ連打を防ぐ）
+  useEffect(() => {
+    if (turnstileSiteKey === "") return;
+    const timer = window.setTimeout(() => setShouldShowTurnstile(true), 2500);
+    return () => window.clearTimeout(timer);
+  }, [turnstileSiteKey]);
+
+  const activateTurnstile = () => setShouldShowTurnstile(true);
 
   // レート制限チェック
   const checkRateLimit = (): boolean => {
@@ -508,6 +517,7 @@ export default function ContactForm() {
               autoComplete="name"
               placeholder="Your Name"
               aria-required="true"
+              onFocus={activateTurnstile}
               onMouseEnter={() => setHoveredField("name")}
               onMouseLeave={() => setHoveredField(null)}
             />
@@ -536,6 +546,7 @@ export default function ContactForm() {
               autoComplete="organization"
               placeholder="Your Company Name"
               aria-required="false"
+              onFocus={activateTurnstile}
               onMouseEnter={() => setHoveredField("company")}
               onMouseLeave={() => setHoveredField(null)}
             />
@@ -564,6 +575,7 @@ export default function ContactForm() {
               autoComplete="email"
               placeholder="Your Email Address"
               aria-required="true"
+              onFocus={activateTurnstile}
               onMouseEnter={() => setHoveredField("email")}
               onMouseLeave={() => setHoveredField(null)}
             />
@@ -594,6 +606,7 @@ export default function ContactForm() {
               autoComplete="off"
               placeholder="Type Your Message"
               aria-required="true"
+              onFocus={activateTurnstile}
               onMouseEnter={() => setHoveredField("message")}
               onMouseLeave={() => setHoveredField(null)}
             />
@@ -601,7 +614,7 @@ export default function ContactForm() {
           </div>
           <PrivacyConsent isChecked={privacyAccepted} onChange={setPrivacyAccepted} />
 
-          {turnstileSiteKey !== "" && (
+          {turnstileSiteKey !== "" && shouldShowTurnstile && (
             <>
               <Turnstile
                 ref={turnstileRef}
@@ -620,7 +633,7 @@ export default function ContactForm() {
                 }}
                 options={{
                   theme: "light",
-                  size: "compact",
+                  size: "normal",
                   language: "ja",
                 }}
               />
