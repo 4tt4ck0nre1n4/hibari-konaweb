@@ -9,6 +9,13 @@ const pdfIcon = "vscode-icons:file-type-pdf2";
 const contactIcon = "ic:baseline-contact-mail";
 const printerIcon = "fxemoji:printer";
 
+/**
+ * Firefox検証用: true にするとロゴ部分を非表示にする
+ * ロゴをコメントアウトした状態でFirefoxから送信・ダウンロードして
+ * 他要素が表示されるか確認し、SVGが原因か特定する
+ */
+const HIDE_LOGO_FOR_FIREFOX_TEST = true;
+
 interface EstimateDocumentProps {
   estimateData: EstimateData;
 }
@@ -142,16 +149,27 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
 
       <div className="estimate-document__company">
         <div className="estimate-document__logo">
-          <img
-            src="/logo_myPortfolioSite-name.svg"
-            alt={COMPANY_INFO.name}
-            className="estimate-document__logo-icon"
-          />
-          <img
-            src="/logo_text.svg"
-            alt={COMPANY_INFO.name}
-            className="estimate-document__logo-text"
-          />
+          {!HIDE_LOGO_FOR_FIREFOX_TEST ? (
+            <>
+              <img
+                src="/logo_myPortfolioSite-name.svg"
+                alt={COMPANY_INFO.name}
+                className="estimate-document__logo-icon"
+                width={32}
+                height={32}
+              />
+              <img
+                src="/logo_text.svg"
+                alt={COMPANY_INFO.name}
+                className="estimate-document__logo-text"
+                width={200}
+                height={24}
+              />
+            </>
+          ) : (
+            /* Firefox検証用: ロゴ非表示で他要素の表示を確認 */
+            null
+          )}
         </div>
         <div className="estimate-document__website">
           {COMPANY_INFO.website}
