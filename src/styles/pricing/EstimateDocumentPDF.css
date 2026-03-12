@@ -151,10 +151,20 @@
   color: #f1f5f9;
 }
 
+/* html2pdf legacy mode用：改ページマーカー（非表示・高さゼロ） */
+.html2pdf__page-break {
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 /* 明細：新しいページで開始（1ページ目はお見積金額まで） */
 .estimate-document__details {
   margin-block-start: 1rem;
   break-before: page;
+  /* stylelint-disable-next-line property-no-deprecated -- レガシーレンダラーの互換性のため併記 */
+  page-break-before: always;
 }
 
 .estimate-document__details-title {

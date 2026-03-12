@@ -210,6 +210,9 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
         </span>
       </div>
 
+      {/* html2pdf legacy mode用：この要素の直後でページ区切り（明細を2ページ目から開始） */}
+      <div className="html2pdf__page-break" aria-hidden="true" />
+
       <div className="estimate-document__details">
         <h2 className="estimate-document__details-title">【明細】</h2>
         <table className="estimate-document__table">
