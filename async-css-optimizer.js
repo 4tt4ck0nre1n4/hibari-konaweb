@@ -97,7 +97,7 @@ export function asyncSwiperCssPlugin() {
               // Swiper CSS: media="print" hack を使用
               if (href.includes("swiper")) {
                 modified = true;
-                replacement = `<link rel="stylesheet" href="${normalizedHref}" media="print" onload="this.media='all'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                replacement = `<link rel="stylesheet" href="${normalizedHref}" media="print" onload="this.media='all'">\n<noscript><link rel="stylesheet" href="${normalizedHref}"></noscript>`;
                 replacements.push({ index, fullMatch, replacement });
               }
               // 非クリティカルなフォントの CSS: <link rel="preload"> で遅延読み込み
@@ -113,7 +113,7 @@ export function asyncSwiperCssPlugin() {
                 modified = true;
                 // <link rel="preload"> で遅延読み込み
                 // requestIdleCallback を使用してブラウザがアイドル状態の時に読み込む
-                replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'">\n<noscript><link rel="stylesheet" href="${normalizedHref}"></noscript>`;
                 replacements.push({ index, fullMatch, replacement });
               }
               // コンポーネントのCSS（index.*.cssなど）: media="print" hack を使用
@@ -122,7 +122,7 @@ export function asyncSwiperCssPlugin() {
                 modified = true;
                 // preload + onload パターンを使用（media="print" hackより推奨）
                 // Critical CSSがインライン化されているため、すべてのCSSを非同期読み込み可能
-                replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'">\n<noscript><link rel="stylesheet" href="${normalizedHref}"></noscript>`;
                 replacements.push({ index, fullMatch, replacement });
               }
               // その他のCSSファイル（reset.css、global.cssなど）も非同期読み込み
@@ -130,7 +130,7 @@ export function asyncSwiperCssPlugin() {
               else {
                 modified = true;
                 // preload + onload パターンを使用
-                replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'" />\n<noscript><link rel="stylesheet" href="${normalizedHref}" /></noscript>`;
+                replacement = `<link rel="preload" href="${normalizedHref}" as="style" onload="this.onload=null;this.rel='stylesheet'">\n<noscript><link rel="stylesheet" href="${normalizedHref}"></noscript>`;
                 replacements.push({ index, fullMatch, replacement });
               }
             }
