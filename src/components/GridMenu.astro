@@ -268,10 +268,14 @@ import pikucha2 from "../assets/svg/pikucha2.svg";
     height: 100%;
     border-radius: 0.625rem;
     object-fit: contain;
-    image-rendering: high-quality;
+    image-rendering: smooth;
     image-rendering: -webkit-optimize-contrast;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  }
+  @supports (-moz-osx-font-smoothing: grayscale) {
+    .grid__menu_svg img {
+      -moz-osx-font-smoothing: grayscale;
+    }
   }
   /* .webp画像に明示的にobject-fit: containを指定し、鮮明な表示を実現 */
   .grid__menu_item.item-10 .grid__menu_svg img,
@@ -289,7 +293,13 @@ import pikucha2 from "../assets/svg/pikucha2.svg";
     will-change: transform;
     /* アンチエイリアシングの最適化 */
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  }
+  @supports (-moz-osx-font-smoothing: grayscale) {
+    .grid__menu_item.item-10 .grid__menu_svg img,
+    .grid__menu_item.item-11 .grid__menu_svg img,
+    .grid__menu_item.item-12 .grid__menu_svg img {
+      -moz-osx-font-smoothing: grayscale;
+    }
   }
   .grid__menu_item:not(.item-4, .item-5, .item-6) .grid__menu_svg {
     /* background: transparent; */

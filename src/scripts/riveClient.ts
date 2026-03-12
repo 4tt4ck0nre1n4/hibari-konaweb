@@ -11,10 +11,12 @@ if (typeof window !== "undefined") {
     if (tagName.toLowerCase() === "canvas") {
       // Canvas要素の高品質設定
       const canvasElement = element as HTMLCanvasElement;
-      canvasElement.style.imageRendering = "high-quality";
+      canvasElement.style.imageRendering = "smooth";
       canvasElement.style.setProperty("image-rendering", "-webkit-optimize-contrast");
       canvasElement.style.setProperty("-webkit-font-smoothing", "antialiased");
-      canvasElement.style.setProperty("-moz-osx-font-smoothing", "grayscale");
+      if (CSS.supports("-moz-osx-font-smoothing", "grayscale")) {
+        canvasElement.style.setProperty("-moz-osx-font-smoothing", "grayscale");
+      }
     }
 
     return element;

@@ -62,16 +62,20 @@ const { className, href, ariaLabel, ariaTitle, src, tooltipText, tooltipPosition
     width: 100%;
     height: 100%;
     /* 高品質画像レンダリング */
-    image-rendering: high-quality;
+    image-rendering: smooth;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
     /* アンチエイリアシング強化 */
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     /* レンダリング品質向上 */
     transform: translateZ(0);
     backface-visibility: hidden;
     will-change: transform;
+  }
+  @supports (-moz-osx-font-smoothing: grayscale) {
+    .rive-component {
+      -moz-osx-font-smoothing: grayscale;
+    }
   }
 
   .grid__menu_rive canvas {
@@ -83,12 +87,11 @@ const { className, href, ariaLabel, ariaTitle, src, tooltipText, tooltipPosition
     vertical-align: middle;
     display: block;
     /* 高品質画像レンダリング */
-    image-rendering: high-quality;
+    image-rendering: smooth;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
     /* アンチエイリアシング強化 */
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     /* レンダリング品質向上 */
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -97,6 +100,11 @@ const { className, href, ariaLabel, ariaTitle, src, tooltipText, tooltipPosition
     image-rendering: -webkit-optimize-contrast;
     /* パフォーマンス最適化 */
     contain: layout style paint;
+  }
+  @supports (-moz-osx-font-smoothing: grayscale) {
+    .grid__menu_rive canvas {
+      -moz-osx-font-smoothing: grayscale;
+    }
   }
 
   /* ローディング状態のスタイル */
