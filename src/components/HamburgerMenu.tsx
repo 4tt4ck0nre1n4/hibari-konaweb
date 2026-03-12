@@ -464,7 +464,6 @@ const HamburgerMenu = () => {
             snsIconSvg={contact.icon}
             ariaLabel={contact.ariaLabel}
             ariaTitle={contact.ariaTitle}
-            targetBlank=""
           />
           <SnsLink
             itemClassName={hamburgerStyles.hamburger__snsItem}

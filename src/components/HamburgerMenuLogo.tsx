@@ -61,7 +61,7 @@ const HamburgerMenuLogo = () => {
 
   return (
     <a className={hamburgerStyles.hamburger__logo_link} href="/" aria-label="ホームに戻る" title="ホームに戻る">
-      <div className={hamburgerStyles.hamburger__logo_container}>
+      <span className={hamburgerStyles.hamburger__logo_container} style={{ display: "contents" }}>
         <img
           className={hamburgerStyles.hamburger__logo_image}
           src="/favicon.svg"
@@ -88,7 +88,7 @@ const HamburgerMenuLogo = () => {
             strokeDashoffset="176"
           />
         </svg>
-      </div>
+      </span>
       <img
         className={hamburgerStyles.hamburger__logo_text}
         src="/logo_text.svg"

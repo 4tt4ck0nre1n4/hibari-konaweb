@@ -22,7 +22,7 @@ const isSvgAsset =
 ---
 
 <li class="sns-icon__item">
-  <a class={className} href={href} target={targetBlank} aria-label={ariaLabel} title={ariaTitle}>
+  <a class={className} href={href} aria-label={ariaLabel} title={ariaTitle} {...(targetBlank === "_blank" ? { target: "_blank" as const } : {})}>
     {
       isSvgAsset ? (
         <img

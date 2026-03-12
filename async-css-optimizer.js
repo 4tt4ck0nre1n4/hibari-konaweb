@@ -141,6 +141,61 @@ export function asyncSwiperCssPlugin() {
               html = html.substring(0, index) + replacement + html.substring(index + fullMatch.length);
             }
 
+            // W3Cバリデーション対応: SVG stop要素にoffset属性を追加
+            // 1. まずグラデーション外も含め、offset を持たないすべての stop を一括で修正
+            //    （pattern 内、defs 直接の子など、あらゆるコンテキストで網羅）
+            const stopWithoutOffsetRegex = /<stop\s+stop-color="([^"]+)"\s*\/?>/g;
+            let prevStopMatch;
+            const stopMatches = [];
+            let stopRe = new RegExp(stopWithoutOffsetRegex.source, "g");
+            while ((prevStopMatch = stopRe.exec(html)) !== null) {
+              stopMatches.push({ index: prevStopMatch.index, full: prevStopMatch[0], color: prevStopMatch[1] });
+            }
+            if (stopMatches.length > 0) {
+              // 各 stop の前後のコンテキストから、同じグラデーション/パターン内の連続 stop を判定
+              // 簡易対応: 隣接する stop の数を数えて 0%, 100% または均等分配
+              let lastReplacedIndex = -1;
+              for (let i = 0; i < stopMatches.length; i++) {
+                const m = stopMatches[i];
+                if (m.full.includes('offset="')) continue; // 既に offset あり
+                const before = html.substring(Math.max(0, m.index - 200), m.index);
+                const after = html.substring(m.index + m.full.length, Math.min(html.length, m.index + m.full.length + 500));
+                // 同ブロック内の stop 数を簡易カウント（前後 200 文字程度）
+                const block = before + m.full + after;
+                const stopsInBlock = (block.match(/<stop\s+/g) || []).length;
+                const stopIndex = (before.match(/<stop\s+/g) || []).length;
+                const offset =
+                  stopsInBlock === 1
+                    ? "0%"
+                    : stopIndex === 0
+                      ? "0%"
+                      : stopIndex === stopsInBlock - 1
+                        ? "100%"
+                        : `${Math.round((stopIndex / (stopsInBlock - 1)) * 100)}%`;
+                const replacement = `<stop offset="${offset}" stop-color="${m.color}">`;
+                html = html.substring(0, m.index) + replacement + html.substring(m.index + m.full.length);
+                // 後続のインデックスをオフセット
+                const lenDiff = replacement.length - m.full.length;
+                for (let j = i + 1; j < stopMatches.length; j++) {
+                  stopMatches[j].index += lenDiff;
+                }
+                modified = true;
+              }
+            }
+
+            // W3Cバリデーション対応: img要素の末尾スラッシュを削除
+            if (/<img[^>]*\s\/>/.test(html)) {
+              html = html.replace(/<img([^>]*?)\s*\/>/g, "<img$1>");
+              modified = true;
+            }
+
+            // W3Cバリデーション対応: U+0000（null文字）とスマートクォートを除去
+            if (html.includes("\u0000") || /[\u201C\u201D\u201E\u201F\u2033\u2036]/.test(html)) {
+              html = html.replace(/\u0000/g, "");
+              html = html.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"');
+              modified = true;
+            }
+
             if (modified) {
               fs.writeFileSync(htmlFile, html, "utf-8");
               console.log(`[async-css-optimizer] ✅ Optimized: ${path.relative(buildDir, htmlFile)}`);

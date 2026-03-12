@@ -56,8 +56,8 @@ const shouldLoadGA: boolean =
     <div id="overlay-root"></div>
     <div id="outer-container">
       <Header />
-      <!-- WCAG 2.1準拠: main要素に明示的なrole属性とaria-label -->
-      <main id="page-wrap" role="main" aria-label="メインコンテンツ">
+      <!-- WCAG 2.1準拠: main要素にaria-labelでアクセシビリティ対応 -->
+      <main id="page-wrap" aria-label="メインコンテンツ">
         <slot />
       </main>
       <Footer />

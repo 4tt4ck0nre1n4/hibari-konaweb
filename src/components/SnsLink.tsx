@@ -70,8 +70,9 @@ const SnsLink = ({
       <a
         className={linkClassName}
         href={href}
-        target={targetBlank}
-        rel={targetBlank === "_blank" ? "noopener noreferrer" : undefined}
+        {...(targetBlank === "_blank"
+          ? { target: "_blank" as const, rel: "noopener noreferrer" }
+          : {})}
         aria-label={ariaLabel}
         title={ariaTitle}
       >

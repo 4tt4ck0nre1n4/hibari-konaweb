@@ -13,12 +13,12 @@ const logo = {
 };
 ---
 
-<header class="header" role="banner">
+<header class="header">
   <div class="header__wrapper">
     <div class="header__inner">
       <h1 class="header__logo">
         <a class="header__logo_link" href={logo.href} aria-label={logo.ariaLabel} title={logo.ariaTitle}>
-          <div class="header__logo_container">
+          <span class="header__logo_container" style="display: contents">
             <Image
               class="header__logo_image"
               src={LogoSvg}
@@ -40,7 +40,7 @@ const logo = {
                 stroke-dasharray="176"
                 stroke-dashoffset="176"></circle>
             </svg>
-          </div>
+          </span>
           <Image
             class="header__logo_text"
             src={TextSvg}
@@ -63,7 +63,7 @@ const logo = {
           />
         </a>
       </h1>
-      <nav class="header__nav" role="navigation" aria-label="メインナビゲーション">
+      <nav class="header__nav" aria-label="メインナビゲーション">
         <Navigation />
       </nav>
     </div>

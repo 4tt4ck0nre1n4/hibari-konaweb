@@ -112,7 +112,7 @@ const googlePrivacypolicyLinks = {
           <li class="privacy__menu_item">
             <p class="privacy__menu_date">
               最終改定日 &#0058;
-              <time id="js-lastRevisedDate" datetime="">
+              <time id="js-lastRevisedDate" datetime={latestRevision ? formatDateToISO(latestRevision) || establishmentDateIso : establishmentDateIso}>
                 {latestRevision}
               </time>
             </p>
