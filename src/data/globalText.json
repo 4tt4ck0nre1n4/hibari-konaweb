@@ -5,7 +5,7 @@
     "colorScheme": "light dark",
     "keywords": "Web制作,ホームページ制作,ポートフォリオ,千葉",
     "author": "hibari-konaweb.com",
-    "robots": "index follow",
+    "robots": "",
     "formatDetection": "telephone=no, address=no"
   },
   "link": {
