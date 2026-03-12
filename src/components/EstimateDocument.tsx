@@ -14,7 +14,7 @@ const printerIcon = "fxemoji:printer";
  * ロゴをコメントアウトした状態でFirefoxから送信・ダウンロードして
  * 他要素が表示されるか確認し、SVGが原因か特定する
  */
-const HIDE_LOGO_FOR_FIREFOX_TEST = true;
+const HIDE_LOGO_FOR_FIREFOX_TEST = false;
 
 interface EstimateDocumentProps {
   estimateData: EstimateData;
@@ -36,6 +36,14 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
       if (!documentRef.current) {
         alert('見積書要素が見つかりません。');
         return;
+      }
+
+      // フォント読み込み完了を待つ（Firefox等でのテキスト描画を安定化）
+      if (typeof document !== 'undefined' && 'fonts' in document) {
+        await Promise.race([
+          document.fonts.ready,
+          new Promise((resolve) => setTimeout(resolve, 2000)),
+        ]);
       }
 
       // ボタンを一時的に非表示
@@ -73,6 +81,14 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
       if (!documentRef.current) {
         alert('見積書要素が見つかりません。');
         return;
+      }
+
+      // フォント読み込み完了を待つ（Firefox等でのテキスト描画を安定化）
+      if (typeof document !== 'undefined' && 'fonts' in document) {
+        await Promise.race([
+          document.fonts.ready,
+          new Promise((resolve) => setTimeout(resolve, 2000)),
+        ]);
       }
 
       // ボタンを一時的に非表示

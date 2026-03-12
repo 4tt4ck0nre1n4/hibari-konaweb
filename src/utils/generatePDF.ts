@@ -289,8 +289,269 @@ export function validateEstimateData(estimateData: EstimateData): boolean {
 }
 
 /**
+ * PDF生成用スタイル（CSS変数を解決した値を直接指定）
+ * Firefox等でcssRulesアクセスが失敗する場合に、クローンされた文書に注入して色・レイアウトを保証する
+ */
+const ESTIMATE_DOCUMENT_PDF_STYLES = `
+.estimate-document {
+  max-width: 900px;
+  color: #010101;
+  background-color: #f1f5f9;
+  margin-inline: auto;
+  padding-block: 3rem;
+  padding-inline: 2rem;
+}
+.estimate-document__header {
+  text-align: center;
+  margin-block-start: 2rem;
+}
+.estimate-document__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #4a90e2;
+  margin: 0;
+}
+.estimate-document__main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-block-start: 2rem;
+}
+.estimate-document__client-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-block-start: 1rem;
+  color: #010101;
+}
+.estimate-document__greeting {
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: #010101;
+}
+.estimate-document__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: right;
+}
+.estimate-document__info-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  color: #010101;
+}
+.estimate-document__info-label {
+  font-weight: 600;
+  color: #010101;
+}
+.estimate-document__company {
+  text-align: right;
+  border-block-end: #e0e0e0 1px solid;
+  margin-block-start: 2rem;
+  padding-block: 1rem;
+}
+.estimate-document__logo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-block-start: 0.5rem;
+}
+.estimate-document__logo-icon {
+  height: 2rem;
+  width: auto;
+}
+.estimate-document__logo-text {
+  height: 1.5rem;
+  width: auto;
+}
+.estimate-document__website {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #010101;
+}
+.estimate-document__subject-section {
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  margin-block-start: 2rem;
+  padding-block: 1rem;
+  padding-inline: 1rem;
+}
+.estimate-document__subject-row {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9375rem;
+  padding-block: 0.5rem;
+  padding-inline: 0;
+  color: #010101;
+}
+.estimate-document__subject-label {
+  min-width: 80px;
+  font-weight: 700;
+  color: #010101;
+}
+.estimate-document__total-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #f1f5f9;
+  background-color: #4a90e2;
+  border-radius: 0.5rem;
+  margin-block-start: 2rem;
+  padding-block: 1.5rem;
+  padding-inline: 2rem;
+}
+.estimate-document__total-label {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+.estimate-document__total-value {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #f1f5f9;
+}
+.estimate-document__details {
+  margin-block-start: 2rem;
+}
+.estimate-document__details-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-block-start: 1rem;
+  color: #010101;
+}
+.estimate-document__table {
+  width: 100%;
+  font-size: 0.9375rem;
+  border-collapse: collapse;
+  color: #010101;
+}
+.estimate-document__table thead {
+  color: #f1f5f9;
+  background-color: #4a90e2;
+}
+.estimate-document__table th {
+  font-weight: 600;
+  text-align: left;
+  border: #4a90e2 1px solid;
+  padding-block: 0.75rem;
+  padding-inline: 1rem;
+  color: #f1f5f9;
+}
+.estimate-document__tax-table th,
+.estimate-document__tax-table td {
+  text-align: center;
+  border: #e0e0e0 1px solid;
+  padding-block: 0.5rem;
+  padding-inline: 0.5rem;
+  color: #010101;
+}
+.estimate-document__tax-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #010101;
+}
+.estimate-document__table th:nth-child(2),
+.estimate-document__table th:nth-child(3),
+.estimate-document__table th:nth-child(4) {
+  text-align: right;
+}
+.estimate-document__table td {
+  border: #e0e0e0 1px solid;
+  padding-block: 0.625rem;
+  padding-inline: 1rem;
+  color: #010101;
+}
+.estimate-document__category-row td {
+  font-weight: 600;
+  background-color: #f8f9fa;
+  color: #010101;
+}
+.estimate-document__table td:nth-child(2),
+.estimate-document__table td:nth-child(3),
+.estimate-document__table td:nth-child(4) {
+  text-align: right;
+}
+.estimate-document__summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-block-start: 2rem;
+}
+.estimate-document__tax-table table {
+  width: 100%;
+  font-size: 0.875rem;
+  border-collapse: collapse;
+}
+.estimate-document__totals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.estimate-document__totals-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9375rem;
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+  padding-block: 0.75rem;
+  padding-inline: 1rem;
+  color: #010101;
+}
+.estimate-document__totals-row--urgent {
+  border-left: #ff4f48 0.25rem solid;
+  color: #010101;
+}
+.estimate-document__totals-row--final {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  background-color: #4a90e2;
+  padding-block: 1rem;
+  padding-inline: 1.25rem;
+}
+.estimate-document__totals-label {
+  font-weight: 600;
+}
+.estimate-document__totals-value {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.estimate-document__notes {
+  border: #e0e0e0 1px solid;
+  border-radius: 0.5rem;
+  margin-block-start: 2rem;
+  padding-block: 1.5rem;
+  padding-inline: 1.5rem;
+}
+.estimate-document__notes-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #010101;
+  margin-block-start: 1rem;
+}
+.estimate-document__notes-content {
+  font-size: 0.875rem;
+  line-height: 1.8;
+  color: #010101;
+}
+.estimate-document__notes-content p {
+  margin: 0;
+  color: #010101;
+}
+.estimate-document__notes-content p:empty {
+  margin-block: 0.5rem;
+}
+`;
+
+/**
  * HTML要素からPDFを生成（html2pdf.js使用）
  * HTML要素をそのまま画像化してPDFに変換するため、デザインが完璧に再現されます
+ * oncloneでスタイルを注入し、Firefox等で色が失われる問題を回避する
  */
 export async function generateEstimatePDFFromHTML(
   element: HTMLElement,
@@ -309,6 +570,13 @@ export async function generateEstimatePDFFromHTML(
         useCORS: true,
         logging: false,
         backgroundColor: '#f1f5f9',
+        onclone: (clonedDoc: Document, _clonedElement: HTMLElement) => {
+          // クローンされた文書にスタイルを注入（FirefoxのcssRules失敗を回避）
+          const style = clonedDoc.createElement('style');
+          style.textContent = ESTIMATE_DOCUMENT_PDF_STYLES;
+          const head = clonedDoc.head ?? clonedDoc.documentElement;
+          head.appendChild(style);
+        },
       },
       jsPDF: {
         unit: 'mm' as const,
