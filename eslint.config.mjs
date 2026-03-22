@@ -110,7 +110,7 @@ export default [
         acf: "readonly",
         wpcf7: "readonly",
         ajaxurl: "readonly",
-        grecaptcha: "readonly",
+        turnstile: "readonly",
         define: "readonly",
       },
     },

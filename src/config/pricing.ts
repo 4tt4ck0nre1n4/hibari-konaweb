@@ -1,3 +1,5 @@
+import { validateConfigData, functionOptionsSchema, pricingItemsSchema, plansSchema, pageCountOptionsSchema } from "../schemas/data.schema";
+
 // その他の機能 サブ項目の型定義
 export interface FunctionOption {
   id: string;
@@ -6,11 +8,17 @@ export interface FunctionOption {
 }
 
 // その他の機能 サブ項目一覧（金額はモーダルに表記しない）
-export const OTHER_FUNCTIONS_OPTIONS: FunctionOption[] = [
+const OTHER_FUNCTIONS_OPTIONS_RAW = [
   { id: 'search',      name: '検索機能', basePrice: 10000 },
   { id: 'reservation', name: '予約機能', basePrice: 10000 },
   { id: 'payment',     name: '決済機能', basePrice: 30000 },
 ];
+
+export const OTHER_FUNCTIONS_OPTIONS: FunctionOption[] = validateConfigData(
+  functionOptionsSchema,
+  OTHER_FUNCTIONS_OPTIONS_RAW,
+  "OTHER_FUNCTIONS_OPTIONS"
+);
 
 // 料金項目の型定義
 export interface PricingItem {
@@ -40,7 +48,7 @@ export interface PageCountOption {
 }
 
 // 料金項目一覧
-export const PRICING_ITEMS: PricingItem[] = [
+const PRICING_ITEMS_RAW = [
   { id: 'top-page', name: 'トップページ', basePrice: 30000, isQuantifiable: false, icon: 'emojione-v1:laptop-computer' },
   { id: 'sub-page', name: '下層ページ', basePrice: 5000, isQuantifiable: true, icon: 'emojione-v1:pages', iconClass: 'icon-sub-page' },
   { id: 'landing-page', name: 'ランディングページ', basePrice: 30000, isQuantifiable: false, icon: 'fxemoji:pages', iconClass: 'icon-landing' },
@@ -64,15 +72,27 @@ export const PRICING_ITEMS: PricingItem[] = [
   { id: 'maintenance', name: 'サイト運用・保守業務', basePrice: 5000, isQuantifiable: false, icon: 'mdi:progress-wrench', iconClass: 'icon-maintenance' },
 ];
 
+export const PRICING_ITEMS: PricingItem[] = validateConfigData(
+  pricingItemsSchema,
+  PRICING_ITEMS_RAW,
+  "PRICING_ITEMS"
+);
+
 // プラン一覧
-export const PLANS: Plan[] = [
-  { id: 'coding', name: 'コーディング', icon: 'streamline-color:keyboard' },
-  { id: 'design', name: 'ホームページ制作', icon: 'twemoji:desktop-computer' },
-  { id: 'urgent', name: '特急案件', icon: 'twemoji:woman-running-light-skin-tone' },
+const PLANS_RAW = [
+  { id: 'coding' as const, name: 'コーディング', icon: 'streamline-color:keyboard' },
+  { id: 'design' as const, name: 'ホームページ制作', icon: 'twemoji:desktop-computer' },
+  { id: 'urgent' as const, name: '特急案件', icon: 'twemoji:woman-running-light-skin-tone' },
 ];
 
+export const PLANS: Plan[] = validateConfigData(
+  plansSchema,
+  PLANS_RAW,
+  "PLANS"
+);
+
 // ページ数オプション
-export const PAGE_COUNT_OPTIONS: PageCountOption[] = [
+const PAGE_COUNT_OPTIONS_RAW = [
   { id: '1', label: '1ページ', value: 1 },
   { id: '2', label: '2ページ', value: 2 },
   { id: '3', label: '3ページ', value: 3 },
@@ -87,6 +107,12 @@ export const PAGE_COUNT_OPTIONS: PageCountOption[] = [
   { id: '50+', label: '50ページ～', value: 50, multiplier: 1.5 },
   { id: 'unknown', label: 'わからない', value: 1 },
 ];
+
+export const PAGE_COUNT_OPTIONS: PageCountOption[] = validateConfigData(
+  pageCountOptionsSchema,
+  PAGE_COUNT_OPTIONS_RAW,
+  "PAGE_COUNT_OPTIONS"
+);
 
 // ホームページ制作プラン 料金項目一覧
 export const HOMEPAGE_PRICING_ITEMS: PricingItem[] = [

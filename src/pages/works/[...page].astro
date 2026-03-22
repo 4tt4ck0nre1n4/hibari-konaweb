@@ -303,7 +303,12 @@ const worksPagination = {
           <p class="works__text">
             {worksText.worksText}
           </p>
-          <ul class="worksCard__menu">
+          <ul
+            class:list={[
+              "worksCard__menu",
+              optimizedWorks.length === 0 && "worksCard__menu--empty",
+            ]}
+          >
             {
               optimizedWorks.length > 0 ? (
                 optimizedWorks.map((work) => (
@@ -350,7 +355,9 @@ const worksPagination = {
                   </li>
                 ))
               ) : (
-                <p>{worksText.error.text}</p>
+                <li class="worksCard__empty">
+                  <p class="worksCard__error">{worksText.error.text}</p>
+                </li>
               )
             }
           </ul>
@@ -567,6 +574,22 @@ const worksPagination = {
     list-style: none;
     margin-block-start: 3rem;
   }
+  /* 実績0件: カード用グリッドを使わず、メッセージを領域内で中央へ */
+  .worksCard__menu--empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-block-size: min(50vh, 24rem);
+  }
+  .worksCard__empty {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
   .worksCard__menu_item {
     display: block grid;
     grid-template-rows: subgrid;
@@ -697,6 +720,17 @@ const worksPagination = {
     text-align: center;
     margin-block-start: auto;
     padding-inline: 0.75rem;
+  }
+  .worksCard__error {
+    margin: 0;
+    text-align: center;
+    padding-inline: 1rem;
+    color: var(--color-purple);
+  }
+  @media (prefers-color-scheme: dark) {
+    html.dark .worksCard__error {
+      color: var(--color-white);
+    }
   }
   @media (width <= 768px) {
     .worksCard__menu_item {

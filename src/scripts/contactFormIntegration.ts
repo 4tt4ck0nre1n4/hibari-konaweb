@@ -2,20 +2,25 @@
  * Contact Form 7にPDFファイルを動的に添付
  * お問い合わせページで実行されるスクリプト
  */
-export function attachPDFToContactForm(): void {
-  const pdfData = sessionStorage.getItem('estimatePDF');
-  const estimateNumber = sessionStorage.getItem('estimateNumber');
+import { getFromStorageSafely, estimatePdfDataSchema, clearFromStorageSafely } from "../schemas/storage.schema";
 
-  if (pdfData == null || estimateNumber == null || pdfData === '' || estimateNumber === '') {
+export function attachPDFToContactForm(): void {
+  const pdfData = getFromStorageSafely(
+    estimatePdfDataSchema,
+    ['estimatePDF', 'estimateNumber'],
+    'sessionStorage'
+  );
+
+  if (pdfData === null) {
     console.log('PDFデータがありません');
     return;
   }
 
   // Base64データをBlobに変換
-  fetch(pdfData)
+  fetch(pdfData.estimatePDF)
     .then((res) => res.blob())
     .then((blob) => {
-      const file = new File([blob], `estimate_${estimateNumber}.pdf`, {
+      const file = new File([blob], `estimate_${pdfData.estimateNumber}.pdf`, {
         type: 'application/pdf',
       });
 
@@ -35,7 +40,7 @@ export function attachPDFToContactForm(): void {
           'input[name="estimate-number"]'
         );
         if (estimateInput) {
-          estimateInput.value = estimateNumber;
+          estimateInput.value = pdfData.estimateNumber;
         }
 
         // 視覚的フィードバック
@@ -50,7 +55,7 @@ export function attachPDFToContactForm(): void {
           // 新しい通知を追加
           const notice = document.createElement('p');
           notice.className = 'estimate-attached-notice';
-          notice.textContent = `✅ 見積書が添付されました: estimate_${estimateNumber}.pdf`;
+          notice.textContent = `✅ 見積書が添付されました: estimate_${pdfData.estimateNumber}.pdf`;
           notice.style.color = '#28a745';
           notice.style.marginTop = '0.5rem';
           notice.style.fontSize = '0.9rem';
@@ -63,9 +68,8 @@ export function attachPDFToContactForm(): void {
         console.warn('ファイル入力フィールドが見つかりません');
       }
 
-      // SessionStorageをクリア
-      sessionStorage.removeItem('estimatePDF');
-      sessionStorage.removeItem('estimateNumber');
+      // SessionStorageをクリア（安全な方法で）
+      clearFromStorageSafely(['estimatePDF', 'estimateNumber'], 'sessionStorage');
     })
     .catch((error) => {
       console.error('PDFファイルの添付に失敗しました:', error);

@@ -63,6 +63,11 @@ export const adobexd = {
   icon: "devicon:xd",
   item: "Adobe XD",
 };
+export const figma = {
+  className: "figma",
+  icon: "devicon:figma",
+  item: "Figma",
+};
 export const gulp = {
   className: "gulp",
   icon: "logos:gulp",
@@ -108,4 +113,19 @@ export const filezilla = {
   className: "filezilla",
   icon: "devicon:filezilla",
   item: "FileZilla",
+};
+export const chatgpt = {
+  className: "chatgpt",
+  icon: "logos:openai-icon",
+  item: "ChatGPT",
+};
+export const gemini = {
+  className: "gemini",
+  icon: "material-icon-theme:gemini-ai",
+  item: "Gemini",
+};
+export const claude = {
+  className: "claude",
+  icon: "logos:claude-icon",
+  item: "Claude",
 };

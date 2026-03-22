@@ -5,56 +5,8 @@ import worksText from "../../data/worksText.json";
 import globalText from "../../data/globalText.json";
 import { WORKS_SLUG_API, WORKS_PATH_API } from "../../api/headlessCms";
 import { getWordPressImageUrl } from "../../util/optimizeWordPressImage";
-
-interface Works {
-  id: number;
-  date: number;
-  title: {
-    rendered: string;
-  };
-  slug: string;
-  acf?: {
-    screenshot_pc?: string;
-    left_link?: string;
-    span_access?: string;
-    span_user?: string;
-    span_password?: string;
-    left_text?: string;
-    pc_image?: string;
-    right_header?: string;
-    right_title?: string;
-    icon_image?: string;
-    right_access?: string;
-    sp_image?: string;
-    right_link?: string;
-    description?: string;
-    icon_vscode?: string;
-    icon_cursor?: string;
-    icon_html?: string;
-    icon_css?: string;
-    icon_sass?: string;
-    icon_javascript?: string;
-    icon_jquery?: string;
-    icon_typescript?: string;
-    icon_gsap?: string;
-    icon_swiper?: string;
-    icon_three?: string;
-    icon_react?: string;
-    icon_wordpress?: string;
-    icon_vite?: string;
-    icon_gulp?: string;
-    icon_webpack?: string;
-    icon_astro?: string;
-    icon_netlify?: string;
-    icon_vercel?: string;
-    icon_github?: string;
-    icon_canva?: string;
-    icon_adobexd?: string;
-    icon_photoshop?: string;
-    icon_illustrator?: string;
-    icon_figma?: string;
-  };
-}
+import { worksResponseSchema, type Works } from "../../schemas/api.schema";
+import { validateApiResponse } from "../../schemas/api.schema";
 
 interface WorksTextData {
   worksTitle: string;
@@ -100,11 +52,17 @@ if (!work) {
       throw new Error(`Failed to fetch work data: ${resWorks.status}`);
     }
 
-    const data = (await resWorks.json()) as Works[];
+    const json = await resWorks.json();
+    const data = validateApiResponse(
+      worksResponseSchema,
+      json,
+      "Works Slug API",
+      [] as Works[]
+    );
 
     console.log("API Response:", data);
 
-    if (Array.isArray(data) && data.length > 0 && data[0] !== undefined) {
+    if (data.length > 0 && data[0] !== undefined) {
       work = data[0];
     } else {
       console.warn(`No data found for slug: ${slug}`);
@@ -133,10 +91,15 @@ export async function getStaticPaths() {
       throw new Error(`Failed to fetch works data: ${res.status} ${res.statusText}`);
     }
 
-    const dataWorks = (await res.json()) as Works[];
+    const dataWorks = validateApiResponse(
+      worksResponseSchema,
+      await res.json(),
+      "Works API",
+      [] as Works[]
+    );
     console.log(`✅ [Works Slug] Successfully fetched ${dataWorks.length} works`);
 
-    if (!Array.isArray(dataWorks) || dataWorks.length === 0) {
+    if (dataWorks.length === 0) {
       console.warn("⚠️ [Works Slug] No works found. Returning empty paths.");
       console.warn("⚠️ [Works Slug] This will result in 404 errors for work detail pages.");
       return [];

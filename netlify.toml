@@ -42,8 +42,6 @@
 #     （通常はこの値のままで問題ありません）
 #   PUBLIC_WPCF7_API_ID = 123
 #     （例示: 実際のContact Form 7のIDに置き換えてください）
-#   PUBLIC_WPCF7_ID = 123
-#     （例示: 実際のContact Form 7のIDに置き換えてください）
 #   PUBLIC_WPCF7_UNIT_TAG = wpcf7-f123-p456-o1
 #     （例示: 実際のユニットタグに置き換えてください）
 #   PUBLIC_WPCF7_POST_ID = 456

@@ -29,7 +29,6 @@ Contact Form 7を使用している場合：
 ```
 PUBLIC_WPCF7_API_PREFIX=contact-form-7/v1/contact-forms/
 PUBLIC_WPCF7_API_ID=123
-PUBLIC_WPCF7_ID=123
 PUBLIC_WPCF7_UNIT_TAG=wpcf7-f123-p456-o1
 PUBLIC_WPCF7_POST_ID=456
 ```

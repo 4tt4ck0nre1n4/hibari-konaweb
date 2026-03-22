@@ -7,9 +7,8 @@ interface ImportMetaEnv {
   readonly PUBLIC_WPCF7_API_URL: string;
   readonly PUBLIC_WPCF7_API_PREFIX: string;
   readonly PUBLIC_WPCF7_API_ID: string;
-  readonly PUBLIC_WPCF7_ID: string;
-  readonly PUBLIC_WPCF7_UNIT_TAG;
-  readonly PUBLIC_WPCF7_POST_ID;
+  readonly PUBLIC_WPCF7_UNIT_TAG: string;
+  readonly PUBLIC_WPCF7_POST_ID: string;
   readonly PUBLIC_GA_MEASUREMENT_ID?: string;
   readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
 }

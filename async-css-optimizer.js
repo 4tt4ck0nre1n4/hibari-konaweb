@@ -172,7 +172,7 @@ export function asyncSwiperCssPlugin() {
                       : stopIndex === stopsInBlock - 1
                         ? "100%"
                         : `${Math.round((stopIndex / (stopsInBlock - 1)) * 100)}%`;
-                const replacement = `<stop offset="${offset}" stop-color="${m.color}">`;
+                const replacement = `<stop offset="${offset}" stop-color="${m.color}"/>`;
                 html = html.substring(0, m.index) + replacement + html.substring(m.index + m.full.length);
                 // 後続のインデックスをオフセット
                 const lenDiff = replacement.length - m.full.length;
@@ -183,7 +183,29 @@ export function asyncSwiperCssPlugin() {
               }
             }
 
-            // W3Cバリデーション対応: img要素の末尾スラッシュを削除
+            // W3Cバリデーション対応: </html> の後に配置された script を </body> の直前に移動（Stray script 対策）
+            const htmlCloseTag = "</html>";
+            const htmlCloseIdx = html.lastIndexOf(htmlCloseTag);
+            if (htmlCloseIdx !== -1) {
+              const afterHtml = html.substring(htmlCloseIdx + htmlCloseTag.length).trim();
+              if (afterHtml.length > 0) {
+                // </html> の後にコンテンツがある場合、</body> の直前に移動
+                const bodyCloseTag = "</body>";
+                const bodyCloseIdx = html.lastIndexOf(bodyCloseTag, htmlCloseIdx);
+                if (bodyCloseIdx !== -1) {
+                  html =
+                    html.substring(0, bodyCloseIdx) +
+                    "\n  " +
+                    afterHtml +
+                    "\n  " +
+                    bodyCloseTag +
+                    html.substring(bodyCloseIdx + bodyCloseTag.length, htmlCloseIdx + htmlCloseTag.length);
+                  modified = true;
+                }
+              }
+            }
+
+            // W3Cバリデーション対応: void要素（img）の末尾スラッシュを削除
             if (/<img[^>]*\s\/>/.test(html)) {
               html = html.replace(/<img([^>]*?)\s*\/>/g, "<img$1>");
               modified = true;

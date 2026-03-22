@@ -45,16 +45,11 @@ NetlifyにデプロイしたAstroサイトでworksページやblogページが40
    （※実際のContact Form 7のIDに置き換えてください）
 
    変数5:
-   Key: PUBLIC_WPCF7_ID
-   Value: 123
-   （※実際のContact Form 7のIDに置き換えてください）
-
-   変数6:
    Key: PUBLIC_WPCF7_UNIT_TAG
    Value: wpcf7-f123-p456-o1
    （※実際のContact Form 7のユニットタグに置き換えてください）
 
-   変数7:
+   変数6:
    Key: PUBLIC_WPCF7_POST_ID
    Value: 456
    （※実際のContact Form 7の投稿IDに置き換えてください）

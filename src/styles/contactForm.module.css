@@ -15,10 +15,6 @@
   font-size: 1.5rem;
 }
 
-.form__hidden {
-  display: none;
-}
-
 .form__box {
   display: flex;
   flex-direction: column;

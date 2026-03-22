@@ -4,8 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { validationSchema } from "../scripts/validationSchema.ts";
 import styles from "../styles/contactForm.module.css";
-import { CONTACT_WPCF7_API, wpcf7Id, wpcf7UnitTag, wpcf7PostId } from "../api/headlessCms.ts";
+import { CONTACT_WPCF7_API, wpcf7PostId, wpcf7UnitTag } from "../api/headlessCms.ts";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+import { wpcf7ResponseSchema, type WPCF7Response } from "../schemas/api.schema.ts";
+import { getFromStorageSafely, estimatePdfDataSchema, clearFromStorageSafely, setToStorageSafely, inquiryDataSchema } from "../schemas/storage.schema.ts";
 
 const requiredMark = "【必須】";
 const THANKS_URL = "/contact/thanks";
@@ -65,24 +67,6 @@ type FormValues = {
   email: string;
   company?: string;
   message: string;
-  wpcf7_unit_tag: string;
-};
-
-// Contact Form 7 API レスポンスの型定義
-type WPCF7InvalidField = {
-  message: string;
-  idref: string | null;
-  error_id: string;
-  // Contact Form 7 REST API が返す追加情報（環境やバージョンで有無がある）
-  field?: string;
-  into?: string;
-};
-
-type WPCF7Response = {
-  status: "mail_sent" | "validation_failed" | "mail_failed" | "aborted" | "spam";
-  message: string;
-  invalid_fields?: WPCF7InvalidField[];
-  posted_data_hash?: string;
 };
 
 export default function ContactForm() {
@@ -122,29 +106,31 @@ export default function ContactForm() {
   // SessionStorageからPDFデータを取得
   useEffect(() => {
     try {
-      const pdfData = sessionStorage.getItem("estimatePDF");
-      const estNumber = sessionStorage.getItem("estimateNumber");
+      const pdfData = getFromStorageSafely(
+        estimatePdfDataSchema,
+        ['estimatePDF', 'estimateNumber'],
+        'sessionStorage'
+      );
 
-      if (pdfData !== null && pdfData.trim() !== "" && estNumber !== null && estNumber.trim() !== "") {
+      if (pdfData !== null) {
         devLog("✅ [Contact Form] PDF data found in SessionStorage");
 
         // Base64からBlobに変換
-        const base64Response = fetch(pdfData);
+        const base64Response = fetch(pdfData.estimatePDF);
         base64Response
           .then((res) => res.blob())
           .then((blob) => {
-            const file = new File([blob], `estimate_${estNumber}.pdf`, { type: "application/pdf" });
+            const file = new File([blob], `estimate_${pdfData.estimateNumber}.pdf`, { type: "application/pdf" });
             setPdfFile(file);
-            setEstimateNumber(estNumber);
+            setEstimateNumber(pdfData.estimateNumber);
             devLog(`✅ [Contact Form] PDF file created: ${file.name}, size: ${file.size} bytes`);
           })
           .catch((err) => {
             devError("❌ [Contact Form] Failed to convert PDF data:", err);
           });
 
-        // 使用後はSessionStorageをクリア
-        sessionStorage.removeItem("estimatePDF");
-        sessionStorage.removeItem("estimateNumber");
+        // 使用後はSessionStorageをクリア（安全な方法で）
+        clearFromStorageSafely(['estimatePDF', 'estimateNumber'], 'sessionStorage');
       } else {
         devLog("ℹ️ [Contact Form] No PDF data in SessionStorage");
       }
@@ -226,7 +212,10 @@ export default function ContactForm() {
     // 会社名は必須項目ではないため、空文字列でも送信する
     formData.append("your-company", data.company !== undefined && data.company !== null ? data.company : "");
     formData.append("your-message", data.message);
-    formData.append("_wpcf7_unit_tag", data.wpcf7_unit_tag);
+    // Contact Form 7 REST API が要求するフィールド（React で管理）
+    formData.append("_wpcf7_locale", "ja");
+    formData.append("_wpcf7_unit_tag", wpcf7UnitTag);
+    formData.append("_wpcf7_container_post", wpcf7PostId);
 
     // PDFファイルがある場合は添付
     if (pdfFile) {
@@ -299,18 +288,15 @@ export default function ContactForm() {
 
       try {
         const parsed = JSON.parse(responseText) as unknown;
-        // 基本的な型チェック
-        if (
-          typeof parsed === "object" &&
-          parsed !== null &&
-          "status" in parsed &&
-          typeof (parsed as { status: unknown }).status === "string"
-        ) {
-          responseData = parsed as WPCF7Response;
-        } else {
-          devError("❌ [Contact Form] Invalid response format:", parsed);
+        // Zodスキーマで検証
+        const validationResult = wpcf7ResponseSchema.safeParse(parsed);
+        
+        if (!validationResult.success) {
+          devError("❌ [Contact Form] Response validation failed:", validationResult.error.format());
           throw new Error("Invalid response format");
         }
+        
+        responseData = validationResult.data;
       } catch (parseError) {
         devError("❌ [Contact Form] Failed to parse response:", {
           error: parseError,
@@ -333,10 +319,18 @@ export default function ContactForm() {
         const inquiryNumber = `INQ-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`;
         const inquiryDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
-        // SessionStorageに保存
-        sessionStorage.setItem("inquiryNumber", inquiryNumber);
-        sessionStorage.setItem("inquiryDate", inquiryDate);
-        devLog("✅ [Contact Form] Inquiry number generated:", inquiryNumber);
+        // SessionStorageに保存（Zodスキーマで検証）
+        const saved = setToStorageSafely(
+          inquiryDataSchema,
+          { inquiryNumber, inquiryDate },
+          'sessionStorage'
+        );
+        
+        if (saved) {
+          devLog("✅ [Contact Form] Inquiry number generated:", inquiryNumber);
+        } else {
+          devError("❌ [Contact Form] Failed to save inquiry data to SessionStorage");
+        }
 
         setTurnstileToken(null); // トークンは1回限り有効のためリセット
         window.location.replace(THANKS_URL);
@@ -487,12 +481,6 @@ export default function ContactForm() {
           aria-labelledby="contact-form-title"
           aria-describedby="contact-form-description"
         >
-          <div className={styles.form__hidden}>
-            <input type="hidden" name="_wpcf7" value={wpcf7Id} />
-            <input type="hidden" name="_wpcf7_locale" value="ja" />
-            <input type="hidden" name="_wpcf7_unit_tag" value={wpcf7UnitTag} />
-            <input type="hidden" name="_wpcf7_container_post" value={wpcf7PostId} />
-          </div>
           <div className={styles.form__box}>
             <label className={styles.label__name} htmlFor="name">
               <span className={styles.label__field}>

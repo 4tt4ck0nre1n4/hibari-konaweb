@@ -782,7 +782,6 @@ PUBLIC_API_PREFIX=/wp-json/wp/v2/
 # Contact Form 7 設定
 PUBLIC_WPCF7_API_PREFIX=contact-form-7/v1/contact-forms/
 PUBLIC_WPCF7_API_ID=123
-PUBLIC_WPCF7_ID=123
 PUBLIC_WPCF7_UNIT_TAG=wpcf7-f123-p456-o1
 PUBLIC_WPCF7_POST_ID=456
 ```
@@ -830,9 +829,6 @@ PUBLIC_WPCF7_POST_ID=456
    Key: PUBLIC_WPCF7_API_ID
    Value: 123
 
-   Key: PUBLIC_WPCF7_ID
-   Value: 123
-
    Key: PUBLIC_WPCF7_UNIT_TAG
    Value: wpcf7-f123-p456-o1
 
@@ -854,7 +850,6 @@ PUBLIC_API_URL=http://hibari-konaweb.local
 PUBLIC_API_PREFIX=/wp-json/wp/v2/
 PUBLIC_WPCF7_API_PREFIX=contact-form-7/v1/contact-forms/
 PUBLIC_WPCF7_API_ID=123
-PUBLIC_WPCF7_ID=123
 PUBLIC_WPCF7_UNIT_TAG=wpcf7-f123-p456-o1
 PUBLIC_WPCF7_POST_ID=456
 ```
@@ -1030,7 +1025,6 @@ WordPress管理画面 → お問い合わせ → コンタクトフォーム
 
 # Netlifyの環境変数を確認
 PUBLIC_WPCF7_API_ID=正しいID
-PUBLIC_WPCF7_ID=正しいID
 
 # APIエンドポイントをテスト
 curl https://your-wordpress-domain.com/wp-json/contact-form-7/v1/contact-forms/
