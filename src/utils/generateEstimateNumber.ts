@@ -5,9 +5,9 @@
 export function generateEstimateNumber(): string {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const random = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const random = String(Math.floor(Math.random() * 10000)).padStart(4, "0");
   return `EST-${year}${month}${day}-${random}`;
 }
 
@@ -17,8 +17,8 @@ export function generateEstimateNumber(): string {
  */
 export function formatDateForDisplay(date: Date): string {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}年${month}月${day}日`;
 }
 

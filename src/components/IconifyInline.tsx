@@ -206,7 +206,9 @@ function IconifyInlineComponent({
     if (typeof window !== "undefined") {
       const isDev = (window as Window & { __DEV__?: boolean }).__DEV__;
       if (isDev === true) {
-        console.log(`IconifyInline loading: icon=${icon}, parsed=${Boolean(parsed)}, isLoading=${isLoading}, iconSet=${Boolean(iconSet)}, iconData=${Boolean(iconData)}`);
+        console.log(
+          `IconifyInline loading: icon=${icon}, parsed=${Boolean(parsed)}, isLoading=${isLoading}, iconSet=${Boolean(iconSet)}, iconData=${Boolean(iconData)}`
+        );
       }
     }
     const placeholderProps: React.SVGProps<SVGSVGElement> = {

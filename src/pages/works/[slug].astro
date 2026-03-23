@@ -53,12 +53,7 @@ if (!work) {
     }
 
     const json = await resWorks.json();
-    const data = validateApiResponse(
-      worksResponseSchema,
-      json,
-      "Works Slug API",
-      [] as Works[]
-    );
+    const data = validateApiResponse(worksResponseSchema, json, "Works Slug API", [] as Works[]);
 
     console.log("API Response:", data);
 
@@ -91,12 +86,7 @@ export async function getStaticPaths() {
       throw new Error(`Failed to fetch works data: ${res.status} ${res.statusText}`);
     }
 
-    const dataWorks = validateApiResponse(
-      worksResponseSchema,
-      await res.json(),
-      "Works API",
-      [] as Works[]
-    );
+    const dataWorks = validateApiResponse(worksResponseSchema, await res.json(), "Works API", [] as Works[]);
     console.log(`✅ [Works Slug] Successfully fetched ${dataWorks.length} works`);
 
     if (dataWorks.length === 0) {
@@ -203,134 +193,134 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     <Breadcrumbs {crumbs} />
   </div>
   <div>
-        {
-          work !== null && work.id !== 0 ? (
-            <article class="work">
-              <div class="split__container">
-                <div class="split left left1">
-                  <div class="left__imageInner">
-                    <img
-                      class="left__image"
-                      src={screenshotPcUrl}
-                      alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
-                      decoding="async"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div class="left__inner">
-                    {/* サイトタイトル */}
-                    <h2 class="left__title" set:html={worksSlugTitle ?? "No title available"} />
-                    <a
-                      class="left__link"
-                      href={worksSlugLeftLink}
-                      aria-label={`${worksSlugTitle}${worksSlugLinks.ariaLabel}`}
-                      title={`${worksSlugTitle}${worksSlugLinks.ariaTitle}`}
-                    >
-                      {/* Basic認証テキスト */}
-                      <span set:html={work?.acf?.span_access ?? ""} />
-                      {/* アクセス権限テキスト */}
-                      <span set:html={work?.acf?.span_user ?? ""} />
-                      {/* ユーザー名 */}
-                      <span set:html={work?.acf?.span_password ?? ""} />
-                      {/* パスワード */}
-                      <span set:html={worksSlugLeftLink ?? ""} />
-                      {/* サイトリンク URL */}
-                    </a>
-                    {/* サイトの特徴 */}
-                    <ul class="left__leadMenu">
-                      {workTextData?.left_leadMenu && workTextData.left_leadMenu.length > 0 ? (
-                        workTextData.left_leadMenu.map(({ header, body }) => (
-                          <li class="left__leadMenu_item">
-                            <h2 class="left__leadMenu_header">{header}</h2>
-                            <p class="left__leadMenu_body">{body}</p>
-                          </li>
-                        ))
-                      ) : (
-                        <li>
-                          <p style="display:none;" />
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                </div>
-
-                <div class="split right site1">
-                  {/* サイト pc画像 */}
-                  <div class="right__pcImageInner">
-                    <img
-                      class="right__pcImage"
-                      src={pcImageUrl}
-                      alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                      decoding="async"
-                      loading="lazy"
-                    />
-                  </div>
-                  {/* サイトタイトル */}
-                  <h1 class="right__header" set:html={worksRightHeader ?? "No title available"} />
-                  {/* ロゴアイコン */}
-                  {iconImageUrl !== "" && (
-                    <img
-                      class="right__logoIcon"
-                      src={iconImageUrl}
-                      alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                      decoding="async"
-                      loading="lazy"
-                    />
-                  )}
-                  {/* Basic認証テキスト */}
-                  <p class="right__text" set:html={worksRightAccess ?? ""} />
-                  {/* サイト sp画像 */}
-                  {spImageUrl !== "" && (
-                    <img
-                      class="right__spImage"
-                      src={spImageUrl}
-                      alt={worksSlugTitle ?? "No image"}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                  {/* サイトリンク URL */}
-                  <a
-                    class="right__link"
-                    href={worksSlugRightLink}
-                    aria-label={`${worksSlugRightLink}${worksSlugLinks.ariaLabel}`}
-                    title={`${worksSlugRightLink}${worksSlugLinks.ariaTitle}`}
-                    set:html={worksSlugRightLink}
-                    target={worksSlugLinks.targetBlank}
-                  />
-                  {/* スキルアイコン */}
-                  <ul class="right__iconMenu">
-                    {icons.length > 0 ? (
-                      icons.map(({ name, url }) => (
-                        <li class="right__iconMenu_item">
-                          <img
-                            class="right__iconMenu_image"
-                            src={url}
-                            alt={`${name} icon`}
-                            loading="lazy"
-                            decoding="async"
-                          />
-                          <span class="right__iconMenu_text">{name}</span>
-                          <div class="right__iconMenu_cover" />
-                        </li>
-                      ))
-                    ) : (
-                      <li class="right__iconMenu_item">
-                        <span>{worksText.error.noIcon}</span>
-                      </li>
-                    )}
-                  </ul>
-                </div>
+    {
+      work !== null && work.id !== 0 ? (
+        <article class="work">
+          <div class="split__container">
+            <div class="split left left1">
+              <div class="left__imageInner">
+                <img
+                  class="left__image"
+                  src={screenshotPcUrl}
+                  alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
+                  decoding="async"
+                  loading="lazy"
+                />
               </div>
-            </article>
-          ) : (
-            <div>
-              <h1>{worksText.error.title}</h1>
-              <p>{worksText.error.text}</p>
+              <div class="left__inner">
+                {/* サイトタイトル */}
+                <h2 class="left__title" set:html={worksSlugTitle ?? "No title available"} />
+                <a
+                  class="left__link"
+                  href={worksSlugLeftLink}
+                  aria-label={`${worksSlugTitle}${worksSlugLinks.ariaLabel}`}
+                  title={`${worksSlugTitle}${worksSlugLinks.ariaTitle}`}
+                >
+                  {/* Basic認証テキスト */}
+                  <span set:html={work?.acf?.span_access ?? ""} />
+                  {/* アクセス権限テキスト */}
+                  <span set:html={work?.acf?.span_user ?? ""} />
+                  {/* ユーザー名 */}
+                  <span set:html={work?.acf?.span_password ?? ""} />
+                  {/* パスワード */}
+                  <span set:html={worksSlugLeftLink ?? ""} />
+                  {/* サイトリンク URL */}
+                </a>
+                {/* サイトの特徴 */}
+                <ul class="left__leadMenu">
+                  {workTextData?.left_leadMenu && workTextData.left_leadMenu.length > 0 ? (
+                    workTextData.left_leadMenu.map(({ header, body }) => (
+                      <li class="left__leadMenu_item">
+                        <h2 class="left__leadMenu_header">{header}</h2>
+                        <p class="left__leadMenu_body">{body}</p>
+                      </li>
+                    ))
+                  ) : (
+                    <li>
+                      <p style="display:none;" />
+                    </li>
+                  )}
+                </ul>
+              </div>
             </div>
-          )
-        }
-      </div>
+
+            <div class="split right site1">
+              {/* サイト pc画像 */}
+              <div class="right__pcImageInner">
+                <img
+                  class="right__pcImage"
+                  src={pcImageUrl}
+                  alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                  decoding="async"
+                  loading="lazy"
+                />
+              </div>
+              {/* サイトタイトル */}
+              <h1 class="right__header" set:html={worksRightHeader ?? "No title available"} />
+              {/* ロゴアイコン */}
+              {iconImageUrl !== "" && (
+                <img
+                  class="right__logoIcon"
+                  src={iconImageUrl}
+                  alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                  decoding="async"
+                  loading="lazy"
+                />
+              )}
+              {/* Basic認証テキスト */}
+              <p class="right__text" set:html={worksRightAccess ?? ""} />
+              {/* サイト sp画像 */}
+              {spImageUrl !== "" && (
+                <img
+                  class="right__spImage"
+                  src={spImageUrl}
+                  alt={worksSlugTitle ?? "No image"}
+                  loading="lazy"
+                  decoding="async"
+                />
+              )}
+              {/* サイトリンク URL */}
+              <a
+                class="right__link"
+                href={worksSlugRightLink}
+                aria-label={`${worksSlugRightLink}${worksSlugLinks.ariaLabel}`}
+                title={`${worksSlugRightLink}${worksSlugLinks.ariaTitle}`}
+                set:html={worksSlugRightLink}
+                target={worksSlugLinks.targetBlank}
+              />
+              {/* スキルアイコン */}
+              <ul class="right__iconMenu">
+                {icons.length > 0 ? (
+                  icons.map(({ name, url }) => (
+                    <li class="right__iconMenu_item">
+                      <img
+                        class="right__iconMenu_image"
+                        src={url}
+                        alt={`${name} icon`}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span class="right__iconMenu_text">{name}</span>
+                      <div class="right__iconMenu_cover" />
+                    </li>
+                  ))
+                ) : (
+                  <li class="right__iconMenu_item">
+                    <span>{worksText.error.noIcon}</span>
+                  </li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </article>
+      ) : (
+        <div>
+          <h1>{worksText.error.title}</h1>
+          <p>{worksText.error.text}</p>
+        </div>
+      )
+    }
+  </div>
 </Layout>
 
 <style is:global>
@@ -1291,7 +1281,6 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
 
     // フェーズ3: 各コンテナの処理を実行
     containerData.forEach((splitElement) => {
-
       // スマホサイズの場合、パララックス効果とスクロールアニメーション
       if (isMobile) {
         if (splitElement.spImage) {

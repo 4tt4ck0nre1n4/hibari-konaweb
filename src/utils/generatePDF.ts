@@ -1,9 +1,9 @@
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import type { EstimateData } from '../types/pricing';
-import { COMPANY_INFO } from '../config/companyInfo';
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import type { EstimateData } from "../types/pricing";
+import { COMPANY_INFO } from "../config/companyInfo";
 // PDF用スタイル（EstimateDocument.css の印刷用スタイルに相当、変数解決済み）
-import estimateDocumentPdfStyles from '../styles/pricing/EstimateDocumentPDF.css?raw';
+import estimateDocumentPdfStyles from "../styles/pricing/EstimateDocumentPDF.css?raw";
 
 /**
  * autoTable の lastAutoTable プロパティの型定義
@@ -25,9 +25,9 @@ function formatPrice(price: number): string {
 export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
   // A4サイズでPDF作成
   const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
   });
 
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -35,29 +35,29 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
 
   // タイトル
   doc.setFontSize(20);
-  doc.setFont('helvetica', 'bold');
-  const titleText = '概算見積書';
+  doc.setFont("helvetica", "bold");
+  const titleText = "概算見積書";
   const titleWidth = doc.getTextWidth(titleText);
   doc.text(titleText, (pageWidth - titleWidth) / 2, currentY);
   currentY += 15;
 
   // 発行日・見積番号（左側）
   doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
+  doc.setFont("helvetica", "normal");
   doc.text(`発行日: ${estimateData.issueDate}`, 20, currentY);
   doc.text(`見積番号: ${estimateData.estimateNumber}`, 20, currentY + 7);
   doc.text(`有効期限: ${estimateData.expiryDate}`, 20, currentY + 14);
 
   // 会社情報（右側）
-  doc.setFont('helvetica', 'bold');
-  doc.text(COMPANY_INFO.name, pageWidth - 20, currentY, { align: 'right' });
-  doc.setFont('helvetica', 'normal');
-  doc.text(COMPANY_INFO.website, pageWidth - 20, currentY + 7, { align: 'right' });
+  doc.setFont("helvetica", "bold");
+  doc.text(COMPANY_INFO.name, pageWidth - 20, currentY, { align: "right" });
+  doc.setFont("helvetica", "normal");
+  doc.text(COMPANY_INFO.website, pageWidth - 20, currentY + 7, { align: "right" });
 
   const regNumber: string = COMPANY_INFO.registrationNumber;
-  if (regNumber !== '' && regNumber.length > 0) {
+  if (regNumber !== "" && regNumber.length > 0) {
     doc.text(`登録番号: ${regNumber}`, pageWidth - 20, currentY + 14, {
-      align: 'right',
+      align: "right",
     });
   }
 
@@ -65,13 +65,13 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
 
   // お客様名
   doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text('〇〇〇〇〇〇 御中', 20, currentY);
+  doc.setFont("helvetica", "bold");
+  doc.text("〇〇〇〇〇〇 御中", 20, currentY);
   currentY += 7;
 
   doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('下記の通りお見積り申し上げます。', 20, currentY);
+  doc.setFont("helvetica", "normal");
+  doc.text("下記の通りお見積り申し上げます。", 20, currentY);
   currentY += 10;
 
   // 件名
@@ -80,21 +80,18 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
 
   // お見積金額
   doc.setFontSize(14);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont("helvetica", "bold");
   const totalAmount = formatPrice(estimateData.calculation.total);
   doc.text(`お見積金額: ${totalAmount}円`, 20, currentY);
   currentY += 10;
 
   // 明細テーブル
   doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
+  doc.setFont("helvetica", "normal");
 
   // 両プランの明細を結合（ホームページ制作 → コーディングの順）
-  const allItems = [
-    ...estimateData.calculation.designItems,
-    ...estimateData.calculation.codingItems,
-  ];
-  const tableData = allItems.map(item => [
+  const allItems = [...estimateData.calculation.designItems, ...estimateData.calculation.codingItems];
+  const tableData = allItems.map((item) => [
     item.name,
     `${formatPrice(item.unitPrice)}円`,
     item.quantity.toString(),
@@ -103,24 +100,24 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
 
   autoTable(doc, {
     startY: currentY,
-    head: [['品名', '単価', '数量', '金額']],
+    head: [["品名", "単価", "数量", "金額"]],
     body: tableData,
-    theme: 'grid',
+    theme: "grid",
     styles: {
-      font: 'helvetica',
+      font: "helvetica",
       fontSize: 9,
       cellPadding: 3,
     },
     headStyles: {
       fillColor: [240, 240, 240],
       textColor: [0, 0, 0],
-      fontStyle: 'bold',
+      fontStyle: "bold",
     },
     columnStyles: {
       0: { cellWidth: 70 },
-      1: { cellWidth: 40, halign: 'right' },
-      2: { cellWidth: 20, halign: 'center' },
-      3: { cellWidth: 40, halign: 'right' },
+      1: { cellWidth: 40, halign: "right" },
+      2: { cellWidth: 20, halign: "center" },
+      3: { cellWidth: 40, halign: "right" },
     },
   });
 
@@ -131,26 +128,30 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
   // 税別内訳テーブル
   autoTable(doc, {
     startY: currentY,
-    head: [['税別内訳', '小計（税抜金額）', '小計（税のみ）']],
+    head: [["税別内訳", "小計（税抜金額）", "小計（税のみ）"]],
     body: [
-      ['10%対象分', `${formatPrice(estimateData.calculation.subtotal)}円`, `${formatPrice(estimateData.calculation.tax)}円`],
-      ['8%対象分', '-', '-'],
+      [
+        "10%対象分",
+        `${formatPrice(estimateData.calculation.subtotal)}円`,
+        `${formatPrice(estimateData.calculation.tax)}円`,
+      ],
+      ["8%対象分", "-", "-"],
     ],
-    theme: 'grid',
+    theme: "grid",
     styles: {
-      font: 'helvetica',
+      font: "helvetica",
       fontSize: 9,
       cellPadding: 3,
     },
     headStyles: {
       fillColor: [240, 240, 240],
       textColor: [0, 0, 0],
-      fontStyle: 'bold',
+      fontStyle: "bold",
     },
     columnStyles: {
       0: { cellWidth: 60 },
-      1: { cellWidth: 55, halign: 'right' },
-      2: { cellWidth: 55, halign: 'right' },
+      1: { cellWidth: 55, halign: "right" },
+      2: { cellWidth: 55, halign: "right" },
     },
   });
 
@@ -162,61 +163,58 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
   const rightX = pageWidth - 20;
 
   doc.text(`小計（税抜）: ${formatPrice(estimateData.calculation.subtotal)}円`, rightX, currentY, {
-    align: 'right',
+    align: "right",
   });
   currentY += 7;
 
   if (estimateData.isUrgent && estimateData.calculation.urgentFee > 0) {
     doc.setTextColor(255, 0, 0);
-    doc.text(
-      `特急料金（20%）: ${formatPrice(estimateData.calculation.urgentFee)}円`,
-      rightX,
-      currentY,
-      { align: 'right' }
-    );
+    doc.text(`特急料金（20%）: ${formatPrice(estimateData.calculation.urgentFee)}円`, rightX, currentY, {
+      align: "right",
+    });
     doc.setTextColor(0, 0, 0);
     currentY += 7;
   }
 
   doc.text(`消費税（10%）: ${formatPrice(estimateData.calculation.tax)}円`, rightX, currentY, {
-    align: 'right',
+    align: "right",
   });
   currentY += 7;
 
   doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont("helvetica", "bold");
   doc.text(`合計（税込）: ${formatPrice(estimateData.calculation.total)}円`, rightX, currentY, {
-    align: 'right',
+    align: "right",
   });
   currentY += 10;
 
   // 備考
   doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.text('備考', 20, currentY);
+  doc.setFont("helvetica", "bold");
+  doc.text("備考", 20, currentY);
   currentY += 5;
 
-  doc.setFont('helvetica', 'normal');
+  doc.setFont("helvetica", "normal");
   const notes = [
-    '※ これは概算見積書です。実際の金額は詳細なヒアリング後に確定いたします。',
-    '※ 価格は予告なく変更される場合があります。',
-    '※ 本概算見積書の有効期限は発行日より30日間です。',
-    '',
-    '【別途費用が発生する項目】',
-    '■ 素材・ライセンス費用',
-    '有料画像素材、プレミアムフォント等のライセンス購入が必要な場合は、実費を別途請求させていただきます。',
-    '',
-    '■ 仕様変更・追加開発',
-    'お見積り後に仕様変更や追加機能のご要望が生じた場合は、内容を確認の上、別途お見積りいたします。',
-    '',
-    '■ その他実費',
-    '交通費、宿泊費等は含まれておりません。別途発生する場合は実費請求とさせていただきます。',
-    '',
-    '【お支払いについて】',
-    'お振込手数料は貴社にてご負担願います。',
+    "※ これは概算見積書です。実際の金額は詳細なヒアリング後に確定いたします。",
+    "※ 価格は予告なく変更される場合があります。",
+    "※ 本概算見積書の有効期限は発行日より30日間です。",
+    "",
+    "【別途費用が発生する項目】",
+    "■ 素材・ライセンス費用",
+    "有料画像素材、プレミアムフォント等のライセンス購入が必要な場合は、実費を別途請求させていただきます。",
+    "",
+    "■ 仕様変更・追加開発",
+    "お見積り後に仕様変更や追加機能のご要望が生じた場合は、内容を確認の上、別途お見積りいたします。",
+    "",
+    "■ その他実費",
+    "交通費、宿泊費等は含まれておりません。別途発生する場合は実費請求とさせていただきます。",
+    "",
+    "【お支払いについて】",
+    "お振込手数料は貴社にてご負担願います。",
   ];
 
-  notes.forEach(note => {
+  notes.forEach((note) => {
     if (currentY > 270) {
       doc.addPage();
       currentY = 20;
@@ -231,7 +229,7 @@ export function generateEstimatePDF(estimateData: EstimateData): jsPDF {
 /**
  * PDFをダウンロード
  */
-export function downloadPDF(doc: jsPDF, filename: string = 'estimate.pdf'): void {
+export function downloadPDF(doc: jsPDF, filename: string = "estimate.pdf"): void {
   doc.save(filename);
 }
 
@@ -239,12 +237,12 @@ export function downloadPDF(doc: jsPDF, filename: string = 'estimate.pdf'): void
  * PDFをBlobとして取得
  */
 export function getPDFBlob(doc: jsPDF): Blob {
-  const blob = doc.output('blob');
+  const blob = doc.output("blob");
 
   // ファイルサイズチェック（5MB制限）
   const MAX_PDF_SIZE = 5 * 1024 * 1024;
   if (blob.size > MAX_PDF_SIZE) {
-    throw new Error('PDFファイルサイズが大きすぎます（最大5MB）');
+    throw new Error("PDFファイルサイズが大きすぎます（最大5MB）");
   }
 
   return blob;
@@ -254,7 +252,7 @@ export function getPDFBlob(doc: jsPDF): Blob {
  * PDFをBase64として取得（フォーム送信用）
  */
 export function getPDFBase64(doc: jsPDF): string {
-  return doc.output('dataurlstring');
+  return doc.output("dataurlstring");
 }
 
 /**
@@ -263,27 +261,25 @@ export function getPDFBase64(doc: jsPDF): string {
 export function validateEstimateData(estimateData: EstimateData): boolean {
   // 必須フィールドのチェック
   if (
-    estimateData.estimateNumber === '' ||
+    estimateData.estimateNumber === "" ||
     estimateData.estimateNumber.length === 0 ||
-    estimateData.issueDate === '' ||
+    estimateData.issueDate === "" ||
     estimateData.issueDate.length === 0
   ) {
-    console.error('見積番号または発行日が不足しています');
+    console.error("見積番号または発行日が不足しています");
     return false;
   }
 
   // 金額の妥当性チェック
   if (estimateData.calculation.total < 0) {
-    console.error('金額が不正です');
+    console.error("金額が不正です");
     return false;
   }
 
   // 項目数のチェック（コーディング・ホームページ制作のいずれかに項目があればOK）
-  const totalItems =
-    estimateData.calculation.codingItems.length +
-    estimateData.calculation.designItems.length;
+  const totalItems = estimateData.calculation.codingItems.length + estimateData.calculation.designItems.length;
   if (totalItems === 0) {
-    console.error('項目が選択されていません');
+    console.error("項目が選択されていません");
     return false;
   }
 
@@ -295,39 +291,36 @@ export function validateEstimateData(estimateData: EstimateData): boolean {
  * HTML要素をそのまま画像化してPDFに変換するため、デザインが完璧に再現されます
  * oncloneでスタイルを注入し、Firefox等で色が失われる問題を回避する
  */
-export async function generateEstimatePDFFromHTML(
-  element: HTMLElement,
-  estimateNumber: string
-): Promise<Blob> {
+export async function generateEstimatePDFFromHTML(element: HTMLElement, estimateNumber: string): Promise<Blob> {
   // 動的インポートでhtml2pdf.jsを読み込み（ブラウザ環境のみ）
-  const html2pdf = (await import('html2pdf.js')).default;
+  const html2pdf = (await import("html2pdf.js")).default;
 
   return new Promise((resolve, reject) => {
     const opt = {
       margin: [10, 10, 10, 10] as [number, number, number, number],
       filename: `estimate_${estimateNumber}.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
+      image: { type: "jpeg" as const, quality: 0.98 },
       pagebreak: {
-        mode: ['css', 'legacy'] as const,
-        before: '.estimate-document__details',
+        mode: ["css", "legacy"] as const,
+        before: ".estimate-document__details",
       },
       html2canvas: {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#f1f5f9',
+        backgroundColor: "#f1f5f9",
         onclone: (clonedDoc: Document, _clonedElement: HTMLElement) => {
           // クローンされた文書にスタイルを注入（FirefoxのcssRules失敗を回避）
-          const style = clonedDoc.createElement('style');
+          const style = clonedDoc.createElement("style");
           style.textContent = estimateDocumentPdfStyles;
           const head = clonedDoc.head ?? clonedDoc.documentElement;
           head.appendChild(style);
         },
       },
       jsPDF: {
-        unit: 'mm' as const,
-        format: 'a4' as const,
-        orientation: 'portrait' as const,
+        unit: "mm" as const,
+        format: "a4" as const,
+        orientation: "portrait" as const,
         compress: true,
       },
     };
@@ -335,12 +328,12 @@ export async function generateEstimatePDFFromHTML(
     html2pdf()
       .set(opt)
       .from(element)
-      .outputPdf('blob')
+      .outputPdf("blob")
       .then((blob: Blob) => {
         // ファイルサイズチェック（5MB制限）
         const MAX_PDF_SIZE = 5 * 1024 * 1024;
         if (blob.size > MAX_PDF_SIZE) {
-          reject(new Error('PDFファイルサイズが大きすぎます（最大5MB）'));
+          reject(new Error("PDFファイルサイズが大きすぎます（最大5MB）"));
         } else {
           resolve(blob);
         }

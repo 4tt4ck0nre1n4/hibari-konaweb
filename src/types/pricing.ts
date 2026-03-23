@@ -1,5 +1,5 @@
 // プランタイプ
-export type PlanType = 'coding' | 'design' | 'urgent';
+export type PlanType = "coding" | "design" | "urgent";
 
 // 選択された項目
 export interface SelectedItem {

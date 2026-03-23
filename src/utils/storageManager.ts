@@ -1,6 +1,6 @@
-import type { SavedState, SelectedItem } from '../types/pricing';
+import type { SavedState, SelectedItem } from "../types/pricing";
 
-const STORAGE_KEY = 'pricing-simulator-state';
+const STORAGE_KEY = "pricing-simulator-state";
 
 /**
  * 状態を保存
@@ -10,7 +10,7 @@ export function saveState(state: SavedState): void {
     const serialized = JSON.stringify(state);
     localStorage.setItem(STORAGE_KEY, serialized);
   } catch (error) {
-    console.error('Failed to save state:', error);
+    console.error("Failed to save state:", error);
   }
 }
 
@@ -20,24 +20,24 @@ export function saveState(state: SavedState): void {
 export function loadState(): SavedState | null {
   try {
     const serialized = localStorage.getItem(STORAGE_KEY);
-    if (serialized === null || serialized.trim() === '') {
+    if (serialized === null || serialized.trim() === "") {
       return null;
     }
     const parsed = JSON.parse(serialized) as Record<string, unknown>;
 
     // 旧スキーマ（selectedItems）から新スキーマへのマイグレーション
-    if ('selectedItems' in parsed && !('codingItems' in parsed)) {
+    if ("selectedItems" in parsed && !("codingItems" in parsed)) {
       return {
         codingItems: (parsed.selectedItems as SelectedItem[]) ?? [],
         designItems: [],
-        selectedPlan: (parsed.selectedPlan as SavedState['selectedPlan']) ?? 'coding',
+        selectedPlan: (parsed.selectedPlan as SavedState["selectedPlan"]) ?? "coding",
         isUrgent: (parsed.isUrgent as boolean) ?? false,
       };
     }
 
     return parsed as unknown as SavedState;
   } catch (error) {
-    console.error('Failed to load state:', error);
+    console.error("Failed to load state:", error);
     return null;
   }
 }
@@ -49,6 +49,6 @@ export function clearState(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
-    console.error('Failed to clear state:', error);
+    console.error("Failed to clear state:", error);
   }
 }

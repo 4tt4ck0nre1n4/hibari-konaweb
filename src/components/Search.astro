@@ -130,7 +130,9 @@
   let hasInitialized = false;
 
   type PagefindUIModule = typeof import("@pagefind/default-ui");
-  type PagefindUIConstructor = PagefindUIModule["PagefindUI"] extends new (...args: any[]) => any ? PagefindUIModule["PagefindUI"] : any;
+  type PagefindUIConstructor = PagefindUIModule["PagefindUI"] extends new (...args: any[]) => any
+    ? PagefindUIModule["PagefindUI"]
+    : any;
   let PagefindUIClass: PagefindUIConstructor | null = null;
 
   // iPhone判定のヘルパー関数
@@ -258,10 +260,7 @@
   };
 
   // 計算された更新を一括で適用（書き込みフェーズ）
-  const applyStyleUpdates = (
-    state: ReturnType<typeof readDOMState>,
-    updates: StyleUpdates
-  ): void => {
+  const applyStyleUpdates = (state: ReturnType<typeof readDOMState>, updates: StyleUpdates): void => {
     // すべての書き込みを一度に実行（リフローを最小化）
     if (updates.searchContainer && state.searchContainer) {
       // クラスベースの制御を優先（リフローを削減）

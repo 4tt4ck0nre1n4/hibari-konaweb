@@ -140,7 +140,11 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
         console.error("❌ [Works Pagination] Error stack:", error.stack);
       }
       // 接続エラーの場合、より詳細な情報を出力
-      if (error.message.includes("fetch failed") || error.message.includes("ECONNREFUSED") || error.message.includes("timeout")) {
+      if (
+        error.message.includes("fetch failed") ||
+        error.message.includes("ECONNREFUSED") ||
+        error.message.includes("timeout")
+      ) {
         console.error("❌ [Works Pagination] Connection error detected. Please check:");
         console.error("   1. WordPress API URL is accessible from Netlify build environment");
         console.error("   2. Environment variable PUBLIC_API_URL is set correctly");
@@ -248,206 +252,201 @@ const worksPagination = {
     <Breadcrumbs {crumbs} />
   </div>
   <div class="works">
-        <div class="works__wrapper">
-          <div class="scrollImage">
-            <ul class="scrollImage__menu">
-              {
-                repeatedWorks.length > 0 ? (
-                  repeatedWorks
-                    .filter((work) => typeof work !== "undefined")
-                    .map((work) => (
-                      <li class="scrollImage__menu_item">
-                        <h2 class="scrollImage__header">{work?.title?.rendered}</h2>
-                        <figure class="scrollImage__figure">
-                          {work?.optimizedImage ? (
-                            <Image
-                              src={work.optimizedImage.src}
-                              alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
-                              class="scrollImage__image"
-                              width={worksItems.width}
-                              height={worksItems.height}
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          ) : (
-                            <img
-                              class="scrollImage__image"
-                              src={work?.fallbackUrl ?? ""}
-                              alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
-                              width={worksItems.width}
-                              height={worksItems.height}
-                              decoding="async"
-                              loading="lazy"
-                            />
-                          )}
-                        </figure>
-                        <a
-                          class="scrollImage__link"
-                          href={work?.acf?.left_link ?? ""}
-                          aria-label={`${work?.acf?.left_link}${worksItems.ariaLabel}`}
-                          title={`${work?.acf?.left_link}${worksItems.ariaTitle}`}
-                          set:html={work?.acf?.left_link ?? ""}
-                        />
-                        <p class="scrollImage__text">{work?.acf?.right_access ?? "No additional information"}</p>
-                      </li>
-                    ))
-                ) : (
-                  <li style="display:none" />
-                )
-              }
-            </ul>
-          </div>
-          <h1 class="works__title">
-            {worksText.worksTitle}
-          </h1>
-          <p class="works__text">
-            {worksText.worksText}
-          </p>
-          <ul
-            class:list={[
-              "worksCard__menu",
-              optimizedWorks.length === 0 && "worksCard__menu--empty",
-            ]}
-          >
-            {
-              optimizedWorks.length > 0 ? (
-                optimizedWorks.map((work) => (
-                  <li class="worksCard__menu_item">
-                    <article
-                      class="worksCard__article"
-                      aria-labelledby={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`}
-                    >
-                      <h2 id={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`} class="worksCard__header">
-                        <a
-                          class="worksCard__slug"
-                          href={`/works/${work.slug}`}
-                          aria-label={`${work?.title?.rendered}${worksItems.ariaLabel}`}
-                          title={`${work?.title?.rendered}${worksItems.ariaTitle}`}
-                          set:html={work?.title?.rendered}
-                        />
-                      </h2>
-                      <a
-                        class="worksCard__slug"
-                        href={`/works/${work.slug}`}
-                        aria-label={`${work.slug}(${work?.title?.rendered})${worksItems.ariaLabel}`}
-                        title={`${work.slug}(${work?.title?.rendered})${worksItems.ariaTitle}`}
-                      >
-                        <img
-                          class="worksCard__image"
-                          src={work?.fallbackUrl ?? ""}
-                          alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
+    <div class="works__wrapper">
+      <div class="scrollImage">
+        <ul class="scrollImage__menu">
+          {
+            repeatedWorks.length > 0 ? (
+              repeatedWorks
+                .filter((work) => typeof work !== "undefined")
+                .map((work) => (
+                  <li class="scrollImage__menu_item">
+                    <h2 class="scrollImage__header">{work?.title?.rendered}</h2>
+                    <figure class="scrollImage__figure">
+                      {work?.optimizedImage ? (
+                        <Image
+                          src={work.optimizedImage.src}
+                          alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
+                          class="scrollImage__image"
                           width={worksItems.width}
                           height={worksItems.height}
                           loading="lazy"
                           decoding="async"
                         />
-                      </a>
-                      <a
-                        class="worksCard__link"
-                        href={work?.acf?.left_link ?? ""}
-                        aria-label={`${work?.title?.rendered}${worksItems.ariaLabelNewTab}`}
-                        title={`${work?.title?.rendered}${worksItems.ariaTitleNewTab}`}
-                        target="_blank"
-                        set:html={work?.acf?.left_link ?? ""}
-                      />
-                      <p class="worksCard__body" set:html={work?.acf?.right_access ?? "No additional information"} />
-                    </article>
+                      ) : (
+                        <img
+                          class="scrollImage__image"
+                          src={work?.fallbackUrl ?? ""}
+                          alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
+                          width={worksItems.width}
+                          height={worksItems.height}
+                          decoding="async"
+                          loading="lazy"
+                        />
+                      )}
+                    </figure>
+                    <a
+                      class="scrollImage__link"
+                      href={work?.acf?.left_link ?? ""}
+                      aria-label={`${work?.acf?.left_link}${worksItems.ariaLabel}`}
+                      title={`${work?.acf?.left_link}${worksItems.ariaTitle}`}
+                      set:html={work?.acf?.left_link ?? ""}
+                    />
+                    <p class="scrollImage__text">{work?.acf?.right_access ?? "No additional information"}</p>
                   </li>
                 ))
-              ) : (
-                <li class="worksCard__empty">
-                  <p class="worksCard__error">{worksText.error.text}</p>
-                </li>
-              )
-            }
-          </ul>
-
-          {
-            isShowPagination ? (
-              <div class="pagination">
-                <ul class="pagination__menu">
-                  {page.url.first !== "" && page.currentPage > 1 ? (
-                    <li class="pagination__menu_item">
-                      <a
-                        class="pagination__link_current"
-                        href={page.url.first}
-                        aria-label={worksPagination.first}
-                        title={worksPagination.first}
-                      >
-                        1
-                      </a>
-                    </li>
-                  ) : (
-                    <li class="pagination__menu_item">
-                      <span class="pagination__link_empty" />
-                    </li>
-                  )}
-                  {page.url.prev !== "" && page.currentPage > 1 ? (
-                    <li class="pagination__menu_item">
-                      <a
-                        class="pagination__link"
-                        href={page.url.prev}
-                        aria-label={`${worksPagination.prev}(${page.currentPage - 1})`}
-                        title={worksPagination.prev}
-                      >
-                        &larr;
-                      </a>
-                    </li>
-                  ) : (
-                    <li class="pagination__menu_item">
-                      <span class="pagination__link_empty" />
-                    </li>
-                  )}
-                  <li class="pagination__menu_item">
-                    <a
-                      class="pagination__link_current"
-                      href={page.url.current}
-                      aria-label={`${worksPagination.current}(${page.currentPage})`}
-                      title={`${worksPagination.current}(${page.currentPage})`}
-                    >
-                      {typeof page.currentPage === "number" && page.currentPage > 0 ? page.currentPage : "1"}
-                    </a>
-                  </li>
-                  {page.url.next !== "" && page.currentPage < page.lastPage ? (
-                    <li class="pagination__menu_item">
-                      <a
-                        class="pagination__link"
-                        href={page.url.next}
-                        aria-label={`${worksPagination.next}(${page.currentPage + 1})`}
-                        title={worksPagination.next}
-                      >
-                        &rarr;
-                      </a>
-                    </li>
-                  ) : (
-                    <li class="pagination__menu_item">
-                      <span class="pagination__link_empty" />
-                    </li>
-                  )}
-                  {page.url.last !== "" && page.currentPage !== page.lastPage ? (
-                    <li class="pagination__menu_item">
-                      <a
-                        class="pagination__link_current"
-                        href={page.url.last}
-                        aria-label={`${worksPagination.last}(${page.lastPage})`}
-                        title={`${worksPagination.last}(${page.lastPage})`}
-                      >
-                        {page.lastPage}
-                      </a>
-                    </li>
-                  ) : (
-                    <li class="pagination__menu_item">
-                      <span class="pagination__link_empty" />
-                    </li>
-                  )}
-                </ul>
-              </div>
             ) : (
-              <div class="pagination" style="display: none;" />
+              <li style="display:none" />
             )
           }
-        </div>
+        </ul>
       </div>
+      <h1 class="works__title">
+        {worksText.worksTitle}
+      </h1>
+      <p class="works__text">
+        {worksText.worksText}
+      </p>
+      <ul class:list={["worksCard__menu", optimizedWorks.length === 0 && "worksCard__menu--empty"]}>
+        {
+          optimizedWorks.length > 0 ? (
+            optimizedWorks.map((work) => (
+              <li class="worksCard__menu_item">
+                <article
+                  class="worksCard__article"
+                  aria-labelledby={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`}
+                >
+                  <h2 id={`works-card-${work.id ?? work.slug}-${work?.title?.rendered}`} class="worksCard__header">
+                    <a
+                      class="worksCard__slug"
+                      href={`/works/${work.slug}`}
+                      aria-label={`${work?.title?.rendered}${worksItems.ariaLabel}`}
+                      title={`${work?.title?.rendered}${worksItems.ariaTitle}`}
+                      set:html={work?.title?.rendered}
+                    />
+                  </h2>
+                  <a
+                    class="worksCard__slug"
+                    href={`/works/${work.slug}`}
+                    aria-label={`${work.slug}(${work?.title?.rendered})${worksItems.ariaLabel}`}
+                    title={`${work.slug}(${work?.title?.rendered})${worksItems.ariaTitle}`}
+                  >
+                    <img
+                      class="worksCard__image"
+                      src={work?.fallbackUrl ?? ""}
+                      alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
+                      width={worksItems.width}
+                      height={worksItems.height}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </a>
+                  <a
+                    class="worksCard__link"
+                    href={work?.acf?.left_link ?? ""}
+                    aria-label={`${work?.title?.rendered}${worksItems.ariaLabelNewTab}`}
+                    title={`${work?.title?.rendered}${worksItems.ariaTitleNewTab}`}
+                    target="_blank"
+                    set:html={work?.acf?.left_link ?? ""}
+                  />
+                  <p class="worksCard__body" set:html={work?.acf?.right_access ?? "No additional information"} />
+                </article>
+              </li>
+            ))
+          ) : (
+            <li class="worksCard__empty">
+              <p class="worksCard__error">{worksText.error.text}</p>
+            </li>
+          )
+        }
+      </ul>
+
+      {
+        isShowPagination ? (
+          <div class="pagination">
+            <ul class="pagination__menu">
+              {page.url.first !== "" && page.currentPage > 1 ? (
+                <li class="pagination__menu_item">
+                  <a
+                    class="pagination__link_current"
+                    href={page.url.first}
+                    aria-label={worksPagination.first}
+                    title={worksPagination.first}
+                  >
+                    1
+                  </a>
+                </li>
+              ) : (
+                <li class="pagination__menu_item">
+                  <span class="pagination__link_empty" />
+                </li>
+              )}
+              {page.url.prev !== "" && page.currentPage > 1 ? (
+                <li class="pagination__menu_item">
+                  <a
+                    class="pagination__link"
+                    href={page.url.prev}
+                    aria-label={`${worksPagination.prev}(${page.currentPage - 1})`}
+                    title={worksPagination.prev}
+                  >
+                    &larr;
+                  </a>
+                </li>
+              ) : (
+                <li class="pagination__menu_item">
+                  <span class="pagination__link_empty" />
+                </li>
+              )}
+              <li class="pagination__menu_item">
+                <a
+                  class="pagination__link_current"
+                  href={page.url.current}
+                  aria-label={`${worksPagination.current}(${page.currentPage})`}
+                  title={`${worksPagination.current}(${page.currentPage})`}
+                >
+                  {typeof page.currentPage === "number" && page.currentPage > 0 ? page.currentPage : "1"}
+                </a>
+              </li>
+              {page.url.next !== "" && page.currentPage < page.lastPage ? (
+                <li class="pagination__menu_item">
+                  <a
+                    class="pagination__link"
+                    href={page.url.next}
+                    aria-label={`${worksPagination.next}(${page.currentPage + 1})`}
+                    title={worksPagination.next}
+                  >
+                    &rarr;
+                  </a>
+                </li>
+              ) : (
+                <li class="pagination__menu_item">
+                  <span class="pagination__link_empty" />
+                </li>
+              )}
+              {page.url.last !== "" && page.currentPage !== page.lastPage ? (
+                <li class="pagination__menu_item">
+                  <a
+                    class="pagination__link_current"
+                    href={page.url.last}
+                    aria-label={`${worksPagination.last}(${page.lastPage})`}
+                    title={`${worksPagination.last}(${page.lastPage})`}
+                  >
+                    {page.lastPage}
+                  </a>
+                </li>
+              ) : (
+                <li class="pagination__menu_item">
+                  <span class="pagination__link_empty" />
+                </li>
+              )}
+            </ul>
+          </div>
+        ) : (
+          <div class="pagination" style="display: none;" />
+        )
+      }
+    </div>
+  </div>
 </Layout>
 
 <style>

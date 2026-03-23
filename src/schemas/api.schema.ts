@@ -40,6 +40,7 @@ const catInfoSchema = z.object({
 const blogAcfSchema = z
   .object({
     blog_image: z.string().optional(),
+    description: z.string().optional(),
   })
   .optional();
 
@@ -184,12 +185,7 @@ export type WPCF7InvalidField = z.infer<typeof wpcf7InvalidFieldSchema>;
  * @param fallback - フォールバック値
  * @returns 検証済みデータまたはフォールバック値
  */
-export function validateApiResponse<T>(
-  schema: z.ZodType<T>,
-  data: unknown,
-  apiName: string,
-  fallback: T
-): T {
+export function validateApiResponse<T>(schema: z.ZodType<T>, data: unknown, apiName: string, fallback: T): T {
   const result = schema.safeParse(data);
 
   if (!result.success) {
@@ -209,11 +205,7 @@ export function validateApiResponse<T>(
  * @returns 検証済みデータ
  * @throws {Error} 検証に失敗した場合
  */
-export function validateApiResponseStrict<T>(
-  schema: z.ZodType<T>,
-  data: unknown,
-  apiName: string
-): T {
+export function validateApiResponseStrict<T>(schema: z.ZodType<T>, data: unknown, apiName: string): T {
   const result = schema.safeParse(data);
 
   if (!result.success) {

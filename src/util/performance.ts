@@ -64,10 +64,7 @@ export function prefersReducedMotion(): boolean {
  * @param callback アニメーション実行関数
  * @param fallback アニメーションをスキップする場合のフォールバック関数（オプション）
  */
-export function conditionalAnimation(
-  callback: () => void,
-  fallback?: () => void
-): void {
+export function conditionalAnimation(callback: () => void, fallback?: () => void): void {
   if (prefersReducedMotion()) {
     if (fallback) {
       fallback();

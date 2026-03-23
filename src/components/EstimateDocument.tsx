@@ -1,9 +1,9 @@
-import { useRef } from 'react';
-import type { EstimateData } from '../types/pricing';
-import { COMPANY_INFO } from '../config/companyInfo';
-import { generateEstimatePDFFromHTML } from '../utils/generatePDF';
-import '../styles/pricing/EstimateDocument.css';
-import IconifyInline from './IconifyInline';
+import { useRef } from "react";
+import type { EstimateData } from "../types/pricing";
+import { COMPANY_INFO } from "../config/companyInfo";
+import { generateEstimatePDFFromHTML } from "../utils/generatePDF";
+import "../styles/pricing/EstimateDocument.css";
+import IconifyInline from "./IconifyInline";
 
 const pdfIcon = "vscode-icons:file-type-pdf2";
 const contactIcon = "ic:baseline-contact-mail";
@@ -34,94 +34,82 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
   const handleDownloadPDF = async () => {
     try {
       if (!documentRef.current) {
-        alert('見積書要素が見つかりません。');
+        alert("見積書要素が見つかりません。");
         return;
       }
 
       // フォント読み込み完了を待つ（Firefox等でのテキスト描画を安定化）
-      if (typeof document !== 'undefined' && 'fonts' in document) {
-        await Promise.race([
-          document.fonts.ready,
-          new Promise((resolve) => setTimeout(resolve, 2000)),
-        ]);
+      if (typeof document !== "undefined" && "fonts" in document) {
+        await Promise.race([document.fonts.ready, new Promise((resolve) => setTimeout(resolve, 2000))]);
       }
 
       // ボタンを一時的に非表示
-      const buttons = documentRef.current.querySelector('.estimate-document__actions');
+      const buttons = documentRef.current.querySelector(".estimate-document__actions");
       if (buttons) {
-        (buttons as HTMLElement).style.display = 'none';
+        (buttons as HTMLElement).style.display = "none";
       }
 
       // PDF生成
-      const blob = await generateEstimatePDFFromHTML(
-        documentRef.current,
-        estimateData.estimateNumber
-      );
+      const blob = await generateEstimatePDFFromHTML(documentRef.current, estimateData.estimateNumber);
 
       // ボタンを再表示
       if (buttons) {
-        (buttons as HTMLElement).style.display = '';
+        (buttons as HTMLElement).style.display = "";
       }
 
       // ダウンロード
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `estimate_${estimateData.estimateNumber}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('PDF生成エラー:', error);
-      alert('PDFの生成に失敗しました。');
+      console.error("PDF生成エラー:", error);
+      alert("PDFの生成に失敗しました。");
     }
   };
 
   const handleContact = async () => {
     try {
       if (!documentRef.current) {
-        alert('見積書要素が見つかりません。');
+        alert("見積書要素が見つかりません。");
         return;
       }
 
       // フォント読み込み完了を待つ（Firefox等でのテキスト描画を安定化）
-      if (typeof document !== 'undefined' && 'fonts' in document) {
-        await Promise.race([
-          document.fonts.ready,
-          new Promise((resolve) => setTimeout(resolve, 2000)),
-        ]);
+      if (typeof document !== "undefined" && "fonts" in document) {
+        await Promise.race([document.fonts.ready, new Promise((resolve) => setTimeout(resolve, 2000))]);
       }
 
       // ボタンを一時的に非表示
-      const buttons = documentRef.current.querySelector('.estimate-document__actions');
+      const buttons = documentRef.current.querySelector(".estimate-document__actions");
       if (buttons) {
-        (buttons as HTMLElement).style.display = 'none';
+        (buttons as HTMLElement).style.display = "none";
       }
 
       // PDF生成
-      const blob = await generateEstimatePDFFromHTML(
-        documentRef.current,
-        estimateData.estimateNumber
-      );
+      const blob = await generateEstimatePDFFromHTML(documentRef.current, estimateData.estimateNumber);
 
       // ボタンを再表示
       if (buttons) {
-        (buttons as HTMLElement).style.display = '';
+        (buttons as HTMLElement).style.display = "";
       }
 
       // BlobをBase64に変換してSessionStorageに保存
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64data = reader.result as string;
-        sessionStorage.setItem('estimatePDF', base64data);
-        sessionStorage.setItem('estimateNumber', estimateData.estimateNumber);
+        sessionStorage.setItem("estimatePDF", base64data);
+        sessionStorage.setItem("estimateNumber", estimateData.estimateNumber);
 
         // お問い合わせページへ遷移
-        window.location.href = '/contact';
+        window.location.href = "/contact";
       };
       reader.readAsDataURL(blob);
     } catch (error) {
-      console.error('PDF生成エラー:', error);
-      alert('PDFの生成に失敗しました。');
+      console.error("PDF生成エラー:", error);
+      alert("PDFの生成に失敗しました。");
     }
   };
 
@@ -141,9 +129,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
       <div className="estimate-document__main">
         <div>
           <div className="estimate-document__client-name">〇〇〇〇〇〇 御中</div>
-          <div className="estimate-document__greeting">
-            下記の通りお見積り申し上げます。
-          </div>
+          <div className="estimate-document__greeting">下記の通りお見積り申し上げます。</div>
         </div>
         <div className="estimate-document__info">
           <div className="estimate-document__info-row">
@@ -154,7 +140,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
             <span className="estimate-document__info-label">見積番号：</span>
             <span>{estimateData.estimateNumber}</span>
           </div>
-          {COMPANY_INFO.registrationNumber !== '' && (
+          {COMPANY_INFO.registrationNumber !== "" && (
             <div className="estimate-document__info-row">
               <span className="estimate-document__info-label">登録番号：</span>
               <span>{COMPANY_INFO.registrationNumber}</span>
@@ -182,14 +168,10 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
                 height={24}
               />
             </>
-          ) : (
-            /* Firefox検証用: ロゴ非表示で他要素の表示を確認 */
-            null
-          )}
+          ) : /* Firefox検証用: ロゴ非表示で他要素の表示を確認 */
+          null}
         </div>
-        <div className="estimate-document__website">
-          {COMPANY_INFO.website}
-        </div>
+        <div className="estimate-document__website">{COMPANY_INFO.website}</div>
       </div>
 
       <div className="estimate-document__subject-section">
@@ -205,9 +187,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
 
       <div className="estimate-document__total-amount">
         <span className="estimate-document__total-label">お見積金額</span>
-        <span className="estimate-document__total-value">
-          {formatPrice(estimateData.calculation.total)}円
-        </span>
+        <span className="estimate-document__total-value">{formatPrice(estimateData.calculation.total)}円</span>
       </div>
 
       {/* html2pdf legacy mode用：この要素の直後でページ区切り（明細を2ページ目から開始） */}
@@ -320,9 +300,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
         <div className="estimate-document__totals">
           <div className="estimate-document__totals-row">
             <span className="estimate-document__totals-label">小計（税抜）</span>
-            <span className="estimate-document__totals-value">
-              {formatPrice(estimateData.calculation.subtotal)}円
-            </span>
+            <span className="estimate-document__totals-value">{formatPrice(estimateData.calculation.subtotal)}円</span>
           </div>
           {estimateData.isUrgent && estimateData.calculation.urgentFee > 0 && (
             <div className="estimate-document__totals-row estimate-document__totals-row--urgent">
@@ -334,15 +312,11 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
           )}
           <div className="estimate-document__totals-row">
             <span className="estimate-document__totals-label">消費税</span>
-            <span className="estimate-document__totals-value">
-              {formatPrice(estimateData.calculation.tax)}円
-            </span>
+            <span className="estimate-document__totals-value">{formatPrice(estimateData.calculation.tax)}円</span>
           </div>
           <div className="estimate-document__totals-row estimate-document__totals-row--final">
             <span className="estimate-document__totals-label">合計（税込）</span>
-            <span className="estimate-document__totals-value">
-              {formatPrice(estimateData.calculation.total)}円
-            </span>
+            <span className="estimate-document__totals-value">{formatPrice(estimateData.calculation.total)}円</span>
           </div>
         </div>
       </div>

@@ -60,7 +60,7 @@ const thanksLinks = {
         <p class="thanks__inquiry-date" id="inquiry-date">-</p>
       </div>
       <p class="thanks__inquiry-note">
-        ※ お問い合わせ番号は、お問い合わせ内容を照会する際に使用します。<br>
+        ※ お問い合わせ番号は、お問い合わせ内容を照会する際に使用します。<br />
         お問い合わせの際にお伝えください。
       </p>
     </div>
@@ -74,12 +74,7 @@ const thanksLinks = {
       decoding="async"
     />
     <p class="thanks__body_secondary">
-      <a
-        class="thanks__link"
-        href={thanksLinks.href}
-        aria-label={thanksLinks.ariaLabel}
-        title={thanksLinks.ariaTitle}
-      >
+      <a class="thanks__link" href={thanksLinks.href} aria-label={thanksLinks.ariaLabel} title={thanksLinks.ariaTitle}>
         {thanksLinks.label}
       </a>
       <span class="thanks__span">
@@ -88,11 +83,7 @@ const thanksLinks = {
     </p>
     <p class="thanks__footer" set:html={contactText.thanks.footer.note} />
     <ul class="thanks__footer_list">
-      {
-        footerList.map(({ item }) => (
-          <li class="thanks__footer_item">{item}</li>
-        ))
-      }
+      {footerList.map(({ item }) => <li class="thanks__footer_item">{item}</li>)}
     </ul>
     <p class="thanks__footer_secondary">
       <span class="thanks__span">
@@ -116,24 +107,24 @@ const thanksLinks = {
 
 <script>
   // お問い合わせ番号と日時を表示
-  const inquiryNumber = sessionStorage.getItem('inquiryNumber');
-  const inquiryDate = sessionStorage.getItem('inquiryDate');
+  const inquiryNumber = sessionStorage.getItem("inquiryNumber");
+  const inquiryDate = sessionStorage.getItem("inquiryDate");
 
   if (inquiryNumber && inquiryDate) {
     // 表示エリアを表示
-    const infoElement = document.getElementById('inquiry-info');
-    const numberElement = document.getElementById('inquiry-number');
-    const dateElement = document.getElementById('inquiry-date');
+    const infoElement = document.getElementById("inquiry-info");
+    const numberElement = document.getElementById("inquiry-number");
+    const dateElement = document.getElementById("inquiry-date");
 
     if (infoElement && numberElement && dateElement) {
       numberElement.textContent = inquiryNumber;
       dateElement.textContent = inquiryDate;
-      infoElement.style.display = 'block';
+      infoElement.style.display = "block";
     }
 
     // 使用後はSessionStorageをクリア
-    sessionStorage.removeItem('inquiryNumber');
-    sessionStorage.removeItem('inquiryDate');
+    sessionStorage.removeItem("inquiryNumber");
+    sessionStorage.removeItem("inquiryDate");
   }
 </script>
 
@@ -319,7 +310,7 @@ const thanksLinks = {
   .thanks__inquiry-date {
     font-size: 1.125rem;
     font-weight: 700;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     color: var(--color-black);
     letter-spacing: 0.05em;
     padding: 0.5rem;

@@ -108,169 +108,169 @@ const stateMachine = "State Machine 1";
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />
   </div>
-      <section class="about" aria-labelledby={`${aboutMeTitle} ${aboutMeSubTitle}`}>
-        <div class="about__wrapper">
-          <FlowingLinesWrapper>
-            <AboutHeading
-              id={`${aboutMeTitle} ${aboutMeSubTitle}`}
-              aboutTitle={aboutMeTitle}
-              aboutSubTitle={aboutMeSubTitle}
-            />
-          </FlowingLinesWrapper>
-          <div class="about__inner">
-            <div class="about__textInner">
-              <AboutMe
-                aboutHeader={typedAboutText.aboutHeader}
-                aboutText={typedAboutText.aboutText}
-                aboutText2={typedAboutText.aboutText2}
-                aboutText3={typedAboutText.aboutText3}
+  <section class="about" aria-labelledby={`${aboutMeTitle} ${aboutMeSubTitle}`}>
+    <div class="about__wrapper">
+      <FlowingLinesWrapper>
+        <AboutHeading
+          id={`${aboutMeTitle} ${aboutMeSubTitle}`}
+          aboutTitle={aboutMeTitle}
+          aboutSubTitle={aboutMeSubTitle}
+        />
+      </FlowingLinesWrapper>
+      <div class="about__inner">
+        <div class="about__textInner">
+          <AboutMe
+            aboutHeader={typedAboutText.aboutHeader}
+            aboutText={typedAboutText.aboutText}
+            aboutText2={typedAboutText.aboutText2}
+            aboutText3={typedAboutText.aboutText3}
+          />
+          <p class="about__text">
+            お仕事のご依頼などは、
+            <a class="about__text_link" href="/contact">お問い合わせフォーム</a>
+            からお願いします。
+          </p>
+          <div class="about__sns">
+            <ul class="about__snsMenu">
+              <Sns
+                className={twitter.className}
+                href={twitter.href}
+                ariaLabel={twitter.ariaLabel}
+                ariaTitle={twitter.ariaTitle}
+                targetBlank={twitter.targetBlank}
+                snsIconSvg={twitter.icon}
               />
-              <p class="about__text">
-                お仕事のご依頼などは、
-                <a class="about__text_link" href="/contact">お問い合わせフォーム</a>
-                からお願いします。
-              </p>
-              <div class="about__sns">
-                <ul class="about__snsMenu">
-                  <Sns
-                    className={twitter.className}
-                    href={twitter.href}
-                    ariaLabel={twitter.ariaLabel}
-                    ariaTitle={twitter.ariaTitle}
-                    targetBlank={twitter.targetBlank}
-                    snsIconSvg={twitter.icon}
-                  />
-                  <Sns
-                    className={github_sns.className}
-                    href={github_sns.href}
-                    ariaLabel={github_sns.ariaLabel}
-                    ariaTitle={github_sns.ariaTitle}
-                    targetBlank={github_sns.targetBlank}
-                    snsIconSvg={github_sns.icon}
-                  />
-                  <Sns
-                    className={typedContact.className.about}
-                    href={typedContact.href}
-                    ariaLabel={typedContact.ariaLabel}
-                    ariaTitle={typedContact.ariaTitle}
-                    snsIconSvg={typedContact.icon}
-                  />
-                  <Sns
-                    className={mail.className.about}
-                    href={mail.href}
-                    snsIconSvg={mail.icon}
-                    ariaLabel={mail.ariaLabel}
-                    ariaTitle={mail.ariaTitle}
-                    targetBlank={mail.targetBlank}
-                  />
-                </ul>
-              </div>
-            </div>
-            <div class="about__imageInner">
-              <img
-                class="about__image"
-                src="/favicon.svg"
-                alt={aboutImage.alt}
-                width={aboutImage.width}
-                height={aboutImage.height}
-                decoding="async"
-                loading="lazy"
+              <Sns
+                className={github_sns.className}
+                href={github_sns.href}
+                ariaLabel={github_sns.ariaLabel}
+                ariaTitle={github_sns.ariaTitle}
+                targetBlank={github_sns.targetBlank}
+                snsIconSvg={github_sns.icon}
               />
-            </div>
-          </div>
-        </div>
-      </section>
-      <section class="skills" aria-labelledby={`${skillsTitle} ${skillsSubTitle}`}>
-        <div class="skills__wrapper">
-          <FlowingLinesWrapper>
-            <AboutHeading
-              id={`${skillsTitle} ${skillsSubTitle}`}
-              aboutTitle={skillsTitle}
-              aboutSubTitle={skillsSubTitle}
-            />
-          </FlowingLinesWrapper>
-          <div class="skills__inner">
-            <ul class="skills__menu">
-              <SkillsIcon className={html.className} iconSvg={html.icon} iconName={html.item} />
-              <SkillsIcon className={css.className} iconSvg={css.icon} iconName={css.item} />
-              <SkillsIcon className={sass.className} iconSvg={sass.icon} iconName={sass.item} />
-              <SkillsIcon className={javascript.className} iconSvg={javascript.icon} iconName={javascript.item} />
-              <SkillsIcon className={typescript.className} iconSvg={typescript.icon} iconName={typescript.item} />
-              <SkillsIcon className={jquery.className} iconSvg={jquery.icon} iconName={jquery.item} />
-              <SkillsIcon className={wordpress.className} iconSvg={wordpress.icon} iconName={wordpress.item} />
-              <SkillsIcon className={swiper.className} iconSvg={swiper.icon} iconName={swiper.item} />
-              <SkillsIcon className={gsap.className} iconSvg={gsap.icon} iconName={gsap.item} />
-              <SkillsIcon className={react.className} iconSvg={react.icon} iconName={react.item} />
-              <SkillsIcon className={canva.className} iconSvg={canva.icon} iconName={canva.item} />
-              <SkillsIcon className={adobexd.className} iconSvg={adobexd.icon} iconName={adobexd.item} />
-              <SkillsIcon className={figma.className} iconSvg={figma.icon} iconName={figma.item} />
-              <SkillsIcon className={gulp.className} iconSvg={gulp.icon} iconName={gulp.item} />
-              <SkillsIcon className={vite.className} iconSvg={vite.icon} iconName={vite.item} />
-              <SkillsIcon className={astro.className} iconSvg={astro.icon} iconName={astro.item} />
-              <SkillsIcon className={vscode.className} iconSvg={vscode.icon} iconName={vscode.item} />
-              <SkillsIcon className={cursor.className} iconSvg={cursor.icon} iconName={cursor.item} />
-              <SkillsIcon className={netlify.className} iconSvg={netlify.icon} iconName={netlify.item} />
-              <SkillsIcon className={vercel.className} iconSvg={vercel.icon} iconName={vercel.item} />
-              <SkillsIcon className={typedGithub.className} iconSvg={typedGithub.icon} iconName={typedGithub.item} />
-              <SkillsIcon className={typedFilezilla.className} iconSvg={typedFilezilla.icon} iconName={typedFilezilla.item} />
-              <SkillsIcon className={chatgpt.className} iconSvg={chatgpt.icon} iconName={chatgpt.item} />
-              <SkillsIcon className={gemini.className} iconSvg={gemini.icon} iconName={gemini.item} />
-              <SkillsIcon className={claude.className} iconSvg={claude.icon} iconName={claude.item} />
-            </ul>
-          </div>
-        </div>
-      </section>
-      <section class="service" aria-labelledby={`${serviceTitle} ${serviceSubTitle}`}>
-        <div class="service__wrapper">
-          <FlowingLinesWrapper>
-            <AboutHeading
-              id={`${serviceTitle} ${serviceSubTitle}`}
-              aboutTitle={serviceTitle}
-              aboutSubTitle={serviceSubTitle}
-            />
-          </FlowingLinesWrapper>
-          <div class="service__inner">
-            <ul class="service__menu">
-              <Card
-                href={href}
-                cardTitle={serviceText.service.card1.serviceHeader}
-                cardBody={serviceText.service.card1.serviceBody}
-                cardDetails=""
-                serviceMenu={serviceText.service.card1.serviceMenu}
-                src={cardSrc1}
-                stateMachines={stateMachine}
+              <Sns
+                className={typedContact.className.about}
+                href={typedContact.href}
+                ariaLabel={typedContact.ariaLabel}
+                ariaTitle={typedContact.ariaTitle}
+                snsIconSvg={typedContact.icon}
               />
-              <Card
-                href={href}
-                cardTitle={serviceText.service.card2.serviceHeader}
-                cardBody={serviceText.service.card2.serviceBody}
-                cardDetails=""
-                serviceMenu={serviceText.service.card2.serviceMenu}
-                src={cardSrc2}
-                stateMachines={stateMachine}
-              />
-              <Card
-                href={href}
-                cardTitle={serviceText.service.card3.serviceHeader}
-                cardBody={serviceText.service.card3.serviceBody}
-                cardDetails=""
-                serviceMenu={serviceText.service.card3.serviceMenu}
-                src={cardSrc3}
-                stateMachines={stateMachine}
-              />
-              <Card
-                href={href}
-                cardTitle={serviceText.service.card4.serviceHeader}
-                cardBody={serviceText.service.card4.serviceBody}
-                cardDetails=""
-                serviceMenu={serviceText.service.card4.serviceMenu}
-                src={cardSrc4}
-                stateMachines={stateMachine}
+              <Sns
+                className={mail.className.about}
+                href={mail.href}
+                snsIconSvg={mail.icon}
+                ariaLabel={mail.ariaLabel}
+                ariaTitle={mail.ariaTitle}
+                targetBlank={mail.targetBlank}
               />
             </ul>
           </div>
         </div>
-      </section>
+        <div class="about__imageInner">
+          <img
+            class="about__image"
+            src="/favicon.svg"
+            alt={aboutImage.alt}
+            width={aboutImage.width}
+            height={aboutImage.height}
+            decoding="async"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="skills" aria-labelledby={`${skillsTitle} ${skillsSubTitle}`}>
+    <div class="skills__wrapper">
+      <FlowingLinesWrapper>
+        <AboutHeading id={`${skillsTitle} ${skillsSubTitle}`} aboutTitle={skillsTitle} aboutSubTitle={skillsSubTitle} />
+      </FlowingLinesWrapper>
+      <div class="skills__inner">
+        <ul class="skills__menu">
+          <SkillsIcon className={html.className} iconSvg={html.icon} iconName={html.item} />
+          <SkillsIcon className={css.className} iconSvg={css.icon} iconName={css.item} />
+          <SkillsIcon className={sass.className} iconSvg={sass.icon} iconName={sass.item} />
+          <SkillsIcon className={javascript.className} iconSvg={javascript.icon} iconName={javascript.item} />
+          <SkillsIcon className={typescript.className} iconSvg={typescript.icon} iconName={typescript.item} />
+          <SkillsIcon className={jquery.className} iconSvg={jquery.icon} iconName={jquery.item} />
+          <SkillsIcon className={wordpress.className} iconSvg={wordpress.icon} iconName={wordpress.item} />
+          <SkillsIcon className={swiper.className} iconSvg={swiper.icon} iconName={swiper.item} />
+          <SkillsIcon className={gsap.className} iconSvg={gsap.icon} iconName={gsap.item} />
+          <SkillsIcon className={react.className} iconSvg={react.icon} iconName={react.item} />
+          <SkillsIcon className={canva.className} iconSvg={canva.icon} iconName={canva.item} />
+          <SkillsIcon className={adobexd.className} iconSvg={adobexd.icon} iconName={adobexd.item} />
+          <SkillsIcon className={figma.className} iconSvg={figma.icon} iconName={figma.item} />
+          <SkillsIcon className={gulp.className} iconSvg={gulp.icon} iconName={gulp.item} />
+          <SkillsIcon className={vite.className} iconSvg={vite.icon} iconName={vite.item} />
+          <SkillsIcon className={astro.className} iconSvg={astro.icon} iconName={astro.item} />
+          <SkillsIcon className={vscode.className} iconSvg={vscode.icon} iconName={vscode.item} />
+          <SkillsIcon className={cursor.className} iconSvg={cursor.icon} iconName={cursor.item} />
+          <SkillsIcon className={netlify.className} iconSvg={netlify.icon} iconName={netlify.item} />
+          <SkillsIcon className={vercel.className} iconSvg={vercel.icon} iconName={vercel.item} />
+          <SkillsIcon className={typedGithub.className} iconSvg={typedGithub.icon} iconName={typedGithub.item} />
+          <SkillsIcon
+            className={typedFilezilla.className}
+            iconSvg={typedFilezilla.icon}
+            iconName={typedFilezilla.item}
+          />
+          <SkillsIcon className={chatgpt.className} iconSvg={chatgpt.icon} iconName={chatgpt.item} />
+          <SkillsIcon className={gemini.className} iconSvg={gemini.icon} iconName={gemini.item} />
+          <SkillsIcon className={claude.className} iconSvg={claude.icon} iconName={claude.item} />
+        </ul>
+      </div>
+    </div>
+  </section>
+  <section class="service" aria-labelledby={`${serviceTitle} ${serviceSubTitle}`}>
+    <div class="service__wrapper">
+      <FlowingLinesWrapper>
+        <AboutHeading
+          id={`${serviceTitle} ${serviceSubTitle}`}
+          aboutTitle={serviceTitle}
+          aboutSubTitle={serviceSubTitle}
+        />
+      </FlowingLinesWrapper>
+      <div class="service__inner">
+        <ul class="service__menu">
+          <Card
+            href={href}
+            cardTitle={serviceText.service.card1.serviceHeader}
+            cardBody={serviceText.service.card1.serviceBody}
+            cardDetails=""
+            serviceMenu={serviceText.service.card1.serviceMenu}
+            src={cardSrc1}
+            stateMachines={stateMachine}
+          />
+          <Card
+            href={href}
+            cardTitle={serviceText.service.card2.serviceHeader}
+            cardBody={serviceText.service.card2.serviceBody}
+            cardDetails=""
+            serviceMenu={serviceText.service.card2.serviceMenu}
+            src={cardSrc2}
+            stateMachines={stateMachine}
+          />
+          <Card
+            href={href}
+            cardTitle={serviceText.service.card3.serviceHeader}
+            cardBody={serviceText.service.card3.serviceBody}
+            cardDetails=""
+            serviceMenu={serviceText.service.card3.serviceMenu}
+            src={cardSrc3}
+            stateMachines={stateMachine}
+          />
+          <Card
+            href={href}
+            cardTitle={serviceText.service.card4.serviceHeader}
+            cardBody={serviceText.service.card4.serviceBody}
+            cardDetails=""
+            serviceMenu={serviceText.service.card4.serviceMenu}
+            src={cardSrc4}
+            stateMachines={stateMachine}
+          />
+        </ul>
+      </div>
+    </div>
+  </section>
 </Layout>
 
 <style is:global>

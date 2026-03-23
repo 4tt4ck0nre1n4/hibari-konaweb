@@ -1,15 +1,11 @@
-import { PRICING_ITEMS, HOMEPAGE_PRICING_ITEMS, OTHER_FUNCTIONS_OPTIONS } from '../config/pricing';
-import { ESTIMATE_CONFIG } from '../config/companyInfo';
-import type { SelectedItem, PriceCalculation, CalculationLineItem } from '../types/pricing';
+import { PRICING_ITEMS, HOMEPAGE_PRICING_ITEMS, OTHER_FUNCTIONS_OPTIONS } from "../config/pricing";
+import { ESTIMATE_CONFIG } from "../config/companyInfo";
+import type { SelectedItem, PriceCalculation, CalculationLineItem } from "../types/pricing";
 
 /**
  * ページ数に応じた料金を計算
  */
-export function calculatePagePrice(
-  basePrice: number,
-  quantity: number,
-  multiplier?: number
-): number {
+export function calculatePagePrice(basePrice: number, quantity: number, multiplier?: number): number {
   if (multiplier === undefined || multiplier === null || multiplier <= 1) {
     return basePrice * quantity;
   }
@@ -26,9 +22,9 @@ function buildLineItems(selectedItems: SelectedItem[]): CalculationLineItem[] {
 
   for (const item of selectedItems) {
     // other-functions はサブ選択を個別明細行に展開
-    if (item.itemId === 'other-functions' && item.selectedFunctions !== undefined) {
+    if (item.itemId === "other-functions" && item.selectedFunctions !== undefined) {
       for (const fnId of item.selectedFunctions) {
-        const fn = OTHER_FUNCTIONS_OPTIONS.find(o => o.id === fnId);
+        const fn = OTHER_FUNCTIONS_OPTIONS.find((o) => o.id === fnId);
         if (fn !== undefined) {
           lineItems.push({
             itemId: fnId,
@@ -43,12 +39,9 @@ function buildLineItems(selectedItems: SelectedItem[]): CalculationLineItem[] {
     }
 
     const pricingItem =
-      PRICING_ITEMS.find(p => p.id === item.itemId) ??
-      HOMEPAGE_PRICING_ITEMS.find(p => p.id === item.itemId);
+      PRICING_ITEMS.find((p) => p.id === item.itemId) ?? HOMEPAGE_PRICING_ITEMS.find((p) => p.id === item.itemId);
     const name =
-      pricingItem?.name !== undefined &&
-      pricingItem.name !== null &&
-      pricingItem.name.trim() !== ''
+      pricingItem?.name !== undefined && pricingItem.name !== null && pricingItem.name.trim() !== ""
         ? pricingItem.name
         : item.itemId;
     const unitPrice = item.quantity > 0 ? item.price / item.quantity : item.price;
@@ -80,9 +73,7 @@ export function calculatePrice(
   const designSubtotal = designItems.reduce((sum, item) => sum + item.totalPrice, 0);
   const subtotal = codingSubtotal + designSubtotal;
 
-  const urgentFee = isUrgent
-    ? Math.round(subtotal * ESTIMATE_CONFIG.urgentFeeRate)
-    : 0;
+  const urgentFee = isUrgent ? Math.round(subtotal * ESTIMATE_CONFIG.urgentFeeRate) : 0;
   const subtotalWithUrgent = subtotal + urgentFee;
   const tax = Math.round(subtotalWithUrgent * ESTIMATE_CONFIG.taxRate);
   const total = subtotalWithUrgent + tax;

@@ -22,7 +22,13 @@ const footerIconHeight = 40;
 ---
 
 <li class="footer-icon__item">
-  <a class={className} href={href} aria-label={ariaLabel} title={ariaTitle} {...(targetBlank === "_blank" ? { target: "_blank" as const } : {})}>
+  <a
+    class={className}
+    href={href}
+    aria-label={ariaLabel}
+    title={ariaTitle}
+    {...targetBlank === "_blank" ? { target: "_blank" as const } : {}}
+  >
     {
       typeof footerIcon === "string" && footerIcon.trim().length > 0 ? (
         <SafeIcon name={footerIcon} width={footerIconWidth} height={footerIconHeight} aria-hidden={ariaHidden} />

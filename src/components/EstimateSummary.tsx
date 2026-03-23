@@ -1,5 +1,5 @@
-import type { PriceCalculation } from '../types/pricing';
-import '../styles/pricing/EstimateSummary.css';
+import type { PriceCalculation } from "../types/pricing";
+import "../styles/pricing/EstimateSummary.css";
 
 interface EstimateSummaryProps {
   calculation: PriceCalculation;
@@ -36,9 +36,7 @@ export function EstimateSummary({ calculation, isUrgent }: EstimateSummaryProps)
           </span>
         </div>
       </div>
-      <p className="estimate-summary__note">
-        ※ この金額は概算です。正式なお見積りは別途ご案内いたします。
-      </p>
+      <p className="estimate-summary__note">※ この金額は概算です。正式なお見積りは別途ご案内いたします。</p>
     </div>
   );
 }

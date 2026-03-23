@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
-import { PricingItemButton } from './PricingItem';
-import { EstimateSummary } from './EstimateSummary';
-import { EstimateDocument } from './EstimateDocument';
-import { ModalDialog } from './ModalDialog';
-import IconifyInline from './IconifyInline';
+import { useState, useEffect, useMemo } from "react";
+import { PricingItemButton } from "./PricingItem";
+import { EstimateSummary } from "./EstimateSummary";
+import { EstimateDocument } from "./EstimateDocument";
+import { ModalDialog } from "./ModalDialog";
+import IconifyInline from "./IconifyInline";
 import {
   PRICING_ITEMS,
   HOMEPAGE_PRICING_ITEMS,
@@ -11,24 +11,24 @@ import {
   PAGE_COUNT_OPTIONS,
   ANIMATION_COUNT_OPTIONS,
   OTHER_FUNCTIONS_OPTIONS,
-} from '../config/pricing';
-import { ESTIMATE_CONFIG } from '../config/companyInfo';
-import { calculatePrice, calculatePagePrice } from '../utils/calculatePrice';
-import { saveState, loadState, clearState } from '../utils/storageManager';
-import { generateEstimateNumber, formatDateForDisplay, calculateExpiryDate } from '../utils/generateEstimateNumber';
-import type { SelectedItem, PlanType, EstimateData } from '../types/pricing';
-import '../styles/pricing/PricingSimulator.css';
+} from "../config/pricing";
+import { ESTIMATE_CONFIG } from "../config/companyInfo";
+import { calculatePrice, calculatePagePrice } from "../utils/calculatePrice";
+import { saveState, loadState, clearState } from "../utils/storageManager";
+import { generateEstimateNumber, formatDateForDisplay, calculateExpiryDate } from "../utils/generateEstimateNumber";
+import type { SelectedItem, PlanType, EstimateData } from "../types/pricing";
+import "../styles/pricing/PricingSimulator.css";
 
 // 「コーディング」または「ホームページ制作」のどちらの項目か判定
-function getItemPlan(itemId: string): 'coding' | 'design' | null {
-  if (PRICING_ITEMS.some(p => p.id === itemId)) return 'coding';
-  if (HOMEPAGE_PRICING_ITEMS.some(p => p.id === itemId)) return 'design';
+function getItemPlan(itemId: string): "coding" | "design" | null {
+  if (PRICING_ITEMS.some((p) => p.id === itemId)) return "coding";
+  if (HOMEPAGE_PRICING_ITEMS.some((p) => p.id === itemId)) return "design";
   return null;
 }
 
 export function PricingSimulator() {
   // 表示中のタブ（'coding' | 'design'）、特急案件はisUrgentで管理
-  const [activeTab, setActiveTab] = useState<'coding' | 'design'>('coding');
+  const [activeTab, setActiveTab] = useState<"coding" | "design">("coding");
   const [codingItemIds, setCodingItemIds] = useState<Set<string>>(new Set());
   const [designItemIds, setDesignItemIds] = useState<Set<string>>(new Set());
   const [codingPageCountMap, setCodingPageCountMap] = useState<Map<string, number>>(new Map());
@@ -45,35 +45,35 @@ export function PricingSimulator() {
   // 初期状態の復元（URLパラメータで明示的に許可する場合のみ）
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const shouldRestore = urlParams.get('restore') === 'true';
+    const shouldRestore = urlParams.get("restore") === "true";
 
     if (shouldRestore) {
       const savedState = loadState();
       if (savedState !== null) {
         const plan = savedState.selectedPlan;
-        setActiveTab(plan === 'design' ? 'design' : 'coding');
+        setActiveTab(plan === "design" ? "design" : "coding");
         setIsUrgent(savedState.isUrgent);
 
-        const codingIds = new Set<string>(savedState.codingItems.map(i => i.itemId));
+        const codingIds = new Set<string>(savedState.codingItems.map((i) => i.itemId));
         setCodingItemIds(codingIds);
 
-        const designIds = new Set<string>(savedState.designItems.map(i => i.itemId));
+        const designIds = new Set<string>(savedState.designItems.map((i) => i.itemId));
         setDesignItemIds(designIds);
 
         // other-functions のサブ選択を復元
-        const otherFnItem = savedState.codingItems.find(i => i.itemId === 'other-functions');
+        const otherFnItem = savedState.codingItems.find((i) => i.itemId === "other-functions");
         if (otherFnItem?.selectedFunctions !== undefined) {
           setConfirmedOtherFunctionsIds(new Set(otherFnItem.selectedFunctions));
         }
 
         const codingMap = new Map<string, number>();
-        savedState.codingItems.forEach(item => {
+        savedState.codingItems.forEach((item) => {
           if (item.quantity > 1) codingMap.set(item.itemId, item.quantity);
         });
         setCodingPageCountMap(codingMap);
 
         const designMap = new Map<string, number>();
-        savedState.designItems.forEach(item => {
+        savedState.designItems.forEach((item) => {
           if (item.quantity > 1) designMap.set(item.itemId, item.quantity);
         });
         setDesignPageCountMap(designMap);
@@ -86,14 +86,14 @@ export function PricingSimulator() {
   // コーディング選択項目の詳細（PRICING_ITEMSの順番を保持）
   const codingSelectedItems: SelectedItem[] = useMemo(() => {
     const items: SelectedItem[] = [];
-    PRICING_ITEMS.forEach(item => {
+    PRICING_ITEMS.forEach((item) => {
       if (!codingItemIds.has(item.id)) return;
 
       // other-functions は確定済みサブ選択の合計額を使用
-      if (item.id === 'other-functions') {
+      if (item.id === "other-functions") {
         if (confirmedOtherFunctionsIds.size === 0) return;
         const price = [...confirmedOtherFunctionsIds].reduce((sum, fnId) => {
-          const fn = OTHER_FUNCTIONS_OPTIONS.find(o => o.id === fnId);
+          const fn = OTHER_FUNCTIONS_OPTIONS.find((o) => o.id === fnId);
           return sum + (fn?.basePrice ?? 0);
         }, 0);
         items.push({
@@ -110,7 +110,7 @@ export function PricingSimulator() {
       if (item.isQuantifiable === true && codingPageCountMap.has(item.id)) {
         const pageCount = codingPageCountMap.get(item.id);
         quantity = pageCount !== undefined ? pageCount : 1;
-        const selectedOption = PAGE_COUNT_OPTIONS.find(opt => opt.value === quantity);
+        const selectedOption = PAGE_COUNT_OPTIONS.find((opt) => opt.value === quantity);
         price = calculatePagePrice(item.basePrice, quantity, selectedOption?.multiplier);
       }
       items.push({ itemId: item.id, quantity, price });
@@ -121,14 +121,14 @@ export function PricingSimulator() {
   // ホームページ制作選択項目の詳細（HOMEPAGE_PRICING_ITEMSの順番を保持）
   const designSelectedItems: SelectedItem[] = useMemo(() => {
     const items: SelectedItem[] = [];
-    HOMEPAGE_PRICING_ITEMS.forEach(item => {
+    HOMEPAGE_PRICING_ITEMS.forEach((item) => {
       if (!designItemIds.has(item.id)) return;
       let quantity = 1;
       let price = item.basePrice;
       if (item.isQuantifiable === true && designPageCountMap.has(item.id)) {
         const pageCount = designPageCountMap.get(item.id);
         quantity = pageCount !== undefined ? pageCount : 1;
-        const selectedOption = PAGE_COUNT_OPTIONS.find(opt => opt.value === quantity);
+        const selectedOption = PAGE_COUNT_OPTIONS.find((opt) => opt.value === quantity);
         price = calculatePagePrice(item.basePrice, quantity, selectedOption?.multiplier);
       }
       items.push({ itemId: item.id, quantity, price });
@@ -157,9 +157,9 @@ export function PricingSimulator() {
 
   // プランタブ切り替え（coding / design）
   const handleTabChange = (planId: PlanType) => {
-    if (planId === 'urgent') {
+    if (planId === "urgent") {
       // 特急案件は items タブを変えず isUrgent をトグル
-      setIsUrgent(prev => !prev);
+      setIsUrgent((prev) => !prev);
       return;
     }
     setActiveTab(planId);
@@ -167,7 +167,7 @@ export function PricingSimulator() {
 
   // その他の機能モーダル: チェックボックストグル（一時選択）
   const handleOtherFunctionToggle = (fnId: string) => {
-    setTempOtherFunctionsIds(prev => {
+    setTempOtherFunctionsIds((prev) => {
       const next = new Set(prev);
       if (next.has(fnId)) next.delete(fnId);
       else next.add(fnId);
@@ -180,9 +180,9 @@ export function PricingSimulator() {
     setConfirmedOtherFunctionsIds(new Set(tempOtherFunctionsIds));
     const newCodingIds = new Set(codingItemIds);
     if (tempOtherFunctionsIds.size > 0) {
-      newCodingIds.add('other-functions');
+      newCodingIds.add("other-functions");
     } else {
-      newCodingIds.delete('other-functions');
+      newCodingIds.delete("other-functions");
     }
     setCodingItemIds(newCodingIds);
     setIsOtherFunctionsModalOpen(false);
@@ -201,7 +201,7 @@ export function PricingSimulator() {
   // 項目トグル（どちらのプランの項目かを自動判定）
   const handleItemToggle = (itemId: string) => {
     // other-functions は複数選択モーダルを開く
-    if (itemId === 'other-functions') {
+    if (itemId === "other-functions") {
       setTempOtherFunctionsIds(new Set(confirmedOtherFunctionsIds));
       setIsOtherFunctionsModalOpen(true);
       return;
@@ -210,8 +210,8 @@ export function PricingSimulator() {
     const itemPlan = getItemPlan(itemId);
     if (itemPlan === null) return;
 
-    if (itemPlan === 'coding') {
-      const item = PRICING_ITEMS.find(p => p.id === itemId);
+    if (itemPlan === "coding") {
+      const item = PRICING_ITEMS.find((p) => p.id === itemId);
       if (item === undefined) return;
 
       if (codingItemIds.has(itemId)) {
@@ -233,7 +233,7 @@ export function PricingSimulator() {
         }
       }
     } else {
-      const item = HOMEPAGE_PRICING_ITEMS.find(p => p.id === itemId);
+      const item = HOMEPAGE_PRICING_ITEMS.find((p) => p.id === itemId);
       if (item === undefined) return;
 
       if (designItemIds.has(itemId)) {
@@ -261,11 +261,11 @@ export function PricingSimulator() {
   const handlePageCountSelect = (value: number) => {
     if (currentPageItem !== null) {
       const itemPlan = getItemPlan(currentPageItem);
-      if (itemPlan === 'coding') {
+      if (itemPlan === "coding") {
         const newMap = new Map(codingPageCountMap);
         newMap.set(currentPageItem, value);
         setCodingPageCountMap(newMap);
-      } else if (itemPlan === 'design') {
+      } else if (itemPlan === "design") {
         const newMap = new Map(designPageCountMap);
         newMap.set(currentPageItem, value);
         setDesignPageCountMap(newMap);
@@ -294,7 +294,7 @@ export function PricingSimulator() {
 
     setEstimateData(estimate);
     setShowEstimate(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // 最初に戻る
@@ -305,7 +305,7 @@ export function PricingSimulator() {
 
   // リセット
   const handleReset = () => {
-    if (confirm('すべての選択をリセットしますか？')) {
+    if (confirm("すべての選択をリセットしますか？")) {
       setCodingItemIds(new Set());
       setDesignItemIds(new Set());
       setCodingPageCountMap(new Map());
@@ -313,21 +313,21 @@ export function PricingSimulator() {
       setConfirmedOtherFunctionsIds(new Set());
       setTempOtherFunctionsIds(new Set());
       setIsUrgent(false);
-      setActiveTab('coding');
+      setActiveTab("coding");
       clearState();
     }
   };
 
   // モーダルのタイトルとオプションを解決
   const resolveModalOptions = () => {
-    if (currentPageItem === null) return { title: 'ページ数を選択してください', options: PAGE_COUNT_OPTIONS };
-    const codingItem = PRICING_ITEMS.find(p => p.id === currentPageItem);
-    const designItem = HOMEPAGE_PRICING_ITEMS.find(p => p.id === currentPageItem);
+    if (currentPageItem === null) return { title: "ページ数を選択してください", options: PAGE_COUNT_OPTIONS };
+    const codingItem = PRICING_ITEMS.find((p) => p.id === currentPageItem);
+    const designItem = HOMEPAGE_PRICING_ITEMS.find((p) => p.id === currentPageItem);
     const item = codingItem ?? designItem;
-    if (item === undefined) return { title: 'ページ数を選択してください', options: PAGE_COUNT_OPTIONS };
-    const isAnimation = item.id.includes('-animation');
+    if (item === undefined) return { title: "ページ数を選択してください", options: PAGE_COUNT_OPTIONS };
+    const isAnimation = item.id.includes("-animation");
     return {
-      title: isAnimation ? 'アニメーションの数量を選択してください' : 'ページ数を選択してください',
+      title: isAnimation ? "アニメーションの数量を選択してください" : "ページ数を選択してください",
       options: isAnimation ? ANIMATION_COUNT_OPTIONS : PAGE_COUNT_OPTIONS,
     };
   };
@@ -361,27 +361,26 @@ export function PricingSimulator() {
 
       {/* アクセシビリティ: 価格変更の通知（スクリーンリーダー用） */}
       <div aria-live="polite" aria-atomic="true" className="screenReader-only">
-        {totalSelectedCount > 0 && (
-          `選択された項目: ${totalSelectedCount}件、合計金額: ${calculation.total.toLocaleString()}円`
-        )}
+        {totalSelectedCount > 0 &&
+          `選択された項目: ${totalSelectedCount}件、合計金額: ${calculation.total.toLocaleString()}円`}
       </div>
 
       {/* プラン選択 */}
       <div className="pricing-simulator__plans">
         <h3 className="pricing-simulator__section-title">プラン</h3>
         <div className="pricing-simulator__plan-grid">
-          {PLANS.map(plan => {
-            const isActive = plan.id === 'urgent' ? isUrgent : activeTab === plan.id;
+          {PLANS.map((plan) => {
+            const isActive = plan.id === "urgent" ? isUrgent : activeTab === plan.id;
 
             return (
               <button
                 key={plan.id}
                 type="button"
-                {...(isActive ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
-                className={`pricing-plan-button${isActive ? ' pricing-plan-button--active' : ''}`}
+                {...(isActive ? { "aria-pressed": "true" as const } : { "aria-pressed": "false" as const })}
+                className={`pricing-plan-button${isActive ? " pricing-plan-button--active" : ""}`}
                 onClick={() => handleTabChange(plan.id)}
               >
-                {plan.icon !== undefined && plan.icon !== '' && (
+                {plan.icon !== undefined && plan.icon !== "" && (
                   <IconifyInline icon={plan.icon} width="24" height="24" />
                 )}
                 <span>{plan.name}</span>
@@ -395,22 +394,22 @@ export function PricingSimulator() {
       <div
         className="pricing-simulator__items"
         role="tabpanel"
-        aria-label={activeTab === 'design' ? 'ホームページ制作の項目' : 'コーディングの項目'}
+        aria-label={activeTab === "design" ? "ホームページ制作の項目" : "コーディングの項目"}
       >
         <h3 className="pricing-simulator__section-title">項目</h3>
         <div className="pricing-simulator__item-grid">
-          {activeTab === 'coding'
-            ? PRICING_ITEMS.map(item => (
+          {activeTab === "coding"
+            ? PRICING_ITEMS.map((item) => (
                 <PricingItemButton
                   key={item.id}
                   item={item}
                   isSelected={codingItemIds.has(item.id)}
                   onToggle={handleItemToggle}
                   quantity={codingPageCountMap.get(item.id)}
-                  selectedFunctions={item.id === 'other-functions' ? [...confirmedOtherFunctionsIds] : undefined}
+                  selectedFunctions={item.id === "other-functions" ? [...confirmedOtherFunctionsIds] : undefined}
                 />
               ))
-            : HOMEPAGE_PRICING_ITEMS.map(item => (
+            : HOMEPAGE_PRICING_ITEMS.map((item) => (
                 <PricingItemButton
                   key={item.id}
                   item={item}
@@ -423,9 +422,7 @@ export function PricingSimulator() {
       </div>
 
       {/* 金額サマリー */}
-      {totalSelectedCount > 0 && (
-        <EstimateSummary calculation={calculation} isUrgent={isUrgent} />
-      )}
+      {totalSelectedCount > 0 && <EstimateSummary calculation={calculation} isUrgent={isUrgent} />}
 
       {/* アクションボタン */}
       <div className="pricing-simulator__actions">
@@ -457,7 +454,7 @@ export function PricingSimulator() {
         title={modalTitle}
       >
         <div className="page-count-options">
-          {modalOptions.map(option => (
+          {modalOptions.map((option) => (
             <button
               key={option.id}
               type="button"
@@ -482,7 +479,7 @@ export function PricingSimulator() {
         title="その他の機能を選択してください"
       >
         <div className="other-functions-options">
-          {OTHER_FUNCTIONS_OPTIONS.map(fn => (
+          {OTHER_FUNCTIONS_OPTIONS.map((fn) => (
             <label key={fn.id} className="other-function-option">
               <input
                 type="checkbox"
@@ -495,18 +492,10 @@ export function PricingSimulator() {
           ))}
         </div>
         <div className="other-functions-modal-actions">
-          <button
-            type="button"
-            className="other-functions-reset-button"
-            onClick={handleOtherFunctionsReset}
-          >
+          <button type="button" className="other-functions-reset-button" onClick={handleOtherFunctionsReset}>
             リセット
           </button>
-          <button
-            type="button"
-            className="other-functions-confirm-button"
-            onClick={handleOtherFunctionsConfirm}
-          >
+          <button type="button" className="other-functions-confirm-button" onClick={handleOtherFunctionsConfirm}>
             確定
           </button>
         </div>

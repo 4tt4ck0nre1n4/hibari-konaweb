@@ -7,7 +7,13 @@ import styles from "../styles/contactForm.module.css";
 import { CONTACT_WPCF7_API, wpcf7PostId, wpcf7UnitTag } from "../api/headlessCms.ts";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { wpcf7ResponseSchema, type WPCF7Response } from "../schemas/api.schema.ts";
-import { getFromStorageSafely, estimatePdfDataSchema, clearFromStorageSafely, setToStorageSafely, inquiryDataSchema } from "../schemas/storage.schema.ts";
+import {
+  getFromStorageSafely,
+  estimatePdfDataSchema,
+  clearFromStorageSafely,
+  setToStorageSafely,
+  inquiryDataSchema,
+} from "../schemas/storage.schema.ts";
 
 const requiredMark = "【必須】";
 const THANKS_URL = "/contact/thanks";
@@ -43,11 +49,7 @@ const devError = (...args: unknown[]): void => {
 const RATE_LIMIT_MAX_REQUESTS = 3;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1分
 
-const fetchWithTimeout = async (
-  input: RequestInfo | URL,
-  init: RequestInit,
-  timeoutMs: number
-): Promise<Response> => {
+const fetchWithTimeout = async (input: RequestInfo | URL, init: RequestInit, timeoutMs: number): Promise<Response> => {
   // AbortSignal.timeout が使える環境ではそれを優先（実装が最適化されていることが多い）
   if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
     return await fetch(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });
@@ -106,11 +108,7 @@ export default function ContactForm() {
   // SessionStorageからPDFデータを取得
   useEffect(() => {
     try {
-      const pdfData = getFromStorageSafely(
-        estimatePdfDataSchema,
-        ['estimatePDF', 'estimateNumber'],
-        'sessionStorage'
-      );
+      const pdfData = getFromStorageSafely(estimatePdfDataSchema, ["estimatePDF", "estimateNumber"], "sessionStorage");
 
       if (pdfData !== null) {
         devLog("✅ [Contact Form] PDF data found in SessionStorage");
@@ -130,7 +128,7 @@ export default function ContactForm() {
           });
 
         // 使用後はSessionStorageをクリア（安全な方法で）
-        clearFromStorageSafely(['estimatePDF', 'estimateNumber'], 'sessionStorage');
+        clearFromStorageSafely(["estimatePDF", "estimateNumber"], "sessionStorage");
       } else {
         devLog("ℹ️ [Contact Form] No PDF data in SessionStorage");
       }
@@ -290,12 +288,12 @@ export default function ContactForm() {
         const parsed = JSON.parse(responseText) as unknown;
         // Zodスキーマで検証
         const validationResult = wpcf7ResponseSchema.safeParse(parsed);
-        
+
         if (!validationResult.success) {
           devError("❌ [Contact Form] Response validation failed:", validationResult.error.format());
           throw new Error("Invalid response format");
         }
-        
+
         responseData = validationResult.data;
       } catch (parseError) {
         devError("❌ [Contact Form] Failed to parse response:", {
@@ -320,12 +318,8 @@ export default function ContactForm() {
         const inquiryDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
         // SessionStorageに保存（Zodスキーマで検証）
-        const saved = setToStorageSafely(
-          inquiryDataSchema,
-          { inquiryNumber, inquiryDate },
-          'sessionStorage'
-        );
-        
+        const saved = setToStorageSafely(inquiryDataSchema, { inquiryNumber, inquiryDate }, "sessionStorage");
+
         if (saved) {
           devLog("✅ [Contact Form] Inquiry number generated:", inquiryNumber);
         } else {

@@ -122,22 +122,22 @@ html.dark .pricing-plan-button {
 }
 
 .pricing-simulator__button--reset {
-  background-color: var(--color-back-button, #4B5563);
+  background-color: var(--color-back-button, #4b5563);
   color: var(--color-white, #f1f5f9);
 }
 
 html.dark .pricing-simulator__button--reset {
-  background-color: var(--color-back-button, #6B7280);
+  background-color: var(--color-back-button, #6b7280);
 }
 
 .pricing-simulator__button--reset:is(:hover, :focus-visible):not(:disabled) {
-  background-color: var(--color-back-button-hover, #3A4451);
+  background-color: var(--color-back-button-hover, #3a4451);
   outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
   outline-offset: 0.125rem;
 }
 
 html.dark .pricing-simulator__button--reset:is(:hover, :focus-visible):not(:disabled) {
-  background-color: var(--color-back-button-hover, #7A8490);
+  background-color: var(--color-back-button-hover, #7a8490);
 }
 
 .pricing-simulator__button--generate {

@@ -24,21 +24,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
   try {
     console.log("Fetching blog slugs from API:", BLOG_POST_API);
 
-    const response = await fetch(
-      BLOG_POST_API
-    );
+    const response = await fetch(BLOG_POST_API);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch blog slugs: ${response.status}`);
     }
 
     const json = await response.json();
-    const dataPosts = validateApiResponse(
-      blogPostsResponseSchema,
-      json,
-      "Blog Posts API",
-      [] as BlogPost[]
-    );
+    const dataPosts = validateApiResponse(blogPostsResponseSchema, json, "Blog Posts API", [] as BlogPost[]);
 
     if (dataPosts.length === 0) {
       console.warn("No posts found, returning empty paths.");
@@ -100,12 +93,7 @@ try {
   }
 
   const json = await resPosts.json();
-  const dataPosts = validateApiResponse(
-    blogPostsResponseSchema,
-    json,
-    "Blog Post Slug API",
-    [] as BlogPost[]
-  );
+  const dataPosts = validateApiResponse(blogPostsResponseSchema, json, "Blog Post Slug API", [] as BlogPost[]);
 
   if (dataPosts.length === 0) {
     console.error("No Post data found for slug:", slug);
@@ -132,11 +120,15 @@ const categoryAriaLabel = "のカテゴリー記事へ";
 const categoryAriaTitle = "のカテゴリー記事へ";
 export const prerender = true;
 
+const acfDescription: string = typeof post?.acf?.description === "string" ? post.acf.description : "";
+const postMetaDescription = acfDescription.trim();
+const jsonLdDescription = acfDescription.replace(/(<([^>]+)>)/gi, "").trim();
+
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   headline: title,
-  description: post?.content?.rendered.replace(/(<([^>]+)>)/gi, "").trim() ?? "",
+  description: jsonLdDescription,
   dataPublished: publishedDate,
   url: `${globalText.url}/blog/${post?.slug}`,
   author: {
@@ -151,12 +143,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
 
 <Layout
   title={title ?? "Blog Title Not Found"}
-  description={globalText.blog.description}
+  description={postMetaDescription}
   ogType={globalText.local.type}
   ogTitle={title ?? "Blog Title Not Found"}
-  ogDescription={globalText.blog.description}
+  ogDescription={postMetaDescription}
   twitterTitle={title ?? "Blog Title Not Found"}
-  twitterDescription={globalText.blog.description}
+  twitterDescription={postMetaDescription}
   jsonLd={jsonLd}
 >
   <div class="breadcrumbs__wrapper">

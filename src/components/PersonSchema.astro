@@ -15,36 +15,36 @@ import globalText from "../data/globalText.json";
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
-  "name": globalText.global.author,
-  "url": globalText.url,
-  "jobTitle": "Web Developer / Freelance Coder",
-  "description": globalText.og.description,
+  name: globalText.global.author,
+  url: globalText.url,
+  jobTitle: "Web Developer / Freelance Coder",
+  description: globalText.og.description,
 
   // プロフィール画像
-  "image": globalText.og.image,
+  image: globalText.og.image,
 
   // 所属組織（個人事業主として）
-  "worksFor": {
+  worksFor: {
     "@type": "Organization",
-    "name": globalText.global.author
+    name: globalText.global.author,
   },
 
   // SNSリンク（実在証明・権威性向上）
-  "sameAs": [
+  sameAs: [
     "https://github.com/4tt4ck0nre1n4",
-    "https://twitter.com/your-account" // 実際のTwitterアカウントに置き換えてください
+    "https://twitter.com/your-account", // 実際のTwitterアカウントに置き換えてください
   ],
 
   // 連絡先情報
-  "contactPoint": {
+  contactPoint: {
     "@type": "ContactPoint",
-    "contactType": "customer support",
-    "url": `${globalText.url}/contact`,
-    "availableLanguage": "Japanese"
+    contactType: "customer support",
+    url: `${globalText.url}/contact`,
+    availableLanguage: "Japanese",
   },
 
   // スキルセット（知識領域）
-  "knowsAbout": [
+  knowsAbout: [
     "Web Development",
     "Astro",
     "WordPress",
@@ -58,48 +58,48 @@ const personSchema = {
     "GSAP",
     "Responsive Design",
     "Web Accessibility",
-    "SEO Optimization"
+    "SEO Optimization",
   ],
 
   // 提供サービス
-  "hasOfferCatalog": {
+  hasOfferCatalog: {
     "@type": "OfferCatalog",
-    "name": "Web制作サービス",
-    "itemListElement": [
+    name: "Web制作サービス",
+    itemListElement: [
       {
         "@type": "Offer",
-        "itemOffered": {
+        itemOffered: {
           "@type": "Service",
-          "name": "ホームページ制作",
-          "description": "アクセシビリティ対応のWebサイト制作"
-        }
+          name: "ホームページ制作",
+          description: "アクセシビリティ対応のWebサイト制作",
+        },
       },
       {
         "@type": "Offer",
-        "itemOffered": {
+        itemOffered: {
           "@type": "Service",
-          "name": "WordPress開発",
-          "description": "WordPressを使用したCMS構築"
-        }
+          name: "WordPress開発",
+          description: "WordPressを使用したCMS構築",
+        },
       },
       {
         "@type": "Offer",
-        "itemOffered": {
+        itemOffered: {
           "@type": "Service",
-          "name": "Webサイトリニューアル",
-          "description": "既存サイトの改善・最適化"
-        }
+          name: "Webサイトリニューアル",
+          description: "既存サイトの改善・最適化",
+        },
       },
       {
         "@type": "Offer",
-        "itemOffered": {
+        itemOffered: {
           "@type": "Service",
-          "name": "コーディング代行",
-          "description": "デザインからの高品質なコーディング実装"
-        }
-      }
-    ]
-  }
+          name: "コーディング代行",
+          description: "デザインからの高品質なコーディング実装",
+        },
+      },
+    ],
+  },
 };
 ---
 

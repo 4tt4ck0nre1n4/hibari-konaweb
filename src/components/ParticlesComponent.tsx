@@ -54,7 +54,6 @@ export default function ParticlesComponent() {
         devError("Failed to load tsParticles:", error);
       }
     })();
-
   }, []);
 
   const defaultOptions: ISourceOptions = useMemo(() => {

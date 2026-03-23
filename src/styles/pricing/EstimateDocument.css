@@ -331,11 +331,11 @@ html.dark .estimate-document {
 
 .estimate-document__button--print {
   color: var(--color-white, #f1f5f9);
-  background-color: var(--color-print-button, #5B7A9A);
+  background-color: var(--color-print-button, #5b7a9a);
 }
 
 .estimate-document__button--print:is(:hover, :focus-visible) {
-  background-color: var(--color-print-button-hover, #4A6B8A);
+  background-color: var(--color-print-button-hover, #4a6b8a);
 }
 
 .estimate-document__button--pdf {
@@ -367,11 +367,11 @@ html.dark .estimate-document {
 
 /* ダークモード対応 */
 html.dark .estimate-document__button--print {
-  background-color: var(--color-print-button, #7A9AB8);
+  background-color: var(--color-print-button, #7a9ab8);
 }
 
 html.dark .estimate-document__button--print:is(:hover, :focus-visible) {
-  background-color: var(--color-print-button-hover, #8BAAC8);
+  background-color: var(--color-print-button-hover, #8baac8);
 }
 
 html.dark .estimate-document__button--pdf {

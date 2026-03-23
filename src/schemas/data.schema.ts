@@ -131,12 +131,7 @@ export type EstimateConfig = z.infer<typeof estimateConfigSchema>;
  * @param fallback - フォールバック値
  * @returns 検証済みデータまたはフォールバック値
  */
-export function validateJsonData<T>(
-  schema: z.ZodType<T>,
-  data: unknown,
-  dataName: string,
-  fallback: T
-): T {
+export function validateJsonData<T>(schema: z.ZodType<T>, data: unknown, dataName: string, fallback: T): T {
   const result = schema.safeParse(data);
 
   if (!result.success) {
@@ -156,11 +151,7 @@ export function validateJsonData<T>(
  * @returns 検証済みデータ
  * @throws {Error} 検証に失敗した場合
  */
-export function validateConfigData<T>(
-  schema: z.ZodType<T>,
-  data: unknown,
-  dataName: string
-): T {
+export function validateConfigData<T>(schema: z.ZodType<T>, data: unknown, dataName: string): T {
   const result = schema.safeParse(data);
 
   if (!result.success) {

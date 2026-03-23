@@ -33,1123 +33,1129 @@ const cspContent = isDev
 ---
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, viewport-fit=cover" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, viewport-fit=cover" />
 
-    <!-- LCP最適化: 背景画像のプリロードを最優先で配置（リソース読み込みの遅延を削減） -->
-    <!-- preloadはmeta charsetの直後に配置して、できるだけ早く読み込みを開始 -->
-    <slot name="lcp-preload" />
+  <!-- LCP最適化: 背景画像のプリロードを最優先で配置（リソース読み込みの遅延を削減） -->
+  <!-- preloadはmeta charsetの直後に配置して、できるだけ早く読み込みを開始 -->
+  <slot name="lcp-preload" />
 
-    <GoogleAnalytics />
-    <meta http-equiv="Content-Security-Policy" content={cspContent} />
+  <GoogleAnalytics />
+  <meta http-equiv="Content-Security-Policy" content={cspContent} />
 
-    <!-- ネットワーク依存関係ツリー最適化: 外部オリジンへの事前接続 -->
-    <!-- 優先度1: クリティカルな外部リソース（最大4つまで推奨） -->
-    <!-- IconifyはローカルJSONのみ使用するため、外部APIへのpreconnectは不要 -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+  <!-- ネットワーク依存関係ツリー最適化: 外部オリジンへの事前接続 -->
+  <!-- 優先度1: クリティカルな外部リソース（最大4つまで推奨） -->
+  <!-- IconifyはローカルJSONのみ使用するため、外部APIへのpreconnectは不要 -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 
-    <!-- 優先度2: 非クリティカルだが早期接続が有効なリソース -->
-    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <Favicon />
-    <meta name="generator" content={Astro.generator} />
-    <meta name="keywords" content={globalText.global.keywords} />
-    <meta name="color-scheme" content={globalText.global.colorScheme} />
-    <meta name="theme-color" content={globalText.global.themeColor} />
-    <meta name="author" content={globalText.global.author} />
-    <meta name="format-detection" content={globalText.global.formatDetection} />
-    <link rel="canonical" href={globalText.link.canonical} />
-    <link rel="author" href={globalText.link.author} />
-    <meta property="og:local" content={globalText.og.local} />
-    <meta property="og:title" content={ogTitle} />
-    <meta property="og:description" content={ogDescription} />
-    <meta property="og:type" content={ogType} />
-    <meta property="og:url" content={globalText.og.url} />
-    <meta property="og:image" content={globalText.og.image} />
-    <meta property="og:site_name" content={globalText.og.site_name} />
-    <meta name="twitter:card" content={globalText.twitter.card} />
-    <meta name="twitter:title" content={twitterTitle} />
-    <meta name="twitter:description" content={twitterDescription} />
-    <meta name="twitter:site" content={globalText.twitter.site} />
-    <meta name="twitter:image" content={globalText.twitter.image} />
+  <!-- 優先度2: 非クリティカルだが早期接続が有効なリソース -->
+  <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <Favicon />
+  <meta name="generator" content={Astro.generator} />
+  <meta name="keywords" content={globalText.global.keywords} />
+  <meta name="color-scheme" content={globalText.global.colorScheme} />
+  <meta name="theme-color" content={globalText.global.themeColor} />
+  <meta name="author" content={globalText.global.author} />
+  <meta name="format-detection" content={globalText.global.formatDetection} />
+  <link rel="canonical" href={globalText.link.canonical} />
+  <link rel="author" href={globalText.link.author} />
+  <meta property="og:local" content={globalText.og.local} />
+  <meta property="og:title" content={ogTitle} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:type" content={ogType} />
+  <meta property="og:url" content={globalText.og.url} />
+  <meta property="og:image" content={globalText.og.image} />
+  <meta property="og:site_name" content={globalText.og.site_name} />
+  <meta name="twitter:card" content={globalText.twitter.card} />
+  <meta name="twitter:title" content={twitterTitle} />
+  <meta name="twitter:description" content={twitterDescription} />
+  <meta name="twitter:site" content={globalText.twitter.site} />
+  <meta name="twitter:image" content={globalText.twitter.image} />
 
-    <!-- ページ固有の追加head要素（LCP最適化など）- 早期読み込みのため、metaタグの直後に配置 -->
-    <slot name="head" />
+  <!-- ページ固有の追加head要素（LCP最適化など）- 早期読み込みのため、metaタグの直後に配置 -->
+  <slot name="head" />
 
-    <ClientRouter />
+  <ClientRouter />
 
-    <!-- Critical CSS インライン化 -->
-    <style is:global>
-      /* CSS変数の定義（初期レンダリングに必須） */
-      :root {
-        --color-white: #f1f5f9;
-        --color-black: #010101;
-        --color-purple: #639;
-        --color-red: #ff4f48;
-        --color-blue: #0d0950;
-        --color-gray: #808080;
-        --color-gray-light: #e0e0e0;
-        --color-gray-lightest: #f8f9fa;
-        --color-blue-light: #4a90e2;
-        --color-blue-hover: #3a7bc8;
-        --color-red-hover: #cc2e2e;
-        --color-purple-dark: #7c3aed;
-        --color-print-button: #5B7A9A;
-        --color-print-button-hover: #4A6B8A;
-        --color-back-button: #4B5563;
-        --color-back-button-hover: #3A4451;
-        --accent: rgb(136 58 234);
-        --accent-light: rgb(224 204 250);
-        --accent-dark: rgb(49 10 101);
-        --accent-gradient: linear-gradient(45deg, var(--accent), var(--accent-light) 30%, var(--color-white) 60%);
-        --color-aqua: #0ff;
-        --white: rgb(255 255 255);
-        --angle: 90deg;
-        --gradient-text: linear-gradient(
-          var(--angle),
-          rgb(238 161 255 / 1) 0%,
-          rgb(147 183 255 / 1) 55%,
-          rgb(170 244 254 / 1) 100%
-        );
-      }
-      *,
-      *::before,
-      *::after {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      html {
-        width: 100%;
-        max-width: 100%;
-        font-family:
-          "Poppins",
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          Roboto,
-          "Helvetica Neue",
-          Arial,
-          system-ui,
-          sans-serif;
-        color: var(--color-black);
-        background-color: var(--color-white);
-        text-size-adjust: none;
-        scrollbar-gutter: stable;
-        block-size: 100%;
-        color-scheme: dark light;
-        tab-size: 2;
-        overflow-x: hidden;
-        transition: background-color 1.2s ease;
-      }
-      html.dark {
-        color: var(--color-white);
-        background-color: var(--color-blue);
-        --color-print-button: #7A9AB8;
-        --color-print-button-hover: #8BAAC8;
-        --color-back-button: #6B7280;
-        --color-back-button-hover: #7A8490;
-      }
-      html.dark header {
-        background-color: transparent;
-      }
-      html.dark footer {
-        background-color: transparent;
-      }
+  <!-- Critical CSS インライン化 -->
+  <style is:global>
+    /* CSS変数の定義（初期レンダリングに必須） */
+    :root {
+      --color-white: #f1f5f9;
+      --color-black: #010101;
+      --color-purple: #639;
+      --color-red: #ff4f48;
+      --color-blue: #0d0950;
+      --color-gray: #808080;
+      --color-gray-light: #e0e0e0;
+      --color-gray-lightest: #f8f9fa;
+      --color-blue-light: #4a90e2;
+      --color-blue-hover: #3a7bc8;
+      --color-red-hover: #cc2e2e;
+      --color-purple-dark: #7c3aed;
+      --color-print-button: #5b7a9a;
+      --color-print-button-hover: #4a6b8a;
+      --color-back-button: #4b5563;
+      --color-back-button-hover: #3a4451;
+      --accent: rgb(136 58 234);
+      --accent-light: rgb(224 204 250);
+      --accent-dark: rgb(49 10 101);
+      --accent-gradient: linear-gradient(45deg, var(--accent), var(--accent-light) 30%, var(--color-white) 60%);
+      --color-aqua: #0ff;
+      --white: rgb(255 255 255);
+      --angle: 90deg;
+      --gradient-text: linear-gradient(
+        var(--angle),
+        rgb(238 161 255 / 1) 0%,
+        rgb(147 183 255 / 1) 55%,
+        rgb(170 244 254 / 1) 100%
+      );
+    }
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      width: 100%;
+      max-width: 100%;
+      font-family:
+        "Poppins",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        system-ui,
+        sans-serif;
+      color: var(--color-black);
+      background-color: var(--color-white);
+      text-size-adjust: none;
+      scrollbar-gutter: stable;
+      block-size: 100%;
+      color-scheme: dark light;
+      tab-size: 2;
+      overflow-x: hidden;
+      transition: background-color 1.2s ease;
+    }
+    html.dark {
+      color: var(--color-white);
+      background-color: var(--color-blue);
+      --color-print-button: #7a9ab8;
+      --color-print-button-hover: #8baac8;
+      --color-back-button: #6b7280;
+      --color-back-button-hover: #7a8490;
+    }
+    html.dark header {
+      background-color: transparent;
+    }
+    html.dark footer {
+      background-color: transparent;
+    }
 
+    body {
+      width: 100%;
+      max-width: 100%;
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizespeed;
+      min-block-size: 100%;
+      overflow-x: hidden;
+      /* レイアウトシフト防止: 初期サイズを明示的に設定 */
+      position: relative;
+    }
+
+    /* スマホサイズでのbody最適化（レイアウトシフト対策） */
+    @media (width <= 768px) {
       body {
-        width: 100%;
-        max-width: 100%;
         min-height: 100vh;
-        line-height: 1.5;
-        -webkit-font-smoothing: antialiased;
-        text-rendering: optimizespeed;
-        min-block-size: 100%;
-        overflow-x: hidden;
-        /* レイアウトシフト防止: 初期サイズを明示的に設定 */
-        position: relative;
+        /* スマホのアドレスバー表示/非表示に対応 */
+        min-height: -webkit-fill-available;
+        /* レイアウトシフト防止: 高さを固定 */
+        height: auto;
       }
+    }
 
-      /* スマホサイズでのbody最適化（レイアウトシフト対策） */
-      @media (width <= 768px) {
-        body {
-          min-height: 100vh;
-          /* スマホのアドレスバー表示/非表示に対応 */
-          min-height: -webkit-fill-available;
-          /* レイアウトシフト防止: 高さを固定 */
-          height: auto;
-        }
+    /* 超小型スマホサイズでのbody最適化 */
+    @media (width <= 480px) {
+      body {
+        min-height: 100vh;
+        /* スマホのアドレスバー表示/非表示に対応 */
+        min-height: -webkit-fill-available;
+        /* レイアウトシフト防止: 高さを固定 */
+        height: auto;
       }
+    }
+    img,
+    svg {
+      max-width: 100%;
+      display: block;
+      vertical-align: middle;
+    }
+    ul {
+      list-style: none;
+    }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-      /* 超小型スマホサイズでのbody最適化 */
-      @media (width <= 480px) {
-        body {
-          min-height: 100vh;
-          /* スマホのアドレスバー表示/非表示に対応 */
-          min-height: -webkit-fill-available;
-          /* レイアウトシフト防止: 高さを固定 */
-          height: auto;
-        }
-      }
-      img,
-      svg {
-        max-width: 100%;
-        display: block;
-        vertical-align: middle;
-      }
-      ul {
-        list-style: none;
-      }
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
+    button {
+      text-align: center;
+    }
+    a[href],
+    button,
+    button[type],
+    [tabindex]:not([tabindex*="-"]) {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    #outer-container {
+      width: 100%;
+      max-width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+    #page-wrap {
+      margin-block-start: 3rem;
+      position: relative;
+      z-index: 1;
+    }
 
-      button {
-        text-align: center;
-      }
-      a[href],
-      button,
-      button[type],
-      [tabindex]:not([tabindex*="-"]) {
-        cursor: pointer;
-        touch-action: manipulation;
-      }
-      #outer-container {
-        width: 100%;
-        max-width: 100%;
-        height: 100%;
-        overflow-x: hidden;
-      }
+    @media (width <= 480px) {
       #page-wrap {
-        margin-block-start: 3rem;
-        position: relative;
-        z-index: 1;
+        margin-block-start: 7rem;
       }
+    }
 
-      @media (width <= 480px) {
-        #page-wrap {
-          margin-block-start: 7rem;
-        }
-      }
+    /* Header クリティカルCSS */
+    .header {
+      width: 100%;
+      max-width: 100%;
+      height: 70px;
+      display: grid;
+      font-family: "Poppins", sans-serif;
+      background-color: rgb(0 0 0 / 0);
+      -webkit-backdrop-filter: blur(0);
+      backdrop-filter: blur(0);
+      border: transparent 1px solid;
+      border-radius: 1rem;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 800;
+      transition: all 1s ease;
+      overflow: hidden;
+    }
+    .header.is-scroll {
+      background-color: rgb(255 255 255 / 0.6);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      box-shadow:
+        inset 0.4em 0.4em 0.4em rgb(0 0 0 / 0.2),
+        inset -0.4em -0.4em 0.4em rgb(0 0 0 / 0.2);
+      transition: box-shadow 0.5s ease;
+    }
+    .header__wrapper {
+      width: 100%;
+      max-width: 700px;
+      margin-inline: auto;
+      padding-block: 0.5rem;
+      padding-inline: 0.5rem;
+    }
 
-      /* Header クリティカルCSS */
+    /* タブレットサイズの調整 */
+    @media (480px <= width <= 1024px) {
       .header {
+        height: 80px;
         width: 100%;
-        max-width: 100%;
-        height: 70px;
-        display: grid;
-        font-family: "Poppins", sans-serif;
-        background-color: rgb(0 0 0 / 0);
-        -webkit-backdrop-filter: blur(0);
-        backdrop-filter: blur(0);
-        border: transparent 1px solid;
-        border-radius: 1rem;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 800;
-        transition: all 1s ease;
-        overflow: hidden;
       }
-      .header.is-scroll {
-        background-color: rgb(255 255 255 / 0.6);
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
-        box-shadow:
-          inset 0.4em 0.4em 0.4em rgb(0 0 0 / 0.2),
-          inset -0.4em -0.4em 0.4em rgb(0 0 0 / 0.2);
-        transition: box-shadow 0.5s ease;
-      }
+
       .header__wrapper {
         width: 100%;
-        max-width: 700px;
-        margin-inline: auto;
-        padding-block: 0.5rem;
-        padding-inline: 0.5rem;
+        max-width: 100%;
       }
 
-      /* タブレットサイズの調整 */
-      @media (480px <= width <= 1024px) {
-        .header {
-          height: 80px;
-          width: 100%;
-        }
-
-        .header__wrapper {
-          width: 100%;
-          max-width: 100%;
-        }
-
-        .header__inner {
-          flex-wrap: wrap;
-          gap: 0.5rem;
-          width: 100%;
-        }
-
-        .header__logo_text,
-        .header__logo_whiteText {
-          width: auto;
-          max-width: 200px;
-          height: 24px;
-        }
-      }
-
-      /* 480px以下でのスマホ最適化 */
-      @media (width <= 480px) {
-        .header {
-          height: 128px;
-        }
-
-        .header__wrapper {
-          max-width: 100%;
-          padding-inline: 0;
-        }
-
-        .header__inner {
-          flex-direction: column;
-          gap: 0.75rem;
-          align-items: center;
-        }
-
-        .header__logo {
-          order: 1;
-        }
-
-        .header__nav {
-          order: 2;
-          width: 100%;
-        }
-
-        .header__logo_image {
-          width: 40px;
-          height: 40px;
-        }
-
-        .header__logo_text,
-        .header__logo_whiteText {
-          height: 24px;
-          width: auto;
-        }
-      }
-
-      /* iPhone特有の調整 - ロゴのスペースをAndroidと同じに */
-      @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
-        .header__logo_container {
-          margin-inline: 0.25rem;
-        }
-
-        .header__logo_image {
-          margin-inline: 0.25rem;
-        }
-
-        .header__logo_text,
-        .header__logo_whiteText {
-          margin-inline: 0.25rem;
-        }
-
-        /* スクロール時も並列配置を維持 */
-        .header__logo_link {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-direction: row;
-        }
-      }
       .header__inner {
-        display: flex;
-        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        width: 100%;
+      }
+
+      .header__logo_text,
+      .header__logo_whiteText {
+        width: auto;
+        max-width: 200px;
+        height: 24px;
+      }
+    }
+
+    /* 480px以下でのスマホ最適化 */
+    @media (width <= 480px) {
+      .header {
+        height: 128px;
+      }
+
+      .header__wrapper {
+        max-width: 100%;
+        padding-inline: 0;
+      }
+
+      .header__inner {
+        flex-direction: column;
+        gap: 0.75rem;
         align-items: center;
       }
-      .header__logo_container {
-        position: relative;
-        display: inline-block;
-        vertical-align: middle;
+
+      .header__logo {
+        order: 1;
+      }
+
+      .header__nav {
+        order: 2;
+        width: 100%;
       }
 
       .header__logo_image {
         width: 40px;
-        height: auto;
-        display: block;
-        position: relative;
-        z-index: 2;
-        /* transition: transform 0.3s ease; */
-      }
-      .header__logo_image.is-scroll {
-        border: transparent 1px solid;
-        border-radius: 50%;
-        box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
-        margin-inline: 0.5rem;
-        padding-block: 0.25rem;
-        padding-inline: 0.25rem;
-        transition:
-          transform 0.3s ease,
-          box-shadow 0.4s ease;
+        height: 40px;
       }
 
-      /* iPhone特有の調整 - スクロール時も並列配置を維持 */
-      @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
-        .header__logo_image.is-scroll {
-          margin-inline: 0.25rem;
-        }
-      }
-
-      .header__clock_animation {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 60px;
-        height: 60px;
-        z-index: 1;
-        pointer-events: none;
-      }
-
-      .clock-circle {
-        stroke: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
-        stroke: #4ecdc4;
-        transform-origin: center;
-        transform: rotate(-90deg);
-        transition: stroke-dashoffset 1s ease-in-out;
-      }
-
-      .header.is-scroll .clock-circle {
-        stroke: #45b7d1;
-      }
-
-      html.dark .clock-circle {
-        stroke: #ffeaa7;
-      }
-
-      html.dark .header.is-scroll .clock-circle {
-        stroke: #96ceb4;
-      }
-      .header__logo_text {
-        width: 280px;
-        height: auto;
-        display: inline-block;
-        vertical-align: middle;
-      }
+      .header__logo_text,
       .header__logo_whiteText {
-        display: none;
-        width: 280px;
-        height: auto;
-        vertical-align: middle;
+        height: 24px;
+        width: auto;
       }
-      /* Dark mode: show WhiteTextSvg, hide TextSvg */
-      html.dark .header__logo_text {
-        display: none;
+    }
+
+    /* iPhone特有の調整 - ロゴのスペースをAndroidと同じに */
+    @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
+      .header__logo_container {
+        margin-inline: 0.25rem;
       }
-      html.dark .header__logo_whiteText {
-        display: inline-block;
+
+      .header__logo_image {
+        margin-inline: 0.25rem;
       }
-      /* Dark mode + scroll: show TextSvg, hide WhiteTextSvg */
-      html.dark .header.is-scroll .header__logo_text {
-        display: inline-block;
+
+      .header__logo_text,
+      .header__logo_whiteText {
+        margin-inline: 0.25rem;
       }
-      html.dark .header.is-scroll .header__logo_whiteText {
-        display: none;
-      }
+
+      /* スクロール時も並列配置を維持 */
       .header__logo_link {
-        font-size: 1.25rem;
-        color: inherit;
-      }
-      .header__nav {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .header__menu {
-        display: flex;
-        align-items: center;
-        list-style: none;
-      }
-      .header__menu_item {
-        max-width: 100%;
-        display: inline-block;
-        border: transparent 1px solid;
-        border-radius: 50%;
-        box-shadow: 0 8px 8px rgb(0 0 0 / 0.6);
-        perspective: 100px;
-        margin-inline: 0.5rem;
-        padding-block: 0.5rem;
-        padding-inline: 0.5rem;
-        transition:
-          transform 0.3s ease,
-          box-shadow 0.4s ease;
-      }
-      .header__menu_item:nth-of-type(3) {
-        padding-block: 0.03375rem;
-        padding-inline: 0.03375rem;
-      }
-      .header__menu_item:nth-of-type(4) {
-        padding-block: 0.28125rem;
-        padding-inline: 0.375rem;
-      }
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton {
-        display: inline-block;
-        background-color: transparent;
-        box-shadow: none;
-        border-radius: 0;
-        width: 28px;
-        height: 31px;
-        min-height: 31px;
-        padding: 0;
-        position: relative;
-        vertical-align: middle;
-      }
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton:is(:hover, :focus-visible) {
-        box-shadow: none;
-      }
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton:active {
-        box-shadow: none;
-      }
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton svg {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        filter: none;
-        margin: 0;
-      }
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton .offBackgroundIcon,
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton .onBackgroundIcon {
         display: flex;
         align-items: center;
         justify-content: center;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        flex-direction: row;
       }
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton .offBackgroundIcon svg,
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton .onBackgroundIcon svg {
-        display: block;
-        position: static;
-        transform: none;
-        margin: 0;
-      }
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton .offBackgroundIcon:is(:hover, :focus-visible) {
-        transform: translate(-50%, -50%) scale(1.1);
-      }
-      .header__menu_item:nth-of-type(4) #toggleBackgroundButton .onBackgroundIcon:is(:hover, :focus-visible) {
-        transform: translate(-50%, -50%) scale(1.1);
-      }
-      .header__menu_item:nth-of-type(5) {
-        padding-block: 1.25rem;
-        padding-inline: 1.25rem;
-      }
-      .header__menu_item:is(:hover, :focus-visible) {
-        box-shadow: 0 8px 4px rgb(0 0 0 / 0.6);
-      }
-      .header__menu_item:not(.header__menu_item--hamburger):active {
-        transform: scale(0.8);
-        box-shadow: 0 8px 8px rgb(0 0 0 / 0.4);
-      }
-      html.dark .header__menu_item:is(:hover, :focus-visible) {
-        box-shadow: 0 8px 8px rgb(255 255 255 / 0.6);
-      }
-      .header__menu_item.is-scroll {
-        box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
-      }
-      .header__menu_link svg {
-        color: inherit;
-      }
+    }
+    .header__inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header__logo_container {
+      position: relative;
+      display: inline-block;
+      vertical-align: middle;
+    }
 
-      .logo__wrapper {
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 9999;
-        opacity: 1;
-        visibility: visible;
-        transition:
-          opacity 0.8s ease-in-out,
-          visibility 0.8s ease-in-out;
-      }
+    .header__logo_image {
+      width: 40px;
+      height: auto;
+      display: block;
+      position: relative;
+      z-index: 2;
+      /* transition: transform 0.3s ease; */
+    }
+    .header__logo_image.is-scroll {
+      border: transparent 1px solid;
+      border-radius: 50%;
+      box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
+      margin-inline: 0.5rem;
+      padding-block: 0.25rem;
+      padding-inline: 0.25rem;
+      transition:
+        transform 0.3s ease,
+        box-shadow 0.4s ease;
+    }
 
-      .logo__wrapper.hidden {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
+    /* iPhone特有の調整 - スクロール時も並列配置を維持 */
+    @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
+      .header__logo_image.is-scroll {
+        margin-inline: 0.25rem;
       }
+    }
 
-      html.dark .logo__wrapper {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    .header__clock_animation {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60px;
+      height: 60px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .clock-circle {
+      stroke: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+      stroke: #4ecdc4;
+      transform-origin: center;
+      transform: rotate(-90deg);
+      transition: stroke-dashoffset 1s ease-in-out;
+    }
+
+    .header.is-scroll .clock-circle {
+      stroke: #45b7d1;
+    }
+
+    html.dark .clock-circle {
+      stroke: #ffeaa7;
+    }
+
+    html.dark .header.is-scroll .clock-circle {
+      stroke: #96ceb4;
+    }
+    .header__logo_text {
+      width: 280px;
+      height: auto;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .header__logo_whiteText {
+      display: none;
+      width: 280px;
+      height: auto;
+      vertical-align: middle;
+    }
+    /* Dark mode: show WhiteTextSvg, hide TextSvg */
+    html.dark .header__logo_text {
+      display: none;
+    }
+    html.dark .header__logo_whiteText {
+      display: inline-block;
+    }
+    /* Dark mode + scroll: show TextSvg, hide WhiteTextSvg */
+    html.dark .header.is-scroll .header__logo_text {
+      display: inline-block;
+    }
+    html.dark .header.is-scroll .header__logo_whiteText {
+      display: none;
+    }
+    .header__logo_link {
+      font-size: 1.25rem;
+      color: inherit;
+    }
+    .header__nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .header__menu {
+      display: flex;
+      align-items: center;
+      list-style: none;
+    }
+    .header__menu_item {
+      max-width: 100%;
+      display: inline-block;
+      border: transparent 1px solid;
+      border-radius: 50%;
+      box-shadow: 0 8px 8px rgb(0 0 0 / 0.6);
+      perspective: 100px;
+      margin-inline: 0.5rem;
+      padding-block: 0.5rem;
+      padding-inline: 0.5rem;
+      transition:
+        transform 0.3s ease,
+        box-shadow 0.4s ease;
+    }
+    .header__menu_item:nth-of-type(3) {
+      padding-block: 0.03375rem;
+      padding-inline: 0.03375rem;
+    }
+    .header__menu_item:nth-of-type(4) {
+      padding-block: 0.28125rem;
+      padding-inline: 0.375rem;
+    }
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton {
+      display: inline-block;
+      background-color: transparent;
+      box-shadow: none;
+      border-radius: 0;
+      width: 28px;
+      height: 31px;
+      min-height: 31px;
+      padding: 0;
+      position: relative;
+      vertical-align: middle;
+    }
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton:is(:hover, :focus-visible) {
+      box-shadow: none;
+    }
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton:active {
+      box-shadow: none;
+    }
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      filter: none;
+      margin: 0;
+    }
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton .offBackgroundIcon,
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton .onBackgroundIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton .offBackgroundIcon svg,
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton .onBackgroundIcon svg {
+      display: block;
+      position: static;
+      transform: none;
+      margin: 0;
+    }
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton .offBackgroundIcon:is(:hover, :focus-visible) {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    .header__menu_item:nth-of-type(4) #toggleBackgroundButton .onBackgroundIcon:is(:hover, :focus-visible) {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    .header__menu_item:nth-of-type(5) {
+      padding-block: 1.25rem;
+      padding-inline: 1.25rem;
+    }
+    .header__menu_item:is(:hover, :focus-visible) {
+      box-shadow: 0 8px 4px rgb(0 0 0 / 0.6);
+    }
+    .header__menu_item:not(.header__menu_item--hamburger):active {
+      transform: scale(0.8);
+      box-shadow: 0 8px 8px rgb(0 0 0 / 0.4);
+    }
+    html.dark .header__menu_item:is(:hover, :focus-visible) {
+      box-shadow: 0 8px 8px rgb(255 255 255 / 0.6);
+    }
+    .header__menu_item.is-scroll {
+      box-shadow: 0 10px 10px rgb(0 0 0 / 0.6);
+    }
+    .header__menu_link svg {
+      color: inherit;
+    }
+
+    .logo__wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      opacity: 1;
+      visibility: visible;
+      transition:
+        opacity 0.8s ease-in-out,
+        visibility 0.8s ease-in-out;
+    }
+
+    .logo__wrapper.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    html.dark .logo__wrapper {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+      min-height: 400px; /* CLSを防ぐために最小高さを設定 */
+      padding: 2rem;
+    }
+
+    .logo-container {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      margin-bottom: 2rem;
+    }
+
+    .logo-image {
+      width: 120px;
+      height: 120px;
+      filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.2));
+      will-change: transform;
+      object-fit: contain;
+    }
+
+    .title {
+      margin-bottom: 2rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      will-change: transform, opacity;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .text-stroke {
+      font-family: "Poppins", sans-serif;
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: transparent;
+      text-align: center;
+      position: relative;
+      -webkit-text-stroke: 2px var(--color-white);
+      paint-order: stroke;
+      text-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
+      display: inline-block;
+    }
+
+    html.dark .text-stroke {
+      color: var(--color-white);
+      background-image: var(--gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 180%;
+      background-position: 0%;
+      animation: flowingGradation 6s ease-in infinite;
+    }
+
+    .text-gradient {
+      display: inline-block;
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      background-image: var(--gradient-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 180%;
+      background-position: 0%;
+      z-index: 3;
+      animation: flowingGradation 6s ease-in infinite;
+    }
+
+    .loading-spinner {
+      margin-top: 1rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
+      border-top: var(--color-white) 3px solid;
+      border-radius: 50%;
+      will-change: transform, opacity;
+      /* CSS animation disabled - using GSAP instead */
+    }
+
+    html.dark .spinner {
+      border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
+      border-top: var(--color-white) 3px solid;
+    }
+
+    @keyframes flowingGradation {
+      0% {
+        background-position: 0% 50%;
       }
-
-      .loading-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        width: 100%;
-        max-width: 500px;
-        min-height: 400px; /* CLSを防ぐために最小高さを設定 */
-        padding: 2rem;
+      50% {
+        background-position: 100% 50%;
       }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
-      .logo-container {
-        position: relative;
-        overflow: hidden;
-        aspect-ratio: 1 / 1;
-        margin-bottom: 2rem;
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* レスポンシブデザイン */
+    @media (width <= 768px) {
+      .text-stroke,
+      .text-gradient {
+        font-size: 2.5rem;
       }
 
       .logo-image {
-        width: 120px;
-        height: 120px;
-        filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.2));
-        will-change: transform;
-        object-fit: contain;
+        width: 100px;
       }
 
       .title {
-        margin-bottom: 2rem;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-        will-change: transform, opacity;
+        gap: 0.3rem;
       }
+    }
 
-      .title-row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .text-stroke {
-        font-family: "Poppins", sans-serif;
-        font-size: 3rem;
-        font-weight: 700;
-        line-height: 1.2;
-        color: transparent;
-        text-align: center;
-        position: relative;
-        -webkit-text-stroke: 2px var(--color-white);
-        paint-order: stroke;
-        text-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
-        display: inline-block;
-      }
-
-      html.dark .text-stroke {
-        color: var(--color-white);
-        background-image: var(--gradient-text);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-size: 180%;
-        background-position: 0%;
-        animation: flowingGradation 6s ease-in infinite;
-      }
-
+    @media (width <= 480px) {
+      .text-stroke,
       .text-gradient {
-        display: inline-block;
-        font-size: 3rem;
-        font-weight: 700;
-        text-align: center;
-        background-image: var(--gradient-text);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-size: 180%;
-        background-position: 0%;
-        z-index: 3;
-        animation: flowingGradation 6s ease-in infinite;
+        font-size: 2rem;
       }
 
-      .loading-spinner {
-        margin-top: 1rem;
+      .logo-image {
+        width: 80px;
       }
 
-      .spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
-        border-top: var(--color-white) 3px solid;
-        border-radius: 50%;
-        will-change: transform, opacity;
-        /* CSS animation disabled - using GSAP instead */
+      .title {
+        gap: 0.2rem;
       }
+    }
 
-      html.dark .spinner {
-        border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
-        border-top: var(--color-white) 3px solid;
-      }
+    .fv {
+      position: relative;
+      pointer-events: none; /* カードへのクリックを通過させる */
+    }
 
-      @keyframes flowingGradation {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
+    .fv > * {
+      pointer-events: auto; /* 子要素は通常通りクリック可能 */
+    }
 
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
+    .fv__wrapper {
+      height: 100%;
+      min-height: 100vh; /* CLS防止: 最小高さを設定してレイアウトシフトを防止 */
+      background: #1d1f20;
+      perspective: 1200px;
+      overflow: hidden;
+      position: relative;
+      margin-block: 0;
+      margin-inline: auto;
+      pointer-events: none; /* カードへのクリックを通過させる */
+      z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+    }
 
-      /* レスポンシブデザイン */
-      @media (width <= 768px) {
-        .text-stroke,
-        .text-gradient {
-          font-size: 2.5rem;
-        }
+    /* LCP最適化: 背景画像を<img>タグとして使用し、fetchpriority="high"を適用 */
+    .fv__background-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: 0;
+      pointer-events: none; /* カードへのクリックを通過させる */
+      /* 画像読み込み中の背景色 */
+      background-color: #1d1f20;
+    }
 
-        .logo-image {
-          width: 100px;
-        }
-
-        .title {
-          gap: 0.3rem;
-        }
-      }
-
-      @media (width <= 480px) {
-        .text-stroke,
-        .text-gradient {
-          font-size: 2rem;
-        }
-
-        .logo-image {
-          width: 80px;
-        }
-
-        .title {
-          gap: 0.2rem;
-        }
-      }
-
-      .fv {
-        position: relative;
-        pointer-events: none; /* カードへのクリックを通過させる */
-      }
-
-      .fv > * {
-        pointer-events: auto; /* 子要素は通常通りクリック可能 */
-      }
-
-      .fv__wrapper {
-        height: 100%;
-        min-height: 100vh; /* CLS防止: 最小高さを設定してレイアウトシフトを防止 */
-        background: #1d1f20;
-        perspective: 1200px;
-        overflow: hidden;
-        position: relative;
-        margin-block: 0;
-        margin-inline: auto;
-        pointer-events: none; /* カードへのクリックを通過させる */
-        z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
-      }
-
-      /* LCP最適化: 背景画像を<img>タグとして使用し、fetchpriority="high"を適用 */
+    /* スマホサイズ（768px以下）での背景画像最適化 */
+    @media (width <= 768px) {
       .fv__background-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        /* スマホ用画像のアスペクト比を維持しながら表示 */
         object-fit: cover;
-        object-position: center;
-        z-index: 0;
-        pointer-events: none; /* カードへのクリックを通過させる */
-        /* 画像読み込み中の背景色 */
-        background-color: #1d1f20;
+        object-position: center center;
       }
+    }
 
-      /* スマホサイズ（768px以下）での背景画像最適化 */
-      @media (width <= 768px) {
-        .fv__background-image {
-          /* スマホ用画像のアスペクト比を維持しながら表示 */
-          object-fit: cover;
-          object-position: center center;
-        }
+    /* タブレットサイズ（769px-1024px）での背景画像最適化 */
+    @media (769px <= width <= 1024px) {
+      .fv__background-image {
+        /* タブレット用：デスクトップ画像を使用するため、適切にフィット */
+        object-fit: cover;
+        object-position: center center;
       }
+    }
 
-      /* タブレットサイズ（769px-1024px）での背景画像最適化 */
-      @media (769px <= width <= 1024px) {
-        .fv__background-image {
-          /* タブレット用：デスクトップ画像を使用するため、適切にフィット */
-          object-fit: cover;
-          object-position: center center;
-        }
-      }
+    .fv__wrapper > * {
+      pointer-events: auto; /* 子要素は通常通りクリック可能 */
+    }
 
-      .fv__wrapper > * {
-        pointer-events: auto; /* 子要素は通常通りクリック可能 */
-      }
+    .fv__wrapper::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+      box-shadow: inset 10px 100px 200px rgb(0 0 0 / 0.6);
+      pointer-events: none;
+    }
 
-      .fv__wrapper::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
-        box-shadow: inset 10px 100px 200px rgb(0 0 0 / 0.6);
-        pointer-events: none;
-      }
+    /* 背景画像コンテナ */
+    .background-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0 !important; /* カードより後ろに配置 */
+      overflow: hidden;
+      transform-style: preserve-3d;
+      pointer-events: none; /* カードへのクリックを通過させる */
+      /* CSS変数の初期値を明示的に設定 */
+      --mouse-x: 50%;
+      --mouse-y: 50%;
+      /* 円形マスクでクリッピング（こちらは正面向き） */
+      -webkit-mask-image: radial-gradient(
+        circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        black 100%,
+        transparent 100%
+      );
+      mask-image: radial-gradient(
+        circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        black 100%,
+        transparent 100%
+      );
+    }
 
-      /* 背景画像コンテナ */
+    /* スマホサイズでマウス追従の円を小さくする */
+    @media (width <= 480px) {
       .background-container {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        z-index: 0 !important; /* カードより後ろに配置 */
-        overflow: hidden;
-        transform-style: preserve-3d;
-        pointer-events: none; /* カードへのクリックを通過させる */
-        /* CSS変数の初期値を明示的に設定 */
+        /* CSS変数の初期値を維持 */
         --mouse-x: 50%;
         --mouse-y: 50%;
-        /* 円形マスクでクリッピング（こちらは正面向き） */
         -webkit-mask-image: radial-gradient(
-          circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+          circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
           black 100%,
           transparent 100%
         );
         mask-image: radial-gradient(
-          circle 7.5rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
+          circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
           black 100%,
           transparent 100%
         );
       }
-
-      /* スマホサイズでマウス追従の円を小さくする */
-      @media (width <= 480px) {
-        .background-container {
-          /* CSS変数の初期値を維持 */
-          --mouse-x: 50%;
-          --mouse-y: 50%;
-          -webkit-mask-image: radial-gradient(
-            circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            black 100%,
-            transparent 100%
-          );
-          mask-image: radial-gradient(
-            circle 4rem at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            black 100%,
-            transparent 100%
-          );
-        }
-      }
-
-      .background-rotated {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 400%;
-        height: 300%;
-        background-size: 480px;
-        background-repeat: repeat;
-        background-position: 50% 50%;
-        transform-style: preserve-3d;
-        animation: background-scroll-3d 24s linear infinite;
-        pointer-events: none;
-        z-index: 0 !important;
-      }
-
-      .background {
-        /* マスク位置を更新するためのダミー要素として保持 */
-        display: none;
-      }
-
-      @keyframes background-scroll-3d {
-        from {
-          background-position: 0% 50%;
-          transform: translateX(0);
-        }
-        to {
-          background-position: 100% 50%;
-          transform: translateX(0);
-        }
-      }
-
-      .glitch-container {
-        width: 100%;
-        height: 100vh;
-        max-width: 1400px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-inline: auto;
-        position: relative;
-        z-index: 0;
-        pointer-events: none;
-        /* CLS改善: 初期サイズを明示的に設定してレイアウトシフトを防止 */
-        min-height: 500px; /* Glitchコンポーネントの最小高さに合わせる */
-      }
-
-      /* モバイルサイズでのglitch-container最適化 */
-      @media (width <= 480px) {
-        .glitch-container {
-          min-height: 400px; /* モバイル用Glitchコンポーネントの高さに合わせる */
-        }
-      }
-
-      .glitch-container > * {
-        pointer-events: auto; /* 子要素は通常通りクリック可能 */
-      }
-
-      /* NaviCardコンポーネント以外のglitch-containerの子要素は、カードより後ろに配置 */
-      .glitch-container > *:not(.navi-card__wrapper) {
-        z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
-      }
-
-      @keyframes noise {
-        0% {
-          background-position: 0 0;
-        }
-        100% {
-          background-position: 100% 100%;
-        }
-      }
-      @media (width <= 480px) {
-        .glitch-container {
-          width: 96%;
-        }
-      }
-    </style>
-
-    <!-- サイト全体の構造化データ（Person + WebSite） -->
-    <PersonSchema />
-    <WebSiteSchema />
-
-    <!-- ページ固有の構造化データ -->
-    {
-      typeof jsonLd === "string" && jsonLd.trim() !== "" && (
-        <script is:inline type="application/ld+json" set:html={jsonLd} />
-      )
     }
 
-    <!-- フォントは@fontsource/poppinsをLayout.astroでインポート済み -->
+    .background-rotated {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 400%;
+      height: 300%;
+      background-size: 480px;
+      background-repeat: repeat;
+      background-position: 50% 50%;
+      transform-style: preserve-3d;
+      animation: background-scroll-3d 24s linear infinite;
+      pointer-events: none;
+      z-index: 0 !important;
+    }
 
-    <!-- 非クリティカルなフォントの遅延読み込み -->
-    <!--
+    .background {
+      /* マスク位置を更新するためのダミー要素として保持 */
+      display: none;
+    }
+
+    @keyframes background-scroll-3d {
+      from {
+        background-position: 0% 50%;
+        transform: translateX(0);
+      }
+      to {
+        background-position: 100% 50%;
+        transform: translateX(0);
+      }
+    }
+
+    .glitch-container {
+      width: 100%;
+      height: 100vh;
+      max-width: 1400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-inline: auto;
+      position: relative;
+      z-index: 0;
+      pointer-events: none;
+      /* CLS改善: 初期サイズを明示的に設定してレイアウトシフトを防止 */
+      min-height: 500px; /* Glitchコンポーネントの最小高さに合わせる */
+    }
+
+    /* モバイルサイズでのglitch-container最適化 */
+    @media (width <= 480px) {
+      .glitch-container {
+        min-height: 400px; /* モバイル用Glitchコンポーネントの高さに合わせる */
+      }
+    }
+
+    .glitch-container > * {
+      pointer-events: auto; /* 子要素は通常通りクリック可能 */
+    }
+
+    /* NaviCardコンポーネント以外のglitch-containerの子要素は、カードより後ろに配置 */
+    .glitch-container > *:not(.navi-card__wrapper) {
+      z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+    }
+
+    @keyframes noise {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 100% 100%;
+      }
+    }
+    @media (width <= 480px) {
+      .glitch-container {
+        width: 96%;
+      }
+    }
+  </style>
+
+  <!-- サイト全体の構造化データ（Person + WebSite） -->
+  <PersonSchema />
+  <WebSiteSchema />
+
+  <!-- ページ固有の構造化データ -->
+  {
+    typeof jsonLd === "string" && jsonLd.trim() !== "" && (
+      <script is:inline type="application/ld+json" set:html={jsonLd} />
+    )
+  }
+
+  <!-- フォントは@fontsource/poppinsをLayout.astroでインポート済み -->
+
+  <!-- 非クリティカルなフォントの遅延読み込み -->
+  <!--
       非クリティカルなフォント（Poppins 700、Cinzel Decorative、Playfair Display、Marcellus）を
       <link rel="preload"> で遅延読み込みします。
       ビルド時に async-css-optimizer.js が自動的に最適化します。
     -->
-    <NonCriticalFonts />
+  <NonCriticalFonts />
 
-    <!-- NOTE:
+  <!-- NOTE:
       以前はFOUC防止のために html を visibility:hidden にしていましたが、
       DevTools Lighthouse 実行時に show 処理が走らないケースがあり NO_FCP の原因になりました。
       Critical CSS をインライン化している前提では、ここで html を隠すメリットが薄いため、
       常に描画可能にして Lighthouse を含む計測ツールで確実にFCPが発生するようにします。
     -->
-    <script is:inline>
-      // 念のため、常に可視化（View Transitionsの遷移後も含む）
+  <script is:inline>
+    // 念のため、常に可視化（View Transitionsの遷移後も含む）
+    document.documentElement.style.visibility = "visible";
+    document.addEventListener("astro:after-swap", () => {
       document.documentElement.style.visibility = "visible";
-      document.addEventListener("astro:after-swap", () => {
-        document.documentElement.style.visibility = "visible";
-      });
-    </script>
+    });
+  </script>
 
-    <!-- CSS非同期読み込みのフォールバックスクリプト -->
-    <script is:inline>
-      // preload + onload パターンと media="print" hack のフォールバック
-      (function () {
-        // preload + onload パターンのフォールバック（reset.css, global.css用）
-        const preloadLinks = document.querySelectorAll('link[rel="preload"][as="style"]');
-        preloadLinks.forEach(function (link) {
-          // onloadがサポートされていない場合は、即座にstylesheetに変換
-          if (!("onload" in link)) {
+  <!-- CSS非同期読み込みのフォールバックスクリプト -->
+  <script is:inline>
+    // preload + onload パターンと media="print" hack のフォールバック
+    (function () {
+      // preload + onload パターンのフォールバック（reset.css, global.css用）
+      const preloadLinks = document.querySelectorAll('link[rel="preload"][as="style"]');
+      preloadLinks.forEach(function (link) {
+        // onloadがサポートされていない場合は、即座にstylesheetに変換
+        if (!("onload" in link)) {
+          link.rel = "stylesheet";
+        } else {
+          // onloadがサポートされている場合は、onloadイベントを設定
+          link.onload = function () {
+            this.onload = null;
+            this.rel = "stylesheet";
+          };
+          // フォールバック: 読み込みが完了している場合に備えて即座にチェック
+          if (link.sheet || (link.href && document.styleSheets.length > 0)) {
             link.rel = "stylesheet";
+          }
+        }
+      });
+
+      // media="print" hack のフォールバック（Swiper CSS、コンポーネントCSS用）
+      const printLinks = document.querySelectorAll('link[rel="stylesheet"][media="print"]');
+      printLinks.forEach(function (link) {
+        const href = link.getAttribute("href");
+        // Swiper CSSまたはコンポーネントのCSS（index.*.cssなど）を処理
+        if (
+          href &&
+          (href.includes("swiper") || href.match(/index\.[A-Za-z0-9]+\.css/) || href.match(/_[A-Za-z0-9]+\.css/))
+        ) {
+          // onloadがサポートされていない場合は、即座にmedia="all"に変換
+          if (!("onload" in link)) {
+            link.media = "all";
           } else {
             // onloadがサポートされている場合は、onloadイベントを設定
             link.onload = function () {
-              this.onload = null;
-              this.rel = "stylesheet";
+              this.media = "all";
             };
             // フォールバック: 読み込みが完了している場合に備えて即座にチェック
-            if (link.sheet || (link.href && document.styleSheets.length > 0)) {
-              link.rel = "stylesheet";
-            }
-          }
-        });
-
-        // media="print" hack のフォールバック（Swiper CSS、コンポーネントCSS用）
-        const printLinks = document.querySelectorAll('link[rel="stylesheet"][media="print"]');
-        printLinks.forEach(function (link) {
-          const href = link.getAttribute("href");
-          // Swiper CSSまたはコンポーネントのCSS（index.*.cssなど）を処理
-          if (
-            href &&
-            (href.includes("swiper") || href.match(/index\.[A-Za-z0-9]+\.css/) || href.match(/_[A-Za-z0-9]+\.css/))
-          ) {
-            // onloadがサポートされていない場合は、即座にmedia="all"に変換
-            if (!("onload" in link)) {
+            if (link.sheet) {
               link.media = "all";
-            } else {
-              // onloadがサポートされている場合は、onloadイベントを設定
-              link.onload = function () {
-                this.media = "all";
-              };
-              // フォールバック: 読み込みが完了している場合に備えて即座にチェック
-              if (link.sheet) {
-                link.media = "all";
-              }
             }
           }
-        });
-      })();
-    </script>
-
-    <!-- グローバルエラーハンドラー: 動的インポートのエラーを適切に処理 -->
-    <!-- is:inlineで即座に実行し、他のスクリプトより先にエラーハンドラーを設定 -->
-    <script is:inline>
-      // @ts-nocheck
-      // IIFEでスコープを分離（重複宣言エラーを防ぐ）
-      (() => {
-        // 開発環境でのみログを出力（重複宣言を防ぐため、既存チェック）
-        if (typeof window !== "undefined" && typeof window.devLog === "undefined") {
-          window.devLog = (...args) => {
-            if (window.__DEV__) {
-              console.log("[ErrorHandler]", ...args);
-            }
-          };
         }
-        const devLog = typeof window !== "undefined" ? window.devLog : () => {};
+      });
+    })();
+  </script>
 
-        // 動的インポートのエラーを処理（コンソールエラーを抑制）
-        if (typeof window !== "undefined") {
-          // 未処理のPromise拒否をキャッチ（動的インポートのエラーなど）
-          window.addEventListener("unhandledrejection", (event) => {
-            const error = event.reason;
-            const errorMessage = error?.message || String(error);
-            const errorStack = error?.stack;
+  <!-- グローバルエラーハンドラー: 動的インポートのエラーを適切に処理 -->
+  <!-- is:inlineで即座に実行し、他のスクリプトより先にエラーハンドラーを設定 -->
+  <script is:inline>
+    // @ts-nocheck
+    // IIFEでスコープを分離（重複宣言エラーを防ぐ）
+    (() => {
+      // 開発環境でのみログを出力（重複宣言を防ぐため、既存チェック）
+      if (typeof window !== "undefined" && typeof window.devLog === "undefined") {
+        window.devLog = (...args) => {
+          if (window.__DEV__) {
+            console.log("[ErrorHandler]", ...args);
+          }
+        };
+      }
+      const devLog = typeof window !== "undefined" ? window.devLog : () => {};
 
-            // 動的インポートのエラーを特定（iconify、tsparticles、gsapなどのチャンク読み込みエラーを含む）
-            const errorString = String(error);
-            const isDynamicImportError =
-              errorMessage.includes("Failed to fetch dynamically imported module") ||
-              errorMessage.includes("Failed to load resource") ||
-              errorMessage.includes("ERR_CONNECTION_FAILED") ||
-              errorMessage.includes("ERR_NETWORK_CHANGED") ||
-              errorMessage.includes("ERR_INTERNET_DISCONNECTED") ||
-              errorMessage.includes("Loading chunk") ||
-              errorMessage.includes("Loading CSS chunk") ||
-              errorMessage.includes("ChunkLoadError") ||
-              errorMessage.includes("/_astro/") ||
-              errorMessage.includes("iconify") ||
-              errorMessage.includes("netlify.app") ||
-              errorString.includes("ERR_CONNECTION_FAILED") ||
-              errorString.includes("iconify") ||
-              errorString.includes("/_astro/");
+      // 動的インポートのエラーを処理（コンソールエラーを抑制）
+      if (typeof window !== "undefined") {
+        // 未処理のPromise拒否をキャッチ（動的インポートのエラーなど）
+        window.addEventListener("unhandledrejection", (event) => {
+          const error = event.reason;
+          const errorMessage = error?.message || String(error);
+          const errorStack = error?.stack;
 
-            if (isDynamicImportError) {
-              // 動的インポートのエラーは開発環境でのみログに記録
-              devLog("Dynamic import error (suppressed in production):", {
-                message: errorMessage,
-                stack: errorStack,
-              });
-              // 本番環境ではエラーを抑制（PageSpeed Insightsのエラーを防ぐ）
-              // ネットワークエラーはユーザーのネットワーク環境によるものであり、アプリケーションのエラーではない
-              event.preventDefault();
-              event.stopPropagation();
-              return;
-            }
+          // 動的インポートのエラーを特定（iconify、tsparticles、gsapなどのチャンク読み込みエラーを含む）
+          const errorString = String(error);
+          const isDynamicImportError =
+            errorMessage.includes("Failed to fetch dynamically imported module") ||
+            errorMessage.includes("Failed to load resource") ||
+            errorMessage.includes("ERR_CONNECTION_FAILED") ||
+            errorMessage.includes("ERR_NETWORK_CHANGED") ||
+            errorMessage.includes("ERR_INTERNET_DISCONNECTED") ||
+            errorMessage.includes("Loading chunk") ||
+            errorMessage.includes("Loading CSS chunk") ||
+            errorMessage.includes("ChunkLoadError") ||
+            errorMessage.includes("/_astro/") ||
+            errorMessage.includes("iconify") ||
+            errorMessage.includes("netlify.app") ||
+            errorString.includes("ERR_CONNECTION_FAILED") ||
+            errorString.includes("iconify") ||
+            errorString.includes("/_astro/");
 
-            // その他のエラーは通常通り処理
-            devLog("Unhandled promise rejection:", error);
-          });
+          if (isDynamicImportError) {
+            // 動的インポートのエラーは開発環境でのみログに記録
+            devLog("Dynamic import error (suppressed in production):", {
+              message: errorMessage,
+              stack: errorStack,
+            });
+            // 本番環境ではエラーを抑制（PageSpeed Insightsのエラーを防ぐ）
+            // ネットワークエラーはユーザーのネットワーク環境によるものであり、アプリケーションのエラーではない
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
 
-          // グローバルエラーハンドラー（ReferenceErrorなど）
-          window.addEventListener("error", (event) => {
-            const error = event.error;
-            const errorMessage = error?.message || event.message || "";
-            const errorStack = error?.stack;
-            const filename = event.filename || "";
-            const target = event.target;
+          // その他のエラーは通常通り処理
+          devLog("Unhandled promise rejection:", error);
+        });
 
-            // 既に処理済みのエラーは無視
-            if (event.defaultPrevented) {
-              return;
-            }
+        // グローバルエラーハンドラー（ReferenceErrorなど）
+        window.addEventListener("error", (event) => {
+          const error = event.error;
+          const errorMessage = error?.message || event.message || "";
+          const errorStack = error?.stack;
+          const filename = event.filename || "";
+          const target = event.target;
 
-            // リソース読み込みエラー（<script>、<link>、<img>などの読み込みエラー）を検出
-            const isResourceLoadError =
-              target &&
-              (target instanceof HTMLElement || target instanceof HTMLScriptElement || target instanceof HTMLLinkElement || target instanceof HTMLImageElement) &&
-              target.tagName &&
-              (target.tagName === "SCRIPT" || target.tagName === "LINK" || target.tagName === "IMG" || target.tagName === "SOURCE");
+          // 既に処理済みのエラーは無視
+          if (event.defaultPrevented) {
+            return;
+          }
 
-            // 動的インポート関連のエラーを特定（iconify、tsparticles、gsapなどのチャンク読み込みエラーを含む）
-            const isDynamicImportError =
-              isResourceLoadError ||
-              errorMessage.includes("Failed to fetch dynamically imported module") ||
-              errorMessage.includes("Failed to load resource") ||
-              errorMessage.includes("ERR_CONNECTION_FAILED") ||
-              errorMessage.includes("ERR_NETWORK_CHANGED") ||
-              errorMessage.includes("ERR_INTERNET_DISCONNECTED") ||
-              errorMessage.includes("Loading chunk") ||
-              errorMessage.includes("Loading CSS chunk") ||
-              errorMessage.includes("ChunkLoadError") ||
-              filename.includes("/_astro/") ||
-              filename.includes("iconify") ||
-              filename.includes("netlify.app") ||
-              (target && target.src && (target.src.includes("/_astro/") || target.src.includes("iconify")));
+          // リソース読み込みエラー（<script>、<link>、<img>などの読み込みエラー）を検出
+          const isResourceLoadError =
+            target &&
+            (target instanceof HTMLElement ||
+              target instanceof HTMLScriptElement ||
+              target instanceof HTMLLinkElement ||
+              target instanceof HTMLImageElement) &&
+            target.tagName &&
+            (target.tagName === "SCRIPT" ||
+              target.tagName === "LINK" ||
+              target.tagName === "IMG" ||
+              target.tagName === "SOURCE");
 
-            if (isDynamicImportError) {
-              // 動的インポートのエラーは開発環境でのみログに記録
-              devLog("Dynamic import/resource load error (suppressed in production):", {
-                message: errorMessage,
-                stack: errorStack,
-                filename: filename,
-                target: target ? (target.tagName || target.nodeName) : null,
-                src: target && target.src ? target.src : null,
-                srcset: target && target.srcset ? target.srcset : null,
-                currentSrc: target && target.currentSrc ? target.currentSrc : null,
-                lineno: event.lineno,
-                colno: event.colno,
-              });
-              // 本番環境ではエラーを抑制（PageSpeed Insightsのエラーを防ぐ）
-              // ネットワークエラーはユーザーのネットワーク環境によるものであり、アプリケーションのエラーではない
-              event.preventDefault();
-              event.stopPropagation();
-              // リソース読み込みエラーの場合、イベントの伝播を停止
-              if (isResourceLoadError && target) {
-                target.onerror = null; // エラーハンドラーをクリアして再発を防ぐ
-                // 画像要素の場合、代替表示を設定
-                if (target.tagName === "IMG" && !target.style.display) {
-                  target.style.opacity = "0";
-                  target.style.visibility = "hidden";
-                }
-              }
-              return;
-            }
+          // 動的インポート関連のエラーを特定（iconify、tsparticles、gsapなどのチャンク読み込みエラーを含む）
+          const isDynamicImportError =
+            isResourceLoadError ||
+            errorMessage.includes("Failed to fetch dynamically imported module") ||
+            errorMessage.includes("Failed to load resource") ||
+            errorMessage.includes("ERR_CONNECTION_FAILED") ||
+            errorMessage.includes("ERR_NETWORK_CHANGED") ||
+            errorMessage.includes("ERR_INTERNET_DISCONNECTED") ||
+            errorMessage.includes("Loading chunk") ||
+            errorMessage.includes("Loading CSS chunk") ||
+            errorMessage.includes("ChunkLoadError") ||
+            filename.includes("/_astro/") ||
+            filename.includes("iconify") ||
+            filename.includes("netlify.app") ||
+            (target && target.src && (target.src.includes("/_astro/") || target.src.includes("iconify")));
 
-            // その他のエラーは開発環境でのみログに記録
-            devLog("Global error:", {
+          if (isDynamicImportError) {
+            // 動的インポートのエラーは開発環境でのみログに記録
+            devLog("Dynamic import/resource load error (suppressed in production):", {
               message: errorMessage,
               stack: errorStack,
               filename: filename,
+              target: target ? target.tagName || target.nodeName : null,
+              src: target && target.src ? target.src : null,
+              srcset: target && target.srcset ? target.srcset : null,
+              currentSrc: target && target.currentSrc ? target.currentSrc : null,
               lineno: event.lineno,
               colno: event.colno,
             });
+            // 本番環境ではエラーを抑制（PageSpeed Insightsのエラーを防ぐ）
+            // ネットワークエラーはユーザーのネットワーク環境によるものであり、アプリケーションのエラーではない
+            event.preventDefault();
+            event.stopPropagation();
+            // リソース読み込みエラーの場合、イベントの伝播を停止
+            if (isResourceLoadError && target) {
+              target.onerror = null; // エラーハンドラーをクリアして再発を防ぐ
+              // 画像要素の場合、代替表示を設定
+              if (target.tagName === "IMG" && !target.style.display) {
+                target.style.opacity = "0";
+                target.style.visibility = "hidden";
+              }
+            }
+            return;
+          }
+
+          // その他のエラーは開発環境でのみログに記録
+          devLog("Global error:", {
+            message: errorMessage,
+            stack: errorStack,
+            filename: filename,
+            lineno: event.lineno,
+            colno: event.colno,
           });
-        }
-      })();
-    </script>
-  </head>
+        });
+      }
+    })();
+  </script>
+</head>

@@ -70,9 +70,7 @@ const SnsLink = ({
       <a
         className={linkClassName}
         href={href}
-        {...(targetBlank === "_blank"
-          ? { target: "_blank" as const, rel: "noopener noreferrer" }
-          : {})}
+        {...(targetBlank === "_blank" ? { target: "_blank" as const, rel: "noopener noreferrer" } : {})}
         aria-label={ariaLabel}
         title={ariaTitle}
       >
@@ -99,11 +97,9 @@ const SnsLink = ({
               data-sns-icon={snsIconSvg}
             />
           )
-        ) : (
-          IconifyInline ? (
-            <IconifyInline icon={snsIconSvg ?? ""} width={snsIconWidth} height={snsIconHeight} aria-hidden />
-          ) : null
-        )}
+        ) : IconifyInline ? (
+          <IconifyInline icon={snsIconSvg ?? ""} width={snsIconWidth} height={snsIconHeight} aria-hidden />
+        ) : null}
         {hasIconName ? <span className="sns-icon__name">{snsIconName}</span> : null}
       </a>
     </li>

@@ -175,188 +175,184 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     <Breadcrumbs {crumbs} />
   </div>
   <div id="main-container">
-        <div class="blog__wrapper">
-          <FlowingLinesWrapper>
-            <h1 class="blog__title">
-              {blogTitle}
-            </h1>
-            <p class="blog__text">
-              {blogText}
-            </p>
-          </FlowingLinesWrapper>
-          <ul class="blog__menu">
-            {
-              blogImages.length > 0 ? (
-                blogImages.map((postData) => (
-                  <li class="blog__menu_item">
-                    <article
-                      class="blog__menu_article"
-                      aria-labelledby={`blog-post-${postData.id ?? postData.slug}-${postData.acf?.blog_title ?? postData.title.rendered}`}
-                    >
-                      <a
-                        class="blog__menu_link"
-                        href={`/blog/${postData.slug ?? ""}`}
-                        aria-label={`${postData.slug}${postAriaLabel}`}
-                        title={`${postData.slug}${postAriaTitle}`}
+    <div class="blog__wrapper">
+      <FlowingLinesWrapper>
+        <h1 class="blog__title">
+          {blogTitle}
+        </h1>
+        <p class="blog__text">
+          {blogText}
+        </p>
+      </FlowingLinesWrapper>
+      <ul class="blog__menu">
+        {
+          blogImages.length > 0 ? (
+            blogImages.map((postData) => (
+              <li class="blog__menu_item">
+                <article
+                  class="blog__menu_article"
+                  aria-labelledby={`blog-post-${postData.id ?? postData.slug}-${postData.acf?.blog_title ?? postData.title.rendered}`}
+                >
+                  <a
+                    class="blog__menu_link"
+                    href={`/blog/${postData.slug ?? ""}`}
+                    aria-label={`${postData.slug}${postAriaLabel}`}
+                    title={`${postData.slug}${postAriaTitle}`}
+                  >
+                    <div class="blog__contents">
+                      <h2
+                        id={`blog-post-${postData.id ?? postData.slug}-${postData.acf?.blog_title ?? postData.title.rendered}`}
+                        class="blog__header"
                       >
-                        <div class="blog__contents">
-                          <h2
-                            id={`blog-post-${postData.id ?? postData.slug}-${postData.acf?.blog_title ?? postData.title.rendered}`}
-                            class="blog__header"
-                          >
-                            {postData.acf?.blog_title ?? postData.title.rendered}
-                          </h2>
-                        </div>
-                        <div class="blog__thumbnail">
-                          {postData.imageUrl !== "" && (
-                            <img
-                              class="blog__menu_image"
-                              src={postData.imageUrl}
-                              alt={postData.title.rendered}
-                              decoding="async"
-                              loading="lazy"
-                            />
-                          )}
-                        </div>
-                      </a>
-                      <div class="blog__footer">
-                        <div class="blog__times">
-                          <SafeIcon name={dateIcon.icon} width={dateIcon.width} height={dateIcon.height} />
-                          <span class="blog__datetime_span screenReader-only">{datetime}</span>
-                          <time
-                            class="blog__dateTime"
-                            datetime={new Date(postData.date)
-                              .toLocaleDateString("ja-JP", {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                              })
-                              .replaceAll("/", "-")}
-                            set:html={new Date(postData.date)
-                              .toLocaleDateString("ja-JP", {
-                                year: "numeric",
-                                month: "2-digit",
-                                day: "2-digit",
-                              })
-                              .replaceAll("/", "-")}
-                          />
-                        </div>
-                        <div class="blog__category">
-                          {Array.isArray(postData.cat_info) && postData.cat_info.length > 0 ? (
-                            <a
-                              class="category__link"
-                              href={`/blog/category/${decodeURIComponent(postData.cat_info[0]?.slug ?? "")}`}
-                              aria-label={`${postData.cat_info[0]?.name}${categoryAriaLabel}`}
-                              title={`${postData.cat_info[0]?.name}${categoryAriaTitle}`}
-                            >
-                              <SafeIcon
-                                name={categoryIcon.icon}
-                                width={categoryIcon.width}
-                                height={categoryIcon.height}
-                              />
-                              <span class="blog__category_span screenReader-only">{category}</span>
-                              <span class="category__link_span" set:html={postData.cat_info[0]?.name} />
-                            </a>
-                          ) : (
-                            <span>{errorCategoryText}</span>
-                          )}
-                        </div>
-                      </div>
-                    </article>
-                  </li>
-                ))
+                        {postData.acf?.blog_title ?? postData.title.rendered}
+                      </h2>
+                    </div>
+                    <div class="blog__thumbnail">
+                      {postData.imageUrl !== "" && (
+                        <img
+                          class="blog__menu_image"
+                          src={postData.imageUrl}
+                          alt={postData.title.rendered}
+                          decoding="async"
+                          loading="lazy"
+                        />
+                      )}
+                    </div>
+                  </a>
+                  <div class="blog__footer">
+                    <div class="blog__times">
+                      <SafeIcon name={dateIcon.icon} width={dateIcon.width} height={dateIcon.height} />
+                      <span class="blog__datetime_span screenReader-only">{datetime}</span>
+                      <time
+                        class="blog__dateTime"
+                        datetime={new Date(postData.date)
+                          .toLocaleDateString("ja-JP", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })
+                          .replaceAll("/", "-")}
+                        set:html={new Date(postData.date)
+                          .toLocaleDateString("ja-JP", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })
+                          .replaceAll("/", "-")}
+                      />
+                    </div>
+                    <div class="blog__category">
+                      {Array.isArray(postData.cat_info) && postData.cat_info.length > 0 ? (
+                        <a
+                          class="category__link"
+                          href={`/blog/category/${decodeURIComponent(postData.cat_info[0]?.slug ?? "")}`}
+                          aria-label={`${postData.cat_info[0]?.name}${categoryAriaLabel}`}
+                          title={`${postData.cat_info[0]?.name}${categoryAriaTitle}`}
+                        >
+                          <SafeIcon name={categoryIcon.icon} width={categoryIcon.width} height={categoryIcon.height} />
+                          <span class="blog__category_span screenReader-only">{category}</span>
+                          <span class="category__link_span" set:html={postData.cat_info[0]?.name} />
+                        </a>
+                      ) : (
+                        <span>{errorCategoryText}</span>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              </li>
+            ))
+          ) : (
+            <p>{errorBlogText}</p>
+          )
+        }
+      </ul>
+
+      <div class="pagination">
+        {
+          hasNextPage && (
+            <ul class="pagination__menu">
+              {page.url.first !== "" && page.currentPage > 1 ? (
+                <li class="pagination__menu_item">
+                  <a
+                    class="pagination__link_current"
+                    href={page.url.first}
+                    aria-label={postPagination.first}
+                    title={postPagination.first}
+                  >
+                    1
+                  </a>
+                </li>
               ) : (
-                <p>{errorBlogText}</p>
-              )
-            }
-          </ul>
+                <li class="pagination__menu_item">
+                  <span class="pagination__link_empty" />
+                </li>
+              )}
+              {page.url.prev !== "" && page.currentPage > 1 ? (
+                <li class="pagination__menu_item">
+                  <a
+                    class="pagination__link"
+                    href={page.url.prev}
+                    aria-label={`${postPagination.prev}(${page.currentPage - 1})`}
+                    title={postPagination.prev}
+                  >
+                    &larr;
+                  </a>
+                </li>
+              ) : (
+                <li class="pagination__menu_item">
+                  <span class="pagination__link_empty" />
+                </li>
+              )}
 
-          <div class="pagination">
-            {
-              hasNextPage && (
-                <ul class="pagination__menu">
-                  {page.url.first !== "" && page.currentPage > 1 ? (
-                    <li class="pagination__menu_item">
-                      <a
-                        class="pagination__link_current"
-                        href={page.url.first}
-                        aria-label={postPagination.first}
-                        title={postPagination.first}
-                      >
-                        1
-                      </a>
-                    </li>
-                  ) : (
-                    <li class="pagination__menu_item">
-                      <span class="pagination__link_empty" />
-                    </li>
-                  )}
-                  {page.url.prev !== "" && page.currentPage > 1 ? (
-                    <li class="pagination__menu_item">
-                      <a
-                        class="pagination__link"
-                        href={page.url.prev}
-                        aria-label={`${postPagination.prev}(${page.currentPage - 1})`}
-                        title={postPagination.prev}
-                      >
-                        &larr;
-                      </a>
-                    </li>
-                  ) : (
-                    <li class="pagination__menu_item">
-                      <span class="pagination__link_empty" />
-                    </li>
-                  )}
-
-                  <li class="pagination__menu_item">
-                    <a
-                      class="pagination__link_current"
-                      href={page.url.current}
-                      aria-label={`${postPagination.current}(${page.currentPage})`}
-                      title={`${postPagination.current}(${page.currentPage})`}
-                    >
-                      {typeof page.currentPage === "number" && page.currentPage > 0 ? page.currentPage : "1"}
-                    </a>
-                  </li>
-                  {page.url.next !== "" && page.currentPage < page.lastPage ? (
-                    <li class="pagination__menu_item">
-                      <a
-                        class="pagination__link"
-                        href={page.url.next}
-                        aria-label={`${postPagination.next}(${page.currentPage + 1})`}
-                        title={postPagination.next}
-                      >
-                        &rarr;
-                      </a>
-                    </li>
-                  ) : (
-                    <li class="pagination__menu_item">
-                      <span class="pagination__link_empty" />
-                    </li>
-                  )}
-                  {page.url.last !== "" && page.currentPage !== page.lastPage ? (
-                    <li class="pagination__menu_item">
-                      <a
-                        class="pagination__link_current"
-                        href={page.url.last}
-                        aria-label={`${postPagination.last}(${page.lastPage})`}
-                        title={`${postPagination.last}(${page.lastPage})`}
-                      >
-                        {page.lastPage}
-                      </a>
-                    </li>
-                  ) : (
-                    <li class="pagination__menu_item">
-                      <span class="pagination__link_empty" />
-                    </li>
-                  )}
-                </ul>
-              )
-            }
-          </div>
-        </div>
-        <!-- </div> -->
+              <li class="pagination__menu_item">
+                <a
+                  class="pagination__link_current"
+                  href={page.url.current}
+                  aria-label={`${postPagination.current}(${page.currentPage})`}
+                  title={`${postPagination.current}(${page.currentPage})`}
+                >
+                  {typeof page.currentPage === "number" && page.currentPage > 0 ? page.currentPage : "1"}
+                </a>
+              </li>
+              {page.url.next !== "" && page.currentPage < page.lastPage ? (
+                <li class="pagination__menu_item">
+                  <a
+                    class="pagination__link"
+                    href={page.url.next}
+                    aria-label={`${postPagination.next}(${page.currentPage + 1})`}
+                    title={postPagination.next}
+                  >
+                    &rarr;
+                  </a>
+                </li>
+              ) : (
+                <li class="pagination__menu_item">
+                  <span class="pagination__link_empty" />
+                </li>
+              )}
+              {page.url.last !== "" && page.currentPage !== page.lastPage ? (
+                <li class="pagination__menu_item">
+                  <a
+                    class="pagination__link_current"
+                    href={page.url.last}
+                    aria-label={`${postPagination.last}(${page.lastPage})`}
+                    title={`${postPagination.last}(${page.lastPage})`}
+                  >
+                    {page.lastPage}
+                  </a>
+                </li>
+              ) : (
+                <li class="pagination__menu_item">
+                  <span class="pagination__link_empty" />
+                </li>
+              )}
+            </ul>
+          )
+        }
       </div>
+    </div>
+    <!-- </div> -->
+  </div>
 </Layout>
 
 <style>

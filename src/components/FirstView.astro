@@ -20,21 +20,9 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
     <!-- width/height属性を追加してレンダリングの遅延を削減（CLS対策も兼ねる） -->
     <picture>
       <!-- モバイル用画像（768px以下・スマホのみ） -->
-      <source
-        media="(max-width: 768px)"
-        srcset={spFvBackgroundImageSrc}
-        type="image/webp"
-        width="768"
-        height="432"
-      />
+      <source media="(max-width: 768px)" srcset={spFvBackgroundImageSrc} type="image/webp" width="768" height="432" />
       <!-- デスクトップ用画像（769px以上・タブレット＋デスクトップ） -->
-      <source
-        media="(min-width: 769px)"
-        srcset={fvBackgroundImageSrc}
-        type="image/webp"
-        width="1920"
-        height="1080"
-      />
+      <source media="(min-width: 769px)" srcset={fvBackgroundImageSrc} type="image/webp" width="1920" height="1080" />
       <!-- フォールバック画像（デスクトップ用を使用） -->
       <img
         src={fvBackgroundImageSrc}
@@ -473,18 +461,18 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
         }
 
         // インラインスタイルで判定できない場合のみ、requestAnimationFrame内でgetComputedStyleを呼ぶ
-        if (loadingScreen.style.display === "" && loadingScreen.style.visibility === "" && loadingScreen.style.opacity === "") {
+        if (
+          loadingScreen.style.display === "" &&
+          loadingScreen.style.visibility === "" &&
+          loadingScreen.style.opacity === ""
+        ) {
           requestAnimationFrame(() => {
             const computedStyle = window.getComputedStyle(loadingScreen);
             const computedDisplay = computedStyle.display;
             const computedVisibility = computedStyle.visibility;
             const computedOpacity = computedStyle.opacity;
 
-            if (
-              computedDisplay === "none" ||
-              computedVisibility === "hidden" ||
-              computedOpacity === "0"
-            ) {
+            if (computedDisplay === "none" || computedVisibility === "hidden" || computedOpacity === "0") {
               devLog("✅ Initializing mouse follow (computed style check passed)");
               initBackgroundMouseFollow();
               return;
