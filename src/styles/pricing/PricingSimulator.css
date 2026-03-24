@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 1200px;
   margin-inline: auto;
-  padding-block: 3rem;
+  padding-block: 2rem;
   padding-inline: 2rem;
 }
 
@@ -65,13 +65,22 @@
   outline-offset: 0.125rem;
 }
 
+.pricing-plan-button--active {
+  /* background-color: var(--color-purple, #8b5cf6); */
+  background-color: var(--color-blue-light, #4a90e2);
+  border-color: var(--color-purple, #8b5cf6);
+  color: var(--color-white, #f1f5f9);
+}
+
 html.dark .pricing-plan-button {
   background-color: var(--color-blue, #0d0950);
   border-color: var(--color-gray, #404040);
 }
 
-.pricing-plan-button--active {
-  background-color: var(--color-purple, #8b5cf6);
+/* 詳細度: html.dark .pricing-plan-button より高く、アクティブ・ホバー・フォーカスを明示 */
+html.dark .pricing-plan-button--active,
+html.dark .pricing-plan-button:is(:hover, :focus-visible) {
+  background-color: #1e293b;
   border-color: var(--color-purple, #8b5cf6);
   color: var(--color-white, #f1f5f9);
 }

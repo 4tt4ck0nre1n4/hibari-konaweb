@@ -4,8 +4,6 @@ import type { GetStaticPaths, PaginateFunction } from "astro";
 import SafeIcon from "../../components/SafeIcon.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
-// import "../../../app/public/wp-includes/css/dist/block-library/style.min.css";
-// import "../../../app/public/wp-content/themes/arkhe/dist/css/main.css";
 import globalText from "../../data/globalText.json";
 import { BLOG_PAGE_API } from "../../api/headlessCms";
 import FlowingLinesWrapper from "../../components/FlowingLinesWrapper.astro";
@@ -109,7 +107,37 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }: { paginate: P
       console.error("❌ [Blog Pagination] Error message:", error.message);
       console.error("❌ [Blog Pagination] Error stack:", error.stack);
     }
-    return [];
+    console.warn("⚠️ [Blog Pagination] API fetch failed. Generating fallback page.");
+    const fallbackPageProps = {
+      page: {
+        data: [] as PostDataObject[],
+        currentPage: 1,
+        lastPage: 1,
+        size: 0,
+        total: 0,
+        start: 0,
+        end: 0,
+        url: {
+          first: "",
+          prev: "",
+          current: "/blog",
+          next: "",
+          last: "",
+          base: "/blog",
+        },
+        baseUrl: "/blog",
+      },
+    };
+    return [
+      {
+        params: { page: undefined },
+        props: fallbackPageProps,
+      },
+      {
+        params: { page: "1" },
+        props: fallbackPageProps,
+      },
+    ];
   }
 };
 
@@ -184,7 +212,8 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
           {blogText}
         </p>
       </FlowingLinesWrapper>
-      <ul class="blog__menu">
+      <!-- <ul class="blog__menu"> -->
+      <ul class:list={["blog__menu", blogImages.length === 0 && "blog__menu--empty"]}>
         {
           blogImages.length > 0 ? (
             blogImages.map((postData) => (
@@ -262,7 +291,10 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
               </li>
             ))
           ) : (
-            <p>{errorBlogText}</p>
+            <li class="blog__menu_empty">
+              <p class="blog__menu_error">{globalText.blog.error}</p>
+            </li>
+            // <p>{errorBlogText}</p>
           )
         }
       </ul>
@@ -514,6 +546,32 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   }
   ul.footer__contactMenu {
     padding-inline-start: 0;
+  }
+  .blog__menu--empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-block-size: min(50vh, 24rem);
+  }
+  .blog__menu_empty {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+  .blog__menu_error {
+    margin: 0;
+    text-align: center;
+    padding-inline: 1rem;
+    color: var(--color-purple);
+  }
+  @media (prefers-color-scheme: dark) {
+    html.dark .blog__menu_error {
+      color: var(--color-white);
+    }
   }
 </style>
 

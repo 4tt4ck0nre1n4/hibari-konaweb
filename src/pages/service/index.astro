@@ -9,10 +9,20 @@ import { PricingSimulator } from "../../components/PricingSimulator";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
-// const cardSrc1 = "/riv/web-developer.riv";
-// const cardSrc2 = "/riv/coding-assets.riv";
-// const cardSrc3 = "/riv/wordpress.riv";
-// const cardSrc4 = "/riv/fixing-site.riv";
+type ServiceSimulatorCopy = typeof globalText.service & {
+  simulatorLeadCardTitle: string;
+  simulatorLeadCardSubtitle: string;
+  simulatorLeadStepLabels: string[];
+  simulatorLeadBenefits: string[];
+  simulatorContactNote: string;
+  simulatorContactHref?: string;
+  simulatorContactLinkLabel: string;
+};
+
+const serviceSimulator = globalText.service as ServiceSimulatorCopy;
+const stepLabels = serviceSimulator.simulatorLeadStepLabels;
+const leadBenefits = serviceSimulator.simulatorLeadBenefits;
+
 ---
 
 <Layout
@@ -32,9 +42,45 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
       <!-- <AboutHeading aboutTitle="Service" aboutSubTitle="サービスについて" /> -->
       <!-- <Subscription client:load /> -->
     </div>
-    <div class="pricePage__wrapper"></div>
     <div class="pricing-simulator-wrapper">
       <AboutHeading aboutTitle="Price" aboutSubTitle="料金について" />
+      <div class="pricePage__wrapper service-simulator-lead">
+        <section class="service-simulator-lead-card" aria-labelledby="simulator-lead-title">
+          <h3 id="simulator-lead-title" class="service-simulator-lead-card__title">
+            {serviceSimulator.simulatorLeadCardTitle}
+          </h3>
+          <p class="service-simulator-lead-card__subtitle">{serviceSimulator.simulatorLeadCardSubtitle}</p>
+          <ol class="service-simulator-lead-card__steps">
+            {stepLabels.map((label, index) => (
+              <li class="service-simulator-lead-card__step">
+                <span class="service-simulator-lead-card__step-badge" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <span class="service-simulator-lead-card__step-label">{label}</span>
+              </li>
+            ))}
+          </ol>
+          <ul class="service-simulator-lead-card__benefits">
+            {leadBenefits.map((text) => (
+              <li class="service-simulator-lead-card__benefit">
+                <span class="service-simulator-lead-card__check" aria-hidden="true">
+                  ✓
+                </span>
+                {text}
+              </li>
+            ))}
+          </ul>
+        </section>
+        <p class="service-simulator-lead-footer">
+          {serviceSimulator.simulatorContactNote}
+          <a
+            href={serviceSimulator.simulatorContactHref ?? "/contact"}
+            class="price__link service-simulator-lead-footer__link"
+          >
+            {serviceSimulator.simulatorContactLinkLabel}
+          </a>
+        </p>
+      </div>
       <PricingSimulator client:load />
     </div>
   </div>
@@ -127,8 +173,165 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     text-decoration: none;
   }
 
+  /* 料金シミュレーター前リードカード */
+  .service-simulator-lead {
+    text-align: center;
+  }
+
+  .service-simulator-lead-card {
+    background-color: transparent;
+    border: 2px solid #1e293b;
+    border-radius: 1rem;
+    padding-block: 1.5rem;
+    padding-inline: 1.5rem;
+    color: inherit;
+    text-align: center;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    margin-block-start: 2rem;
+  }
+
+  .service-simulator-lead-card__title {
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: 0.06em;
+    margin: 0;
+    color: inherit;
+  }
+
+  .service-simulator-lead-card__subtitle {
+    margin-block: 0.75rem 1.25rem;
+    margin-inline: auto;
+    max-width: 36rem;
+    font-size: 1rem;
+    line-height: 1.75;
+    letter-spacing: 0.06em;
+    color: color-mix(in srgb, currentColor 72%, transparent);
+  }
+
+  .service-simulator-lead-card__steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem 0.75rem;
+    justify-content: center;
+  }
+
+  .service-simulator-lead-card__step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-inline-size: 0;
+    padding-block: 0.45rem;
+    padding-inline: 0.65rem 0.85rem;
+    background-color: color-mix(in srgb, currentColor 6%, transparent);
+    border-radius: 624.9375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+  }
+
+  .service-simulator-lead-card__step-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 1.75rem;
+    block-size: 1.75rem;
+    border-radius: 50%;
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-white, #f1f5f9);
+    background-color: var(--color-light-blue, #4a90e2);
+  }
+
+  .service-simulator-lead-card__step-label {
+    color: inherit;
+  }
+
+  .service-simulator-lead-card__benefits {
+    list-style: none;
+    margin: 1.25rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    justify-content: center;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+    color: var(--color-purple, #639);
+  }
+
+  .service-simulator-lead-card__benefit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .service-simulator-lead-card__check {
+    font-weight: 700;
+  }
+
+  .service-simulator-lead-footer {
+    margin-block: 1rem 0;
+    margin-inline: 0;
+    font-size: 0.875rem;
+    line-height: 1.75;
+    letter-spacing: 0.06em;
+    text-align: center;
+    color: inherit;
+  }
+
+  .service-simulator-lead-footer__link {
+    margin-inline-start: 0.15em;
+    margin-block-start: 0;
+    text-align: inherit;
+    display: inline;
+  }
+
+  @media (width <= 768px) {
+    .service-simulator-lead-card {
+      padding-block: 1.25rem;
+      padding-inline: 1.125rem;
+    }
+
+    .service-simulator-lead-card__steps {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .service-simulator-lead-card__step {
+      justify-content: center;
+      inline-size: 100%;
+      max-width: 20rem;
+    }
+
+    .service-simulator-lead-card__benefits {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+  }
+
   /* 印刷時のスタイル */
   @media print {
+    .service-simulator-lead {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
     .about-heading,
     .about__title,
     .about__subTitle,

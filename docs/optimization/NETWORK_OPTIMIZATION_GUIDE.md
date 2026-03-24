@@ -14,7 +14,7 @@
 | `/wasm/rive.wasm`                        | 4,151 ms     | 463.96 KiB    | 🔴 最大 |
 | `ScrollTrigger.js`                       | 3,623 ms     | 17.75 KiB     | 🔴 高   |
 | `fluent-emoji.json` (api.iconify.design) | 3,378 ms     | 6.73 KiB      | 🔴 高   |
-| `/riv/*.riv` (3ファイル)                 | 3,000+ ms    | 合計23 KiB    | 🔴 高   |
+| `/riv/*.riv` (複数ファイル)              | 3,000+ ms    | 合計23 KiB    | 🔴 高   |
 | `RiveComponent.js`                       | 2,489 ms     | 43.94 KiB     | 🟡 中   |
 | `swiper-bundle.js`                       | 2,274 ms     | 22.36 KiB     | 🟡 中   |
 | **合計**                                 | **約20秒**   | **約550 KiB** | -       |
@@ -28,7 +28,7 @@
 #### 問題点
 
 - `rive.wasm` (464 KB) がページ読み込み時に即座にダウンロードされ、クリティカルパスをブロック
-- 3つの`.riv`ファイルがプリロードされている
+- 複数の`.riv`ファイルがプリロードされている
 - 初期表示に必須ではないアニメーションがLCPを遅延させている
 
 #### 実施内容
@@ -47,7 +47,7 @@
 
 ```diff
 // src/pages/index.astro
-- const riveImages = ["/riv/my-portfolio.riv", "/riv/working-office.riv", "/riv/designer-life.riv"];
+- const riveImages = ["/riv/working-office.riv", "/riv/designer-life.riv"];
 - riveImages.forEach((src) => {
 -   const link = document.createElement("link");
 -   link.rel = "preload";

@@ -10,6 +10,8 @@ import sitemap from "@astrojs/sitemap";
 import netlify from "@astrojs/netlify";
 import { asyncSwiperCssPlugin } from "./async-css-optimizer.js";
 
+import tailwindcss from "@tailwindcss/vite";
+
 // WordPressドメインを環境変数から取得（リモート画像最適化用）
 function getWordPressDomain() {
   const apiUrl = process.env.PUBLIC_API_URL;
@@ -149,9 +151,11 @@ export default defineConfig({
     },
   },
   vite: {
-    plugins: [
-      // dynamicImport() // pagefindと競合するため削除
-    ],
+    plugins: [tailwindcss()],
+    // @rive-app/react-canvas とアプリで React が二重解決されると useState が null になる
+    resolve: {
+      dedupe: ["react", "react-dom"],
+    },
     cacheDir: ".vite-cache", // node_modules外にキャッシュを配置
     build: {
       emptyOutDir: false, // Windowsのファイルロック問題を回避

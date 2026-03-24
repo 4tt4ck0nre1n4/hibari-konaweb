@@ -28,6 +28,10 @@ html.dark .pricing-item {
   border-color: var(--color-gray, #404040);
 }
 
+html.dark .pricing-item:is(:hover, :focus-visible) {
+  background-color: #1e293b;
+}
+
 .pricing-item--selected {
   background-color: var(--color-purple, #8b5cf6);
   border-color: var(--color-purple, #8b5cf6);
@@ -40,7 +44,13 @@ html.dark .pricing-item {
 }
 
 html.dark .pricing-item--selected {
-  background-color: var(--color-purple, #8b5cf6);
+  background-color: #1e293b;
+  border-color: var(--color-purple, #8b5cf6);
+}
+
+html.dark .pricing-item--selected:is(:hover, :focus-visible) {
+  background-color: #1e293b;
+  border-color: var(--color-purple, #8b5cf6);
 }
 
 .pricing-item__content {

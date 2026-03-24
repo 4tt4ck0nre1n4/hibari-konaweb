@@ -1,0 +1,3 @@
+/* Tailwind CSS v4（Preflight 無効: theme + utilities のみ。既存 reset / SCSS と要素リセットが二重にならないようにする） */
+@import url("tailwindcss/theme.css") layer(theme);
+@import url("tailwindcss/utilities.css") layer(utilities);

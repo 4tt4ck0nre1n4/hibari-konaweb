@@ -116,16 +116,16 @@ html.dark .modal-close:is(:hover, :focus-visible) {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding-block: 0.875rem;
-  padding-inline: 1rem;
   border-radius: 0.5rem;
   border: var(--color-gray-light, #e0e0e0) 1px solid;
   cursor: pointer;
   transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease;
+  background-color 0.15s ease,
+  border-color 0.15s ease;
   -webkit-user-select: none;
   user-select: none;
+  padding-block: 0.875rem;
+  padding-inline: 1rem;
 }
 
 .other-function-option:is(:hover, :focus-visible) {
