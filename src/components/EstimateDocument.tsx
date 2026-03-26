@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { EstimateData } from "../types/pricing";
 import { COMPANY_INFO } from "../config/companyInfo";
 import { generateEstimatePDFFromHTML } from "../utils/generatePDF";
@@ -38,13 +38,24 @@ interface EstimateDocumentProps {
 
 export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
   const documentRef = useRef<HTMLDivElement>(null);
-  const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({
+  type AccordionKey = "extraCosts" | "aboutEstimate" | "payment";
+  const [openAccordions, setOpenAccordions] = useState<Record<AccordionKey, boolean>>({
     extraCosts: false,
     aboutEstimate: false,
     payment: false,
   });
 
-  const toggleAccordion = (key: string) => {
+  useEffect(() => {
+    const el = documentRef.current;
+    if (!el) return;
+    (Object.keys(openAccordions) as AccordionKey[]).forEach((key) => {
+      const btn = el.querySelector<HTMLButtonElement>(`button[data-accordion-key="${key}"]`);
+      if (!btn) return;
+      btn.setAttribute("aria-expanded", openAccordions[key] ? "true" : "false");
+    });
+  }, [openAccordions]);
+
+  const toggleAccordion = (key: AccordionKey) => {
     setOpenAccordions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
@@ -452,7 +463,8 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
             <button
               type="button"
               className="estimate-document__notes-accordion__header"
-              aria-expanded={openAccordions.extraCosts ? "true" : "false"}
+              aria-expanded="false"
+              data-accordion-key="extraCosts"
               onClick={() => toggleAccordion("extraCosts")}
             >
               {renderIcon(warningIcon, "estimate-document__notes-accordion__icon", "20")}
@@ -479,7 +491,8 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
             <button
               type="button"
               className="estimate-document__notes-accordion__header"
-              aria-expanded={openAccordions.aboutEstimate ? "true" : "false"}
+              aria-expanded="false"
+              data-accordion-key="aboutEstimate"
               onClick={() => toggleAccordion("aboutEstimate")}
             >
               {renderIcon(cashPaymentIcon, "estimate-document__notes-accordion__icon", "20")}
@@ -506,7 +519,8 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
             <button
               type="button"
               className="estimate-document__notes-accordion__header"
-              aria-expanded={openAccordions.payment ? "true" : "false"}
+              aria-expanded="false"
+              data-accordion-key="payment"
               onClick={() => toggleAccordion("payment")}
             >
               {renderIcon(creditCardIcon, "estimate-document__notes-accordion__icon", "20")}

@@ -78,8 +78,8 @@ export default defineConfig({
           "filezilla",
         ],
         logos: ["wordpress-icon", "greensock-icon", "netlify-icon", "gulp", "openai-icon", "claude-icon"],
-        "fa6-solid": ["cat", "envelope"],
-        "fa6-brands": ["instagram"],
+        "fa6-solid": ["cat", "envelope", "paper-plane", "rocket", "crown", "arrow-right", "desktop", "link"],
+        "fa6-brands": ["instagram", "x-twitter", "facebook-f"],
         ic: ["baseline-contact-mail"],
         "fluent-emoji": [
           "red-heart",

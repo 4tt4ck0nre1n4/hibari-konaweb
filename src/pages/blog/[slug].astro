@@ -1,13 +1,23 @@
 ---
+import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
 import type { GetStaticPaths } from "astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import globalText from "../../data/globalText.json";
-import { BLOG_POST_API, BLOG_SLUG_API } from "../../api/headlessCms";
+import { github_sns, twitter } from "../../data/constSns";
+import { BLOG_PAGE_API, BLOG_POST_API, BLOG_SLUG_API } from "../../api/headlessCms";
 import SafeIcon from "../../components/SafeIcon.astro";
 import { blogPostsResponseSchema, type BlogPost } from "../../schemas/api.schema";
 import { validateApiResponse } from "../../schemas/api.schema";
 import "../../styles/blog-article.css";
+
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 const dateIcon = {
   icon: "emojione-v1:alarm-clock",
@@ -20,6 +30,8 @@ const categoryIcon = {
   width: 24,
   height: 24,
 };
+
+const shareIconSize = 18;
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
@@ -57,13 +69,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 const { slug } = Astro.params;
 let post: BlogPost | undefined;
 
-// リトライ機構付きのフェッチ関数
 async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(url);
 
-      // 5xx エラーの場合はリトライ
       if (response.status >= 500 && i < retries - 1) {
         console.warn(`Server error ${response.status}, retrying... (${i + 1}/${retries})`);
         await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
@@ -107,9 +117,22 @@ try {
   throw new Error("Post not found");
 }
 
+let sidebarPosts: BlogPost[] = [];
+try {
+  const resList = await fetchWithRetry(BLOG_PAGE_API);
+  if (resList.ok) {
+    const jsonList = await resList.json();
+    const allPosts = validateApiResponse(blogPostsResponseSchema, jsonList, "Blog page list for sidebar", [] as BlogPost[]);
+    sidebarPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 4);
+  }
+} catch (e) {
+  console.warn("Sidebar posts fetch failed:", e);
+}
+
 const postId = post?.id ?? 0;
 const postSlugTitle = post?.title?.rendered;
 const title = post?.title?.rendered ?? "記事が見つかりません";
+const plainTitle = stripHtml(title);
 const publishedDate = typeof post?.date === "string" && post.date !== "" ? new Date(post.date).toISOString() : "";
 const postDate = post?.date ?? "";
 const content = post?.content?.rendered ?? "この記事の内容は表示できません";
@@ -125,12 +148,27 @@ const acfDescription: string = typeof post?.acf?.description === "string" ? post
 const postMetaDescription = acfDescription.trim();
 const jsonLdDescription = acfDescription.replace(/(<([^>]+)>)/gi, "").trim();
 
+const siteBase = globalText.url.replace(/\/$/, "");
+const contactUrl = `${siteBase}/contact`;
+const worksUrl = `${siteBase}/works`;
+const serviceUrl = `${siteBase}/service`;
+const aboutUrl = `${siteBase}/about`;
+
+const authorName = globalText.global.author;
+const profileBio =
+  "クリエイティビティ × AI × ビジネス。成果に直結するWebサイトやアプリケーションを制作しています。Astro / React 等が得意です。";
+const profileTagline = "フロントエンドエンジニア / デザイナー";
+const profileAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=4f46e5&color=fff&size=150`;
+
+const layoutTitle = plainTitle !== "" ? plainTitle : "Blog Title Not Found";
+const jsonLdHeadline = plainTitle !== "" ? plainTitle : "Blog post";
+
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "BlogPosting",
-  headline: title,
+  headline: jsonLdHeadline,
   description: jsonLdDescription,
-  dataPublished: publishedDate,
+  datePublished: publishedDate,
   url: `${globalText.url}/blog/${post?.slug}`,
   author: {
     "@type": "Person",
@@ -143,31 +181,31 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
 ---
 
 <Layout
-  title={title ?? "Blog Title Not Found"}
+  title={layoutTitle}
   description={postMetaDescription}
   ogType={globalText.local.type}
-  ogTitle={title ?? "Blog Title Not Found"}
+  ogTitle={layoutTitle}
   ogDescription={postMetaDescription}
-  twitterTitle={title ?? "Blog Title Not Found"}
+  twitterTitle={layoutTitle}
   twitterDescription={postMetaDescription}
   jsonLd={jsonLd}
 >
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />
   </div>
-  <div class="blog-detail__wrapper">
-    <div class="blog-detail__container">
-      <article id={postId.toString()} class="blog-detail__article">
-        <header class="blog-detail__header">
-          <h1 class="blog-detail__title" set:html={title} />
-          <div class="blog-detail__meta">
-            <div class="blog-detail__times">
+
+  <div class="max-w-6xl mx-auto px-4 pb-16 flex flex-col lg:flex-row gap-8">
+    <main class="w-full lg:w-2/3">
+      <article id={postId.toString()} class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 md:p-10">
+        <header class="mb-8 border-b border-slate-100 pb-8">
+          <h1 class="text-2xl md:text-3xl font-bold leading-tight mb-4 text-slate-900" set:html={title} />
+          <div class="flex flex-wrap items-center text-sm text-slate-500 gap-4">
+            <div class="flex items-center gap-1">
               <SafeIcon name={dateIcon.icon} width={dateIcon.width} height={dateIcon.height} />
-              <span class="blog-detail__datetime_span screenReader-only">{datetime}</span>
+              <span class="screenReader-only">{datetime}</span>
               {
                 postDate !== "" && (
                   <time
-                    class="blog-detail__dateTime"
                     datetime={new Date(postDate)
                       .toLocaleDateString("ja-JP", {
                         year: "numeric",
@@ -185,18 +223,18 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
                 )
               }
             </div>
-            <div class="blog-detail__category">
+            <div class="flex items-center">
               {
                 Array.isArray(post?.cat_info) && post.cat_info.length > 0 ? (
                   <a
-                    class="blog-detail__category-link"
+                    class="inline-flex items-center gap-1 no-underline text-inherit hover:opacity-80 transition-opacity"
                     href={`/blog/category/${decodeURIComponent(post.cat_info[0]?.slug ?? "")}`}
                     aria-label={`${post.cat_info[0]?.name}${categoryAriaLabel}`}
                     title={`${post.cat_info[0]?.name}${categoryAriaTitle}`}
                   >
                     <SafeIcon name={categoryIcon.icon} width={categoryIcon.width} height={categoryIcon.height} />
-                    <span class="blog-detail__category_span screenReader-only">{categoryLabel}</span>
-                    <span class="blog-detail__category-link_span">{post.cat_info[0]?.name}</span>
+                    <span class="screenReader-only">{categoryLabel}</span>
+                    <span>{post.cat_info[0]?.name}</span>
                   </a>
                 ) : (
                   <span>{errorCategoryText}</span>
@@ -206,406 +244,182 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
           </div>
         </header>
 
-        <!-- 広告エリア（上部） -->
-        <div class="blog-detail__ad-top" id="ad-top">
-          <!-- 将来的な広告表示エリア -->
+        <div class="blog-article-content" set:html={content} />
+
+        <div class="flex items-center justify-between py-6 border-t border-b border-slate-100 mb-10">
+          <span class="text-sm font-bold text-slate-400">記事をシェアする</span>
+          <div class="flex gap-3">
+            <a
+              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(plainTitle)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-colors duration-200"
+              aria-label="X (Twitter)でシェア"
+            >
+              <SafeIcon name="fa6-brands:x-twitter" width={shareIconSize} height={shareIconSize} ariaHidden={true} />
+            </a>
+            <a
+              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-[#1877F2] hover:text-white transition-colors duration-200"
+              aria-label="Facebookでシェア"
+            >
+              <SafeIcon name="fa6-brands:facebook-f" width={shareIconSize} height={shareIconSize} ariaHidden={true} />
+            </a>
+            <a
+              href={`https://b.hatena.ne.jp/add?mode=confirm&url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(plainTitle)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-[#00A4DE] hover:text-white transition-colors duration-200 font-bold font-serif leading-none text-sm"
+              aria-label="はてなブックマークに追加"
+            >
+              B!
+            </a>
+          </div>
         </div>
 
-        <!-- メインコンテンツ -->
-        <div class="blog-detail__content" set:html={content} />
+        <div
+          class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-8 border border-indigo-100 text-center relative overflow-hidden"
+        >
+          <div class="absolute -right-6 -top-6 text-indigo-100 opacity-50 pointer-events-none" aria-hidden="true">
+            <SafeIcon name="fa6-solid:paper-plane" width={120} height={120} ariaHidden={true} />
+          </div>
 
-        <!-- 広告エリア（コンテンツ中） -->
-        <div class="blog-detail__ad-middle" id="ad-middle">
-          <!-- 将来的な広告表示エリア -->
-        </div>
+          <div class="relative z-10">
+            <span class="inline-block px-3 py-1 bg-primary text-white text-xs font-bold rounded-full mb-4">
+              Web制作・システム開発のご相談
+            </span>
+            <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-3">
+              あなたのビジネス課題をWebで解決しませんか？
+            </h2>
+            <p class="text-sm md:text-base text-slate-600 mb-6 max-w-lg mx-auto">
+              この記事で紹介した技術を用いたサイト構築や、現状のWebサイトの改善提案を行っています。まずは無料でお気軽にご相談ください。
+            </p>
 
-        <!-- フッター情報 -->
-        <footer class="blog-detail__footer">
-          <div class="blog-detail__share">
-            <h2 class="blog-detail__share-title">シェアする</h2>
-            <div class="blog-detail__share-buttons">
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
               <a
-                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(title)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="blog-detail__share-button blog-detail__share-button--twitter"
-                aria-label="Twitterでシェア"
+                href={contactUrl}
+                class="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
               >
-                Twitter
+                <SafeIcon name="fa6-solid:envelope" width={18} height={18} class="mr-2 shrink-0" ariaHidden={true} />
+                無料相談・お問い合わせ
               </a>
               <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="blog-detail__share-button blog-detail__share-button--facebook"
-                aria-label="Facebookでシェア"
+                href={worksUrl}
+                class="inline-flex items-center justify-center px-6 py-3 bg-white text-primary font-bold rounded-lg border border-primary hover:bg-slate-50 transition-colors"
               >
-                Facebook
-              </a>
-              <a
-                href={`https://b.hatena.ne.jp/add?mode=confirm&url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(title)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="blog-detail__share-button blog-detail__share-button--hatena"
-                aria-label="はてなブックマークに追加"
-              >
-                はてブ
+                <SafeIcon name="fa6-solid:desktop" width={18} height={18} class="mr-2 shrink-0" ariaHidden={true} />
+                制作実績を見る
               </a>
             </div>
           </div>
-        </footer>
+        </div>
       </article>
+    </main>
 
-      <!-- サイドバー -->
-      <aside class="blog-detail__sidebar">
-        <!-- 広告エリア（サイドバー上部） -->
-        <div class="blog-detail__ad-sidebar-top" id="ad-sidebar-top">
-          <!-- 将来的な広告表示エリア -->
+    <aside class="w-full lg:w-1/3 space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 text-center">
+        <div class="w-24 h-24 mx-auto rounded-full bg-slate-200 mb-4 overflow-hidden border-4 border-slate-50">
+          <img
+            src={profileAvatarUrl}
+            alt=""
+            width={150}
+            height={150}
+            class="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-1">{authorName}</h3>
+        <p class="text-xs text-primary font-bold mb-4">{profileTagline}</p>
+        <p class="text-sm text-slate-600 text-left mb-4 leading-relaxed">
+          {profileBio}
+        </p>
+        <div class="flex justify-center gap-3 border-t border-slate-100 pt-4">
+          <a
+            href={github_sns.href}
+            target={github_sns.targetBlank}
+            rel="noopener noreferrer"
+            class="text-slate-400 hover:text-slate-600"
+            aria-label={github_sns.ariaLabel}
+          >
+            <SafeIcon name="bi:github" width={22} height={22} ariaHidden={true} />
+          </a>
+          <a
+            href={twitter.href}
+            target={twitter.targetBlank}
+            rel="noopener noreferrer"
+            class="text-slate-400 hover:text-[#1DA1F2]"
+            aria-label={twitter.ariaLabel}
+          >
+            <SafeIcon name="devicon:twitter" width={22} height={22} ariaHidden={true} />
+          </a>
+          <a href={aboutUrl} class="text-slate-400 hover:text-slate-600" aria-label="サイトについて">
+            <SafeIcon name="fa6-solid:link" width={22} height={22} ariaHidden={true} />
+          </a>
+        </div>
+      </div>
 
-        <!-- 目次エリア（将来的に追加可能） -->
-        <div class="blog-detail__toc" id="table-of-contents">
-          <!-- 将来的に目次を自動生成 -->
+      <a
+        href={serviceUrl}
+        class="block bg-slate-800 text-white rounded-xl shadow-sm overflow-hidden hover:opacity-95 transition-opacity group relative"
+      >
+        <div class="p-6 relative z-10">
+          <div class="text-secondary text-xs font-bold mb-2">おすすめパッケージ</div>
+          <h3 class="text-lg font-bold mb-2">
+            月額5500円<br />
+            サブスクリプション型ホームページ制作
+          </h3>
+          <p class="text-xs text-slate-300 mb-4">Astro + Headless CMSで保守性の高いモダンなサイトを構築します。</p>
+          <div class="inline-flex items-center text-sm font-bold text-white group-hover:translate-x-1 transition-transform">
+            詳細を見る
+            <SafeIcon name="fa6-solid:arrow-right" width={16} height={16} class="ml-2 text-secondary shrink-0" ariaHidden={true} />
+          </div>
         </div>
+        <div class="absolute -bottom-10 -right-10 text-slate-700 opacity-30 transform rotate-12 pointer-events-none" aria-hidden="true">
+          <SafeIcon name="fa6-solid:rocket" width={180} height={180} ariaHidden={true} />
+        </div>
+      </a>
 
-        <!-- 関連記事エリア（将来的に追加可能） -->
-        <div class="blog-detail__related" id="related-posts">
-          <!-- 将来的に関連記事を表示 -->
-        </div>
-
-        <!-- 広告エリア（サイドバー下部） -->
-        <div class="blog-detail__ad-sidebar-bottom" id="ad-sidebar-bottom">
-          <!-- 将来的な広告表示エリア -->
-        </div>
-      </aside>
-    </div>
+      <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+        <h3 class="text-sm font-bold text-slate-900 mb-4 flex items-center border-b border-slate-100 pb-2">
+          <SafeIcon name="fa6-solid:crown" width={18} height={18} class="text-yellow-400 mr-2 shrink-0" ariaHidden={true} />
+          読まれている記事
+        </h3>
+        <ul class="space-y-4">
+          {
+            sidebarPosts.map((p) => {
+              const thumb = typeof p.acf?.blog_image === "string" && p.acf.blog_image !== "" ? p.acf.blog_image : null;
+              const itemTitle = p.title?.rendered ?? "";
+              return (
+                <li>
+                  <a href={`/blog/${p.slug}`} class="group flex items-start gap-3 no-underline">
+                    <div class="w-16 h-12 bg-slate-100 rounded shrink-0 border border-slate-200 overflow-hidden flex items-center justify-center">
+                      {thumb !== null ? (
+                        <Image
+                          src={thumb}
+                          alt=""
+                          width={64}
+                          height={48}
+                          class="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : null}
+                    </div>
+                    <div class="min-w-0">
+                      <h4
+                        class="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors line-clamp-2 leading-tight"
+                        set:html={itemTitle}
+                      />
+                    </div>
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+    </aside>
   </div>
 </Layout>
-
-<style>
-  /* メインラッパー */
-  .blog-detail__wrapper {
-    width: 100%;
-    max-width: 1200px;
-    margin-inline: auto;
-    padding-inline: 1rem;
-    padding-block: 2rem;
-  }
-
-  /* コンテナ（2カラムレイアウト） */
-  .blog-detail__container {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 2rem;
-    align-items: start;
-  }
-
-  /* メイン記事 */
-  .blog-detail__article {
-    background-color: var(--color-white, #f1f5f9);
-    border-radius: 0.5rem;
-    padding: 2rem;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-  }
-
-  /* ヘッダー */
-  .blog-detail__header {
-    margin-block-end: 2rem;
-    padding-block-end: 1.5rem;
-    border-bottom: 2px solid var(--color-purple, #639);
-  }
-
-  .blog-detail__title {
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.5;
-    margin-block-end: 1rem;
-    color: var(--color-purple, #639);
-  }
-
-  /* メタ情報 */
-  .blog-detail__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-    font-size: 0.875rem;
-    color: var(--color-gray, #666);
-  }
-
-  .blog-detail__times {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .blog-detail__dateTime {
-    color: inherit;
-  }
-
-  .blog-detail__category {
-    display: flex;
-    align-items: center;
-  }
-
-  .blog-detail__category-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    color: inherit;
-    transition: opacity 0.2s;
-  }
-
-  .blog-detail__category-link:hover {
-    opacity: 0.7;
-  }
-
-  .blog-detail__category-link_span {
-    color: inherit;
-  }
-
-  /* 広告エリア */
-  .blog-detail__ad-top,
-  .blog-detail__ad-middle,
-  .blog-detail__ad-sidebar-bottom {
-    min-height: 100px;
-    background-color: var(--color-gray-light, #f5f5f5);
-    border: 1px dashed var(--color-gray, #ccc);
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-gray, #999);
-    font-size: 0.875rem;
-    margin-block: 1.5rem;
-  }
-
-  .blog-detail__ad-sidebar-top {
-    min-height: 100px;
-    background-color: var(--color-gray-light, #f5f5f5);
-    border: 1px dashed var(--color-gray, #ccc);
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-gray, #999);
-    font-size: 0.875rem;
-  }
-
-  .blog-detail__ad-top::before,
-  .blog-detail__ad-middle::before,
-  .blog-detail__ad-sidebar-top::before,
-  .blog-detail__ad-sidebar-bottom::before {
-    content: "広告表示エリア";
-  }
-
-  /* メインコンテンツ */
-  .blog-detail__content {
-    font-size: 1rem;
-    line-height: 1.8;
-    color: var(--color-text, #333);
-    margin-block: 2rem;
-  }
-
-  /* WordPressコンテンツのスタイル調整 */
-  .blog-detail__content :global(h2) {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-block-start: 2rem;
-    margin-block-end: 1rem;
-    padding-block-end: 0.5rem;
-    border-bottom: 2px solid var(--color-purple, #639);
-    color: var(--color-purple, #639);
-  }
-
-  .blog-detail__content :global(h3) {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-block-start: 1.5rem;
-    margin-block-end: 0.75rem;
-    color: var(--color-purple, #639);
-  }
-
-  .blog-detail__content :global(h4) {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-block-start: 1.25rem;
-    margin-block-end: 0.5rem;
-  }
-
-  .blog-detail__content :global(p) {
-    margin-block-end: 1rem;
-  }
-
-  .blog-detail__content :global(img) {
-    max-width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-    margin-block: 1.5rem;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-  }
-
-  .blog-detail__content :global(ul),
-  .blog-detail__content :global(ol) {
-    margin-block: 1rem;
-    padding-inline-start: 2rem;
-  }
-
-  .blog-detail__content :global(li) {
-    margin-block-end: 0.5rem;
-  }
-
-  .blog-detail__content :global(blockquote) {
-    border-inline-start: 4px solid var(--color-purple, #639);
-    padding-inline-start: 1rem;
-    margin-block: 1.5rem;
-    font-style: italic;
-    color: var(--color-gray, #666);
-  }
-
-  .blog-detail__content :global(code) {
-    background-color: var(--color-gray-light, #f5f5f5);
-    padding: 0.2em 0.4em;
-    border-radius: 0.25rem;
-    font-family: monospace;
-    font-size: 0.9em;
-  }
-
-  .blog-detail__content :global(pre) {
-    background-color: var(--color-gray-light, #f5f5f5);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    overflow-x: auto;
-    margin-block: 1.5rem;
-  }
-
-  .blog-detail__content :global(pre code) {
-    background-color: transparent;
-    padding: 0;
-  }
-
-  .blog-detail__content :global(a) {
-    color: var(--color-purple, #639);
-    text-decoration: underline;
-    transition: opacity 0.2s;
-  }
-
-  .blog-detail__content :global(a:hover) {
-    opacity: 0.7;
-  }
-
-  /* フッター */
-  .blog-detail__footer {
-    margin-block-start: 3rem;
-    padding-block-start: 2rem;
-    border-top: 2px solid var(--color-purple, #639);
-  }
-
-  .blog-detail__share {
-    margin-block-start: 1.5rem;
-  }
-
-  .blog-detail__share-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-block-end: 1rem;
-    color: var(--color-purple, #639);
-  }
-
-  .blog-detail__share-buttons {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .blog-detail__share-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.2s;
-    color: var(--color-white, #f1f5f9);
-  }
-
-  .blog-detail__share-button--twitter {
-    background-color: #1da1f2;
-  }
-
-  .blog-detail__share-button--twitter:hover {
-    background-color: #0d8bd9;
-  }
-
-  .blog-detail__share-button--facebook {
-    background-color: #1877f2;
-  }
-
-  .blog-detail__share-button--facebook:hover {
-    background-color: #166fe5;
-  }
-
-  .blog-detail__share-button--hatena {
-    background-color: #00a4de;
-  }
-
-  .blog-detail__share-button--hatena:hover {
-    background-color: #0093cc;
-  }
-
-  /* サイドバー */
-  .blog-detail__sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .blog-detail__toc,
-  .blog-detail__related {
-    background-color: var(--color-white, #f1f5f9);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-    min-height: 200px;
-  }
-
-  /* レスポンシブデザイン */
-  @media (max-width: 768px) {
-    .blog-detail__container {
-      grid-template-columns: 1fr;
-    }
-
-    .blog-detail__article {
-      padding: 1.5rem;
-      order: 1;
-    }
-
-    .blog-detail__title {
-      font-size: 1.5rem;
-    }
-
-    .blog-detail__meta {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .blog-detail__sidebar {
-      order: 2;
-    }
-  }
-
-  /* スクリーンリーダー用 */
-  /* .screenReader-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-  } */
-</style>

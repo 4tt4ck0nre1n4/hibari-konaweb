@@ -1,3 +1,109 @@
 /* Tailwind CSS v4（Preflight 無効: theme + utilities のみ。既存 reset / SCSS と要素リセットが二重にならないようにする） */
+/* stylelint-disable at-rule-no-unknown -- Tailwind v4 @theme / @layer */
 @import url("tailwindcss/theme.css") layer(theme);
 @import url("tailwindcss/utilities.css") layer(utilities);
+
+@theme {
+  --color-primary: #4f46e5;
+  --color-secondary: #10b981;
+}
+
+/* WordPress 本文（HTML）用 — blog 記事ページのみで使用 */
+@layer components {
+  .blog-article-content {
+    font-size: 1rem;
+    line-height: 1.625;
+    color: rgb(51 65 85);
+    margin-bottom: 3rem;
+  }
+
+  .blog-article-content :is(h2) {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-left: 0.75rem;
+    border-left-width: 4px;
+    border-left-style: solid;
+    border-left-color: var(--color-primary);
+    color: rgb(15 23 42);
+  }
+
+  .blog-article-content :is(h3) {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: rgb(15 23 42);
+  }
+
+  .blog-article-content :is(h4) {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: rgb(15 23 42);
+  }
+
+  .blog-article-content :is(p) {
+    margin-bottom: 1rem;
+  }
+
+  .blog-article-content :is(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin-block: 1.5rem;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+  }
+
+  .blog-article-content :is(ul, ol) {
+    margin-block: 1rem;
+    padding-inline-start: 2rem;
+  }
+
+  .blog-article-content :is(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .blog-article-content :is(blockquote) {
+    border-left-width: 4px;
+    border-left-style: solid;
+    border-left-color: var(--color-primary);
+    padding-left: 1rem;
+    margin-block: 1.5rem;
+    font-style: italic;
+    color: rgb(71 85 105);
+  }
+
+  .blog-article-content :is(code) {
+    background-color: rgb(241 245 249);
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em;
+  }
+
+  .blog-article-content :is(pre) {
+    background-color: rgb(241 245 249);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-block: 1.5rem;
+  }
+
+  .blog-article-content pre code {
+    background-color: transparent;
+    padding: 0;
+  }
+
+  .blog-article-content :is(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+    transition: opacity 0.2s;
+  }
+
+  .blog-article-content :is(a:hover) {
+    opacity: 0.85;
+  }
+}

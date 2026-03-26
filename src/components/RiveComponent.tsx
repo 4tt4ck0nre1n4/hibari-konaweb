@@ -72,7 +72,7 @@ function RivePlayer({
     }
 
     const container = containerRef.current;
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let timeoutId: number | undefined;
 
     const applyCanvasStyles = (): void => {
       const canvas = container.querySelector("canvas");
