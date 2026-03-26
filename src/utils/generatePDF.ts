@@ -287,57 +287,126 @@ export function validateEstimateData(estimateData: EstimateData): boolean {
 }
 
 /**
- * HTML要素からPDFを生成（html2pdf.js使用）
- * HTML要素をそのまま画像化してPDFに変換するため、デザインが完璧に再現されます
- * oncloneでスタイルを注入し、Firefox等で色が失われる問題を回避する
+ * HTML要素からPDFを生成（html2canvas + 手動キャンバス分割 + jsPDF 方式）
+ *
+ * html2pdf.js の改ページ機構（before/css/legacy）はそれぞれ独立した余白挿入により
+ * 2ページ目先頭の空白問題を引き起こすため、以下の方式に切り替えた：
+ *
+ * 1. html2canvas でページ全体を1枚のキャンバスに描画
+ * 2. .estimate-document__page1 ラッパーの高さから分割位置を計算
+ * 3. キャンバスを1ページ目スライスと2ページ目以降スライスに手動分割
+ * 4. jsPDF.addImage() で各スライスをページとして書き出す
  */
-export async function generateEstimatePDFFromHTML(element: HTMLElement, estimateNumber: string): Promise<Blob> {
-  // 動的インポートでhtml2pdf.jsを読み込み（ブラウザ環境のみ）
-  const html2pdf = (await import("html2pdf.js")).default;
+export async function generateEstimatePDFFromHTML(element: HTMLElement, _estimateNumber: string): Promise<Blob> {
+  // 動的インポート（ブラウザ環境のみ）
+  const html2canvas = (await import("html2canvas")).default;
 
-  return new Promise((resolve, reject) => {
-    const opt = {
-      margin: [10, 10, 10, 10] as [number, number, number, number],
-      filename: `estimate_${estimateNumber}.pdf`,
-      image: { type: "jpeg" as const, quality: 0.98 },
-      pagebreak: {
-        mode: ["css", "legacy"] as const,
-        before: ".estimate-document__details",
-      },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#f1f5f9",
-        onclone: (clonedDoc: Document, _clonedElement: HTMLElement) => {
-          // クローンされた文書にスタイルを注入（FirefoxのcssRules失敗を回避）
-          const style = clonedDoc.createElement("style");
-          style.textContent = estimateDocumentPdfStyles;
-          const head = clonedDoc.head ?? clonedDoc.documentElement;
-          head.appendChild(style);
-        },
-      },
-      jsPDF: {
-        unit: "mm" as const,
-        format: "a4" as const,
-        orientation: "portrait" as const,
-        compress: true,
-      },
-    };
+  // 分割位置：onclone 内（PDF CSS 適用済みのクローン DOM）で計測することで正確な値を得る
+  // オリジナル DOM とクローン DOM では padding・font-size 等が異なるため、クローン側で計測する必要がある
+  let canvasSplitY = 0;
 
-    html2pdf()
-      .set(opt)
-      .from(element)
-      .outputPdf("blob")
-      .then((blob: Blob) => {
-        // ファイルサイズチェック（5MB制限）
-        const MAX_PDF_SIZE = 5 * 1024 * 1024;
-        if (blob.size > MAX_PDF_SIZE) {
-          reject(new Error("PDFファイルサイズが大きすぎます（最大5MB）"));
-        } else {
-          resolve(blob);
-        }
-      })
-      .catch(reject);
+  // キャンバスにフル描画（onclone でスタイル注入・クラス付与・details margin リセット・分割位置計測）
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    logging: false,
+    backgroundColor: "#f1f5f9",
+    onclone: (clonedDoc: Document, clonedElement: HTMLElement) => {
+      // PDF 専用スタイルを最後に注入し、画面用の EstimateDocument.css より優先させる
+      const style = clonedDoc.createElement("style");
+      style.setAttribute("data-estimate-pdf-styles", "true");
+      style.textContent = estimateDocumentPdfStyles;
+      const head = clonedDoc.head ?? clonedDoc.documentElement;
+      head.appendChild(style);
+      clonedElement.classList.add("estimate-document--pdf-export");
+      // インラインスタイルで margin-block-start: 0 を直接適用し、CSS読み込み順に依存しないようにする
+      const detailsEl = clonedElement.querySelector<HTMLElement>(".estimate-document__details");
+      if (detailsEl) detailsEl.style.marginBlockStart = "0";
+
+      // アコーディオン親の overflow を強制解除（CSS 注入タイミング差への安全策）
+      // アコーディオンの展開自体は呼び出し元（handleDownloadPDF / handleContact）で
+      // documentRef.current に対して直接 DOM 操作済みのため、ここでは overflow のみ修正する
+      const accordionEls = clonedElement.querySelectorAll<HTMLElement>(
+        ".estimate-document__notes-accordion",
+      );
+      accordionEls.forEach((el) => {
+        el.style.overflow = "visible";
+      });
+
+      // PDF CSS が適用されたクローン DOM で page1 ラッパーの下端位置を計測
+      // （オリジナル DOM より正確にキャンバス上の分割位置と一致する）
+      const page1InClone = clonedElement.querySelector<HTMLElement>(".estimate-document__page1");
+      if (page1InClone) {
+        const clonedRect = clonedElement.getBoundingClientRect();
+        const page1Rect = page1InClone.getBoundingClientRect();
+        canvasSplitY = Math.round((page1Rect.bottom - clonedRect.top) * 2); // scale 2
+      }
+    },
   });
+
+  // onclone での計測に失敗した場合のフォールバック
+  if (canvasSplitY <= 0) {
+    const page1El = element.querySelector<HTMLElement>(".estimate-document__page1");
+    const page1HeightCssPx = page1El?.getBoundingClientRect().height ?? 0;
+    const CANVAS_TOP_PAD_PX = Math.round((0.2 / 2.54) * 96 * 2); // 0.2cm @ 96dpi × scale2 ≈ 15px
+    canvasSplitY = Math.round(page1HeightCssPx * 2) + CANVAS_TOP_PAD_PX;
+  }
+  canvasSplitY = Math.min(canvasSplitY, canvas.height);
+
+  // PDF ページ寸法（mm）
+  const MARGIN = { top: 4, right: 8, bottom: 10, left: 8 };
+  const CONTENT_W_MM = 210 - MARGIN.left - MARGIN.right; // 194mm
+  const CONTENT_H_MM = 297 - MARGIN.top - MARGIN.bottom; // 283mm
+
+  // キャンバスの mm 換算スケール（canvas.width = 要素のCSS幅 × 2）
+  const pxPerMm = canvas.width / CONTENT_W_MM;
+  const pageHeightPx = Math.round(CONTENT_H_MM * pxPerMm);
+
+  const doc = new jsPDF({
+    unit: "mm",
+    format: "a4",
+    orientation: "portrait",
+    compress: true,
+  });
+
+  /**
+   * キャンバスの [startPx, endPx) 範囲を切り出して PDF ページとして追加する
+   */
+  const addSlice = (startPx: number, endPx: number, isFirstPage: boolean): void => {
+    const sliceH = endPx - startPx;
+    const offscreen = document.createElement("canvas");
+    offscreen.width = canvas.width;
+    offscreen.height = sliceH;
+    offscreen.getContext("2d")?.drawImage(canvas, 0, startPx, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+    if (!isFirstPage) doc.addPage();
+    // 品質を 0.80 に下げてカラー SVG アイコン含む新デザインの JPEG サイズを抑制
+    doc.addImage(
+      offscreen.toDataURL("image/jpeg", 0.80),
+      "JPEG",
+      MARGIN.left,
+      MARGIN.top,
+      CONTENT_W_MM,
+      sliceH / pxPerMm,
+    );
+  };
+
+  // 1ページ目：ヘッダー〜お見積金額（canvas[0 → canvasSplitY]）
+  addSlice(0, canvasSplitY, true);
+
+  // 2ページ目以降：明細・合計・備考（canvas[canvasSplitY → 末尾] を A4 高さ単位で分割）
+  let y = canvasSplitY;
+  while (y < canvas.height) {
+    addSlice(y, Math.min(y + pageHeightPx, canvas.height), false);
+    y += pageHeightPx;
+  }
+
+  const blob = doc.output("blob");
+
+  // ファイルサイズチェック（カラーSVGアイコン追加後の増加を考慮して 10MB に引き上げ）
+  const MAX_PDF_SIZE = 10 * 1024 * 1024;
+  if (blob.size > MAX_PDF_SIZE) {
+    throw new Error(`PDFファイルサイズが大きすぎます（${(blob.size / 1024 / 1024).toFixed(1)}MB、最大10MB）`);
+  }
+
+  return blob;
 }

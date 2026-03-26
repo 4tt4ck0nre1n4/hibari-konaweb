@@ -61,7 +61,7 @@
     "title": "Service | My Portfolio Site",
     "description": "Web制作などのお仕事に関する私のサービス内容と料金表を紹介しています。",
     "simulatorLeadCardTitle": "プランを選んで、タップするだけ。",
-    "simulatorLeadCardSubtitle": "その場でわかる料金シュミレーター。概算金額がすぐに確認でき、そのまま見積書の作成まで進められます。",
+    "simulatorLeadCardSubtitle": "その場でわかる料金シミュレーター。概算金額がすぐに確認でき、そのまま見積書の作成まで進められます。",
     "simulatorLeadStepLabels": ["プランを選ぶ", "項目をタップ", "見積書を作成"],
     "simulatorLeadBenefits": ["最短30秒", "ステップが視覚的", "簡単に見積書を作成"],
     "simulatorContactNote": "正式なお見積りや仕様のすり合わせは、",

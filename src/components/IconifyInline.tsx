@@ -39,6 +39,9 @@ const loadIconSet = async (prefix: string): Promise<IconifyIconsJSON | null> => 
       case "devicon":
         iconSet = (await import("@iconify-json/devicon/icons.json")).default as IconifyIconsJSON;
         break;
+      case "emojione":
+        iconSet = (await import("@iconify-json/emojione/icons.json")).default as IconifyIconsJSON;
+        break;
       case "emojione-v1":
         iconSet = (await import("@iconify-json/emojione-v1/icons.json")).default as IconifyIconsJSON;
         break;

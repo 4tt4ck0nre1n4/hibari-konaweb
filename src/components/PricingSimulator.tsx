@@ -3,7 +3,9 @@ import { PricingItemButton } from "./PricingItem";
 import { EstimateSummary } from "./EstimateSummary";
 import { EstimateDocument } from "./EstimateDocument";
 import { ModalDialog } from "./ModalDialog";
+import { PricingSimulatorScrollBar } from "./PricingSimulatorScrollBar";
 import IconifyInline from "./IconifyInline";
+import { mail } from "../data/constSns";
 import {
   PRICING_ITEMS,
   HOMEPAGE_PRICING_ITEMS,
@@ -16,8 +18,26 @@ import { ESTIMATE_CONFIG } from "../config/companyInfo";
 import { calculatePrice, calculatePagePrice } from "../utils/calculatePrice";
 import { saveState, loadState, clearState } from "../utils/storageManager";
 import { generateEstimateNumber, formatDateForDisplay, calculateExpiryDate } from "../utils/generateEstimateNumber";
-import type { SelectedItem, PlanType, EstimateData } from "../types/pricing";
+import type { SelectedItem, PlanType, EstimateData, PriceCalculation } from "../types/pricing";
 import "../styles/pricing/PricingSimulator.css";
+
+const PRICING_SIMULATOR_SUMMARY_ID = "pricing-simulator-summary";
+
+function buildMailtoWithSelection(href: string, calculation: PriceCalculation): string {
+  const lines = [
+    ...calculation.codingItems.map((r) => `${r.name}${r.quantity > 1 ? ` ×${r.quantity}` : ""}`),
+    ...calculation.designItems.map((r) => `${r.name}${r.quantity > 1 ? ` ×${r.quantity}` : ""}`),
+  ];
+  const bodyText =
+    lines.length > 0
+      ? `以下、料金シミュレーターでの選択内容です（概算）。\n\n${lines.join("\n")}\n\n税込合計: ¥${calculation.total.toLocaleString()}\n`
+      : `料金シミュレーターからのお問い合わせです。\n\n税込合計（概算）: ¥${calculation.total.toLocaleString()}\n`;
+  const truncated = bodyText.length > 1800 ? `${bodyText.slice(0, 1797)}…` : bodyText;
+  const params = new URLSearchParams();
+  params.set("body", truncated);
+  const sep = href.includes("?") ? "&" : "?";
+  return `${href}${sep}${params.toString()}`;
+}
 
 // 「コーディング」または「ホームページ制作」のどちらの項目か判定
 function getItemPlan(itemId: string): "coding" | "design" | null {
@@ -83,6 +103,19 @@ export function PricingSimulator() {
     }
   }, []);
 
+  // 概算見積書表示中は /service のリード（カード＋フッター行）を非表示にする（data-* + グローバル CSS）
+  useEffect(() => {
+    const root = document.documentElement;
+    if (showEstimate) {
+      root.dataset.estimateView = "true";
+    } else {
+      delete root.dataset.estimateView;
+    }
+    return () => {
+      delete root.dataset.estimateView;
+    };
+  }, [showEstimate]);
+
   // コーディング選択項目の詳細（PRICING_ITEMSの順番を保持）
   const codingSelectedItems: SelectedItem[] = useMemo(() => {
     const items: SelectedItem[] = [];
@@ -142,6 +175,13 @@ export function PricingSimulator() {
   }, [codingSelectedItems, designSelectedItems, isUrgent]);
 
   const totalSelectedCount = codingSelectedItems.length + designSelectedItems.length;
+
+  const activePlanLabelForBar = useMemo(() => {
+    const p = PLANS.find((plan) => plan.id === activeTab);
+    return p?.name ?? "コーディング";
+  }, [activeTab]);
+
+  const mailtoWithBody = useMemo(() => buildMailtoWithSelection(mail.href, calculation), [calculation]);
 
   // 状態を保存
   useEffect(() => {
@@ -339,14 +379,16 @@ export function PricingSimulator() {
     return (
       <div className="pricing-simulator">
         <EstimateDocument estimateData={estimateData} />
-        <div className="pricing-simulator__actions pricing-simulator__actions--back">
-          <button
-            type="button"
-            className="pricing-simulator__button pricing-simulator__button--reset"
-            onClick={handleBackToSimulator}
-          >
-            最初に戻る
-          </button>
+        <div className="pricing-simulator__estimate-back-wrap">
+          <div className="pricing-simulator__actions pricing-simulator__actions--back">
+            <button
+              type="button"
+              className="pricing-simulator__button pricing-simulator__button--back-sub"
+              onClick={handleBackToSimulator}
+            >
+              ← 料金シミュレーターに戻る
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -356,7 +398,7 @@ export function PricingSimulator() {
   return (
     <div className="pricing-simulator">
       <div className="pricing-simulator__header">
-        <h2 className="pricing-simulator__title">料金シュミレーター</h2>
+        <h2 className="pricing-simulator__title">料金シミュレーター</h2>
       </div>
 
       {/* アクセシビリティ: 価格変更の通知（スクリーンリーダー用） */}
@@ -390,6 +432,13 @@ export function PricingSimulator() {
         </div>
       </div>
 
+      <PricingSimulatorScrollBar
+        activePlanLabel={activePlanLabelForBar}
+        selectedCount={totalSelectedCount}
+        totalInclTax={calculation.total}
+        summarySectionId={PRICING_SIMULATOR_SUMMARY_ID}
+      />
+
       {/* 項目選択（アクティブタブに応じて表示切替） */}
       <div
         className="pricing-simulator__items"
@@ -421,27 +470,53 @@ export function PricingSimulator() {
         </div>
       </div>
 
-      {/* 金額サマリー */}
-      {totalSelectedCount > 0 && <EstimateSummary calculation={calculation} isUrgent={isUrgent} />}
-
-      {/* アクションボタン */}
-      <div className="pricing-simulator__actions">
-        <button
-          type="button"
-          className="pricing-simulator__button pricing-simulator__button--reset"
-          onClick={handleReset}
-          disabled={totalSelectedCount === 0}
-        >
-          やり直し
-        </button>
-        <button
-          type="button"
-          className="pricing-simulator__button pricing-simulator__button--generate"
-          onClick={handleGenerateEstimate}
-          disabled={totalSelectedCount === 0}
-        >
-          この結果で概算見積書を作成
-        </button>
+      <div id={PRICING_SIMULATOR_SUMMARY_ID} className="pricing-simulator__summary-block">
+        <EstimateSummary calculation={calculation} isUrgent={isUrgent} activeTab={activeTab} />
+        <div className="pricing-simulator__post-summary">
+          {totalSelectedCount > 0 && (
+            <div className="pricing-simulator__next-step">
+              <IconifyInline icon="emojione:light-bulb" width="22" height="22" className="pricing-simulator__next-step-icon" />
+              <div>
+                <strong>次のステップ：この内容で概算見積書を作成しますか？</strong>
+                <p className="pricing-simulator__next-step__desc">
+                  選択した項目をもとに概算見積書を作成します。内容はあとから変更もできます。
+                </p>
+              </div>
+            </div>
+          )}
+          <div
+            className={`pricing-simulator__actions${totalSelectedCount > 0 ? " pricing-simulator__actions--has-selection" : ""}`}
+          >
+            <button
+              type="button"
+              className="pricing-simulator__button pricing-simulator__button--reset"
+              onClick={handleReset}
+              disabled={totalSelectedCount === 0}
+            >
+              ← やり直す
+            </button>
+            <button
+              type="button"
+              className="pricing-simulator__button pricing-simulator__button--generate"
+              onClick={handleGenerateEstimate}
+              disabled={totalSelectedCount === 0}
+            >
+              この金額で概算見積書を作成する →
+            </button>
+          </div>
+          <p className="pricing-simulator__actions-hint">詳細な内訳は概算見積書をご覧ください。</p>
+          <div className="pricing-simulator__footer-links">
+            <a href={mailtoWithBody} className="pricing-simulator__footer-link">
+              メールで内容を送る
+            </a>
+            <span className="pricing-simulator__footer-sep" aria-hidden="true">
+              |
+            </span>
+            <a href="/contact" className="pricing-simulator__footer-link">
+              直接相談する →
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* ページ数 / アニメーション数量選択モーダル */}

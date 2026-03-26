@@ -17,6 +17,13 @@ const menuItems = [
     icon: "flat-color-icons:home",
   },
   {
+    label: "Blog",
+    href: "/blog",
+    ariaLabel: "ブログページへ",
+    ariaTitle: "ブログページへ",
+    icon: "vscode-icons:file-type-libreoffice-writer",
+  },
+  {
     label: "About",
     href: "/about",
     ariaLabel: "アバウトページへ",
@@ -31,11 +38,11 @@ const menuItems = [
     icon: "twemoji:woman-technologist-medium-light-skin-tone",
   },
   {
-    label: "Blog",
-    href: "/blog",
-    ariaLabel: "ブログページへ",
-    ariaTitle: "ブログページへ",
-    icon: "vscode-icons:file-type-libreoffice-writer",
+    label: "Service",
+    href: "/service",
+    ariaLabel: "サービスページへ",
+    ariaTitle: "サービスページへ",
+    icon: "streamline-ultimate-color:cash-payment-sign-2",
   },
   {
     label: "Contact",

@@ -6,6 +6,325 @@
   padding-inline: 2rem;
 }
 
+/* 上部スライドイン合計バー（ヘッダ直下・z-index はヘッダ 800 より下） */
+.pricing-simulator-scroll-bar {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  z-index: 750;
+  background-color: var(--color-white, #f1f5f9);
+  border-bottom: 1px solid var(--color-gray-light, #e0e0e0);
+  box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 0.06);
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.28s ease,
+    opacity 0.28s ease;
+}
+
+.pricing-simulator-scroll-bar--visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html.dark .pricing-simulator-scroll-bar {
+  background-color: var(--color-white, #f1f5f9);
+  border-bottom-color: var(--color-gray-light, #e0e0e0);
+}
+
+.pricing-simulator-scroll-bar__inner {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-block: 0.65rem;
+  padding-inline-start: max(1rem, env(safe-area-inset-left));
+  padding-inline-end: max(1rem, env(safe-area-inset-right));
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pricing-simulator-scroll-bar__col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.pricing-simulator-scroll-bar__col--plan {
+  flex: 0 1 auto;
+}
+
+.pricing-simulator-scroll-bar__col--count {
+  flex: 0 1 8.5rem;
+}
+
+.pricing-simulator-scroll-bar__col--price {
+  flex: 1 1 auto;
+  align-items: flex-start;
+}
+
+.pricing-simulator-scroll-bar__col--cta {
+  flex: 0 0 auto;
+}
+
+.pricing-simulator-scroll-bar__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgb(1 1 1 / 0.45);
+  color: color-mix(in srgb, var(--color-black, #010101) 45%, transparent);
+}
+
+html.dark .pricing-simulator-scroll-bar__label {
+  color: rgb(1 1 1 / 0.45);
+  color: color-mix(in srgb, var(--color-black, #010101) 45%, transparent);
+}
+
+.pricing-simulator-scroll-bar__plan-pill {
+  display: inline-block;
+  padding-block: 0.25rem;
+  padding-inline: 0.65rem;
+  border-radius: 624.9375rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-purple, #639);
+  background-color: #f3f0ff;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pricing-simulator-scroll-bar__count {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-black, #010101);
+  white-space: nowrap;
+}
+
+.pricing-simulator-scroll-bar__price-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.pricing-simulator-scroll-bar__amount {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--color-black, #010101);
+  transition: color 0.15s ease, text-shadow 0.15s ease;
+}
+
+.pricing-simulator-scroll-bar__amount--flash {
+  animation: pricingSimulatorPriceFlash 0.55s ease;
+}
+
+@keyframes pricingSimulatorPriceFlash {
+  0%,
+  100% {
+    color: var(--color-black, #010101);
+    text-shadow: none;
+  }
+
+  35% {
+    color: var(--color-purple, #639);
+    text-shadow: 0 0 0.75rem color-mix(in srgb, var(--color-purple, #639) 55%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pricing-simulator-scroll-bar__amount--flash {
+    animation: none;
+  }
+}
+
+.pricing-simulator-scroll-bar__tax-note {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: rgb(1 1 1 / 0.45);
+  color: color-mix(in srgb, var(--color-black, #010101) 45%, transparent);
+}
+
+.pricing-simulator-scroll-bar__divider {
+  align-self: stretch;
+  width: 1px;
+  min-height: 2.25rem;
+  background-color: var(--color-gray-light, #e0e0e0);
+  flex-shrink: 0;
+}
+
+.pricing-simulator-scroll-bar__divider--before-cta {
+  margin-inline: 0.25rem;
+}
+
+.pricing-simulator-scroll-bar__cta {
+  appearance: none;
+  border: none;
+  border-radius: 0.5rem;
+  padding-block: 0.55rem;
+  padding-inline: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  color: var(--color-white, #f1f5f9);
+  background-color: var(--color-purple, #8b5cf6);
+  white-space: nowrap;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.pricing-simulator-scroll-bar__cta:is(:hover, :focus-visible):not(:disabled) {
+  background-color: var(--color-purple-dark, #7c3aed);
+  outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
+  outline-offset: 0.125rem;
+}
+
+.pricing-simulator-scroll-bar__cta--muted {
+  background-color: #e5e7eb;
+  color: #6b7280;
+}
+
+.pricing-simulator-scroll-bar__cta--muted:is(:hover, :focus-visible) {
+  background-color: #d1d5db;
+  color: #4b5563;
+}
+
+@media (480px <= width <= 1024px) {
+  .pricing-simulator-scroll-bar {
+    top: 80px;
+  }
+}
+
+@media (width <= 480px) {
+  .pricing-simulator-scroll-bar {
+    top: 128px;
+  }
+
+  .pricing-simulator-scroll-bar__inner {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .pricing-simulator-scroll-bar__divider--before-cta {
+    display: none;
+  }
+
+  .pricing-simulator-scroll-bar__col--cta {
+    flex: 1 1 100%;
+  }
+
+  .pricing-simulator-scroll-bar__cta {
+    width: 100%;
+  }
+}
+
+/* サマリーブロック（項目グリッドの下・アンカー用） */
+.pricing-simulator__summary-block {
+  margin-block-start: 2.5rem;
+  scroll-margin-top: 10rem;
+}
+
+/* 合計バー（.estimate-summary 内グリッド）と同じ左右インセットにアクション列を揃える */
+.pricing-simulator__post-summary {
+  width: 100%;
+  margin-block-start: 2rem;
+  padding-inline: 2rem;
+  box-sizing: border-box;
+}
+
+/* 次のステップ案内（アクションボタン直上） */
+.pricing-simulator__next-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+  color: #166534;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.75rem;
+  margin-block-start: 2rem;
+  padding-block: 1rem;
+  padding-inline: 1.25rem;
+}
+
+.pricing-simulator__next-step-icon {
+  flex-shrink: 0;
+  margin-block-start: 0.1rem;
+}
+
+.pricing-simulator__next-step strong {
+  display: block;
+  font-weight: 700;
+}
+
+.pricing-simulator__next-step__desc {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  margin-block-start: 0.5rem;
+}
+
+html.dark .pricing-simulator__next-step {
+  background-color: #052e16;
+  border-color: #14532d;
+  color: #bbf7d0;
+}
+
+/* 見積書ビュー:「最初に戻る」を .estimate-document と同じ列幅（印刷〜お問い合わせ行と同じ内幅）に合わせる */
+.pricing-simulator__estimate-back-wrap {
+  max-width: 900px;
+  margin-inline: auto;
+  padding-inline: 2rem;
+  margin-block-start: 1.5rem;
+  box-sizing: border-box;
+}
+
+.pricing-simulator__actions-hint {
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--color-purple, #639);
+  text-align: center;
+  margin-block: 0.75rem 0;
+  margin-inline: 0;
+}
+
+.pricing-simulator__footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+  margin-block-start: 1.25rem;
+}
+
+.pricing-simulator__footer-sep {
+  color: rgb(0 0 0 / 0.45);
+  color: color-mix(in srgb, currentcolor 45%, transparent);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.pricing-simulator__footer-link {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-blue-light, #4a90e2);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.pricing-simulator__footer-link:is(:hover, :focus-visible) {
+  color: var(--color-red, #ff4f48);
+  text-decoration: none;
+}
+
 .pricing-simulator__header {
   text-align: center;
   margin-block-start: 3rem;
@@ -102,20 +421,17 @@ html.dark .pricing-plan-button:is(:hover, :focus-visible) {
   display: flex;
   gap: 1rem;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
+}
+
+.pricing-simulator__post-summary .pricing-simulator__actions {
   margin-block-start: 2rem;
 }
 
-.pricing-simulator__actions--back {
-  justify-content: center;
-}
-
 .pricing-simulator__button {
-  width: 280px;
   font-size: 1rem;
   font-weight: 600;
   border-radius: 0.75rem;
-  border: none;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -131,35 +447,119 @@ html.dark .pricing-plan-button:is(:hover, :focus-visible) {
 }
 
 .pricing-simulator__button--reset {
-  background-color: var(--color-back-button, #4b5563);
-  color: var(--color-white, #f1f5f9);
+  background-color: transparent;
+  color: inherit;
+  border: 2px solid rgb(0 0 0 / 0.28);
+  border: 2px solid color-mix(in srgb, currentcolor 28%, transparent);
+}
+
+/* 選択あり時のレイアウト（色より前に置き、詳細度順を満たす） */
+.pricing-simulator__actions--has-selection {
+  display: grid;
+  grid-template-columns: minmax(13rem, 0.46fr) minmax(0, 1fr);
+  width: 100%;
+}
+
+.pricing-simulator__actions--has-selection .pricing-simulator__button--reset {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 1.25rem;
 }
 
 html.dark .pricing-simulator__button--reset {
-  background-color: var(--color-back-button, #6b7280);
+  background-color: rgb(241 245 249 / 0.08);
+  background-color: color-mix(in srgb, var(--color-white, #f1f5f9) 8%, transparent);
+  border-color: var(--color-gray, #404040);
+  color: var(--color-white, #f1f5f9);
 }
 
 .pricing-simulator__button--reset:is(:hover, :focus-visible):not(:disabled) {
-  background-color: var(--color-back-button-hover, #3a4451);
+  background-color: rgb(0 0 0 / 0.06);
+  background-color: color-mix(in srgb, currentcolor 6%, transparent);
   outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
   outline-offset: 0.125rem;
 }
 
 html.dark .pricing-simulator__button--reset:is(:hover, :focus-visible):not(:disabled) {
-  background-color: var(--color-back-button-hover, #7a8490);
+  background-color: rgb(241 245 249 / 0.12);
+  background-color: color-mix(in srgb, var(--color-white, #f1f5f9) 12%, transparent);
 }
 
 .pricing-simulator__button--generate {
   background-color: var(--color-purple, #8b5cf6);
   color: var(--color-white, #f1f5f9);
+  border: none;
+}
+
+.pricing-simulator__actions--has-selection .pricing-simulator__button--generate {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 1.25rem;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.35;
 }
 
 .pricing-simulator__button--generate:is(:hover, :focus-visible):not(:disabled) {
   background-color: var(--color-purple-dark, #7c3aed);
   transform: translateY(-0.125rem);
-  box-shadow: 0 0.25rem 0.75rem rgb(139 92 246 / 0.4);
+  box-shadow: 0 0.25rem 0.75rem rgb(139 92 246 / 0.35);
   outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
   outline-offset: 0.125rem;
+}
+
+.pricing-simulator__actions--back {
+  justify-content: center;
+  margin-block-start: 0;
+}
+
+.pricing-simulator__actions--back .pricing-simulator__button {
+  width: 100%;
+  max-width: none;
+  flex: none;
+}
+
+/* 戻るサブ動線ボタン（テキストリンク風・控えめ） */
+.pricing-simulator__button--back-sub {
+  width: auto !important;
+  max-width: none;
+  flex: none;
+  background: none;
+  border: 1px solid var(--color-gray-light, #e0e0e0);
+  border-radius: 0.5rem;
+  color: rgb(1 1 1 / 0.5);
+  color: color-mix(in srgb, var(--color-black, #010101) 50%, transparent);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding-block: 0.625rem;
+  padding-inline: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pricing-simulator__button--back-sub:is(:hover, :focus-visible) {
+  background-color: var(--color-gray-lightest, #f8f9fa);
+  border-color: var(--color-gray, #b0b0b0);
+  color: var(--color-black, #010101);
+}
+
+html.dark .pricing-simulator__button--back-sub {
+  border-color: #334155;
+  color: rgb(241 245 249 / 0.5);
+  color: color-mix(in srgb, var(--color-white, #f1f5f9) 50%, transparent);
+}
+
+html.dark .pricing-simulator__button--back-sub:is(:hover, :focus-visible) {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: var(--color-white, #f1f5f9);
+}
+
+.pricing-simulator__actions:not(.pricing-simulator__actions--has-selection, .pricing-simulator__actions--back)
+  .pricing-simulator__button {
+  width: 280px;
+  max-width: 100%;
+  flex: 1 1 0;
 }
 
 /* ページ数選択 */
@@ -229,8 +629,8 @@ html.dark .page-count-option:is(:hover, :focus-visible) {
 @media (width <= 768px) {
   .pricing-simulator {
     padding-block: 2rem;
-    padding-inline-start: max(0.5rem, env(safe-area-inset-left, 0px));
-    padding-inline-end: max(0.5rem, env(safe-area-inset-right, 0px));
+    padding-inline-start: max(0.5rem, env(safe-area-inset-left));
+    padding-inline-end: max(0.5rem, env(safe-area-inset-right));
   }
 
   .pricing-simulator__title {
@@ -250,15 +650,48 @@ html.dark .page-count-option:is(:hover, :focus-visible) {
     gap: 0.75rem;
   }
 
+  .pricing-simulator__post-summary {
+    padding-inline: 1rem;
+  }
+
+  .pricing-simulator__estimate-back-wrap {
+    padding-inline: 1rem;
+  }
+
+
   .pricing-simulator__actions {
     flex-direction: column;
+    align-items: center;
+  }
+
+  .pricing-simulator__actions--has-selection {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+  }
+
+  .pricing-simulator__actions--has-selection .pricing-simulator__button--reset,
+  .pricing-simulator__actions--has-selection .pricing-simulator__button--generate {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pricing-simulator__actions--has-selection .pricing-simulator__button--generate {
+    order: 1;
+  }
+
+  .pricing-simulator__actions--has-selection .pricing-simulator__button--reset {
+    order: 2;
   }
 
   .pricing-simulator__button {
     width: 100%;
-    padding-block: 0.5rem;
-    padding-inline: 0.5rem;
     font-size: 0.9375rem;
+  }
+
+  .pricing-simulator__actions:not(.pricing-simulator__actions--has-selection, .pricing-simulator__actions--back)
+  .pricing-simulator__button {
+    width: 320px;
   }
 
   .page-count-options {

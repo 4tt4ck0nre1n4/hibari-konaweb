@@ -101,7 +101,8 @@ html.dark .estimate-document {
 
 .estimate-document__website {
   font-size: 0.9375rem;
-  font-weight: 600;
+  /* font-weight: 600; */
+  margin-block-start: 0.5rem;
 }
 
 /* 件名 */
@@ -167,6 +168,7 @@ html.dark .estimate-document {
   font-size: 1rem;
   font-weight: 700;
   margin-block-start: 1rem;
+  margin-block-end: 0.85rem;
 }
 
 .estimate-document__table {
@@ -280,42 +282,301 @@ html.dark .estimate-document {
 /* 備考 */
 .estimate-document__notes {
   border: var(--color-gray-light, #e0e0e0) 1px solid;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   margin-block-start: 2rem;
   padding-block: 1.5rem;
   padding-inline: 1.5rem;
 }
 
-.estimate-document__notes-title {
-  font-size: 1rem;
+/* ─── サマリーピル ─── */
+.estimate-document__notes-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-block-end: 1.25rem;
+}
+
+.estimate-document__notes-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: var(--color-gray-lightest, #f8f9fa);
+  border: 1px solid var(--color-gray-light, #e0e0e0);
+  border-radius: 0.75rem;
+  padding-block: 1rem;
+  padding-inline: 0.75rem;
+  text-align: center;
+}
+
+.estimate-document__notes-pill-icon {
+  flex-shrink: 0;
+}
+
+.estimate-document__notes-pill-title {
+  font-size: 0.875rem;
+  color: color-mix(in srgb, var(--color-black, #010101) 55%, transparent);
+  line-height: 1.3;
+}
+
+.estimate-document__notes-pill-value {
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-black, #010101);
-  margin-block-start: 1rem;
+  line-height: 1.4;
 }
 
-.estimate-document__notes-content {
+/* ─── アコーディオン ─── */
+.estimate-document__notes-accordions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.estimate-document__notes-accordion {
+  border: 1px solid var(--color-gray-light, #e0e0e0);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.estimate-document__notes-accordion__header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-black, #010101);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+  padding-block: 0.875rem;
+  padding-inline: 1rem;
+}
+
+.estimate-document__notes-accordion__header:is(:hover, :focus-visible) {
+  background-color: var(--color-gray-lightest, #f8f9fa);
+  outline: none;
+}
+
+.estimate-document__notes-accordion__icon {
+  flex-shrink: 0;
+}
+
+.estimate-document__notes-accordion__title {
+  flex: 1;
+}
+
+.estimate-document__notes-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #854d0e;
+  background-color: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 0.75rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
+}
+
+.estimate-document__notes-accordion__arrow {
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, var(--color-black, #010101) 40%, transparent);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+html.dark .estimate-document__notes-accordion__arrow {
+  color: color-mix(in srgb, var(--color-white, #f1f5f9) 45%, transparent);
+}
+
+.estimate-document__notes-accordion[data-open="true"] .estimate-document__notes-accordion__arrow {
+  transform: rotate(180deg);
+}
+
+.estimate-document__notes-accordion__content {
+  display: none;
+  padding-block: 0.75rem;
+  padding-inline: 1rem;
+}
+
+.estimate-document__notes-accordion[data-open="true"] .estimate-document__notes-accordion__content {
+  display: block;
+}
+
+.estimate-document__notes-accordion__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   font-size: 0.875rem;
-  line-height: 1.8;
-}
-
-.estimate-document__notes-content p {
+  line-height: 1.7;
+  color: var(--color-black, #010101);
   margin: 0;
+  padding-inline-start: 1.25rem;
 }
 
-.estimate-document__notes-content p:empty {
-  margin-block: 0.5rem;
+/* ─── フッター ─── */
+.estimate-document__notes-footer {
+  font-size: 0.875rem;
+  color: color-mix(in srgb, var(--color-black, #010101) 55%, transparent);
+  text-align: center;
+  margin-block-start: 1rem;
+  margin-block-end: 0;
 }
 
-/* アクションボタン */
+.estimate-document__notes-footer-link {
+  color: var(--color-blue-light, #4a90e2);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.estimate-document__notes-footer-link:is(:hover, :focus-visible) {
+  color: var(--color-blue-hover, #3a7bc8);
+}
+
+/* ─── ダークモード ─── */
+html.dark .estimate-document__notes-pill {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .estimate-document__notes-pill-title {
+  color: color-mix(in srgb, var(--color-white, #f1f5f9) 55%, transparent);
+}
+
+html.dark .estimate-document__notes-pill-value {
+  color: var(--color-white, #f1f5f9);
+}
+
+html.dark .estimate-document__notes-accordion {
+  border-color: #334155;
+}
+
+html.dark .estimate-document__notes-accordion__header {
+  color: var(--color-white, #f1f5f9);
+}
+
+html.dark .estimate-document__notes-accordion__header:is(:hover, :focus-visible) {
+  background-color: #1e293b;
+}
+
+html.dark .estimate-document__notes-badge {
+  color: #fbbf24;
+  background-color: #292400;
+  border-color: #5c4200;
+}
+
+html.dark .estimate-document__notes-accordion__list {
+  color: var(--color-white, #f1f5f9);
+}
+
+html.dark .estimate-document__notes-footer {
+  color: color-mix(in srgb, var(--color-white, #f1f5f9) 55%, transparent);
+}
+
+/* アクションエリア */
 .estimate-document__actions {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   gap: 1rem;
   margin-block-start: 3rem;
 }
 
+/* 有効期限バッジ */
+.estimate-document__expiry-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: center;
+  background-color: #fffbe6;
+  border: 1px solid #ffe58f;
+  border-radius: 624.9375rem;
+  padding-block: 0.4rem;
+  padding-inline: 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #7c5700;
+}
+
+/* 次のステップ案内 */
+.estimate-document__next-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.75rem;
+  padding-block: 1rem;
+  padding-inline: 1.25rem;
+  font-size: 0.9375rem;
+  color: #166534;
+}
+
+.estimate-document__icon--next-step {
+  flex-shrink: 0;
+  margin-block-start: 0.1rem;
+}
+
+.estimate-document__next-step strong {
+  display: block;
+  font-weight: 700;
+  margin-block-end: 0.25rem;
+}
+
+.estimate-document__next-step__desc {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+/* CTAカード */
+.estimate-document__cta-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: var(--color-white, #f1f5f9);
+  border: 1px solid var(--color-gray-light, #e0e0e0);
+  border-radius: 1rem;
+  padding-block: 1.5rem;
+  padding-inline: 1.5rem;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+}
+
+.estimate-document__cta-heading {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-black, #010101);
+}
+
+.estimate-document__cta-sub {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-blue-light, #4a90e2);
+}
+
+.estimate-document__cta-assurance {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-purple, #8b5cf6);
+}
+
+/* サブアクション行（印刷・PDF） */
+.estimate-document__secondary-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* ボタン共通 */
 .estimate-document__button {
-  min-width: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -325,7 +586,8 @@ html.dark .estimate-document {
   border: none;
   border-radius: 0.75rem;
   padding-block: 1rem;
-  padding-inline: 2rem;
+  padding-inline: 1.5rem;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
@@ -352,11 +614,10 @@ html.dark .estimate-document {
   text-align: center;
 }
 
-.estimate-document__icon--pdf:is(:hover, :focus-visible) {
-  color: var(--color-white, #f1f5f9);
-}
-
+/* お問い合わせCTAボタン（パープル・全幅） */
 .estimate-document__button--contact {
+  width: 100%;
+  font-size: 1.125rem;
   color: var(--color-white, #f1f5f9);
   background-color: var(--color-purple, #8b5cf6);
 }
@@ -366,6 +627,31 @@ html.dark .estimate-document {
 }
 
 /* ダークモード対応 */
+html.dark .estimate-document__expiry-badge {
+  background-color: #2d2400;
+  border-color: #5c3d00;
+  color: #ffd666;
+}
+
+html.dark .estimate-document__next-step {
+  background-color: #052e16;
+  border-color: #14532d;
+  color: #bbf7d0;
+}
+
+html.dark .estimate-document__cta-card {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html.dark .estimate-document__cta-heading {
+  color: var(--color-white, #f1f5f9);
+}
+
+html.dark .estimate-document__cta-assurance {
+  color: color-mix(in srgb, var(--color-white, #f1f5f9) 55%, transparent);
+}
+
 html.dark .estimate-document__button--print {
   background-color: var(--color-print-button, #7a9ab8);
 }
@@ -383,7 +669,7 @@ html.dark .estimate-document__button--pdf:is(:hover, :focus-visible) {
 }
 
 html.dark .estimate-document__button--contact {
-  background-color: var(--color-purple, #639);
+  background-color: var(--color-purple, #8b5cf6);
 }
 
 html.dark .estimate-document__button--contact:is(:hover, :focus-visible) {
@@ -401,6 +687,7 @@ html.dark .estimate-document__button--contact:is(:hover, :focus-visible) {
 
   .no-print,
   .estimate-document__actions,
+  .pricing-simulator__estimate-back-wrap,
   .pricing-simulator__actions--back {
     display: none !important;
   }
@@ -494,26 +781,34 @@ html.dark .estimate-document__button--contact:is(:hover, :focus-visible) {
     font-size: 1.75rem;
   }
 
-  /* 明細テーブル */
+  /* 明細テーブル（ブラウザ印刷：1ページ目の直後で改ページ。明細ブロック内は行単位で分割可） */
   .estimate-document__details {
-    margin-block-start: 1rem;
+    margin-block-start: 0;
     break-before: page;
+    break-inside: auto;
   }
 
   .estimate-document__details-title {
     font-size: 0.9375rem;
-    margin-block-start: 0.75rem;
+    margin-block-start: 0;
+    margin-block-end: 0.85rem;
   }
 
   .estimate-document__table {
     font-size: 0.875rem;
+    break-inside: auto;
   }
 
   .estimate-document__table thead {
+    display: table-header-group;
     color: var(--color-white, #f1f5f9) !important;
     background-color: var(--color-blue-light, #4a90e2) !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  .estimate-document__table tr {
+    break-inside: avoid;
   }
 
   .estimate-document__table th,
@@ -532,20 +827,23 @@ html.dark .estimate-document__button--contact:is(:hover, :focus-visible) {
   }
 
   .estimate-document__tax-breakdown {
-    height: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
   }
 
   .estimate-document__tax-table {
-    height: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
   }
 
   .estimate-document__totals {
-    height: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important;
     gap: 0.5rem;
   }
 
@@ -582,18 +880,56 @@ html.dark .estimate-document__button--contact:is(:hover, :focus-visible) {
     padding-inline: 1rem;
   }
 
-  .estimate-document__notes-title {
-    font-size: 0.9375rem;
+  /* 印刷時：アコーディオンを全展開 */
+  .estimate-document__notes-accordion {
+    overflow: visible !important;
+  }
+
+  .estimate-document__notes-accordion__content {
+    display: block !important;
+    overflow: visible !important;
+    padding-block: 0.5rem;
+    padding-inline: 0.75rem;
+  }
+
+  .estimate-document__notes-accordion__arrow {
+    display: none;
+  }
+
+  .estimate-document__notes-pills {
+    gap: 0.5rem;
+  }
+
+  .estimate-document__notes-pill {
+    padding-block: 0.625rem;
+    padding-inline: 0.5rem;
+  }
+
+  .estimate-document__notes-pill-title {
+    font-size: 0.6875rem;
+  }
+
+  .estimate-document__notes-pill-value {
+    font-size: 0.75rem;
+  }
+
+  .estimate-document__notes-accordion__header {
+    padding-block: 0.625rem;
+    padding-inline: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .estimate-document__notes-accordion__list {
+    font-size: 0.8125rem;
+    gap: 0.375rem;
+  }
+
+  .estimate-document__notes-footer {
+    font-size: 0.875rem;
     margin-block-start: 0.75rem;
   }
 
-  .estimate-document__notes-content {
-    font-size: 0.8125rem;
-    line-height: 1.6;
-  }
-
   /* ページ区切り制御 */
-  .estimate-document__details,
   .estimate-document__summary,
   .estimate-document__notes {
     break-inside: avoid;
@@ -657,11 +993,43 @@ html.dark .estimate-document__button--contact:is(:hover, :focus-visible) {
     padding-inline: 0.625rem;
   }
 
-  .estimate-document__actions {
-    flex-direction: column;
+  .estimate-document__secondary-buttons {
+    grid-template-columns: 1fr;
   }
 
   .estimate-document__button {
     width: 100%;
+  }
+
+  .estimate-document__cta-assurance {
+    flex-direction: column;
+    gap: 0.375rem;
+    align-items: center;
+  }
+
+  .estimate-document__notes-pills {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .estimate-document__notes-pill {
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    padding-block: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .estimate-document__notes-pill-title,
+  .estimate-document__notes-pill-value {
+    text-align: left;
+  }
+
+  .estimate-document__notes-accordion__header {
+    font-size: 0.875rem;
+  }
+
+  .estimate-document__notes-footer {
+    text-align: left;
   }
 }
