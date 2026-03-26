@@ -328,6 +328,8 @@
 }
 
 .blog-post-cta-badge {
+  padding-block: 0.5rem;
+  padding-inline: 1rem;
   background-color: #4f46e5;
   color: rgb(255 255 255);
 }
