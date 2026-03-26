@@ -486,13 +486,13 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
   .blog__menu_image {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: flex;
     flex-shrink: 0;
-    box-shadow: 0 8px 8px rgb(0 0 0 / 0.6);
+    box-shadow: 0 6px 10px rgb(0 0 0 / 0.6);
     object-fit: contain;
     overflow: hidden;
-    transition: transform 0.5s ease;
+    transition: transform 0.3s ease-in;
     margin-block-start: 1rem;
     padding-inline: 0.25rem;
   }
@@ -505,9 +505,8 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    margin-block-start: 1rem;
-    margin-top: auto;
-    padding-top: 1rem;
+    margin-block-start: auto;
+    padding-block-start: 1rem;
   }
 
   .blog__times {

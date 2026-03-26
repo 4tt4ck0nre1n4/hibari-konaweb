@@ -126,8 +126,15 @@ const aboutUrl = `${siteBase}/about`;
 const authorName = globalText.global.author;
 const profileBio =
   "クリエイティビティ × AI × ビジネス。成果に直結するWebサイトやアプリケーションを制作しています。Astro / React 等が得意です。";
-const profileTagline = "フロントエンドエンジニア / デザイナー";
-const profileAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=4f46e5&color=fff&size=150`;
+const profileTagline = "フロントエンドエンジニア";
+/**
+ * 旧プロフィール画像: ui-avatars（`https://ui-avatars.com/api/?name=...&background=4f46e5&color=fff&size=150`）
+ * 現在は `sidebarAvatarSrc`（/favicon.svg）を使用。
+ */
+const sidebarAvatarSrc = "/favicon.svg";
+
+/** false のときサイドバーの「おすすめパッケージ」は空プレースホルダ表示（下の JSX の true 分支に旧マークアップを保持） */
+const showServiceSidebarBanner = false;
 
 const layoutTitle = plainTitle !== "" ? plainTitle : "Blog Title Not Found";
 const jsonLdHeadline = plainTitle !== "" ? plainTitle : "Blog post";
@@ -253,13 +260,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
         </div>
 
         <div
-          class="blog-post-cta bg-linear-to-br from-indigo-50 to-blue-50 rounded-xl p-8 border border-indigo-100 text-center relative overflow-hidden"
+          class="blog-post-cta bg-linear-to-br from-indigo-50 to-blue-50 rounded-xl p-8 border border-indigo-100 text-center"
         >
-          <div class="absolute -right-6 -top-6 text-indigo-100 opacity-50 pointer-events-none" aria-hidden="true">
-            <SafeIcon name="fa6-solid:paper-plane" width={120} height={120} ariaHidden={true} />
-          </div>
-
-          <div class="blog-post-cta-inner relative z-10">
+          <div class="blog-post-cta-inner">
             <span class="blog-post-cta-badge inline-block px-3 py-1 bg-primary text-white text-xs font-bold rounded-full mb-4">
               Web制作・システム開発のご相談
             </span>
@@ -293,22 +296,24 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
 
     <aside class="blog-post-sidebar w-full lg:w-1/3 space-y-6">
       <div class="blog-post-sidebar-card bg-white rounded-xl shadow-sm border border-slate-100 p-6 text-center">
-        <div class="w-24 h-24 mx-auto rounded-full bg-slate-200 mb-4 overflow-hidden border-4 border-slate-50">
-          <img
-            src={profileAvatarUrl}
-            alt=""
-            width={150}
-            height={150}
-            class="w-full h-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
+        <div class="blog-post-sidebar-profile">
+          <div class="blog-post-sidebar-avatar w-24 h-24 mx-auto rounded-full bg-slate-200 mb-4 overflow-hidden border-4 border-slate-50">
+            <img
+              src={sidebarAvatarSrc}
+              alt=""
+              width={96}
+              height={96}
+              class="h-full w-full object-contain p-1"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <h3 class="blog-post-sidebar-name text-lg font-bold text-slate-900 mb-1">{authorName}</h3>
+          <p class="blog-post-sidebar-tagline text-xs text-primary font-bold mb-4">{profileTagline}</p>
+          <p class="blog-post-sidebar-bio text-xs text-slate-600 text-left mb-4 leading-relaxed">
+            {profileBio}
+          </p>
         </div>
-        <h3 class="text-lg font-bold text-slate-900 mb-1">{authorName}</h3>
-        <p class="text-xs text-primary font-bold mb-4">{profileTagline}</p>
-        <p class="text-sm text-slate-600 text-left mb-4 leading-relaxed">
-          {profileBio}
-        </p>
         <div class="blog-post-sidebar-social flex justify-center gap-3 border-t border-slate-100 pt-4">
           <a
             href={github_sns.href}
@@ -334,26 +339,32 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
         </div>
       </div>
 
-      <a
-        href={serviceUrl}
-        class="blog-post-sidebar-banner block bg-slate-800 text-white rounded-xl shadow-sm overflow-hidden hover:opacity-95 transition-opacity group relative"
-      >
-        <div class="p-6 relative z-10">
-          <div class="text-secondary text-xs font-bold mb-2">おすすめパッケージ</div>
-          <h3 class="text-lg font-bold mb-2">
-            月額5500円<br />
-            サブスクリプション型ホームページ制作
-          </h3>
-          <p class="text-xs text-slate-300 mb-4">Astro + Headless CMSで保守性の高いモダンなサイトを構築します。</p>
-          <div class="inline-flex items-center text-sm font-bold text-white group-hover:translate-x-1 transition-transform">
-            詳細を見る
-            <SafeIcon name="fa6-solid:arrow-right" width={16} height={16} class="ml-2 text-secondary shrink-0" ariaHidden={true} />
-          </div>
-        </div>
-        <div class="absolute -bottom-10 -right-10 text-slate-700 opacity-30 transform rotate-12 pointer-events-none" aria-hidden="true">
-          <SafeIcon name="fa6-solid:rocket" width={180} height={180} ariaHidden={true} />
-        </div>
-      </a>
+      {
+        showServiceSidebarBanner ? (
+          <a
+            href={serviceUrl}
+            class="blog-post-sidebar-banner block bg-slate-800 text-white rounded-xl shadow-sm overflow-hidden hover:opacity-95 transition-opacity group relative"
+          >
+            <div class="p-6 relative z-10">
+              <div class="text-secondary text-xs font-bold mb-2">おすすめパッケージ</div>
+              <h3 class="text-lg font-bold mb-2">
+                月額5500円<br />
+                サブスクリプション型ホームページ制作
+              </h3>
+              <p class="text-xs text-slate-300 mb-4">Astro + Headless CMSで保守性の高いモダンなサイトを構築します。</p>
+              <div class="inline-flex items-center text-sm font-bold text-white group-hover:translate-x-1 transition-transform">
+                詳細を見る
+                <SafeIcon name="fa6-solid:arrow-right" width={16} height={16} class="ml-2 text-secondary shrink-0" ariaHidden={true} />
+              </div>
+            </div>
+            <div class="absolute -bottom-10 -right-10 text-slate-700 opacity-30 transform rotate-12 pointer-events-none" aria-hidden="true">
+              <SafeIcon name="fa6-solid:rocket" width={180} height={180} ariaHidden={true} />
+            </div>
+          </a>
+        ) : (
+          <div class="blog-post-sidebar-banner blog-post-sidebar-banner--empty" aria-hidden="true" />
+        )
+      }
 
       <div class="blog-post-sidebar-card bg-white rounded-xl shadow-sm border border-slate-100 p-6">
         <h3 class="text-sm font-bold text-slate-900 mb-4 flex items-center border-b border-slate-100 pb-2">
