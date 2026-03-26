@@ -11,6 +11,8 @@ interface ImportMetaEnv {
   readonly PUBLIC_WPCF7_POST_ID: string;
   readonly PUBLIC_GA_MEASUREMENT_ID?: string;
   readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
+  /** Local WP 不能時など、ビルドで WP 取得失敗を許容する（本番では未設定推奨） */
+  readonly PUBLIC_BUILD_SKIP_WORDPRESS?: string;
 }
 
 interface ImportMeta {

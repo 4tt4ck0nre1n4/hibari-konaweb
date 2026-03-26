@@ -8,26 +8,41 @@
 import { getImage } from "astro:assets";
 import type { GetImageResult } from "astro";
 
+/** ACF / WP REST が返す画像フィールドの代表的な形 */
+export type WordPressImageFieldInput =
+  | string
+  | number
+  | { url?: string; source_url?: string; id?: number; width?: number; height?: number }
+  | null
+  | undefined;
+
 /**
  * WordPress画像URLを取得して正規化する
- * ACFフィールドから画像URLを抽出（オブジェクト形式または文字列形式に対応）
+ * ACFフィールドから画像URLを抽出（文字列・数値 ID・オブジェクト形式に対応）
  *
- * @param imageData - ACFフィールドの画像データ（オブジェクトまたは文字列）
- * @returns 正規化された画像URL、またはnull
+ * @param imageData - ACFフィールドの画像データ
+ * @returns 正規化された画像URL、またはnull（メディア ID のみで URL が不明な場合など）
  */
-export function getWordPressImageUrl(
-  imageData: string | { url: string } | { url: string; width?: number; height?: number } | undefined | null
-): string | null {
+export function getWordPressImageUrl(imageData: WordPressImageFieldInput): string | null {
   if (imageData === null || imageData === undefined) {
     return null;
   }
 
   if (typeof imageData === "string") {
-    return imageData;
+    return imageData.trim() === "" ? null : imageData;
   }
 
-  if (typeof imageData === "object" && imageData !== null && "url" in imageData) {
-    return imageData.url;
+  if (typeof imageData === "number") {
+    return null;
+  }
+
+  if (typeof imageData === "object" && imageData !== null) {
+    if (typeof imageData.url === "string" && imageData.url !== "") {
+      return imageData.url;
+    }
+    if (typeof imageData.source_url === "string" && imageData.source_url !== "") {
+      return imageData.source_url;
+    }
   }
 
   return null;
@@ -85,7 +100,7 @@ export async function optimizeWordPressImage(
  * @returns 最適化された画像メタデータ、またはnull
  */
 export async function getOptimizedWordPressImage(
-  imageData: string | { url: string } | { url: string; width?: number; height?: number } | undefined | null,
+  imageData: WordPressImageFieldInput,
   options?: {
     width?: number;
     height?: number;

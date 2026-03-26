@@ -1,6 +1,6 @@
 import type { GetStaticPaths } from "astro";
 import { z } from "zod";
-import { BLOG_POST_API, headlessCmsUrl } from "./headlessCms";
+import { BLOG_POST_API, buildSkipWordPress, headlessCmsUrl } from "./headlessCms";
 
 /**
  * `fetch failed` / ECONNREFUSED などネットワーク失敗時に、SSG ビルド向けの対処ヒントを付与する
@@ -38,10 +38,24 @@ function rethrowIfWordPressUnreachable(requestUrl: string, error: unknown): neve
   throw error;
 }
 
-async function fetchOkOrThrow(url: string): Promise<Response> {
+/**
+ * ブログビルド用 fetch。`buildSkipWordPress` 時は失敗しても `null`（呼び出し側で空配列扱い）。
+ */
+async function fetchResponseForBlogBuild(url: string): Promise<Response | null> {
   try {
     return await fetch(url);
   } catch (e) {
+    if (buildSkipWordPress) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(
+        [
+          `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: fetch failed; continuing with no blog static paths.`,
+          `  URL: ${url}`,
+          `  ${msg}`,
+        ].join("\n"),
+      );
+      return null;
+    }
     rethrowIfWordPressUnreachable(url, e);
   }
 }
@@ -68,8 +82,20 @@ function parseSlugsFromWordPressPosts(raw: unknown[], apiName: string): string[]
  * ビルド時用: WordPress `posts` を `per_page=100` で取得し、100 件超は `page` を進めて全件結合する。
  */
 export async function fetchAllBlogPostsRawForBuild(): Promise<unknown[]> {
-  const firstResponse = await fetchOkOrThrow(BLOG_POST_API);
+  const firstResponse = await fetchResponseForBlogBuild(BLOG_POST_API);
+  if (firstResponse === null) {
+    return [];
+  }
   if (!firstResponse.ok) {
+    if (buildSkipWordPress) {
+      console.warn(
+        [
+          `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: WordPress returned ${firstResponse.status} ${firstResponse.statusText}; continuing with no blog static paths.`,
+          `  ${BLOG_POST_API}`,
+        ].join("\n"),
+      );
+      return [];
+    }
     throw new Error(`Failed to fetch blog posts: ${firstResponse.status} ${firstResponse.statusText}`);
   }
 
@@ -86,8 +112,20 @@ export async function fetchAllBlogPostsRawForBuild(): Promise<unknown[]> {
 
   for (let page = 2; page <= totalPages; page++) {
     const url = `${BLOG_POST_API}&page=${page}`;
-    const res = await fetchOkOrThrow(url);
+    const res = await fetchResponseForBlogBuild(url);
+    if (res === null) {
+      break;
+    }
     if (!res.ok) {
+      if (buildSkipWordPress) {
+        console.warn(
+          [
+            `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: page ${page} returned ${res.status} ${res.statusText}; using ${all.length} post(s) fetched so far.`,
+            `  ${url}`,
+          ].join("\n"),
+        );
+        break;
+      }
       throw new Error(`Failed to fetch blog posts (page ${page}): ${res.status} ${res.statusText}`);
     }
     const pageJson: unknown = await res.json();
@@ -110,6 +148,12 @@ export async function fetchBlogSlugsForStaticPaths(): Promise<string[]> {
   const slugs = parseSlugsFromWordPressPosts(raw, "Blog Posts API (getStaticPaths)");
 
   if (raw.length > 0 && slugs.length === 0) {
+    if (buildSkipWordPress) {
+      console.warn(
+        "⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: posts were returned but no valid slug was parsed; continuing with no blog static paths.",
+      );
+      return [];
+    }
     throw new Error(
       "Blog getStaticPaths: no posts contained a valid slug. Check WordPress REST response (posts collection).",
     );

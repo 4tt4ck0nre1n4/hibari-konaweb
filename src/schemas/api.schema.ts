@@ -9,24 +9,31 @@ const wpRenderedSchema = z.object({
   rendered: z.string(),
 });
 
-// WordPress 埋め込み著者情報
-const wpAuthorSchema = z.object({
-  name: z.string(),
-  link: z.string().url(),
+/** ブログ等: `rendered` 欠損・非文字列でもビルドを落とさない（出力型は常に string） */
+const wpRenderedLenientSchema = z.object({
+  rendered: z
+    .unknown()
+    .transform((v) => (v === undefined || v === null ? "" : String(v))),
 });
 
-// WordPress カテゴリ/タグ情報
-const wpTermSchema = z.object({
-  id: z.number(),
-  name: z.string(),
+/** `_embedded.author`: 相対 URL や空でも許容（embed 文脈で揺れる） */
+const wpAuthorLenientSchema = z.object({
+  name: z
+    .unknown()
+    .transform((v) => (v === undefined || v === null ? "" : String(v))),
+  link: z
+    .unknown()
+    .transform((v) => (v === undefined || v === null ? "" : String(v))),
 });
 
-// WordPress 埋め込みデータ
-const wpEmbeddedSchema = z
+/** ブログ詳細: `_embedded` の形が投稿・プラグインで微妙に異なる場合がある */
+const wpEmbeddedLenientSchema = z
   .object({
-    author: z.array(wpAuthorSchema).optional(),
-    "wp:term": z.array(z.array(wpTermSchema)).optional(),
+    author: z.array(wpAuthorLenientSchema).optional(),
+    /** タームのフィールドが文脈で欠ける場合があるため緩く受ける */
+    "wp:term": z.array(z.array(z.record(z.unknown()))).optional(),
   })
+  .passthrough()
   .optional();
 
 // カテゴリ情報
@@ -36,12 +43,34 @@ const catInfoSchema = z.object({
   name: z.string(),
 });
 
+/**
+ * ACF 画像: 文字列 URL / メディア ID / `{ url }` / `{ source_url }` 等（REST・ACF の返し方差を吸収）
+ * 正規化後は表示側 `getWordPressImageUrl` で URL 文字列に揃える
+ */
+const blogImageAcfFieldSchema = z
+  .unknown()
+  .transform((val): string | number | undefined => {
+    if (val === undefined || val === null) return undefined;
+    if (typeof val === "string") return val;
+    if (typeof val === "number" && Number.isFinite(val)) return val;
+    if (typeof val === "object" && val !== null) {
+      const o = val as Record<string, unknown>;
+      if (typeof o.url === "string") return o.url;
+      if (typeof o.source_url === "string") return o.source_url;
+    }
+    return undefined;
+  });
+
 // Advanced Custom Fields (ACF) - Blog
 const blogAcfSchema = z
   .object({
-    blog_image: z.string().optional(),
-    description: z.string().optional(),
+    blog_image: blogImageAcfFieldSchema,
+    description: z
+      .unknown()
+      .optional()
+      .transform((v) => (v === undefined || v === null ? undefined : String(v))),
   })
+  .passthrough()
   .optional();
 
 // Advanced Custom Fields (ACF) - Works
@@ -95,22 +124,27 @@ const worksAcfSchema = z
  */
 export const blogPostSchema = z.object({
   id: z.number(),
-  title: wpRenderedSchema,
+  title: wpRenderedLenientSchema,
   slug: z.string(),
   date: z.string(),
-  categories: z.array(z.number()),
-  content: wpRenderedSchema,
+  categories: z
+    .unknown()
+    .transform((v) => {
+      if (!Array.isArray(v)) return [];
+      return v.filter((x): x is number => typeof x === "number" && Number.isFinite(x));
+    }),
+  content: wpRenderedLenientSchema,
   cat_info: z.array(catInfoSchema).optional(),
-  _embedded: wpEmbeddedSchema,
+  _embedded: wpEmbeddedLenientSchema,
   acf: blogAcfSchema,
 });
 
 // APIレスポンス全体を包む（配列）
 export const blogPostsResponseSchema = z.array(blogPostSchema);
 
-// 型推論
-export type BlogPost = z.infer<typeof blogPostSchema>;
-export type BlogPostsResponse = z.infer<typeof blogPostsResponseSchema>;
+// 型推論（transform 後の形を正とする）
+export type BlogPost = z.output<typeof blogPostSchema>;
+export type BlogPostsResponse = z.output<typeof blogPostsResponseSchema>;
 
 /**
  * Works（制作実績）スキーマ
@@ -179,13 +213,18 @@ export type WPCF7InvalidField = z.infer<typeof wpcf7InvalidFieldSchema>;
 
 /**
  * APIレスポンスを安全に検証
- * @param schema - Zodスキーマ
+ * @param schema - Zodスキーマ（transform がある場合も **出力型** を返す）
  * @param data - 検証するデータ
  * @param apiName - API名（エラーログ用）
  * @param fallback - フォールバック値
  * @returns 検証済みデータまたはフォールバック値
  */
-export function validateApiResponse<T>(schema: z.ZodType<T>, data: unknown, apiName: string, fallback: T): T {
+export function validateApiResponse<S extends z.ZodTypeAny>(
+  schema: S,
+  data: unknown,
+  apiName: string,
+  fallback: z.output<S>,
+): z.output<S> {
   const result = schema.safeParse(data);
 
   if (!result.success) {
@@ -205,7 +244,7 @@ export function validateApiResponse<T>(schema: z.ZodType<T>, data: unknown, apiN
  * @returns 検証済みデータ
  * @throws {Error} 検証に失敗した場合
  */
-export function validateApiResponseStrict<T>(schema: z.ZodType<T>, data: unknown, apiName: string): T {
+export function validateApiResponseStrict<S extends z.ZodTypeAny>(schema: S, data: unknown, apiName: string): z.output<S> {
   const result = schema.safeParse(data);
 
   if (!result.success) {

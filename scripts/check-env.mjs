@@ -72,6 +72,13 @@ if (hasErrors) {
 } else {
   console.log("\n✅ すべての環境変数が正しく設定されています！\n");
 
+  const skipWp = process.env.PUBLIC_BUILD_SKIP_WORDPRESS;
+  if (skipWp === "true" || skipWp === "1" || skipWp === "yes") {
+    console.log("⚠️  PUBLIC_BUILD_SKIP_WORDPRESS が有効です。");
+    console.log("   静的ビルドで WordPress に届かなくてもブログ記事ページの生成はスキップします（失敗ではありません）。");
+    console.log("   本番 Netlify では未設定のままにしてください（誤デプロイ防止）。\n");
+  }
+
   // API接続テスト（オプション）
   const apiUrl = process.env.PUBLIC_API_URL;
   const apiPrefix = process.env.PUBLIC_API_PREFIX || "/wp-json/wp/v2/";

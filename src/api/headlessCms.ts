@@ -1,10 +1,31 @@
 import { validateEnv } from "../schemas/env.schema";
 
+/**
+ * Vite は `.env` に無い `PUBLIC_*` を `import.meta.env` に載せないことがある。
+ * `PUBLIC_BUILD_SKIP_WORDPRESS` は CI / シェルでだけ渡す場合もあるため `process.env` を優先マージする。
+ */
+function mergeImportMetaWithProcessEnv(): Record<string, unknown> {
+  const raw = { ...(import.meta.env as unknown as Record<string, unknown>) };
+  if (typeof process !== "undefined" && process.env.PUBLIC_BUILD_SKIP_WORDPRESS !== undefined) {
+    raw.PUBLIC_BUILD_SKIP_WORDPRESS = process.env.PUBLIC_BUILD_SKIP_WORDPRESS;
+  }
+  return raw;
+}
+
 // 環境変数を検証（Zodスキーマによる型安全な検証）
-const env = validateEnv(import.meta.env);
+const env = validateEnv(mergeImportMetaWithProcessEnv());
 
 export const headlessCmsUrl = env.PUBLIC_API_URL;
 export const headlessCmsApiPrefix = env.PUBLIC_API_PREFIX;
+
+/** `true` のとき、ブログ静的パス生成で WP 取得失敗してもビルドを止めない */
+export const buildSkipWordPress = env.PUBLIC_BUILD_SKIP_WORDPRESS;
+
+if (buildSkipWordPress) {
+  console.warn(
+    "⚠️ [API Config] PUBLIC_BUILD_SKIP_WORDPRESS is enabled: if WordPress is unreachable, blog post routes may be skipped during `astro build` (empty paths). Do not set this on production Netlify.",
+  );
+}
 
 // ビルド時に環境変数をログ出力（開発環境のみ）
 if (env.DEV) {

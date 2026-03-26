@@ -8,6 +8,7 @@ import { BLOG_PAGE_API, BLOG_SLUG_API } from "../../api/headlessCms";
 import SafeIcon from "../../components/SafeIcon.astro";
 import { blogPostsResponseSchema, type BlogPost } from "../../schemas/api.schema";
 import { validateApiResponse } from "../../schemas/api.schema";
+import { getWordPressImageUrl } from "../../util/optimizeWordPressImage";
 import "../../styles/blog-article.css";
 
 function stripHtml(html: string): string {
@@ -142,7 +143,7 @@ const jsonLd = JSON.stringify({
     "@type": "Person",
     name: `${globalText.global.author}`,
   },
-  image: post?.acf?.blog_image ?? "",
+  image: getWordPressImageUrl(post?.acf?.blog_image) ?? "",
 });
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { name: postSlugTitle }];
@@ -358,13 +359,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
         <ul class="space-y-4">
           {
             sidebarPosts.map((p) => {
-              const thumb = typeof p.acf?.blog_image === "string" && p.acf.blog_image !== "" ? p.acf.blog_image : null;
+              const thumb = getWordPressImageUrl(p.acf?.blog_image);
               const itemTitle = p.title?.rendered ?? "";
               return (
                 <li>
                   <a href={`/blog/${p.slug}`} class="group flex items-start gap-3 no-underline">
                     <div class="w-16 h-12 bg-slate-100 rounded shrink-0 border border-slate-200 overflow-hidden flex items-center justify-center">
-                      {thumb !== null ? (
+                      {thumb !== null && thumb !== "" ? (
                         <Image
                           src={thumb}
                           alt=""

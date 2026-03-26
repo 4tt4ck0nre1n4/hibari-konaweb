@@ -34,6 +34,23 @@ export const envSchema = z.object({
   // Cloudflare Turnstile Site Key（任意）
   PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
 
+  /**
+   * `true` のとき、静的ビルドで WordPress REST が失敗してもブログ `getStaticPaths` を落とさない（空パスで続行）。
+   * 本番 Netlify では未設定のままにすること（誤デプロイ防止）。
+   */
+  PUBLIC_BUILD_SKIP_WORDPRESS: z
+    .union([z.string(), z.boolean(), z.undefined()])
+    .optional()
+    .transform((v) => {
+      if (v === undefined || v === null) return false;
+      if (typeof v === "boolean") return v;
+      if (typeof v === "string") {
+        const s = v.trim().toLowerCase();
+        return s === "1" || s === "true" || s === "yes";
+      }
+      return false;
+    }),
+
   // 開発環境フラグ（システム提供）
   DEV: z.boolean().default(false),
 });

@@ -152,10 +152,13 @@ hibari-konaweb/
 
 Local の WordPress が使えない場合は、`.env` の `PUBLIC_API_URL` を**本番と同じ WordPress の URL**（`https://` で公開されているサイト）に設定すれば、ローカルでも `npm run dev` / `npm run build` 時に REST API を取得できます。`env.example.txt` のコメントも参照してください。
 
+Local が 502 などで全く使えず、**静的ビルドだけ通したい**場合は `.env` に `PUBLIC_BUILD_SKIP_WORDPRESS=true` を書くか、ビルド直前に環境変数として渡してください（例: `cmd /c "set PUBLIC_BUILD_SKIP_WORDPRESS=true&& npm run build:safe"`）。ブログ記事の `getStaticPaths` が失敗してもビルドは止まりません（その時点では記事詳細ページは生成されません）。**本番 Netlify では未設定のまま**にしてください。
+
 ### オプション環境変数
 
 | 変数名                        | 説明                                       |
 | ----------------------------- | ------------------------------------------ |
+| `PUBLIC_BUILD_SKIP_WORDPRESS` | `true`/`1` で WordPress 取得失敗時もブログ静的パス生成をスキップ（ローカル用・本番では未設定推奨） |
 | `PUBLIC_WPCF7_*`              | Contact Form 7の設定                       |
 | `PUBLIC_TURNSTILE_SITE_KEY`   | Cloudflare Turnstileのサイトキー（セキュリティ対策） |
 | `PUBLIC_GA_MEASUREMENT_ID`    | Google Analytics 4の測定ID                 |
