@@ -62,7 +62,8 @@ export const wpcf7UnitTag = env.PUBLIC_WPCF7_UNIT_TAG;
 export const wpcf7PostId = env.PUBLIC_WPCF7_POST_ID;
 
 export const blogPageApi = "posts?_embed&context=embed&acf_format=standard&per_page=100";
-export const blogPostApi = "posts?context=embed&acf_format=standard";
+/** 一覧・静的パス生成と同じ最大件数。未指定だと WP 既定 per_page=10 となり詳細ページのパスが欠ける */
+export const blogPostApi = "posts?context=embed&acf_format=standard&per_page=100";
 export const blogSlugApi = "posts?context=view&acf_format=standard&slug=";
 
 export const categoryPageApi = "categories?context=embed&acf_format=standard&per_page=100";

@@ -45,8 +45,9 @@ for (const envVar of requiredEnvVars) {
     // ローカルURLの警告
     if (value.includes("localhost") || value.includes("127.0.0.1") || value.includes(".local")) {
       console.log(`⚠️  ${envVar.name}: ${value}`);
-      console.log(`   警告: ローカルURLは本番環境では機能しません！`);
-      console.log(`   本番環境では公開アクセス可能なURLを設定してください。`);
+      console.log(`   注意: この URL は「そのマシンから HTTP で届く」必要があります。`);
+      console.log(`   Local WP が起動しない・使えない場合は、本番の WordPress URL（https://…）に変更してください。`);
+      console.log(`   （Netlify 本番ビルドでは必ず公開 URL を設定してください）`);
     } else {
       console.log(`✅ ${envVar.name}: ${value}`);
     }

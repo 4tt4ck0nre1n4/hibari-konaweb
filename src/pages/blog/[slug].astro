@@ -1,11 +1,10 @@
 ---
 import { Image } from "astro:assets";
 import Layout from "../../layouts/Layout.astro";
-import type { GetStaticPaths } from "astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import globalText from "../../data/globalText.json";
 import { github_sns, twitter } from "../../data/constSns";
-import { BLOG_PAGE_API, BLOG_POST_API, BLOG_SLUG_API } from "../../api/headlessCms";
+import { BLOG_PAGE_API, BLOG_SLUG_API } from "../../api/headlessCms";
 import SafeIcon from "../../components/SafeIcon.astro";
 import { blogPostsResponseSchema, type BlogPost } from "../../schemas/api.schema";
 import { validateApiResponse } from "../../schemas/api.schema";
@@ -33,38 +32,7 @@ const categoryIcon = {
 
 const shareIconSize = 18;
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  try {
-    console.log("Fetching blog slugs from API:", BLOG_POST_API);
-
-    const response = await fetch(BLOG_POST_API);
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch blog slugs: ${response.status}`);
-    }
-
-    const json = await response.json();
-    const dataPosts = validateApiResponse(blogPostsResponseSchema, json, "Blog Posts API", [] as BlogPost[]);
-
-    if (dataPosts.length === 0) {
-      console.warn("No posts found, returning empty paths.");
-      return [];
-    }
-
-    const paths = dataPosts.map((post: BlogPost) => ({
-      params: {
-        slug: post.slug,
-      },
-    }));
-
-    console.log("Generated paths:", paths);
-
-    return paths;
-  } catch (error) {
-    console.error("Error fetching static paths:", error);
-    return [];
-  }
-};
+export { getBlogSlugStaticPaths as getStaticPaths } from "../../api/blogPostsBuild";
 
 const { slug } = Astro.params;
 let post: BlogPost | undefined;
@@ -280,7 +248,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
         </div>
 
         <div
-          class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-8 border border-indigo-100 text-center relative overflow-hidden"
+          class="bg-linear-to-br from-indigo-50 to-blue-50 rounded-xl p-8 border border-indigo-100 text-center relative overflow-hidden"
         >
           <div class="absolute -right-6 -top-6 text-indigo-100 opacity-50 pointer-events-none" aria-hidden="true">
             <SafeIcon name="fa6-solid:paper-plane" width={120} height={120} ariaHidden={true} />

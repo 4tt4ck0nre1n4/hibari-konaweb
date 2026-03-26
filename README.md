@@ -150,6 +150,8 @@ hibari-konaweb/
 | `PUBLIC_API_URL`    | WordPressのURL           |
 | `PUBLIC_API_PREFIX` | REST APIのプレフィックス |
 
+Local の WordPress が使えない場合は、`.env` の `PUBLIC_API_URL` を**本番と同じ WordPress の URL**（`https://` で公開されているサイト）に設定すれば、ローカルでも `npm run dev` / `npm run build` 時に REST API を取得できます。`env.example.txt` のコメントも参照してください。
+
 ### オプション環境変数
 
 | 変数名                        | 説明                                       |
