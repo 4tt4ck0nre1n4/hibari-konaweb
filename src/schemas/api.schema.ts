@@ -142,6 +142,37 @@ export const blogPostSchema = z.object({
 // APIレスポンス全体を包む（配列）
 export const blogPostsResponseSchema = z.array(blogPostSchema);
 
+/**
+ * ブログ詳細サイドバー「読まれている記事」用。
+ * 一覧 API（embed）では `content` 等が欠けたり 1 件だけ形が崩れても、配列全体を [] にしない。
+ */
+export const blogPostSidebarItemSchema = z
+  .object({
+    id: z.number(),
+    slug: z.string(),
+    title: z.preprocess(
+      (v) => (v === undefined || v === null ? { rendered: "" } : v),
+      wpRenderedLenientSchema,
+    ),
+    acf: blogAcfSchema,
+  })
+  .passthrough();
+
+export type BlogPostSidebarItem = z.output<typeof blogPostSidebarItemSchema>;
+
+/** `posts` 配列を要素単位でパースし、不正な要素だけ捨てる */
+export function parseBlogPostSidebarList(data: unknown): BlogPostSidebarItem[] {
+  if (!Array.isArray(data)) return [];
+  const out: BlogPostSidebarItem[] = [];
+  for (const item of data) {
+    const result = blogPostSidebarItemSchema.safeParse(item);
+    if (result.success) {
+      out.push(result.data);
+    }
+  }
+  return out;
+}
+
 // 型推論（transform 後の形を正とする）
 export type BlogPost = z.output<typeof blogPostSchema>;
 export type BlogPostsResponse = z.output<typeof blogPostsResponseSchema>;

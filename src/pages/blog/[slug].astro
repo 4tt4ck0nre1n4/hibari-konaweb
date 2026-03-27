@@ -4,9 +4,9 @@ import Layout from "../../layouts/Layout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import globalText from "../../data/globalText.json";
 import { github_sns, twitter } from "../../data/constSns";
-import { BLOG_PAGE_API, BLOG_SLUG_API } from "../../api/headlessCms";
+import { BLOG_POST_API, BLOG_SLUG_API } from "../../api/headlessCms";
 import SafeIcon from "../../components/SafeIcon.astro";
-import { blogPostsResponseSchema, type BlogPost } from "../../schemas/api.schema";
+import { blogPostsResponseSchema, parseBlogPostSidebarList, type BlogPost, type BlogPostSidebarItem } from "../../schemas/api.schema";
 import { validateApiResponse } from "../../schemas/api.schema";
 import { getWordPressImageUrl } from "../../util/optimizeWordPressImage";
 import "../../styles/blog-article.css";
@@ -86,15 +86,19 @@ try {
   throw new Error("Post not found");
 }
 
-let sidebarPosts: BlogPost[] = [];
+let sidebarPosts: BlogPostSidebarItem[] = [];
+let sidebarListFetchFailed = false;
 try {
-  const resList = await fetchWithRetry(BLOG_PAGE_API);
-  if (resList.ok) {
+  const resList = await fetchWithRetry(BLOG_POST_API);
+  if (!resList.ok) {
+    sidebarListFetchFailed = true;
+  } else {
     const jsonList = await resList.json();
-    const allPosts = validateApiResponse(blogPostsResponseSchema, jsonList, "Blog page list for sidebar", [] as BlogPost[]);
+    const allPosts = parseBlogPostSidebarList(jsonList);
     sidebarPosts = allPosts.filter((p) => p.slug !== slug).slice(0, 4);
   }
 } catch (e) {
+  sidebarListFetchFailed = true;
   console.warn("Sidebar posts fetch failed:", e);
 }
 
@@ -374,7 +378,11 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
         <ul class="space-y-4">
           {
             sidebarPosts.length === 0 ? (
-              <li class="text-xs text-slate-500">記事一覧を読み込めませんでした。時間をおいて再度お試しください。</li>
+              <li class="text-xs text-slate-500">
+                {sidebarListFetchFailed
+                  ? "記事一覧を読み込めませんでした。時間をおいて再度お試しください。"
+                  : "他に表示できる記事はまだありません。"}
+              </li>
             ) : (
               sidebarPosts.map((p) => {
                 const thumb = getWordPressImageUrl(p.acf?.blog_image);
