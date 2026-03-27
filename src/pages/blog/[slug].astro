@@ -371,12 +371,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
         )
       }
 
-      <div class="blog-post-sidebar-card bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-        <h3 class="blog-post-sidebar-popular-title text-sm font-normal text-slate-900 mb-4 flex items-center gap-2 border-b border-slate-100 pb-2">
+      <div class="blog-post-sidebar-card bg-white rounded-xl shadow-sm border border-slate-100">
+        <h3 class="blog-post-sidebar-popular-title text-sm font-normal text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2">
           <SafeIcon name="emojione-v1:star" width={18} height={18} class="text-violet-500 shrink-0" ariaHidden={true} />
           読まれている記事
         </h3>
-        <ul class="blog-post-sidebar-popular-list list-none pl-0 m-0">
+        <ul class="blog-post-sidebar-popular-list list-none pl-0">
           {
             sidebarPosts.length === 0 ? (
               <li class="text-xs text-slate-500">
@@ -390,35 +390,30 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
                 const itemTitle = p.title?.rendered ?? "";
                 const firstCat = Array.isArray(p.cat_info) && p.cat_info.length > 0 ? p.cat_info[0] : undefined;
                 return (
-                  <li class="blog-post-sidebar-popular-item border-t border-[0.5px] border-slate-100 pt-3 first:border-t-0 first:pt-0">
+                  <li class="blog-post-sidebar-popular-item">
                     <a
                       href={`/blog/${p.slug}`}
-                      class="blog-post-sidebar-popular-link group flex items-start gap-3 no-underline rounded-lg -m-1 p-1 transition-colors duration-200 hover:bg-slate-50/80"
+                      class="blog-post-sidebar-popular-link group flex flex-col gap-2 no-underline rounded-lg p-1 -m-1 transition-colors duration-200 hover:bg-slate-50/80"
                     >
-                      <div class="w-[160px] shrink-0 aspect-video overflow-hidden rounded-[0.5rem] bg-slate-100 border border-slate-200 flex items-center justify-center">
+                      <div class="blog-post-sidebar-popular-thumb">
                         {thumb !== null && thumb !== "" ? (
                           <Image
                             src={thumb}
                             alt=""
-                            width={160}
-                            height={90}
-                            class="h-full w-full object-cover transition-transform duration-200 ease-out group-hover:scale-105"
+                            width={640}
+                            height={360}
+                            class="h-full w-full object-cover"
                             loading="lazy"
                           />
                         ) : null}
                       </div>
-                      <div class="min-w-0 flex-1">
-                        {firstCat !== undefined ? (
-                          <span
-                            class={`inline-block max-w-full truncate rounded-full px-2 py-0.5 text-xs font-normal ${getCategoryBadgeClasses(firstCat.id)}`}
-                            set:html={firstCat.name}
-                          />
-                        ) : null}
-                        <h4
-                          class={`text-sm font-normal text-slate-700 transition-colors duration-200 line-clamp-2 leading-tight min-h-[2.75rem] group-hover:text-primary ${firstCat !== undefined ? "mt-1.5" : ""}`}
-                          set:html={itemTitle}
-                        />
-                      </div>
+                      {firstCat !== undefined ? (
+                        <span class={getCategoryBadgeClasses(firstCat.id)} set:html={firstCat.name} />
+                      ) : null}
+                      <h4
+                        class="min-w-0 text-sm font-normal leading-tight text-slate-700 transition-colors duration-200 line-clamp-2 min-h-[2.75rem] group-hover:text-primary"
+                        set:html={itemTitle}
+                      />
                     </a>
                   </li>
                 );
@@ -426,13 +421,15 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
             )
           }
         </ul>
-        <a
-          href="/blog"
-          class="blog-post-sidebar-popular-footer mt-4 inline-flex items-center gap-1 text-sm font-normal text-slate-600 transition-colors duration-200 hover:text-primary hover:underline"
-        >
-          すべての記事を見る
-          <span aria-hidden="true">→</span>
-        </a>
+        <div class="blog-post-sidebar-popular-footer-wrap">
+          <a
+            href="/blog"
+            class="blog-post-sidebar-popular-footer text-sm font-normal text-slate-600 transition-colors duration-200 hover:text-primary hover:underline"
+          >
+            すべての記事を見る
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
       </div>
     </aside>
   </div>
