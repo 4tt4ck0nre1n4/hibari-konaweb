@@ -155,6 +155,7 @@ export const blogPostSidebarItemSchema = z
       wpRenderedLenientSchema,
     ),
     acf: blogAcfSchema,
+    cat_info: z.array(catInfoSchema).optional(),
   })
   .passthrough();
 

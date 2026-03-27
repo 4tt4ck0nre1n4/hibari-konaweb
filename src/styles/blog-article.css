@@ -432,8 +432,14 @@
     align-items: stretch;
   }
 
-  .blog-post-cta-actions > a {
-    flex: 1 1 0;
+  .blog-post-cta-actions > a.blog-post-cta-btn-primary {
+    flex: 6 1 0;
+    min-width: 0;
+    width: auto;
+  }
+
+  .blog-post-cta-actions > a.blog-post-cta-btn-secondary {
+    flex: 4 1 0;
     min-width: 0;
     width: auto;
   }
@@ -558,6 +564,15 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-weight: normal;
+}
+
+.blog-post-sidebar-popular-list {
+  list-style: none;
+}
+
+.blog-post-sidebar-popular-footer {
+  text-decoration: none;
 }
 
 .blog-post-sidebar-profile {

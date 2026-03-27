@@ -99,7 +99,7 @@ export default defineConfig({
           "man-technologist-medium-light",
         ],
         "fluent-emoji-high-contrast": ["party-popper", "mobile-phone", "mobile-phone-with-arrow"],
-        "emojione-v1": ["alarm-clock", "bookmark"],
+        "emojione-v1": ["alarm-clock", "bookmark", "star", "laptop-computer"],
         bi: ["alarm-fill", "github"],
         octicon: ["play-24"],
         carbon: ["pause-outline"],

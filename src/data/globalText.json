@@ -47,7 +47,9 @@
   "blog": {
     "title": "Blog | My Portfolio Site",
     "description": "ブログの記事一覧です。",
-    "error": "申し訳ございません。ブログの記事一覧のデータを読み込むことができませんでした。もう一度お試しください。"
+    "error": "申し訳ございません。ブログの記事一覧のデータを読み込むことができませんでした。もう一度お試しください。",
+    "postCtaHeading": "あなたのビジネス課題をWebで解決しませんか？",
+    "postCtaDescription": "この記事で紹介した技術を用いたサイト構築や、現状のWebサイトの改善提案を行っています。まずは無料でお気軽にご相談ください。"
   },
   "categories": {
     "title": "Categories | My Portfolio Site",
