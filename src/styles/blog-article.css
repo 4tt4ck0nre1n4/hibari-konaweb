@@ -70,7 +70,7 @@
 }
 
 .blog-post-header {
-  margin-bottom: 2rem;
+  margin-bottom: 0;
   padding-bottom: 2rem;
   border-bottom-width: 1px;
   border-bottom-style: solid;
@@ -81,7 +81,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   line-height: 1.25;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   color: rgb(15 23 42);
 }
 
@@ -111,11 +111,16 @@
   opacity: 0.8;
 }
 
+.blog-post-header .blog-post-meta {
+  margin-block-start: 1rem;
+}
+
 .blog-article-body {
   width: 100%;
   max-width: 700px;
   margin-inline: auto;
-  margin-bottom: 3rem;
+  margin-block-start: 2rem;
+  margin-bottom: 0;
   box-sizing: border-box;
 }
 
@@ -136,8 +141,8 @@
 .blog-article-content :is(h2) {
   font-size: 1.25rem;
   font-weight: 700;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-block-start: 2rem;
+  margin-bottom: 0;
   padding-left: 0.75rem;
   border-left-width: 4px;
   border-left-style: solid;
@@ -145,24 +150,41 @@
   color: rgb(15 23 42);
 }
 
+.blog-article-content > :first-child:is(h2) {
+  margin-block-start: 0;
+}
+
 .blog-article-content :is(h3) {
   font-size: 1.125rem;
   font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
+  margin-block-start: 1.5rem;
+  margin-bottom: 0;
   color: rgb(15 23 42);
+}
+
+.blog-article-content > :first-child:is(h3) {
+  margin-block-start: 0;
 }
 
 .blog-article-content :is(h4) {
   font-size: 1rem;
   font-weight: 600;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
+  margin-block-start: 1.25rem;
+  margin-bottom: 0;
   color: rgb(15 23 42);
 }
 
+.blog-article-content > :first-child:is(h4) {
+  margin-block-start: 0;
+}
+
 .blog-article-content :is(p) {
-  margin-bottom: 1rem;
+  margin-block-start: 1rem;
+  margin-bottom: 0;
+}
+
+.blog-article-content > :first-child:is(p) {
+  margin-block-start: 0;
 }
 
 .blog-article-content :is(img) {
@@ -179,7 +201,11 @@
 }
 
 .blog-article-content :is(li) {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
+}
+
+.blog-article-content :is(li:not(:first-child)) {
+  margin-block-start: 0.5rem;
 }
 
 .blog-article-content :is(blockquote) {
@@ -249,17 +275,28 @@
   overflow-x: auto;
 }
 
-.blog-article-content .wp-block-table table {
+.blog-article-content .wp-block-table table,
+.blog-article-content > table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 0.9375rem;
 }
 
 .blog-article-content .wp-block-table th,
-.blog-article-content .wp-block-table td {
+.blog-article-content .wp-block-table td,
+.blog-article-content > table th,
+.blog-article-content > table td {
   border: 1px solid rgb(203 213 225);
   padding: 0.5rem 0.75rem;
   text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.blog-article-content table th:first-child,
+.blog-article-content table td:first-child {
+  width: 20%;
+  max-width: 12rem;
 }
 
 .blog-article-content .wp-block-table th {
@@ -287,11 +324,12 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
+  margin-block-start: 3rem;
+  margin-bottom: 0;
   padding-block: 1.5rem;
   border-top-width: 1px;
   border-bottom-width: 1px;
   border-color: rgb(241 245 249);
-  margin-bottom: 2.5rem;
 }
 
 .blog-post-share > span:first-child {
@@ -322,29 +360,63 @@
 .blog-post-cta {
   background: linear-gradient(to bottom right, rgb(238 242 255), rgb(239 246 255));
   border-radius: 0.75rem;
-  padding: 2rem;
-  border: 1px solid rgb(199 210 254);
+  border: rgb(199 210 254) 1px solid;
   text-align: center;
+  margin-block-start: 2.5rem;
+  padding-block: 1rem;
+  padding-inline: 1.5rem;
+}
+
+.blog-post-cta-inner > .blog-post-cta-badge {
+  margin-block-start: 0;
 }
 
 .blog-post-cta-badge {
-  padding-block: 0.5rem;
-  padding-inline: 1rem;
-  background-color: #4f46e5;
   color: rgb(255 255 255);
+  background-color: #4f46e5;
+  border-radius: 0.5rem;
+  margin-block-start: 1rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.5rem;
+}
+
+.blog-post-cta-inner h2 {
+  margin-block-start: 1rem;
+  margin-bottom: 0;
+}
+
+.blog-post-cta-inner p {
+  margin-block-start: 0.75rem;
+  margin-bottom: 0;
+}
+
+.blog-post-cta-inner .blog-post-cta-actions {
+  margin-block-start: 1.5rem;
 }
 
 .blog-post-cta-actions {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   gap: 1rem;
+}
+
+.blog-post-cta-actions > a {
+  box-sizing: border-box;
+  width: 100%;
 }
 
 @media (width >= 640px) {
   .blog-post-cta-actions {
     flex-direction: row;
+    align-items: stretch;
+  }
+
+  .blog-post-cta-actions > a {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
   }
 }
 
@@ -373,7 +445,6 @@
   font-size: 1.25rem;
   font-weight: 700;
   color: rgb(15 23 42);
-  margin-bottom: 0.75rem;
 }
 
 @media (width >= 768px) {
@@ -383,10 +454,10 @@
 }
 
 .blog-post-cta p {
+  max-width: 32rem;
   font-size: 0.875rem;
   color: rgb(71 85 105);
-  margin-bottom: 1.5rem;
-  max-width: 32rem;
+  text-align: justify;
   margin-inline: auto;
 }
 
@@ -400,26 +471,26 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
+  gap: 0.5rem;
   font-weight: 700;
   border-radius: 0.5rem;
   text-decoration: none;
+  padding-block: 0.75rem;
+  padding-inline: 1.5rem;
 }
 
 .blog-post-cta a.bg-primary,
 .blog-post-cta a.inline-flex.bg-primary,
 .blog-post-cta a.blog-post-cta-btn-primary {
-  background-color: #4f46e5;
   color: rgb(255 255 255);
+  background-color: #4f46e5;
 }
 
 .blog-post-cta a.border-primary,
 .blog-post-cta a.blog-post-cta-btn-secondary {
-  background-color: rgb(255 255 255);
   color: #4f46e5;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #4f46e5;
+  background-color: rgb(255 255 255);
+  border: #4f46e5 1px solid;
 }
 
 .blog-post-sidebar-card {
@@ -460,8 +531,14 @@
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  text-decoration: none;
   color: inherit;
+  text-decoration: none;
+}
+
+.blog-post-sidebar-popular-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .blog-post-sidebar-profile {
@@ -492,7 +569,7 @@
   display: flex;
   justify-content: center;
   gap: 0.75rem;
-  margin-top: 0.5rem;
+  margin-block-start: 0.5rem;
   padding-top: 1.25rem;
   padding-bottom: 0.5rem;
   border-top-width: 1px;
