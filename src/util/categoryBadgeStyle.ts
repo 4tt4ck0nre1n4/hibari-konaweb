@@ -12,5 +12,6 @@ const PALETTE = [
 
 export function getCategoryBadgeClasses(categoryId: number): string {
   const n = Number.isFinite(categoryId) ? Math.abs(Math.trunc(categoryId)) : 0;
-  return PALETTE[n % PALETTE.length];
+  const idx = n % PALETTE.length;
+  return PALETTE[idx] ?? PALETTE[0];
 }
