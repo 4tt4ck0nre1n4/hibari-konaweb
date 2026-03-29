@@ -136,7 +136,7 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
     if (error instanceof Error) {
       console.error("❌ [Works Pagination] Error message:", error.message);
       console.error("❌ [Works Pagination] Error name:", error.name);
-      if (error.stack) {
+      if (error.stack !== undefined && error.stack !== "") {
         console.error("❌ [Works Pagination] Error stack:", error.stack);
       }
       // 接続エラーの場合、より詳細な情報を出力

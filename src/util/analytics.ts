@@ -52,7 +52,7 @@ export function trackPageView(pagePath: string, pageTitle?: string): void {
   if (typeof window !== "undefined" && window.gtag) {
     window.gtag("event", "page_view", {
       page_path: pagePath,
-      page_title: pageTitle || document.title,
+      page_title: pageTitle !== undefined && pageTitle !== "" ? pageTitle : document.title,
       page_location: window.location.href,
     });
   } else if (import.meta.env.DEV) {

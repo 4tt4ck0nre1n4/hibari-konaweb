@@ -1,5 +1,25 @@
 import { z } from "zod";
 
+/** `unknown` を緩く string に（オブジェクトの String() は使わない） */
+function lenientUnknownToString(v: unknown): string {
+  if (v === undefined || v === null) return "";
+  if (typeof v === "string") return v;
+  if (typeof v === "number" || typeof v === "boolean" || typeof v === "bigint") {
+    return String(v);
+  }
+  return "";
+}
+
+/** 省略可能フィールド用: プリミティブのみ文字列化し、オブジェクトは undefined */
+function lenientUnknownToOptionalString(v: unknown): string | undefined {
+  if (v === undefined || v === null) return undefined;
+  if (typeof v === "string") return v;
+  if (typeof v === "number" || typeof v === "boolean" || typeof v === "bigint") {
+    return String(v);
+  }
+  return undefined;
+}
+
 /**
  * WordPress REST API レスポンススキーマ
  */
@@ -13,17 +33,17 @@ const wpRenderedSchema = z.object({
 const wpRenderedLenientSchema = z.object({
   rendered: z
     .unknown()
-    .transform((v) => (v === undefined || v === null ? "" : String(v))),
+    .transform((v) => lenientUnknownToString(v)),
 });
 
 /** `_embedded.author`: 相対 URL や空でも許容（embed 文脈で揺れる） */
 const wpAuthorLenientSchema = z.object({
   name: z
     .unknown()
-    .transform((v) => (v === undefined || v === null ? "" : String(v))),
+    .transform((v) => lenientUnknownToString(v)),
   link: z
     .unknown()
-    .transform((v) => (v === undefined || v === null ? "" : String(v))),
+    .transform((v) => lenientUnknownToString(v)),
 });
 
 /** ブログ詳細: `_embedded` の形が投稿・プラグインで微妙に異なる場合がある */
@@ -68,7 +88,7 @@ const blogAcfSchema = z
     description: z
       .unknown()
       .optional()
-      .transform((v) => (v === undefined || v === null ? undefined : String(v))),
+      .transform((v) => lenientUnknownToOptionalString(v)),
   })
   .passthrough()
   .optional();
@@ -262,10 +282,13 @@ export function validateApiResponse<S extends z.ZodTypeAny>(
   if (!result.success) {
     console.error(`❌ [API Validation] ${apiName} validation failed:`, result.error.format());
     console.warn(`⚠️ [API Validation] Using fallback value for ${apiName}`);
+    // S extends ZodTypeAny のとき z.output<S> が any と推論され no-unsafe-return となる
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- 呼び出し側で z.output<S> を渡す
     return fallback;
   }
 
-  return result.data;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safeParse 成功時の data は実行時検証済み
+  return result.data as z.output<S>;
 }
 
 /**
@@ -284,5 +307,6 @@ export function validateApiResponseStrict<S extends z.ZodTypeAny>(schema: S, dat
     throw new Error(`API response validation failed for ${apiName}`);
   }
 
-  return result.data;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- safeParse 成功時の data は実行時検証済み
+  return result.data as z.output<S>;
 }

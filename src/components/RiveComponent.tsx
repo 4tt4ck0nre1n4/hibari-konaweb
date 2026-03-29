@@ -181,7 +181,7 @@ function RiveClient({
     debugLog("RiveComponent src changed:", src);
   }, [src]);
 
-  const showSpinner = (runtimeLoading || (!!layout && !fileReady)) && !error;
+  const showSpinner = (runtimeLoading || (layout !== null && !fileReady)) && (error === null || error === "");
 
   return (
     <div ref={containerRef} className="rive-container">
@@ -190,7 +190,7 @@ function RiveClient({
           <div className="rive-loading-spinner"></div>
         </div>
       )}
-      {layout !== null && !error && (
+      {layout !== null && (error === null || error === "") && (
         <RivePlayer
           key={src}
           src={src}

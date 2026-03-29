@@ -9,9 +9,6 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 export function asyncSwiperCssPlugin() {
   return {
     name: "async-css-optimizer",
@@ -36,7 +33,7 @@ export function asyncSwiperCssPlugin() {
                   buildDir = dir.pathname;
                 }
               }
-            } catch (e) {
+            } catch {
               // fileURLToPath が失敗した場合は文字列として使用
               buildDir = dir.pathname || dir.href || "./dist";
             }
@@ -86,9 +83,8 @@ export function asyncSwiperCssPlugin() {
 
             // 置換内容を収集（まず正順でカウント、その後逆順で置換）
             const replacements = [];
-            let nonSwiperCssIndex = 0;
 
-            // 正順で処理して、nonSwiperCssIndexをカウント
+            // 正順で stylesheet リンクを処理
             for (let i = 0; i < stylesheetMatches.length; i++) {
               const { fullMatch, index, href } = stylesheetMatches[i];
               const normalizedHref = href.startsWith("/") ? href : `/${href}`;
@@ -154,7 +150,6 @@ export function asyncSwiperCssPlugin() {
             if (stopMatches.length > 0) {
               // 各 stop の前後のコンテキストから、同じグラデーション/パターン内の連続 stop を判定
               // 簡易対応: 隣接する stop の数を数えて 0%, 100% または均等分配
-              let lastReplacedIndex = -1;
               for (let i = 0; i < stopMatches.length; i++) {
                 const m = stopMatches[i];
                 if (m.full.includes('offset="')) continue; // 既に offset あり
@@ -213,7 +208,7 @@ export function asyncSwiperCssPlugin() {
 
             // W3Cバリデーション対応: U+0000（null文字）とスマートクォートを除去
             if (html.includes("\u0000") || /[\u201C\u201D\u201E\u201F\u2033\u2036]/.test(html)) {
-              html = html.replace(/\u0000/g, "");
+              html = html.split("\u0000").join("");
               html = html.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"');
               modified = true;
             }

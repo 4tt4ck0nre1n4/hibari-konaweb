@@ -10,6 +10,7 @@ import astroParser from "astro-eslint-parser";
 export default [
   {
     ignores: [
+      "_local/**",
       "**/.astro/**",
       "**/*.astro/**",
       "**/.astro/*.ts",
@@ -46,6 +47,16 @@ export default [
   },
   eslintJs.configs.recommended,
   ...tsEslint.configs.recommendedTypeChecked,
+  // 型情報のない.jsではtype-checkedルールを無効化（tsconfig に含まれないルートの JS 等）
+  {
+    files: ["**/*.js"],
+    ...tsEslint.configs.disableTypeChecked,
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
   {
     files: ["**/.astro/*.ts"],
     languageOptions: {

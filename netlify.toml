@@ -4,7 +4,8 @@
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "20"
+  # Astro 6 は Node >=22.12.0（.nvmrc と揃える）
+  NODE_VERSION = "22.12.0"
   # ビルドログを詳細にする
   NODE_OPTIONS = "--max-old-space-size=4096"
 

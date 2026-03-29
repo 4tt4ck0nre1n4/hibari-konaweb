@@ -41,6 +41,15 @@ const sortedRevisionDates = revisionDates.sort((a, b) => {
 
 const latestRevision = sortedRevisionDates.at(-1)?.data ?? null;
 
+/** 最終改定日の <time datetime> 用（null / 空は制定日にフォールバック） */
+const lastRevisedDatetimeIso =
+  latestRevision !== null && latestRevision !== ""
+    ? (() => {
+        const iso = formatDateToISO(latestRevision);
+        return iso !== "" ? iso : establishmentDateIso;
+      })()
+    : establishmentDateIso;
+
 const contactLinks = {
   href: "/contact",
   ariaLabel: "お問い合わせページへ",
@@ -114,9 +123,9 @@ const googlePrivacypolicyLinks = {
           最終改定日 &#0058;
           <time
             id="js-lastRevisedDate"
-            datetime={latestRevision ? formatDateToISO(latestRevision) || establishmentDateIso : establishmentDateIso}
+            datetime={lastRevisedDatetimeIso}
           >
-            {latestRevision}
+            {latestRevision !== null && latestRevision !== "" ? latestRevision : establishmentDate}
           </time>
         </p>
       </li>

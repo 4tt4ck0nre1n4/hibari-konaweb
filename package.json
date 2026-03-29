@@ -127,5 +127,8 @@
     "stylelint-config-standard": "^39.0.1",
     "ts-node": "^10.9.2",
     "vite-plugin-dynamic-import": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }
