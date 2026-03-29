@@ -49,7 +49,14 @@
     "description": "ブログの記事一覧です。",
     "error": "申し訳ございません。ブログの記事一覧のデータを読み込むことができませんでした。もう一度お試しください。",
     "postCtaHeading": "あなたのビジネス課題をWebで解決しませんか？",
-    "postCtaDescription": "この記事で紹介した技術を用いたサイト構築や、現状のWebサイトの改善提案を行っています。まずは無料でお気軽にご相談ください。"
+    "postCtaDescription": "この記事で紹介した技術を用いたサイト構築や、現状のWebサイトの改善提案を行っています。まずは無料でお気軽にご相談ください。",
+    "postCtaBadge": "Web制作・システム開発のご相談",
+    "postCtaContactButton": "無料相談・お問い合わせ",
+    "postCtaWorksButton": "制作実績を見る →",
+    "authorName": "hibari-konaweb.com",
+    "profileName": "",
+    "profileTagline": "フロントエンドエンジニア",
+    "profileBio": "クリエイティビティ × AI × ビジネス。成果に直結するWebサイトやアプリケーションを制作しています。Astro / React 等が得意です。"
   },
   "categories": {
     "title": "Categories | My Portfolio Site",

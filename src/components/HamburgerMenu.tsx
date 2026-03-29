@@ -8,13 +8,25 @@ import HamburgerMenuLogo from "./HamburgerMenuLogo";
 import type { IconifyInlineProps } from "./IconifyInline";
 
 const title = "My Portfolio Site";
-const menuItems = [
+
+type MenuItemConfig = {
+  label: string;
+  href: string;
+  ariaLabel: string;
+  ariaTitle: string;
+  icon: string;
+  subLabel: string;
+  sectionBorderTop?: boolean;
+};
+
+const menuItems: MenuItemConfig[] = [
   {
     label: "Home",
     href: "/",
     ariaLabel: "トップページへ戻る",
     ariaTitle: "トップページへ戻る",
     icon: "flat-color-icons:home",
+    subLabel: "トップページへ戻る",
   },
   {
     label: "Blog",
@@ -22,6 +34,7 @@ const menuItems = [
     ariaLabel: "ブログページへ",
     ariaTitle: "ブログページへ",
     icon: "vscode-icons:file-type-libreoffice-writer",
+    subLabel: "ブログ記事を見る",
   },
   {
     label: "About",
@@ -29,13 +42,16 @@ const menuItems = [
     ariaLabel: "アバウトページへ",
     ariaTitle: "アバウトページへ",
     icon: "streamline-ultimate-color:laptop-user",
+    subLabel: "私について",
+    sectionBorderTop: true,
   },
   {
     label: "Works",
     href: "/works",
     ariaLabel: "ワークスページへ",
     ariaTitle: "ワークスページへ",
-    icon: "twemoji:woman-technologist-medium-light-skin-tone",
+    icon: "emojione-v1:laptop-computer",
+    subLabel: "制作実績を見る",
   },
   {
     label: "Service",
@@ -43,6 +59,7 @@ const menuItems = [
     ariaLabel: "サービスページへ",
     ariaTitle: "サービスページへ",
     icon: "streamline-ultimate-color:cash-payment-sign-2",
+    subLabel: "私の提供するサービス",
   },
   {
     label: "Contact",
@@ -50,6 +67,8 @@ const menuItems = [
     ariaLabel: "お問い合わせページへ",
     ariaTitle: "お問い合わせページへ",
     icon: "fluent-emoji-flat:envelope",
+    subLabel: "お問い合わせページへ",
+    sectionBorderTop: true,
   },
 ];
 
@@ -416,10 +435,13 @@ const HamburgerMenu = () => {
         <h2 className={hamburgerStyles.hamburger__title_text}>{title}</h2>
       </div>
       <ul>
-        {menuItems.map(({ label, href, icon, ariaLabel, ariaTitle }, index) => {
+        {menuItems.map(({ label, href, icon, ariaLabel, ariaTitle, subLabel, sectionBorderTop }, index: number) => {
           const isActive = currentPath === href || (href !== "/" && currentPath.startsWith(href));
           return (
-            <li key={label} className={hamburgerStyles.hamburger__menu_item}>
+            <li
+              key={label + subLabel + index.toString()}
+              className={`${hamburgerStyles.hamburger__menu_item} ${sectionBorderTop === true ? hamburgerStyles.hamburger__menu_item_sectionTop : ""}`}
+            >
               <a
                 className={`${hamburgerStyles.hamburger__menu_link} ${isActive ? hamburgerStyles.active : ""}`}
                 href={href}
@@ -438,7 +460,10 @@ const HamburgerMenu = () => {
                     aria-hidden
                   />
                 ) : null}
-                <span className={hamburgerStyles.hamburger__menu_label}>{label}</span>
+                <span className={hamburgerStyles.hamburger__menu_text}>
+                  <span className={hamburgerStyles.hamburger__menu_label}>{label}</span>
+                  <span className={hamburgerStyles.hamburger__menu_subLabel}>{subLabel}</span>
+                </span>
               </a>
             </li>
           );

@@ -2,6 +2,14 @@
 
 export default {
   extends: ["stylelint-config-standard", "stylelint-config-recommended"],
+  // Tailwind CSS v4: @theme — CSSTree / at-rule-no-unknown 用（空定義で登録のみ）
+  languageOptions: {
+    syntax: {
+      atRules: {
+        theme: {},
+      },
+    },
+  },
   rules: {
     // Allow empty sources (useful for CSS modules)
     "no-empty-source": null,
@@ -16,9 +24,12 @@ export default {
     "at-rule-no-unknown": [
       true,
       {
-        ignoreAtRules: ["tailwind", "apply", "variants", "responsive", "screen", "layer"],
+        ignoreAtRules: ["tailwind", "apply", "variants", "responsive", "screen", "layer", "theme"],
       },
     ],
+
+    // Tailwind v4 @theme（推奨設定の prelude チェックと併用）
+    "at-rule-prelude-no-invalid": [true, { ignoreAtRules: ["media", "theme"] }],
 
     // Color function notation
     "color-function-notation": "modern",

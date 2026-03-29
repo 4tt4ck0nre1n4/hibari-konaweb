@@ -1,5 +1,4 @@
 /* Tailwind CSS v4（Preflight 無効: theme + utilities のみ。既存 reset / SCSS と要素リセットが二重にならないようにする） */
-/* stylelint-disable at-rule-no-unknown -- Tailwind v4 @theme / @layer */
 @import url("tailwindcss/theme.css") layer(theme);
 @import url("tailwindcss/utilities.css") layer(utilities);
 
@@ -524,6 +523,8 @@
   border-radius: 0.75rem;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
   box-sizing: border-box;
+  padding-block: 2rem;
+  padding-inline: 1rem;
 }
 
 .blog-post-sidebar-banner {
@@ -548,14 +549,9 @@
   box-shadow: none;
 }
 
+
 .blog-post-sidebar .blog-post-sidebar-banner .text-secondary {
   color: var(--color-secondary);
-}
-
-.blog-post-sidebar-card {
-  padding-block: 2rem;
-  padding-inline: 1rem;
-  box-sizing: border-box;
 }
 
 .blog-post-sidebar-card a.group {
@@ -652,7 +648,9 @@
 
 .blog-post-sidebar-popular-footer-wrap {
   display: block;
-  margin-block-start: 1rem;
+  margin-block-start: 0;
+  padding-block-start: 0.75rem;
+  border-top: 0.5px solid rgb(226 232 240);
   text-align: center;
 }
 
@@ -678,14 +676,17 @@
 .blog-post-sidebar-tagline {
   font-size: 0.6875rem;
   padding-inline: 1rem;
+  color: var(--color-primary);
 }
 
 .blog-post-sidebar-bio {
   font-size: 0.6875rem;
   max-width: 22rem;
   margin-inline: auto;
+  margin-block-start: 1rem;
   padding-inline: 1.125rem;
   text-align: left;
+  color: rgb(69 85 108);
 }
 
 .blog-post-sidebar-social {

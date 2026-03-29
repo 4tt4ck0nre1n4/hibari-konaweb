@@ -101,6 +101,7 @@ html.dark .estimate-document {
 
 .estimate-document__website {
   font-size: 0.9375rem;
+
   /* font-weight: 600; */
   margin-block-start: 0.5rem;
 }
