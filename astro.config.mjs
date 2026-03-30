@@ -58,10 +58,7 @@ export default defineConfig({
     react(),
     pagefind(),
     sitemap({
-      i18n: {
-        defaultLocale: "ja",
-        xslURL: "/sitemap.xsl",
-      },
+      xslURL: "/sitemap.xsl",
     }),
     icon({
       include: {
