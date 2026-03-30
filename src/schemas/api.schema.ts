@@ -24,11 +24,6 @@ function lenientUnknownToOptionalString(v: unknown): string | undefined {
  * WordPress REST API レスポンススキーマ
  */
 
-// WordPress レンダリングコンテンツ
-const wpRenderedSchema = z.object({
-  rendered: z.string(),
-});
-
 /** ブログ等: `rendered` 欠損・非文字列でもビルドを落とさない（出力型は常に string） */
 const wpRenderedLenientSchema = z.object({
   rendered: z
@@ -93,51 +88,11 @@ const blogAcfSchema = z
   .passthrough()
   .optional();
 
-// Advanced Custom Fields (ACF) - Works
-const worksAcfSchema = z
-  .object({
-    screenshot_pc: z.string().optional(),
-    left_link: z.string().optional(),
-    span_access: z.string().optional(),
-    span_user: z.string().optional(),
-    span_password: z.string().optional(),
-    left_text: z.string().optional(),
-    pc_image: z.string().optional(),
-    right_header: z.string().optional(),
-    right_title: z.string().optional(),
-    icon_image: z.string().optional(),
-    right_access: z.string().optional(),
-    sp_image: z.string().optional(),
-    right_link: z.string().optional(),
-    description: z.string().optional(),
-    // アイコンフラグ
-    icon_vscode: z.string().optional(),
-    icon_cursor: z.string().optional(),
-    icon_html: z.string().optional(),
-    icon_css: z.string().optional(),
-    icon_sass: z.string().optional(),
-    icon_javascript: z.string().optional(),
-    icon_jquery: z.string().optional(),
-    icon_typescript: z.string().optional(),
-    icon_gsap: z.string().optional(),
-    icon_swiper: z.string().optional(),
-    icon_three: z.string().optional(),
-    icon_react: z.string().optional(),
-    icon_wordpress: z.string().optional(),
-    icon_vite: z.string().optional(),
-    icon_gulp: z.string().optional(),
-    icon_webpack: z.string().optional(),
-    icon_astro: z.string().optional(),
-    icon_netlify: z.string().optional(),
-    icon_vercel: z.string().optional(),
-    icon_github: z.string().optional(),
-    icon_canva: z.string().optional(),
-    icon_adobexd: z.string().optional(),
-    icon_photoshop: z.string().optional(),
-    icon_illustrator: z.string().optional(),
-    icon_figma: z.string().optional(),
-  })
-  .optional();
+/**
+ * Works の ACF は REST で文字列 / メディア ID / `{ url }` / `null` など揺れる。
+ * ビルド時の静的パス生成で落とさないよう広く受け、表示は `getWordPressImageUrl` 等で正規化する。
+ */
+const worksAcfRestSchema = z.record(z.unknown()).nullish();
 
 /**
  * Blog投稿スキーマ
@@ -199,14 +154,33 @@ export type BlogPost = z.output<typeof blogPostSchema>;
 export type BlogPostsResponse = z.output<typeof blogPostsResponseSchema>;
 
 /**
+ * WordPress REST の `date` は ISO 8601 文字列が一般的。数値（Unix 秒/ミリ秒）も許容し、正規化後は ISO 文字列。
+ */
+const worksDateNormalizedSchema = z
+  .union([z.string(), z.number()])
+  .transform((v): string => {
+    if (typeof v === "number") {
+      if (!Number.isFinite(v) || v === 0) return "";
+      const ms = v < 1e12 ? v * 1000 : v;
+      const d = new Date(ms);
+      return Number.isNaN(d.getTime()) ? "" : d.toISOString();
+    }
+    const trimmed = v.trim();
+    if (trimmed === "") return "";
+    const t = Date.parse(trimmed);
+    if (Number.isNaN(t)) return trimmed;
+    return new Date(t).toISOString();
+  });
+
+/**
  * Works（制作実績）スキーマ
  */
 export const worksSchema = z.object({
-  id: z.number(),
-  date: z.number(),
-  title: wpRenderedSchema,
+  id: z.coerce.number(),
+  date: worksDateNormalizedSchema,
+  title: wpRenderedLenientSchema,
   slug: z.string(),
-  acf: worksAcfSchema,
+  acf: worksAcfRestSchema,
 });
 
 // APIレスポンス全体を包む（配列）

@@ -6,7 +6,7 @@ import globalText from "../../data/globalText.json";
 import { WORKS_SLUG_API } from "../../api/headlessCms";
 
 export { getWorksSlugStaticPaths as getStaticPaths } from "../../api/worksBuild";
-import { getWordPressImageUrl } from "../../util/optimizeWordPressImage";
+import { getWordPressImageUrl, type WordPressImageFieldInput } from "../../util/optimizeWordPressImage";
 import { worksResponseSchema, type Works } from "../../schemas/api.schema";
 import { validateApiResponse } from "../../schemas/api.schema";
 
@@ -85,16 +85,27 @@ if (!work) {
   // ビルドを停止せず、エラーページを生成するために空のデータ構造を作成
   work = {
     id: 0,
-    date: 0,
+    date: "",
     title: { rendered: "Work Not Found" },
     slug: slug,
     acf: undefined,
   } as Works;
 }
 
+function asWpImage(v: unknown): WordPressImageFieldInput {
+  return v as WordPressImageFieldInput;
+}
+
+function acfStr(v: unknown): string {
+  return typeof v === "string" ? v : "";
+}
+
 const icons = work?.acf
   ? Object.entries(work.acf)
-      .filter(([key, value]) => key.startsWith("icon_") && typeof value === "string" && value.trim() !== "")
+      .filter((entry): entry is [string, string] => {
+        const [key, value] = entry;
+        return key.startsWith("icon_") && typeof value === "string" && value.trim() !== "";
+      })
       .map(([key, value]) => ({
         name: key.replace("icon_", ""),
         url: value.trim(),
@@ -102,18 +113,18 @@ const icons = work?.acf
   : [];
 
 const worksSlugTitle = work?.title?.rendered;
-const worksSlugDescription = work?.acf?.description ?? "";
-const worksScreenshotPc = getWordPressImageUrl(work?.acf?.screenshot_pc) ?? "";
-const worksSlugLeftLink = work?.acf?.left_link;
-const worksSlugRightLink = work?.acf?.right_link;
-const worksRightHeader = work?.acf?.right_header;
-const worksRightAccess = work?.acf?.right_access;
+const worksSlugDescription = acfStr(work?.acf?.description);
+const worksScreenshotPc = getWordPressImageUrl(asWpImage(work?.acf?.screenshot_pc)) ?? "";
+const worksSlugLeftLink = acfStr(work?.acf?.left_link) || undefined;
+const worksSlugRightLink = acfStr(work?.acf?.right_link) || undefined;
+const worksRightHeader = acfStr(work?.acf?.right_header) || undefined;
+const worksRightAccess = acfStr(work?.acf?.right_access) || undefined;
 
 // WordPress画像は外部配信のため、通常のimgタグを使用
-const screenshotPcUrl = getWordPressImageUrl(work?.acf?.screenshot_pc) ?? "";
-const pcImageUrl = getWordPressImageUrl(work?.acf?.pc_image) ?? "";
-const spImageUrl = getWordPressImageUrl(work?.acf?.sp_image) ?? "";
-const iconImageUrl = getWordPressImageUrl(work?.acf?.icon_image) ?? "";
+const screenshotPcUrl = getWordPressImageUrl(asWpImage(work?.acf?.screenshot_pc)) ?? "";
+const pcImageUrl = getWordPressImageUrl(asWpImage(work?.acf?.pc_image)) ?? "";
+const spImageUrl = getWordPressImageUrl(asWpImage(work?.acf?.sp_image)) ?? "";
+const iconImageUrl = getWordPressImageUrl(asWpImage(work?.acf?.icon_image)) ?? "";
 
 const siteOrigin = Astro.site?.origin ?? globalText.url.replace(/\/$/, "");
 
@@ -121,9 +132,9 @@ const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "CreativeWork",
   name: worksSlugTitle,
-  description: work?.acf?.description?.replace(/(<([^>]+)>)/gi, "").trim(),
+  description: worksSlugDescription.replace(/(<([^>]+)>)/gi, "").trim(),
   url: `${siteOrigin}/works/${work.slug}`,
-  dataPublished: work.date,
+  ...(work.date !== "" ? { datePublished: work.date } : {}),
   author: {
     "@type": "Person",
     name: "hibari-konaweb.com",

@@ -1,5 +1,4 @@
 ---
-import type { GetStaticPaths } from "astro";
 import Layout from "../layouts/Layout.astro";
 import { Image } from "astro:assets";
 import NotfoundImage from "../assets/image/404.webp";
@@ -7,16 +6,12 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 import globalText from "../data/globalText.json";
 import errorText from "../data/errorText.json";
 
-export const getStaticPaths: GetStaticPaths = () => {
-  return [];
-};
-
 export const prerender = true;
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "404 Not Found Error" }];
 
 const notFoundImageMeta = {
-  alt: "404 NotFound エラーを案内する猫の画像",
+  alt: "404 NotFound エラーを案内する画像",
   width: 280,
   height: 280,
 };
