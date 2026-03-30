@@ -701,4 +701,49 @@
   border-top-color: rgb(241 245 249);
 }
 
+/*
+ * 白いカード上のテキスト: html.dark の継承色や非レイヤーの a { color: inherit } より、
+ * ライトモードと同じ色を明示（Tailwind utilities レイヤーより優先させるためこのファイルは @layer 外）。
+ */
+html.dark .blog-post-sidebar-name {
+  color: rgb(15 23 42);
+}
+
+html.dark .blog-post-sidebar-tagline {
+  color: #4f46e5;
+}
+
+html.dark .blog-post-sidebar-social a {
+  color: rgb(148 163 184);
+}
+
+html.dark .blog-post-sidebar-social a:nth-child(1):is(:hover, :focus-visible),
+html.dark .blog-post-sidebar-social a:nth-child(3):is(:hover, :focus-visible) {
+  color: rgb(71 85 105);
+}
+
+html.dark .blog-post-sidebar-social a:nth-child(2):is(:hover, :focus-visible) {
+  color: #1da1f2;
+}
+
+html.dark .blog-post-sidebar-popular-title {
+  color: rgb(15 23 42);
+}
+
+html.dark .blog-post-sidebar-popular-item h4 {
+  color: rgb(51 65 85);
+}
+
+html.dark .blog-post-sidebar-popular-link:is(:hover, :focus-visible) h4 {
+  color: #4f46e5;
+}
+
+html.dark .blog-post-sidebar-popular-footer {
+  color: rgb(71 85 105);
+}
+
+html.dark .blog-post-sidebar-popular-footer:is(:hover, :focus-visible) {
+  color: #4f46e5;
+}
+
 /* stylelint-enable no-descending-specificity */
