@@ -21,7 +21,7 @@ export const headlessCmsApiPrefix = env.PUBLIC_API_PREFIX;
 /** `true` のとき、ブログ静的パス生成で WP 取得失敗してもビルドを止めない */
 export const buildSkipWordPress = env.PUBLIC_BUILD_SKIP_WORDPRESS;
 
-if (buildSkipWordPress) {
+if (buildSkipWordPress && import.meta.env.DEV) {
   console.warn(
     "⚠️ [API Config] PUBLIC_BUILD_SKIP_WORDPRESS is enabled: if WordPress is unreachable, blog post routes may be skipped during `astro build` (empty paths). Do not set this on production Netlify.",
   );

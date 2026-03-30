@@ -3,7 +3,9 @@ import Layout from "../../layouts/Layout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import worksText from "../../data/worksText.json";
 import globalText from "../../data/globalText.json";
-import { WORKS_SLUG_API, WORKS_PATH_API } from "../../api/headlessCms";
+import { WORKS_SLUG_API } from "../../api/headlessCms";
+
+export { getWorksSlugStaticPaths as getStaticPaths } from "../../api/worksBuild";
 import { getWordPressImageUrl } from "../../util/optimizeWordPressImage";
 import { worksResponseSchema, type Works } from "../../schemas/api.schema";
 import { validateApiResponse } from "../../schemas/api.schema";
@@ -40,14 +42,16 @@ if (!work) {
   try {
     const resWorks = await fetch(`${WORKS_SLUG_API}${slug}`);
 
-    console.log("Fetching data WORKS_SLUG_API:", `${WORKS_SLUG_API}${slug}`);
+    if (import.meta.env.DEV) {
+      console.log("Fetching data WORKS_SLUG_API:", `${WORKS_SLUG_API}${slug}`);
+    }
 
     if (!resWorks.ok) {
-      console.error("Failed to fetch work data. Status:", resWorks.status);
-      // 507エラーなどの一時的なエラーの場合は警告のみ
-      if (resWorks.status === 507) {
-        console.warn(`⚠️ [Works Slug] Server returned 507 (Insufficient Storage) for slug: ${slug}`);
-        console.warn(`⚠️ [Works Slug] This may be a temporary server issue. Skipping this page.`);
+      if (import.meta.env.DEV) {
+        console.warn("Failed to fetch work data. Status:", resWorks.status);
+        if (resWorks.status === 507) {
+          console.warn(`⚠️ [Works Slug] Server returned 507 (Insufficient Storage) for slug: ${slug}`);
+        }
       }
       throw new Error(`Failed to fetch work data: ${resWorks.status}`);
     }
@@ -55,7 +59,9 @@ if (!work) {
     const json = await resWorks.json();
     const data = validateApiResponse(worksResponseSchema, json, "Works Slug API", [] as Works[]);
 
-    console.log("API Response:", data);
+    if (import.meta.env.DEV) {
+      console.log("API Response:", data);
+    }
 
     if (data.length > 0 && data[0] !== undefined) {
       work = data[0];
@@ -64,64 +70,18 @@ if (!work) {
       work = null;
     }
   } catch (error) {
-    console.error(`Error fetching work data for slug ${slug}:`, error);
+    if (import.meta.env.DEV) {
+      console.warn(`Error fetching work data for slug ${slug}:`, error);
+    }
     work = null;
-  }
-}
-
-export async function getStaticPaths() {
-  try {
-    console.log("🔍 [Works Slug] Fetching works from:", WORKS_PATH_API);
-    const res = await fetch(WORKS_PATH_API);
-
-    if (!res.ok) {
-      console.error(`❌ [Works Slug] Failed to fetch works: ${res.status} ${res.statusText}`);
-      console.error(`❌ [Works Slug] API URL: ${WORKS_PATH_API}`);
-      // 507エラーの場合は警告のみ（一時的なサーバー問題の可能性）
-      if (res.status === 507) {
-        console.warn(`⚠️ [Works Slug] Server returned 507 (Insufficient Storage). This may be a temporary issue.`);
-        console.warn(`⚠️ [Works Slug] Returning empty paths to prevent build failure.`);
-        return [];
-      }
-      throw new Error(`Failed to fetch works data: ${res.status} ${res.statusText}`);
-    }
-
-    const dataWorks = validateApiResponse(worksResponseSchema, await res.json(), "Works API", [] as Works[]);
-    console.log(`✅ [Works Slug] Successfully fetched ${dataWorks.length} works`);
-
-    if (dataWorks.length === 0) {
-      console.warn("⚠️ [Works Slug] No works found. Returning empty paths.");
-      console.warn("⚠️ [Works Slug] This will result in 404 errors for work detail pages.");
-      return [];
-    }
-
-    // 各workデータをpropsとして渡す（個別のAPIリクエストを避けるため）
-    const paths = dataWorks.map((work) => ({
-      params: { slug: work.slug },
-      props: { work },
-    }));
-
-    console.log(`✅ [Works Slug] Generated ${paths.length} work detail pages`);
-    console.log(`📋 [Works Slug] Slugs:`, paths.map((p) => p.params.slug).join(", "));
-
-    return paths;
-  } catch (error) {
-    console.error("❌ [Works Slug] Error in getStaticPaths:", error);
-    console.error("❌ [Works Slug] API URL:", WORKS_PATH_API);
-    if (error instanceof Error) {
-      console.error("❌ [Works Slug] Error message:", error.message);
-      console.error("❌ [Works Slug] Error stack:", error.stack);
-    }
-    // エラー時も空配列を返してビルドを継続（ビルド全体を停止しない）
-    console.warn("⚠️ [Works Slug] Returning empty paths to prevent build failure.");
-    return [];
   }
 }
 
 // データが見つからない場合は、エラーページを生成する（ビルドを停止しない）
 if (!work) {
-  console.error(`❌ [Works Slug] No matching data found for slug: ${slug}`);
-  console.error(`❌ [Works Slug] This page will be generated as an error page.`);
+  if (import.meta.env.DEV) {
+    console.warn(`❌ [Works Slug] No matching data found for slug: ${slug}`);
+  }
   // ビルドを停止せず、エラーページを生成するために空のデータ構造を作成
   work = {
     id: 0,
@@ -155,12 +115,14 @@ const pcImageUrl = getWordPressImageUrl(work?.acf?.pc_image) ?? "";
 const spImageUrl = getWordPressImageUrl(work?.acf?.sp_image) ?? "";
 const iconImageUrl = getWordPressImageUrl(work?.acf?.icon_image) ?? "";
 
+const siteOrigin = Astro.site?.origin ?? globalText.url.replace(/\/$/, "");
+
 const jsonLd = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "CreativeWork",
   name: worksSlugTitle,
   description: work?.acf?.description?.replace(/(<([^>]+)>)/gi, "").trim(),
-  url: `${globalText.url}/works/${work.slug}`,
+  url: `${siteOrigin}/works/${work.slug}`,
   dataPublished: work.date,
   author: {
     "@type": "Person",

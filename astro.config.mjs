@@ -30,13 +30,22 @@ const wordPressDomain = getWordPressDomain();
 const imageDomains = ["astro.build"];
 if (wordPressDomain) {
   imageDomains.push(wordPressDomain);
-  console.log(`✅ [Image Config] WordPress domain added for image optimization: ${wordPressDomain}`);
-} else {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`✅ [Image Config] WordPress domain added for image optimization: ${wordPressDomain}`);
+  }
+} else if (process.env.NODE_ENV !== "production") {
   console.warn("⚠️ [Image Config] WordPress domain not found. Remote image optimization may not work.");
 }
 
+/** Netlify の `URL` / `DEPLOY_PRIME_URL` でプライマリドメインと一致させる（サイトマップ・canonical 用） */
+function resolveSiteUrl() {
+  const fromEnv = process.env.PUBLIC_SITE_URL || process.env.URL || process.env.DEPLOY_PRIME_URL || "";
+  const trimmed = typeof fromEnv === "string" ? fromEnv.trim().replace(/\/$/, "") : "";
+  return trimmed !== "" ? trimmed : "https://hibari-konaweb.netlify.app";
+}
+
 export default defineConfig({
-  site: "https://hibari-konaweb.netlify.app",
+  site: resolveSiteUrl(),
   build: {
     format: "file",
     inlineStylesheets: "auto", // 小さなCSSを自動的にインライン化（Critical CSSと組み合わせて最適化）

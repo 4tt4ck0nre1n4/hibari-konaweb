@@ -60,7 +60,7 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 
         // 5xx エラーの場合はリトライ
         if (response.status >= 500 && i < retries - 1) {
-          console.warn(`⚠️ [Works Pagination] Server error ${response.status}, retrying... (${i + 1}/${retries})`);
+          devWarn(`⚠️ [Works Pagination] Server error ${response.status}, retrying... (${i + 1}/${retries})`);
           await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
           continue;
         }
@@ -68,7 +68,7 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
         return response;
       } catch (error) {
         if (i < retries - 1) {
-          console.warn(`⚠️ [Works Pagination] Fetch failed, retrying... (${i + 1}/${retries})`, error);
+          devWarn(`⚠️ [Works Pagination] Fetch failed, retrying... (${i + 1}/${retries})`, error);
           await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
           continue;
         }
@@ -130,30 +130,27 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 
     return paths;
   } catch (error) {
-    // エラーは常にログ出力（ビルド失敗の原因を特定するため）
-    console.error("❌ [Works Pagination] Error in getStaticPaths:", error);
-    console.error("❌ [Works Pagination] API URL:", WORKS_PAGE_API);
+    devError("❌ [Works Pagination] Error in getStaticPaths:", error);
+    devError("❌ [Works Pagination] API URL:", WORKS_PAGE_API);
     if (error instanceof Error) {
-      console.error("❌ [Works Pagination] Error message:", error.message);
-      console.error("❌ [Works Pagination] Error name:", error.name);
+      devError("❌ [Works Pagination] Error message:", error.message);
+      devError("❌ [Works Pagination] Error name:", error.name);
       if (error.stack !== undefined && error.stack !== "") {
-        console.error("❌ [Works Pagination] Error stack:", error.stack);
+        devError("❌ [Works Pagination] Error stack:", error.stack);
       }
-      // 接続エラーの場合、より詳細な情報を出力
       if (
         error.message.includes("fetch failed") ||
         error.message.includes("ECONNREFUSED") ||
         error.message.includes("timeout")
       ) {
-        console.error("❌ [Works Pagination] Connection error detected. Please check:");
-        console.error("   1. WordPress API URL is accessible from Netlify build environment");
-        console.error("   2. Environment variable PUBLIC_API_URL is set correctly");
-        console.error("   3. WordPress site is not blocking requests from Netlify");
-        console.error("   4. WordPress API endpoint is responding correctly");
+        devError("❌ [Works Pagination] Connection error detected. Please check:");
+        devError("   1. WordPress API URL is accessible from Netlify build environment");
+        devError("   2. Environment variable PUBLIC_API_URL is set correctly");
+        devError("   3. WordPress site is not blocking requests from Netlify");
+        devError("   4. WordPress API endpoint is responding correctly");
       }
     }
-    // エラー時もフォールバックページを生成してビルドを継続（ビルド全体を停止しない）
-    console.warn("⚠️ [Works Pagination] API fetch failed. Generating fallback page.");
+    devWarn("⚠️ [Works Pagination] API fetch failed. Generating fallback page.");
     // フォールバック: 空のデータで/worksページを生成
     const fallbackPageProps = {
       page: {
@@ -184,7 +181,9 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 };
 
 const { page } = Astro.props as { page: PageObject };
-console.log("Astro props:", page);
+if (import.meta.env.DEV) {
+  console.log("Astro props:", page);
+}
 
 const isShowPagination = page.lastPage > 1;
 

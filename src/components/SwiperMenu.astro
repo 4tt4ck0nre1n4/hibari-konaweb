@@ -16,6 +16,8 @@ interface Slider {
 
 let sliders: Slider[] = [];
 
+const isDevSlider = import.meta.env.DEV;
+
 try {
   const resSlider = await fetch(SLIDER_PATH_API, {
     method: "GET",
@@ -30,18 +32,22 @@ try {
     const data = (await resSlider.json()) as unknown as Slider[];
 
     if (!Array.isArray(data)) {
-      console.warn("Expected an array of posts, but received:", data);
+      if (isDevSlider) {
+        console.warn("Expected an array of posts, but received:", data);
+      }
     } else {
       sliders = data;
     }
-  } else {
+  } else if (isDevSlider) {
     console.warn("Failed to fetch slider data:", resSlider.status);
   }
 } catch (error) {
   if (error instanceof Error) {
     if (error.name === "AbortError") {
-      console.warn("Slider data fetch timed out");
-    } else {
+      if (isDevSlider) {
+        console.warn("Slider data fetch timed out");
+      }
+    } else if (isDevSlider) {
       console.warn("Error fetching slider data:", error.message);
     }
   }

@@ -21,7 +21,9 @@ try {
   }
   categories = (await response.json()) as Category[];
 } catch (error) {
-  console.error("Error fetching categories:", error);
+  if (import.meta.env.DEV) {
+    console.error("Error fetching categories:", error);
+  }
 }
 
 const categoryTitle = "Category";

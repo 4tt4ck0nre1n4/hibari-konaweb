@@ -19,6 +19,8 @@ interface CategoryPosts {
   };
 }
 
+const isDevCategorySlug = import.meta.env.DEV;
+
 interface Post {
   id: number;
   title: {
@@ -34,8 +36,13 @@ interface Post {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  // getStaticPaths はビルド時に別チャンク化されるため、外側の const は参照できない。
+  // import.meta.env.DEV をここで直接使う。
+  const isDev = import.meta.env.DEV;
   try {
-    console.log("Fetching Categories from API:", CATEGORY_PAGE_API);
+    if (isDev) {
+      console.log("Fetching Categories from API:", CATEGORY_PAGE_API);
+    }
 
     const response = await fetch(CATEGORY_PAGE_API);
 
@@ -44,10 +51,14 @@ export const getStaticPaths: GetStaticPaths = async () => {
     }
 
     const categories = (await response.json()) as CategoryPosts[];
-    console.log("Fetched categories:", categories);
+    if (isDev) {
+      console.log("Fetched categories:", categories);
+    }
 
     if (!Array.isArray(categories) || categories.length === 0) {
-      console.warn("No category found.");
+      if (isDev) {
+        console.warn("No category found.");
+      }
       return [];
     }
 
@@ -57,11 +68,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
         params: { slug: decodeURIComponent(category.slug) },
       }));
 
-    console.log("Generated category paths:", paths);
+    if (isDev) {
+      console.log("Generated category paths:", paths);
+    }
 
     return paths;
   } catch (error) {
-    console.error("Error in getStaticPaths:", error);
+    if (isDev) {
+      console.error("Error in getStaticPaths:", error);
+    }
     return [];
   }
 };
@@ -79,7 +94,9 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<R
 
       // 5xx エラーの場合はリトライ
       if (response.status >= 500 && i < retries - 1) {
-        console.warn(`Server error ${response.status}, retrying... (${i + 1}/${retries})`);
+        if (isDevCategorySlug) {
+          console.warn(`Server error ${response.status}, retrying... (${i + 1}/${retries})`);
+        }
         await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
         continue;
       }
@@ -87,7 +104,9 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<R
       return response;
     } catch (error) {
       if (i < retries - 1) {
-        console.warn(`Fetch failed, retrying... (${i + 1}/${retries})`, error);
+        if (isDevCategorySlug) {
+          console.warn(`Fetch failed, retrying... (${i + 1}/${retries})`, error);
+        }
         await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
         continue;
       }
@@ -98,14 +117,18 @@ async function fetchWithRetry(url: string, retries = 3, delay = 1000): Promise<R
 }
 
 try {
-  console.log(`Fetching category details for slug: ${slug}`);
+  if (isDevCategorySlug) {
+    console.log(`Fetching category details for slug: ${slug}`);
+  }
 
   const categoryRes = await fetchWithRetry(`${CATEGORY_SLUG_API}${slug}&per_page=100`);
 
   if (!categoryRes.ok) {
-    console.error(
-      `Failed to fetch category details for slug "${slug}": ${categoryRes.status} ${categoryRes.statusText}`
-    );
+    if (isDevCategorySlug) {
+      console.error(
+        `Failed to fetch category details for slug "${slug}": ${categoryRes.status} ${categoryRes.statusText}`
+      );
+    }
     throw new Error(`Failed to fetch category datails: ${categoryRes.status}`);
   }
 
@@ -117,18 +140,24 @@ try {
     throw new Error("404: Not Found");
   }
 
-  console.log(`Fetching posts for category ID: ${category.id}`);
+  if (isDevCategorySlug) {
+    console.log(`Fetching posts for category ID: ${category.id}`);
+  }
 
   const postsRes = await fetchWithRetry(`${CATEGORY_ID_API}${category.id}&_embed&acf_format=standard&per_page=100`);
 
   if (!postsRes.ok) {
-    console.error(`Failed to fetch posts for category ID ${category.id}: ${postsRes.status} ${postsRes.statusText}`);
+    if (isDevCategorySlug) {
+      console.error(`Failed to fetch posts for category ID ${category.id}: ${postsRes.status} ${postsRes.statusText}`);
+    }
     throw new Error(`Failed to fetch posts for category: ${postsRes.status}`);
   }
 
   posts = (await postsRes.json()) as Post[];
 } catch (error) {
-  console.error("Error fetching category data:", error);
+  if (isDevCategorySlug) {
+    console.error("Error fetching category data:", error);
+  }
 
   category = null;
 }

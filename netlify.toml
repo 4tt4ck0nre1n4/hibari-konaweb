@@ -221,6 +221,16 @@
   [headers.values]
     Cache-Control = "public, max-age=86400, must-revalidate"
 
+[[headers]]
+  for = "/sitemap-index.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+
+[[headers]]
+  for = "/sitemap-*.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, must-revalidate"
+
 # ============================================
 # セキュリティヘッダー設定（OWASP推奨 + CSP）
 # ============================================

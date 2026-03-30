@@ -23,6 +23,10 @@ interface Props {
 
 const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitterDescription, jsonLd } = Astro.props;
 
+const canonicalHref = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).href
+  : globalText.link.canonical;
+
 // 開発環境と本番環境でCSPを切り替え
 const isDev = import.meta.env.DEV;
 const cspContent = isDev
@@ -61,13 +65,13 @@ const cspContent = isDev
   <meta name="theme-color" content={globalText.global.themeColor} />
   <meta name="author" content={globalText.global.author} />
   <meta name="format-detection" content={globalText.global.formatDetection} />
-  <link rel="canonical" href={globalText.link.canonical} />
+  <link rel="canonical" href={canonicalHref} />
   <link rel="author" href={globalText.link.author} />
   <meta property="og:local" content={globalText.og.local} />
   <meta property="og:title" content={ogTitle} />
   <meta property="og:description" content={ogDescription} />
   <meta property="og:type" content={ogType} />
-  <meta property="og:url" content={globalText.og.url} />
+  <meta property="og:url" content={canonicalHref} />
   <meta property="og:image" content={globalText.og.image} />
   <meta property="og:site_name" content={globalText.og.site_name} />
   <meta name="twitter:card" content={globalText.twitter.card} />

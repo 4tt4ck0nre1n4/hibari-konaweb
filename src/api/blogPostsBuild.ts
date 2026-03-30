@@ -5,7 +5,7 @@ import { BLOG_POST_API, buildSkipWordPress, headlessCmsUrl } from "./headlessCms
 /**
  * `fetch failed` / ECONNREFUSED などネットワーク失敗時に、SSG ビルド向けの対処ヒントを付与する
  */
-function rethrowIfWordPressUnreachable(requestUrl: string, error: unknown): never {
+export function rethrowIfWordPressUnreachable(requestUrl: string, error: unknown): never {
   const msg = error instanceof Error ? error.message : String(error);
   const cause = error instanceof Error && error.cause != null ? error.cause : undefined;
   const code =
@@ -47,13 +47,15 @@ async function fetchResponseForBlogBuild(url: string): Promise<Response | null> 
   } catch (e) {
     if (buildSkipWordPress) {
       const msg = e instanceof Error ? e.message : String(e);
-      console.warn(
-        [
-          `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: fetch failed; continuing with no blog static paths.`,
-          `  URL: ${url}`,
-          `  ${msg}`,
-        ].join("\n"),
-      );
+      if (import.meta.env.DEV) {
+        console.warn(
+          [
+            `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: fetch failed; continuing with no blog static paths.`,
+            `  URL: ${url}`,
+            `  ${msg}`,
+          ].join("\n"),
+        );
+      }
       return null;
     }
     rethrowIfWordPressUnreachable(url, e);
@@ -71,7 +73,7 @@ function parseSlugsFromWordPressPosts(raw: unknown[], apiName: string): string[]
     const result = wordPressPostSlugSchema.safeParse(raw[i]);
     if (result.success) {
       slugs.push(result.data.slug);
-    } else {
+    } else if (import.meta.env.DEV) {
       console.warn(`⚠️ [API Validation] ${apiName}: skipping post at index ${i} (no slug):`, result.error.format());
     }
   }
@@ -88,12 +90,14 @@ export async function fetchAllBlogPostsRawForBuild(): Promise<unknown[]> {
   }
   if (!firstResponse.ok) {
     if (buildSkipWordPress) {
-      console.warn(
-        [
-          `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: WordPress returned ${firstResponse.status} ${firstResponse.statusText}; continuing with no blog static paths.`,
-          `  ${BLOG_POST_API}`,
-        ].join("\n"),
-      );
+      if (import.meta.env.DEV) {
+        console.warn(
+          [
+            `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: WordPress returned ${firstResponse.status} ${firstResponse.statusText}; continuing with no blog static paths.`,
+            `  ${BLOG_POST_API}`,
+          ].join("\n"),
+        );
+      }
       return [];
     }
     throw new Error(`Failed to fetch blog posts: ${firstResponse.status} ${firstResponse.statusText}`);
@@ -118,12 +122,14 @@ export async function fetchAllBlogPostsRawForBuild(): Promise<unknown[]> {
     }
     if (!res.ok) {
       if (buildSkipWordPress) {
-        console.warn(
-          [
-            `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: page ${page} returned ${res.status} ${res.statusText}; using ${all.length} post(s) fetched so far.`,
-            `  ${url}`,
-          ].join("\n"),
-        );
+        if (import.meta.env.DEV) {
+          console.warn(
+            [
+              `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: page ${page} returned ${res.status} ${res.statusText}; using ${all.length} post(s) fetched so far.`,
+              `  ${url}`,
+            ].join("\n"),
+          );
+        }
         break;
       }
       throw new Error(`Failed to fetch blog posts (page ${page}): ${res.status} ${res.statusText}`);
@@ -149,9 +155,11 @@ export async function fetchBlogSlugsForStaticPaths(): Promise<string[]> {
 
   if (raw.length > 0 && slugs.length === 0) {
     if (buildSkipWordPress) {
-      console.warn(
-        "⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: posts were returned but no valid slug was parsed; continuing with no blog static paths.",
-      );
+      if (import.meta.env.DEV) {
+        console.warn(
+          "⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: posts were returned but no valid slug was parsed; continuing with no blog static paths.",
+        );
+      }
       return [];
     }
     throw new Error(
@@ -179,13 +187,17 @@ export const getBlogSlugStaticPaths: GetStaticPaths = async () => {
   const slugs = await fetchBlogSlugsForStaticPaths();
 
   if (slugs.length === 0) {
-    console.warn("No posts found for blog static paths.");
+    if (import.meta.env.DEV) {
+      console.warn("No posts found for blog static paths.");
+    }
     return [];
   }
 
   const paths = buildUniqueBlogSlugPaths(slugs);
 
-  console.log(`✅ [Blog Slug] Generated ${paths.length} paths:`, paths.map((p) => p.params.slug).join(", "));
+  if (import.meta.env.DEV) {
+    console.log(`✅ [Blog Slug] Generated ${paths.length} paths:`, paths.map((p) => p.params.slug).join(", "));
+  }
 
   return paths;
 };
