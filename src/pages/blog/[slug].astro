@@ -124,7 +124,14 @@ const plainTitle = stripHtml(title);
 const publishedDate = typeof post?.date === "string" && post.date !== "" ? new Date(post.date).toISOString() : "";
 const postDate = post?.date ?? "";
 const content = post?.content?.rendered ?? "この記事の内容は表示できません";
-const postUrl = `${globalText.url}/blog/${post?.slug}`;
+
+/** HeadLayout の canonical と同一（globalText と Astro.site の食い違いを防ぐ） */
+const articleCanonicalHref =
+  Astro.site != null
+    ? new URL(Astro.url.pathname, Astro.site).href
+    : `${globalText.url.replace(/\/$/, "")}/blog/${post?.slug}`;
+
+const postUrl = articleCanonicalHref;
 const errorCategoryText = "カテゴリーが見つかりませんでした。";
 const datetime = "投稿日:";
 const categoryLabel = "カテゴリー:";
@@ -158,19 +165,43 @@ const showServiceSidebarBanner = false;
 const layoutTitle = plainTitle !== "" ? plainTitle : "Blog Title Not Found";
 const jsonLdHeadline = plainTitle !== "" ? plainTitle : "Blog post";
 
-const jsonLd = JSON.stringify({
+const postFeaturedImageUrl = getWordPressImageUrl(post?.acf?.blog_image);
+const postSocialImage =
+  typeof postFeaturedImageUrl === "string" && postFeaturedImageUrl.trim() !== "" ? postFeaturedImageUrl.trim() : undefined;
+
+/** アイキャッチが無いときは og:image 既定（空文字はスキーマ上避ける） */
+const blogPostingImageUrl =
+  typeof postFeaturedImageUrl === "string" && postFeaturedImageUrl.trim() !== ""
+    ? postFeaturedImageUrl.trim()
+    : globalText.og.image;
+
+const modifiedRaw = typeof post?.modified === "string" ? post.modified.trim() : "";
+const dateModifiedIso =
+  modifiedRaw !== ""
+    ? (() => {
+        const t = Date.parse(modifiedRaw);
+        return Number.isNaN(t) ? "" : new Date(t).toISOString();
+      })()
+    : "";
+
+const blogPostingLd: Record<string, unknown> = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   headline: jsonLdHeadline,
   description: jsonLdDescription,
   datePublished: publishedDate,
-  url: `${globalText.url}/blog/${post?.slug}`,
+  url: articleCanonicalHref,
   author: {
     "@type": "Person",
     name: `${globalText.blog.authorName}`,
   },
-  image: getWordPressImageUrl(post?.acf?.blog_image) ?? "",
-});
+  image: blogPostingImageUrl,
+};
+if (dateModifiedIso !== "") {
+  blogPostingLd.dateModified = dateModifiedIso;
+}
+
+const jsonLd = JSON.stringify(blogPostingLd);
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { name: postSlugTitle }];
 ---
@@ -184,6 +215,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   twitterTitle={layoutTitle}
   twitterDescription={postMetaDescription}
   jsonLd={jsonLd}
+  socialImage={postSocialImage}
 >
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />

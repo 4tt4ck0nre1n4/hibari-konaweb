@@ -1,4 +1,6 @@
 ---
+import globalText from "../data/globalText.json";
+
 interface CrumbProps {
   name: string;
   path?: string;
@@ -9,6 +11,14 @@ const { crumbs } = Astro.props as { crumbs: CrumbProps[] };
 const isValidPath = (path: unknown): path is string => typeof path === "string" && path.trim() !== "";
 
 const hasMultipleCrumbs = crumbs.length > 1;
+
+/** canonical と同じく Astro.site を優先、未設定時は globalText.url */
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+
+function absoluteUrlForPath(path: string): string {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  return `${siteBaseHref}${normalized}`;
+}
 
 let breadcrumbJsonLd: string | null = null;
 
@@ -26,7 +36,7 @@ if (hasMultipleCrumbs) {
       return isValidPath(crumb.path)
         ? {
             ...base,
-            item: `http://hibari-konaweb${crumb.path}`,
+            item: absoluteUrlForPath(crumb.path),
           }
         : base;
     }),

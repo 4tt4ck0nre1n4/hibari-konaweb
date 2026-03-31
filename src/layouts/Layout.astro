@@ -16,9 +16,12 @@ interface Props {
   twitterTitle: string;
   twitterDescription: string;
   jsonLd?: string;
+  /** 記事ページなど: BlogPosting の image と同じ絶対 URL を渡すと og:image / twitter:image に反映 */
+  socialImage?: string;
 }
 
-const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitterDescription, jsonLd } = Astro.props;
+const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitterDescription, jsonLd, socialImage } =
+  Astro.props;
 
 // Google Analytics設定
 const GA_MEASUREMENT_ID: string | undefined =
@@ -41,6 +44,7 @@ const shouldLoadGA: boolean =
     twitterTitle={twitterTitle}
     twitterDescription={twitterDescription}
     jsonLd={jsonLd}
+    socialImage={socialImage}
   >
     <slot name="head" slot="head" />
   </HeadLayout>

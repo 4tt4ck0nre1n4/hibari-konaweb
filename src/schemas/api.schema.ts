@@ -102,6 +102,8 @@ export const blogPostSchema = z.object({
   title: wpRenderedLenientSchema,
   slug: z.string(),
   date: z.string(),
+  /** WordPress REST の投稿更新日時（ISO 8601 文字列が一般的） */
+  modified: z.string().optional(),
   categories: z
     .unknown()
     .transform((v) => {
