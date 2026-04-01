@@ -100,6 +100,11 @@ function acfStr(v: unknown): string {
   return typeof v === "string" ? v : "";
 }
 
+function optionalAcfStr(v: unknown): string | undefined {
+  const s = acfStr(v);
+  return s !== "" ? s : undefined;
+}
+
 const icons = work?.acf
   ? Object.entries(work.acf)
       .filter((entry): entry is [string, string] => {
@@ -115,10 +120,10 @@ const icons = work?.acf
 const worksSlugTitle = work?.title?.rendered;
 const worksSlugDescription = acfStr(work?.acf?.description);
 const worksScreenshotPc = getWordPressImageUrl(asWpImage(work?.acf?.screenshot_pc)) ?? "";
-const worksSlugLeftLink = acfStr(work?.acf?.left_link) || undefined;
-const worksSlugRightLink = acfStr(work?.acf?.right_link) || undefined;
-const worksRightHeader = acfStr(work?.acf?.right_header) || undefined;
-const worksRightAccess = acfStr(work?.acf?.right_access) || undefined;
+const worksSlugLeftLink = optionalAcfStr(work?.acf?.left_link);
+const worksSlugRightLink = optionalAcfStr(work?.acf?.right_link);
+const worksRightHeader = optionalAcfStr(work?.acf?.right_header);
+const worksRightAccess = optionalAcfStr(work?.acf?.right_access);
 
 // WordPress画像は外部配信のため、通常のimgタグを使用
 const screenshotPcUrl = getWordPressImageUrl(asWpImage(work?.acf?.screenshot_pc)) ?? "";

@@ -120,8 +120,8 @@ html.dark .modal-close:is(:hover, :focus-visible) {
   border: var(--color-gray-light, #e0e0e0) 1px solid;
   cursor: pointer;
   transition:
-  background-color 0.15s ease,
-  border-color 0.15s ease;
+    background-color 0.15s ease,
+    border-color 0.15s ease;
   -webkit-user-select: none;
   user-select: none;
   padding-block: 0.875rem;

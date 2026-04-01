@@ -326,9 +326,7 @@ export async function generateEstimatePDFFromHTML(element: HTMLElement, _estimat
       // アコーディオン親の overflow を強制解除（CSS 注入タイミング差への安全策）
       // アコーディオンの展開自体は呼び出し元（handleDownloadPDF / handleContact）で
       // documentRef.current に対して直接 DOM 操作済みのため、ここでは overflow のみ修正する
-      const accordionEls = clonedElement.querySelectorAll<HTMLElement>(
-        ".estimate-document__notes-accordion",
-      );
+      const accordionEls = clonedElement.querySelectorAll<HTMLElement>(".estimate-document__notes-accordion");
       accordionEls.forEach((el) => {
         el.style.overflow = "visible";
       });
@@ -381,12 +379,12 @@ export async function generateEstimatePDFFromHTML(element: HTMLElement, _estimat
     if (!isFirstPage) doc.addPage();
     // 品質を 0.80 に下げてカラー SVG アイコン含む新デザインの JPEG サイズを抑制
     doc.addImage(
-      offscreen.toDataURL("image/jpeg", 0.80),
+      offscreen.toDataURL("image/jpeg", 0.8),
       "JPEG",
       MARGIN.left,
       MARGIN.top,
       CONTENT_W_MM,
-      sliceH / pxPerMm,
+      sliceH / pxPerMm
     );
   };
 

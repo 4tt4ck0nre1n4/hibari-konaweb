@@ -5,7 +5,7 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import globalText from "../../data/globalText.json";
 import contactText from "../../data/contactText.json";
-import contactBackgroundImageSrc from "../../assets/contactBackground.webp";
+import contactBackgroundImageSrc from "../../assets/gridBackground.webp";
 import { getImage } from "astro:assets";
 
 const contactBackgroundImage = await getImage({ src: contactBackgroundImageSrc });
@@ -46,36 +46,29 @@ export const prerender = true;
   </div>
   <div class="contact" style={`background-image: url(${contactBackgroundImage.src})`}>
     <div class="contact__wrapper">
-      <h1 class="contact__title" id="contact-form-title">
-        {pageTitle}
-      </h1>
-      {
-        contactText.contact.body.map(({ text }) => (
-          <p id="contact-form-description" class="contact__body" set:html={text} />
-        ))
-      }
-      <p id="contact-form-description" class="contact__body">
-        <span class="contact__body--required">【必須】</span>のついた項目は必ずご記入ください。
-      </p>
-      <div class="contactForm">
-        <ContactForm client:visible />
+      <div class="contact__layout">
+        <div class="contact__column contact__column--text">
+          <h1 class="contact__title" id="contact-form-title">
+            {pageTitle}
+          </h1>
+          {
+            contactText.contact.body.map(({ text }) => (
+              <p id="contact-form-description" class="contact__body" set:html={text} />
+            ))
+          }
+          <p id="contact-form-description" class="contact__body">
+            <span class="contact__body--required">【必須】</span>のついた項目は必ずご記入ください。
+          </p>
+          {
+            contactText.contact.footer.map(({ note }) => (
+              <p id="contact-form-description" class="contact__footer" set:html={note} />
+            ))
+          }
+        </div>
+        <div class="contact__column contact__column--form">
+          <ContactForm client:visible />
+        </div>
       </div>
-      {
-        contactText.contact.footer.map(({ note }) => (
-          <p id="contact-form-description" class="contact__footer" set:html={note} />
-        ))
-      }
-      <!-- <p id="contact-form-description" class="contact__footer" set:html={contactText.contact.footer.note} /> -->
-      <!-- <p id="contact-form-description" class="contact__footer" set:html={contactText.contact.footer.note} /> -->
-      <!-- <ul class="contact__footer_list">
-            {
-              footerList.map(({ item }) => (
-                <li>
-                  <p id="contact-form-description" class="contact__footer_item" set:html={item} />
-                </li>
-              ))
-            }
-          </ul> -->
     </div>
   </div>
 </Layout>
@@ -84,12 +77,12 @@ export const prerender = true;
   .contact {
     width: 100%;
     min-height: 100vh;
-    color: var(--color-black);
+    color: var(--color-white, #f1f5f9);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
     overflow: auto;
-    padding-block: 4rem;
+    padding-block: 3rem;
   }
   .contact__wrapper {
     width: 100%;
@@ -99,6 +92,45 @@ export const prerender = true;
   @media (width <= 480px) {
     .contact__wrapper {
       width: 90%;
+    }
+  }
+  .contact__layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  @media (width >= 1025px) {
+    .contact__wrapper {
+      max-width: 1200px;
+      padding-inline: 2rem;
+    }
+    .contact__layout {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .contact__column {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    /*
+      左テキストの上端を「会社名」ラベル行に合わせる。
+      form__inner の margin-block + padding-block 先頭、お名前行、入力、label__company 直前まで（contactForm.module.css の値と一致）
+    */
+    .contact__column--text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-block-start: calc(
+        2rem + 2rem + 0.5rem + 2rem + 0.5rem + 2.8125rem + 0.5rem
+      );
+    }
+    .contact__column--text .contact__title {
+      text-align: center;
+    }
+    .contact__column--text .contact__body,
+    .contact__column--text .contact__footer {
+      margin-inline: auto;
     }
   }
   .contact__title {
@@ -139,12 +171,12 @@ export const prerender = true;
     line-height: 1.8;
     letter-spacing: 0.06em;
     text-align: left;
-    margin-block-start: 0.5rem;
+    margin-block-start: 2rem;
     margin-inline: auto;
   }
 
-  .contact__footer:first-of-type {
-    margin-block-start: 1rem;
+  .contact__footer ~ .contact__footer {
+    margin-block-start: 0.5rem;
   }
 
   .contact__footer_list {
@@ -162,5 +194,12 @@ export const prerender = true;
   .contact__footer_item {
     font-size: 0.8125rem;
     text-align: left;
+  }
+  @media (width <= 480px) {
+    .contact__footer {
+      max-width: 330px;
+      text-align: justify;
+      padding-inline: 0.5rem;
+    }
   }
 </style>

@@ -516,7 +516,7 @@ export default function ContactForm() {
                 <span
                   className={`${styles.label__text}${hoveredField === "company" ? styles["label__text--active"] : ""}`}
                 >
-                  Company Name
+                  Company
                 </span>
               </span>
             </label>

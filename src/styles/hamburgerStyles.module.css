@@ -220,17 +220,7 @@
   }
 }
 
-/* PCサイズ（1025px以上）での調整 */
-@media (width >= 1025px) {
-  .hamburger__menu {
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  .hamburger__menu.open {
-    transform: translateY(-50%);
-  }
-}
+/* PCサイズ（1025px以上）のメニューパネルレイアウトは、.hamburger__menu.open より後のメディアクエリで定義 */
 
 /* ロゴセクション */
 .hamburger__logo_wrapper {
@@ -434,18 +424,79 @@
   transition-delay: 0.72s;
 }
 
+/* 1024px以下: サイドパネル／全画面いずれも高さをビューポートに合わせ、フッターを下端に固定（ナビのみスクロール） */
+@media (width <= 1024px) {
+  .hamburger__menu {
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-block-start: max(1.5rem, env(safe-area-inset-top));
+    padding-block-end: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .hamburger__menu.open {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .hamburger__logo_wrapper,
+  .hamburger__title,
+  .hamburger__sns,
+  .hamburger__copyright {
+    flex-shrink: 0;
+  }
+
+  .hamburger__menu > ul {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-overflow-scrolling: touch;
+    gap: 0.65rem;
+    margin-block-start: 0.5rem;
+    padding-block-start: 0.85rem;
+    padding-block-end: 0.5rem;
+  }
+
+  .hamburger__logo_wrapper {
+    margin-block-end: 0.5rem;
+  }
+
+  .hamburger__menu_item_sectionTop {
+    padding-block-start: 0.5rem;
+    margin-block-start: 0.15rem;
+  }
+
+  .hamburger__menu_link {
+    padding-block: 0.45rem;
+  }
+
+  .hamburger__sns .hamburger__snsMenu {
+    padding-block-start: 0.4rem;
+    padding-block-end: 0.45rem;
+  }
+
+  .hamburger__copyright {
+    margin-block-start: 0.35rem;
+    padding-block-start: 0.4rem;
+  }
+}
+
 @media (width <= 768px) {
   .hamburger__menu {
     inset: 0;
     width: 100vw;
     max-width: none;
     max-width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
     border-left: none;
     margin: 0;
-    padding-block-start: 1.5rem;
-    padding-block-end: 2rem;
+    padding-block-start: max(1.25rem, env(safe-area-inset-top));
+    padding-block-end: max(1rem, env(safe-area-inset-bottom));
     padding-inline: 0;
     top: 0;
     transform: none;
@@ -455,8 +506,67 @@
     transform: none;
   }
 
-  .hamburger__menu ul {
+  .hamburger__menu > ul {
     padding-inline: 1rem;
+  }
+}
+
+/* 1025px以上: 右側パネルをビューポート高に収め、フッターを常に表示（ナビのみスクロール） */
+@media (width >= 1025px) {
+  .hamburger__menu {
+    top: 50%;
+    transform: translateY(-50%);
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding-block-end: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .hamburger__menu.open {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(-50%);
+  }
+
+  .hamburger__logo_wrapper,
+  .hamburger__title,
+  .hamburger__sns,
+  .hamburger__copyright {
+    flex-shrink: 0;
+  }
+
+  .hamburger__menu > ul {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    gap: 0.6rem;
+    margin-block-start: 0.5rem;
+    padding-block-start: 0.85rem;
+    padding-block-end: 0.5rem;
+  }
+
+  .hamburger__menu_item_sectionTop {
+    padding-block-start: 0.5rem;
+    margin-block-start: 0.15rem;
+  }
+
+  .hamburger__menu_link {
+    padding-block: 0.45rem;
+  }
+
+  .hamburger__sns .hamburger__snsMenu {
+    padding-block-start: 0.4rem;
+    padding-block-end: 0.45rem;
+  }
+
+  .hamburger__copyright {
+    margin-block-start: 0.35rem;
+    padding-block-start: 0.4rem;
   }
 }
 
@@ -484,7 +594,8 @@
   transition:
     background 0.2s ease,
     color 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .hamburger__menu_link::after {
@@ -508,9 +619,10 @@
 }
 
 .hamburger__menu_link:not(.active):is(:hover, :focus-visible) {
-  --hamburger-link-fg: #4f46e5;
+  --hamburger-link-fg: #4338ca;
 
-  background: #f1f5f9;
+  background: linear-gradient(to bottom right, #bfdbfe, #dbeafe);
+  border-left-color: #93c5fd;
 }
 
 .hamburger__menu_link:not(.active):is(:hover, :focus-visible)::after {
@@ -518,10 +630,11 @@
 }
 
 .hamburger__menu_link.active {
-  --hamburger-link-fg: #4f46e5;
+  --hamburger-link-fg: #1e3a8a;
 
-  background: linear-gradient(to bottom right, #e0e7ff, #eef2ff);
-  border-left-color: #2563eb;
+  background: linear-gradient(145deg, #a5b4fc 0%, #c7d2fe 50%, #e0e7ff 100%);
+  border-left-color: #1d4ed8;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45);
   color: var(--hamburger-link-fg);
 }
 

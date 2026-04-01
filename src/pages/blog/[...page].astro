@@ -457,6 +457,7 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   .blog__menu_article {
     display: flex;
     flex-direction: column;
+    min-height: 0;
     height: 100%;
     text-decoration: none;
   }
@@ -465,12 +466,13 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-height: 0;
     text-decoration: none;
     /* pointer-events: none; */
   }
 
   .blog__contents {
-    flex: 1;
+    flex: 0 1 auto;
     display: flex;
     flex-direction: column;
     transition: opacity 0.25s;
@@ -481,12 +483,14 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   }
 
   .blog__header {
-    flex: 1;
+    flex: 0 1 auto;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
     -webkit-box-orient: vertical;
     font-size: 1rem;
     line-height: 1.5;
+    min-height: calc(1.5em * 4);
     letter-spacing: 0.02em;
     color: inherit;
     text-align: justify;
@@ -497,21 +501,19 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
     width: 100%;
     position: relative;
     aspect-ratio: 2 / 1;
-    order: -1;
+    margin-block-start: 1rem;
     overflow: hidden;
   }
 
   .blog__menu_image {
+    position: absolute;
+    inset: 0;
+    display: block;
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-shrink: 0;
+    object-fit: cover;
     box-shadow: 0 6px 10px rgb(0 0 0 / 0.6);
-    object-fit: contain;
-    overflow: hidden;
     transition: transform 0.3s ease-in;
-    margin-block-start: 1rem;
-    padding-inline: 0.25rem;
   }
 
   .blog__menu_image:is(:hover, :focus-visible) {

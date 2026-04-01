@@ -31,9 +31,7 @@ const ogImageResolved =
 const twitterImageResolved =
   typeof socialImage === "string" && socialImage.trim() !== "" ? socialImage.trim() : globalText.twitter.image;
 
-const canonicalHref = Astro.site
-  ? new URL(Astro.url.pathname, Astro.site).href
-  : globalText.link.canonical;
+const canonicalHref = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : globalText.link.canonical;
 
 // 開発環境と本番環境でCSPを切り替え
 const isDev = import.meta.env.DEV;

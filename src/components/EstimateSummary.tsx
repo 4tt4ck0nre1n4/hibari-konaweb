@@ -7,11 +7,7 @@ interface EstimateSummaryProps {
   activeTab: "coding" | "design";
 }
 
-function planContextHeading(
-  activeTab: "coding" | "design",
-  codingLineCount: number,
-  designLineCount: number
-): string {
+function planContextHeading(activeTab: "coding" | "design", codingLineCount: number, designLineCount: number): string {
   const hasC = codingLineCount > 0;
   const hasD = designLineCount > 0;
   let name: string;
@@ -38,11 +34,7 @@ export function EstimateSummary({ calculation, isUrgent, activeTab }: EstimateSu
     })),
   ];
 
-  const heading = planContextHeading(
-    activeTab,
-    calculation.codingItems.length,
-    calculation.designItems.length
-  );
+  const heading = planContextHeading(activeTab, calculation.codingItems.length, calculation.designItems.length);
 
   return (
     <div className="estimate-summary">

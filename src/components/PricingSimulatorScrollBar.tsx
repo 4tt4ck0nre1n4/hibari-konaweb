@@ -78,7 +78,10 @@ export function PricingSimulatorScrollBar({
             <span className="pricing-simulator-scroll-bar__tax-note">(税込)</span>
           </span>
         </div>
-        <div className="pricing-simulator-scroll-bar__divider pricing-simulator-scroll-bar__divider--before-cta" aria-hidden="true" />
+        <div
+          className="pricing-simulator-scroll-bar__divider pricing-simulator-scroll-bar__divider--before-cta"
+          aria-hidden="true"
+        />
         <div className="pricing-simulator-scroll-bar__col pricing-simulator-scroll-bar__col--cta">
           <button
             type="button"

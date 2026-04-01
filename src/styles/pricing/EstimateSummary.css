@@ -89,7 +89,6 @@ html.dark .estimate-summary__item {
   border-block-end: none;
 }
 
-
 .estimate-summary__item--urgent {
   border-left: var(--color-red, #ff4f48) 2px solid;
 }

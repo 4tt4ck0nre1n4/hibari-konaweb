@@ -465,7 +465,7 @@ const cardSrc4 = "/riv/fixing-site.riv";
   }
   .skills__menu {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(8ch, 1fr));
+    grid-template-columns: repeat(5, 1fr);
     gap: 2rem;
     list-style: none;
     perspective: 1000px;
@@ -528,7 +528,7 @@ const cardSrc4 = "/riv/fixing-site.riv";
     transform: scale(0);
   }
 
-  /* スクロール検知時の順次表示アニメーション */
+  /* スクロール検知時の行単位表示アニメーション */
   .skills-icon__image[data-icon].show {
     opacity: 1;
     transform: scale(1);
@@ -1173,7 +1173,7 @@ const cardSrc4 = "/riv/fixing-site.riv";
     observer.observe(aboutImageInner);
   }
 
-  // スキルアイコンの順次表示アニメーション
+  // スキルアイコンの行単位表示アニメーション
   function setupSkillsIconAnimation() {
     const skillsMenu = document.querySelector(".skills__menu");
 
@@ -1203,21 +1203,27 @@ const cardSrc4 = "/riv/fixing-site.riv";
       });
     };
 
-    // アニメーションを実行する関数
+    // アニメーションを実行する関数（1行分まとめて表示、行ごとにスタッガー）
     const runAnimation = () => {
       // 既存のタイムアウトをクリア
       timeoutIds.forEach((id) => clearTimeout(id));
       timeoutIds = [];
 
       const skillImages = getSkillImages();
+      const cols = window.matchMedia("(max-width: 768px)").matches ? 3 : 5;
+      const rowStaggerMs = 250;
+      const rowCount = Math.ceil(skillImages.length / cols) || 0;
 
-      // 各画像を0.2秒ずつ遅らせながら順番に表示
-      skillImages.forEach((image, index) => {
+      for (let row = 0; row < rowCount; row++) {
         const timeoutId = window.setTimeout(() => {
-          image.classList.add("show");
-        }, index * 200); // 0.2秒 = 200ms
+          const start = row * cols;
+          const end = Math.min(start + cols, skillImages.length);
+          skillImages.slice(start, end).forEach((image) => {
+            image.classList.add("show");
+          });
+        }, row * rowStaggerMs);
         timeoutIds.push(timeoutId);
-      });
+      }
     };
 
     // Intersection Observer の設定

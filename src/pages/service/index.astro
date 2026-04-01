@@ -23,7 +23,6 @@ type ServiceSimulatorCopy = typeof globalText.service & {
 const serviceSimulator = globalText.service as ServiceSimulatorCopy;
 const stepLabels = serviceSimulator.simulatorLeadStepLabels;
 const leadBenefits = serviceSimulator.simulatorLeadBenefits;
-
 ---
 
 <Layout
@@ -57,33 +56,37 @@ const leadBenefits = serviceSimulator.simulatorLeadBenefits;
           </h3>
           <p class="service-simulator-lead-card__subtitle">{serviceSimulator.simulatorLeadCardSubtitle}</p>
           <ol class="service-simulator-lead-card__steps">
-            {stepLabels.map((label, index) => (
-              <li class="service-simulator-lead-card__step">
-                <span class="service-simulator-lead-card__step-badge" aria-hidden="true">
-                  {index + 1}
-                </span>
-                {index < 2 ? (
-                  <a
-                    href="#pricing-simulator"
-                    class="service-simulator-lead-card__step-label service-simulator-lead-card__step-label--link"
-                  >
-                    {label}
-                  </a>
-                ) : (
-                  <span class="service-simulator-lead-card__step-label">{label}</span>
-                )}
-              </li>
-            ))}
+            {
+              stepLabels.map((label, index) => (
+                <li class="service-simulator-lead-card__step">
+                  <span class="service-simulator-lead-card__step-badge" aria-hidden="true">
+                    {index + 1}
+                  </span>
+                  {index < 2 ? (
+                    <a
+                      href="#pricing-simulator"
+                      class="service-simulator-lead-card__step-label service-simulator-lead-card__step-label--link"
+                    >
+                      {label}
+                    </a>
+                  ) : (
+                    <span class="service-simulator-lead-card__step-label">{label}</span>
+                  )}
+                </li>
+              ))
+            }
           </ol>
           <ul class="service-simulator-lead-card__benefits">
-            {leadBenefits.map((text) => (
-              <li class="service-simulator-lead-card__benefit">
-                <span class="service-simulator-lead-card__check" aria-hidden="true">
-                  ✓
-                </span>
-                {text}
-              </li>
-            ))}
+            {
+              leadBenefits.map((text) => (
+                <li class="service-simulator-lead-card__benefit">
+                  <span class="service-simulator-lead-card__check" aria-hidden="true">
+                    ✓
+                  </span>
+                  {text}
+                </li>
+              ))
+            }
           </ul>
         </section>
         <p class="service-simulator-lead-footer">

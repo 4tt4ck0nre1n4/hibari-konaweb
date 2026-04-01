@@ -6,7 +6,12 @@ import globalText from "../../data/globalText.json";
 import { github_sns, twitter } from "../../data/constSns";
 import { BLOG_PAGE_API, BLOG_SLUG_API } from "../../api/headlessCms";
 import SafeIcon from "../../components/SafeIcon.astro";
-import { blogPostsResponseSchema, parseBlogPostSidebarList, type BlogPost, type BlogPostSidebarItem } from "../../schemas/api.schema";
+import {
+  blogPostsResponseSchema,
+  parseBlogPostSidebarList,
+  type BlogPost,
+  type BlogPostSidebarItem,
+} from "../../schemas/api.schema";
 import { validateApiResponse } from "../../schemas/api.schema";
 import { getWordPressImageUrl } from "../../util/optimizeWordPressImage";
 import { getCategoryBadgeClasses } from "../../util/categoryBadgeStyle";
@@ -156,8 +161,7 @@ const aboutUrl = `${siteBase}/about`;
 const sidebarAvatarSrc = "/favicon.svg";
 
 const profileNameRaw: unknown = globalText.blog.profileName;
-const profileNameForSidebar =
-  typeof profileNameRaw === "string" ? profileNameRaw.trim() : "";
+const profileNameForSidebar = typeof profileNameRaw === "string" ? profileNameRaw.trim() : "";
 
 /** false のときサイドバーの「おすすめパッケージ」は空プレースホルダ表示（下の JSX の true 分支に旧マークアップを保持） */
 const showServiceSidebarBanner = false;
@@ -167,7 +171,9 @@ const jsonLdHeadline = plainTitle !== "" ? plainTitle : "Blog post";
 
 const postFeaturedImageUrl = getWordPressImageUrl(post?.acf?.blog_image);
 const postSocialImage =
-  typeof postFeaturedImageUrl === "string" && postFeaturedImageUrl.trim() !== "" ? postFeaturedImageUrl.trim() : undefined;
+  typeof postFeaturedImageUrl === "string" && postFeaturedImageUrl.trim() !== ""
+    ? postFeaturedImageUrl.trim()
+    : undefined;
 
 /** アイキャッチが無いときは og:image 既定（空文字はスキーマ上避ける） */
 const blogPostingImageUrl =
@@ -223,7 +229,10 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
 
   <div class="blog-post-page max-w-6xl mx-auto px-4 pb-16 flex flex-col lg:flex-row gap-8">
     <main class="blog-post-main w-full lg:w-2/3">
-      <article id={postId.toString()} class="blog-post-article bg-white rounded-xl shadow-sm border border-slate-100 p-6 md:p-10">
+      <article
+        id={postId.toString()}
+        class="blog-post-article bg-white rounded-xl shadow-sm border border-slate-100 p-6 md:p-10"
+      >
         <header class="blog-post-header border-b border-slate-100 pb-8">
           <h1 class="text-2xl md:text-3xl font-bold leading-tight text-slate-900" set:html={title} />
           <div class="blog-post-meta flex flex-row flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
@@ -275,9 +284,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
           <div class="blog-article-content" set:html={content} />
         </div>
 
-        <div
-          class="blog-post-share flex items-center justify-between py-6 border-t border-b border-slate-100"
-        >
+        <div class="blog-post-share flex items-center justify-between py-6 border-t border-b border-slate-100">
           <span class="text-sm font-bold text-slate-400">記事をシェアする</span>
           <div class="blog-post-share-buttons flex gap-3">
             <a
@@ -336,7 +343,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
                 href={worksUrl}
                 class="blog-post-cta-btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3 w-full bg-white text-primary font-bold rounded-lg border border-primary hover:bg-slate-50 transition-colors"
               >
-                <SafeIcon name="emojione-v1:laptop-computer" width={20} height={20} class="shrink-0" ariaHidden={true} />
+                <SafeIcon
+                  name="emojione-v1:laptop-computer"
+                  width={20}
+                  height={20}
+                  class="shrink-0"
+                  ariaHidden={true}
+                />
                 {globalText.blog.postCtaWorksButton}
               </a>
             </div>
@@ -348,7 +361,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
     <aside class="blog-post-sidebar w-full lg:w-1/3 space-y-6">
       <div class="blog-post-sidebar-card bg-white rounded-xl shadow-sm border border-slate-100 p-6 text-center">
         <div class="blog-post-sidebar-profile">
-          <div class="blog-post-sidebar-avatar w-24 h-24 mx-auto rounded-full bg-slate-200 mb-4 overflow-hidden border-4 border-slate-50">
+          <div
+            class="blog-post-sidebar-avatar w-24 h-24 mx-auto rounded-full bg-slate-200 mb-4 overflow-hidden border-4 border-slate-50"
+          >
             <img
               src={sidebarAvatarSrc}
               alt=""
@@ -404,16 +419,26 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
             <div class="p-6 relative z-10">
               <div class="text-secondary text-xs font-bold mb-2">おすすめパッケージ</div>
               <h3 class="text-lg font-bold mb-2">
-                月額5500円<br />
+                月額5500円
+                <br />
                 サブスクリプション型ホームページ制作
               </h3>
               <p class="text-xs text-slate-300 mb-4">Astro + Headless CMSで保守性の高いモダンなサイトを構築します。</p>
               <div class="inline-flex items-center text-sm font-bold text-white group-hover:translate-x-1 transition-transform">
                 詳細を見る
-                <SafeIcon name="fa6-solid:arrow-right" width={16} height={16} class="ml-2 text-secondary shrink-0" ariaHidden={true} />
+                <SafeIcon
+                  name="fa6-solid:arrow-right"
+                  width={16}
+                  height={16}
+                  class="ml-2 text-secondary shrink-0"
+                  ariaHidden={true}
+                />
               </div>
             </div>
-            <div class="absolute -bottom-10 -right-10 text-slate-700 opacity-30 transform rotate-12 pointer-events-none" aria-hidden="true">
+            <div
+              class="absolute -bottom-10 -right-10 text-slate-700 opacity-30 transform rotate-12 pointer-events-none"
+              aria-hidden="true"
+            >
               <SafeIcon name="fa6-solid:rocket" width={180} height={180} ariaHidden={true} />
             </div>
           </a>
@@ -423,7 +448,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
       }
 
       <div class="blog-post-sidebar-card bg-white rounded-xl shadow-sm border border-slate-100">
-        <h3 class="blog-post-sidebar-popular-title text-sm font-normal text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2">
+        <h3
+          class="blog-post-sidebar-popular-title text-sm font-normal text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2"
+        >
           <SafeIcon name="emojione-v1:star" width={18} height={18} class="text-violet-500 shrink-0" ariaHidden={true} />
           読まれている記事
         </h3>

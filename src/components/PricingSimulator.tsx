@@ -475,7 +475,12 @@ export function PricingSimulator() {
         <div className="pricing-simulator__post-summary">
           {totalSelectedCount > 0 && (
             <div className="pricing-simulator__next-step">
-              <IconifyInline icon="emojione:light-bulb" width="22" height="22" className="pricing-simulator__next-step-icon" />
+              <IconifyInline
+                icon="emojione:light-bulb"
+                width="22"
+                height="22"
+                className="pricing-simulator__next-step-icon"
+              />
               <div>
                 <strong>次のステップ：この内容で概算見積書を作成しますか？</strong>
                 <p className="pricing-simulator__next-step__desc">

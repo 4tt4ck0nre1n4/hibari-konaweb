@@ -456,10 +456,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
         {/* アコーディオンリスト */}
         <div className="estimate-document__notes-accordions">
           {/* 別途費用 */}
-          <div
-            className="estimate-document__notes-accordion"
-            data-open={openAccordions.extraCosts ? "true" : "false"}
-          >
+          <div className="estimate-document__notes-accordion" data-open={openAccordions.extraCosts ? "true" : "false"}>
             <button
               type="button"
               className="estimate-document__notes-accordion__header"
@@ -468,17 +465,24 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
               onClick={() => toggleAccordion("extraCosts")}
             >
               {renderIcon(warningIcon, "estimate-document__notes-accordion__icon", "20")}
-              <span className="estimate-document__notes-accordion__title">
-                別途費用が発生する場合があります
-              </span>
+              <span className="estimate-document__notes-accordion__title">別途費用が発生する場合があります</span>
               <span className="estimate-document__notes-badge">3項目</span>
-              <span className="estimate-document__notes-accordion__arrow" aria-hidden="true">▼</span>
+              <span className="estimate-document__notes-accordion__arrow" aria-hidden="true">
+                ▼
+              </span>
             </button>
             <div className="estimate-document__notes-accordion__content">
               <ul className="estimate-document__notes-accordion__list">
-                <li><strong>素材・ライセンス費用</strong> — 有料画像・フォント等のライセンスが必要な場合は実費を別途請求します</li>
-                <li><strong>仕様変更・追加機能</strong> — お見積り後の変更・追加は内容確認のうえ別途お見積りします</li>
-                <li><strong>その他実費</strong> — 交通費・宿泊費等は含まれておりません</li>
+                <li>
+                  <strong>素材・ライセンス費用</strong> —
+                  有料画像・フォント等のライセンスが必要な場合は実費を別途請求します
+                </li>
+                <li>
+                  <strong>仕様変更・追加機能</strong> — お見積り後の変更・追加は内容確認のうえ別途お見積りします
+                </li>
+                <li>
+                  <strong>その他実費</strong> — 交通費・宿泊費等は含まれておりません
+                </li>
               </ul>
             </div>
           </div>
@@ -496,11 +500,11 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
               onClick={() => toggleAccordion("aboutEstimate")}
             >
               {renderIcon(cashPaymentIcon, "estimate-document__notes-accordion__icon", "20")}
-              <span className="estimate-document__notes-accordion__title">
-                この概算見積りについて
-              </span>
+              <span className="estimate-document__notes-accordion__title">この概算見積りについて</span>
               <span className="estimate-document__notes-badge">3項目</span>
-              <span className="estimate-document__notes-accordion__arrow" aria-hidden="true">▼</span>
+              <span className="estimate-document__notes-accordion__arrow" aria-hidden="true">
+                ▼
+              </span>
             </button>
             <div className="estimate-document__notes-accordion__content">
               <ul className="estimate-document__notes-accordion__list">
@@ -512,10 +516,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
           </div>
 
           {/* お支払いについて */}
-          <div
-            className="estimate-document__notes-accordion"
-            data-open={openAccordions.payment ? "true" : "false"}
-          >
+          <div className="estimate-document__notes-accordion" data-open={openAccordions.payment ? "true" : "false"}>
             <button
               type="button"
               className="estimate-document__notes-accordion__header"
@@ -524,11 +525,11 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
               onClick={() => toggleAccordion("payment")}
             >
               {renderIcon(creditCardIcon, "estimate-document__notes-accordion__icon", "20")}
-              <span className="estimate-document__notes-accordion__title">
-                お支払いについて
-              </span>
+              <span className="estimate-document__notes-accordion__title">お支払いについて</span>
               <span className="estimate-document__notes-badge">2項目</span>
-              <span className="estimate-document__notes-accordion__arrow" aria-hidden="true">▼</span>
+              <span className="estimate-document__notes-accordion__arrow" aria-hidden="true">
+                ▼
+              </span>
             </button>
             <div className="estimate-document__notes-accordion__content">
               <ul className="estimate-document__notes-accordion__list">
@@ -561,7 +562,9 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
           {renderIcon(lightBulbIcon, "estimate-document__icon--next-step", "24")}
           <div>
             <strong>次のステップ：正式なご依頼はお問い合わせから</strong>
-            <p className="estimate-document__next-step__desc">この概算をベースに仕様のすり合わせを行い、正式見積りをご案内します。</p>
+            <p className="estimate-document__next-step__desc">
+              この概算をベースに仕様のすり合わせを行い、正式見積りをご案内します。
+            </p>
           </div>
         </div>
 

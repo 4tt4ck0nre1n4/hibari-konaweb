@@ -23,7 +23,7 @@ export const buildSkipWordPress = env.PUBLIC_BUILD_SKIP_WORDPRESS;
 
 if (buildSkipWordPress && import.meta.env.DEV) {
   console.warn(
-    "⚠️ [API Config] PUBLIC_BUILD_SKIP_WORDPRESS is enabled: if WordPress is unreachable, blog post routes may be skipped during `astro build` (empty paths). Do not set this on production Netlify.",
+    "⚠️ [API Config] PUBLIC_BUILD_SKIP_WORDPRESS is enabled: if WordPress is unreachable, blog post routes may be skipped during `astro build` (empty paths). Do not set this on production Netlify."
   );
 }
 

@@ -32,7 +32,7 @@ export function rethrowIfWordPressUnreachable(requestUrl: string, error: unknown
         `  対処: Local / Docker で WordPress を起動する、または .env の PUBLIC_API_URL を到達可能な URL（本番の https://… など）に変更してからビルドする。`,
         `  Netlify では Environment Variables の PUBLIC_API_URL がビルド時に使われます。`,
         `  詳細: ${msg}${code !== "" ? ` [${code}]` : ""}`,
-      ].join("\n"),
+      ].join("\n")
     );
   }
   throw error;
@@ -53,7 +53,7 @@ async function fetchResponseForBlogBuild(url: string): Promise<Response | null> 
             `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: fetch failed; continuing with no blog static paths.`,
             `  URL: ${url}`,
             `  ${msg}`,
-          ].join("\n"),
+          ].join("\n")
         );
       }
       return null;
@@ -95,7 +95,7 @@ export async function fetchAllBlogPostsRawForBuild(): Promise<unknown[]> {
           [
             `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: WordPress returned ${firstResponse.status} ${firstResponse.statusText}; continuing with no blog static paths.`,
             `  ${BLOG_POST_API}`,
-          ].join("\n"),
+          ].join("\n")
         );
       }
       return [];
@@ -127,7 +127,7 @@ export async function fetchAllBlogPostsRawForBuild(): Promise<unknown[]> {
             [
               `⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: page ${page} returned ${res.status} ${res.statusText}; using ${all.length} post(s) fetched so far.`,
               `  ${url}`,
-            ].join("\n"),
+            ].join("\n")
           );
         }
         break;
@@ -157,13 +157,13 @@ export async function fetchBlogSlugsForStaticPaths(): Promise<string[]> {
     if (buildSkipWordPress) {
       if (import.meta.env.DEV) {
         console.warn(
-          "⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: posts were returned but no valid slug was parsed; continuing with no blog static paths.",
+          "⚠️ [Blog build] PUBLIC_BUILD_SKIP_WORDPRESS: posts were returned but no valid slug was parsed; continuing with no blog static paths."
         );
       }
       return [];
     }
     throw new Error(
-      "Blog getStaticPaths: no posts contained a valid slug. Check WordPress REST response (posts collection).",
+      "Blog getStaticPaths: no posts contained a valid slug. Check WordPress REST response (posts collection)."
     );
   }
 

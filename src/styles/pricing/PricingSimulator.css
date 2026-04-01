@@ -120,7 +120,9 @@ html.dark .pricing-simulator-scroll-bar__label {
   font-weight: 800;
   letter-spacing: 0.02em;
   color: var(--color-black, #010101);
-  transition: color 0.15s ease, text-shadow 0.15s ease;
+  transition:
+    color 0.15s ease,
+    text-shadow 0.15s ease;
 }
 
 .pricing-simulator-scroll-bar__amount--flash {
@@ -178,7 +180,9 @@ html.dark .pricing-simulator-scroll-bar__label {
   color: var(--color-white, #f1f5f9);
   background-color: var(--color-purple, #8b5cf6);
   white-space: nowrap;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .pricing-simulator-scroll-bar__cta:is(:hover, :focus-visible):not(:disabled) {
@@ -315,13 +319,13 @@ html.dark .pricing-simulator__next-step {
   font-size: 0.9375rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--color-blue-light, #4a90e2);
+  color: #4f46e5;
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
 
 .pricing-simulator__footer-link:is(:hover, :focus-visible) {
-  color: var(--color-red, #ff4f48);
+  color: var(--color-light-blue, #4a90e2);
   text-decoration: none;
 }
 
@@ -378,16 +382,18 @@ html.dark .pricing-simulator__next-step {
 }
 
 .pricing-plan-button:is(:hover, :focus-visible) {
-  border-color: var(--color-purple, #8b5cf6);
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+  color: var(--color-white, #f1f5f9);
   transform: translateY(-0.125rem);
-  outline: var(--color-purple, #8b5cf6) 0.1875rem solid;
+  outline: #4f46e5 0.1875rem solid;
   outline-offset: 0.125rem;
 }
 
 .pricing-plan-button--active {
   /* background-color: var(--color-purple, #8b5cf6); */
-  background-color: var(--color-blue-light, #4a90e2);
-  border-color: var(--color-purple, #8b5cf6);
+  background-color: #4f46e5;
+  border-color: #4f46e5;
   color: var(--color-white, #f1f5f9);
 }
 
@@ -658,7 +664,6 @@ html.dark .page-count-option:is(:hover, :focus-visible) {
     padding-inline: 1rem;
   }
 
-
   .pricing-simulator__actions {
     flex-direction: column;
     align-items: center;
@@ -690,7 +695,7 @@ html.dark .page-count-option:is(:hover, :focus-visible) {
   }
 
   .pricing-simulator__actions:not(.pricing-simulator__actions--has-selection, .pricing-simulator__actions--back)
-  .pricing-simulator__button {
+    .pricing-simulator__button {
     width: 320px;
   }
 

@@ -26,19 +26,13 @@ function lenientUnknownToOptionalString(v: unknown): string | undefined {
 
 /** ブログ等: `rendered` 欠損・非文字列でもビルドを落とさない（出力型は常に string） */
 const wpRenderedLenientSchema = z.object({
-  rendered: z
-    .unknown()
-    .transform((v) => lenientUnknownToString(v)),
+  rendered: z.unknown().transform((v) => lenientUnknownToString(v)),
 });
 
 /** `_embedded.author`: 相対 URL や空でも許容（embed 文脈で揺れる） */
 const wpAuthorLenientSchema = z.object({
-  name: z
-    .unknown()
-    .transform((v) => lenientUnknownToString(v)),
-  link: z
-    .unknown()
-    .transform((v) => lenientUnknownToString(v)),
+  name: z.unknown().transform((v) => lenientUnknownToString(v)),
+  link: z.unknown().transform((v) => lenientUnknownToString(v)),
 });
 
 /** ブログ詳細: `_embedded` の形が投稿・プラグインで微妙に異なる場合がある */
@@ -62,19 +56,17 @@ const catInfoSchema = z.object({
  * ACF 画像: 文字列 URL / メディア ID / `{ url }` / `{ source_url }` 等（REST・ACF の返し方差を吸収）
  * 正規化後は表示側 `getWordPressImageUrl` で URL 文字列に揃える
  */
-const blogImageAcfFieldSchema = z
-  .unknown()
-  .transform((val): string | number | undefined => {
-    if (val === undefined || val === null) return undefined;
-    if (typeof val === "string") return val;
-    if (typeof val === "number" && Number.isFinite(val)) return val;
-    if (typeof val === "object" && val !== null) {
-      const o = val as Record<string, unknown>;
-      if (typeof o.url === "string") return o.url;
-      if (typeof o.source_url === "string") return o.source_url;
-    }
-    return undefined;
-  });
+const blogImageAcfFieldSchema = z.unknown().transform((val): string | number | undefined => {
+  if (val === undefined || val === null) return undefined;
+  if (typeof val === "string") return val;
+  if (typeof val === "number" && Number.isFinite(val)) return val;
+  if (typeof val === "object" && val !== null) {
+    const o = val as Record<string, unknown>;
+    if (typeof o.url === "string") return o.url;
+    if (typeof o.source_url === "string") return o.source_url;
+  }
+  return undefined;
+});
 
 // Advanced Custom Fields (ACF) - Blog
 const blogAcfSchema = z
@@ -104,12 +96,10 @@ export const blogPostSchema = z.object({
   date: z.string(),
   /** WordPress REST の投稿更新日時（ISO 8601 文字列が一般的） */
   modified: z.string().optional(),
-  categories: z
-    .unknown()
-    .transform((v) => {
-      if (!Array.isArray(v)) return [];
-      return v.filter((x): x is number => typeof x === "number" && Number.isFinite(x));
-    }),
+  categories: z.unknown().transform((v) => {
+    if (!Array.isArray(v)) return [];
+    return v.filter((x): x is number => typeof x === "number" && Number.isFinite(x));
+  }),
   content: wpRenderedLenientSchema,
   cat_info: z.array(catInfoSchema).optional(),
   _embedded: wpEmbeddedLenientSchema,
@@ -127,10 +117,7 @@ export const blogPostSidebarItemSchema = z
   .object({
     id: z.number(),
     slug: z.string(),
-    title: z.preprocess(
-      (v) => (v === undefined || v === null ? { rendered: "" } : v),
-      wpRenderedLenientSchema,
-    ),
+    title: z.preprocess((v) => (v === undefined || v === null ? { rendered: "" } : v), wpRenderedLenientSchema),
     acf: blogAcfSchema,
     cat_info: z.array(catInfoSchema).optional(),
   })
@@ -158,21 +145,19 @@ export type BlogPostsResponse = z.output<typeof blogPostsResponseSchema>;
 /**
  * WordPress REST の `date` は ISO 8601 文字列が一般的。数値（Unix 秒/ミリ秒）も許容し、正規化後は ISO 文字列。
  */
-const worksDateNormalizedSchema = z
-  .union([z.string(), z.number()])
-  .transform((v): string => {
-    if (typeof v === "number") {
-      if (!Number.isFinite(v) || v === 0) return "";
-      const ms = v < 1e12 ? v * 1000 : v;
-      const d = new Date(ms);
-      return Number.isNaN(d.getTime()) ? "" : d.toISOString();
-    }
-    const trimmed = v.trim();
-    if (trimmed === "") return "";
-    const t = Date.parse(trimmed);
-    if (Number.isNaN(t)) return trimmed;
-    return new Date(t).toISOString();
-  });
+const worksDateNormalizedSchema = z.union([z.string(), z.number()]).transform((v): string => {
+  if (typeof v === "number") {
+    if (!Number.isFinite(v) || v === 0) return "";
+    const ms = v < 1e12 ? v * 1000 : v;
+    const d = new Date(ms);
+    return Number.isNaN(d.getTime()) ? "" : d.toISOString();
+  }
+  const trimmed = v.trim();
+  if (trimmed === "") return "";
+  const t = Date.parse(trimmed);
+  if (Number.isNaN(t)) return trimmed;
+  return new Date(t).toISOString();
+});
 
 /**
  * Works（制作実績）スキーマ
@@ -251,7 +236,7 @@ export function validateApiResponse<S extends z.ZodTypeAny>(
   schema: S,
   data: unknown,
   apiName: string,
-  fallback: z.output<S>,
+  fallback: z.output<S>
 ): z.output<S> {
   const result = schema.safeParse(data);
 
@@ -275,7 +260,11 @@ export function validateApiResponse<S extends z.ZodTypeAny>(
  * @returns 検証済みデータ
  * @throws {Error} 検証に失敗した場合
  */
-export function validateApiResponseStrict<S extends z.ZodTypeAny>(schema: S, data: unknown, apiName: string): z.output<S> {
+export function validateApiResponseStrict<S extends z.ZodTypeAny>(
+  schema: S,
+  data: unknown,
+  apiName: string
+): z.output<S> {
   const result = schema.safeParse(data);
 
   if (!result.success) {
