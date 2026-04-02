@@ -129,7 +129,7 @@ html.dark .modal-close:is(:hover, :focus-visible) {
 }
 
 .other-function-option:is(:hover, :focus-visible) {
-  background-color: #f9fafb;
+  background-color: var(--color-gray-50, #f9fafb);
   border-color: var(--color-purple, #8b5cf6);
 }
 

@@ -111,7 +111,7 @@
   display: block;
   width: 20px;
   height: 2.5px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, var(--color-gradient-hamburger-start, #667eea) 0%, var(--color-gradient-hamburger-end, #764ba2) 100%);
   position: relative;
   border-radius: 2px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -122,7 +122,7 @@
   display: block;
   width: 20px;
   height: 2.5px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, var(--color-gradient-hamburger-start, #667eea) 0%, var(--color-gradient-hamburger-end, #764ba2) 100%);
   position: absolute;
   left: 0;
   top: -6px;
@@ -137,7 +137,7 @@
   display: block;
   width: 20px;
   height: 2.5px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, var(--color-gradient-hamburger-start, #667eea) 0%, var(--color-gradient-hamburger-end, #764ba2) 100%);
   position: absolute;
   left: 0;
   bottom: -6px;
@@ -166,7 +166,7 @@
   left: -2px;
   transform: rotate(45deg);
   top: 0;
-  background: #4f46e5;
+  background: var(--color-indigo-600, #4f46e5);
 }
 
 .hamburger__button.open .hamburger__line::after {
@@ -175,7 +175,7 @@
   left: -2px;
   transform: rotate(-45deg);
   bottom: 0;
-  background: #4f46e5;
+  background: var(--color-indigo-600, #4f46e5);
 }
 
 .hamburger__menu {
@@ -318,7 +318,7 @@
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-gradient-hamburger-start, #667eea) 0%, var(--color-gradient-hamburger-end, #764ba2) 100%);
   /* stylelint-disable-next-line property-no-vendor-prefix */
   -webkit-background-clip: text;
   background-clip: text;
@@ -571,7 +571,7 @@
 }
 
 .hamburger__menu_link {
-  --hamburger-link-fg: #4f46e5;
+  --hamburger-link-fg: var(--color-indigo-600, #4f46e5);
   --hamburger-link-bg: linear-gradient(to bottom right, #eef2ff, #eff6ff);
 
   width: 100%;
@@ -614,7 +614,7 @@
 }
 
 .hamburger__menu_link:focus-visible {
-  outline: 2px solid #4f46e5;
+  outline: 2px solid var(--color-indigo-600, #4f46e5);
   outline-offset: 2px;
 }
 
@@ -678,7 +678,7 @@
   font-weight: 400;
   letter-spacing: 0.03em;
   line-height: 1.35;
-  color: #64748b;
+  color: var(--color-slate-500, #64748b);
   background: none;
   border-radius: 0;
 }

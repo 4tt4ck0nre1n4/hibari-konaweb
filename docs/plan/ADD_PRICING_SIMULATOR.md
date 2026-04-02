@@ -179,7 +179,7 @@ CSS
 
 ## CSS
 
-CSSのコーディングルールは、CSS_CODING_RULES.mdを参照してください。
+CSSのコーディングルールは、`.cursor/rules/css-coding-rules.mdc` を参照してください。
 
 ## 概算料金自動計算プログラム
 

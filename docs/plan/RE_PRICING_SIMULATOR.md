@@ -5,7 +5,7 @@
 - プランのボタンにアイコン画像を追加する
 - アイコン画像にインストールが必要であればお願いします。
 - アイコン、ボタンテキストの順で、並列表示。
-- CSSは、docs/coding-rules/CSS_CODING_RULES.mdを参照。
+- CSSは、`.cursor/rules/css-coding-rules.mdc` を参照。
 - HTML、scriptは、PricingItem.tsx、EstimateDocument.tsxなどを参照。
 
 1. コーディング

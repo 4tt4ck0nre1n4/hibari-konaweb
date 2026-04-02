@@ -3,7 +3,7 @@
 @import url("tailwindcss/utilities.css") layer(utilities);
 
 @theme {
-  --color-primary: #4f46e5;
+  --color-primary: var(--color-indigo-600, #4f46e5);
   --color-secondary: #10b981;
 }
 
@@ -391,7 +391,7 @@
 
 .blog-post-cta-badge {
   color: rgb(255 255 255);
-  background-color: #4f46e5;
+  background-color: var(--color-indigo-600, #4f46e5);
   border-radius: 0.5rem;
   margin-block-start: 1rem;
   padding-block: 0.5rem;
@@ -445,7 +445,7 @@
 }
 
 .blog-post-cta-btn-primary {
-  background-color: #4f46e5;
+  background-color: var(--color-indigo-600, #4f46e5);
   color: rgb(255 255 255);
 }
 
@@ -455,10 +455,10 @@
 
 .blog-post-cta-btn-secondary {
   background-color: rgb(255 255 255);
-  color: #4f46e5;
+  color: var(--color-indigo-600, #4f46e5);
   border-width: 1px;
   border-style: solid;
-  border-color: #4f46e5;
+  border-color: var(--color-indigo-600, #4f46e5);
 }
 
 .blog-post-cta-btn-secondary:hover {
@@ -507,14 +507,14 @@
 .blog-post-cta a.inline-flex.bg-primary,
 .blog-post-cta a.blog-post-cta-btn-primary {
   color: rgb(255 255 255);
-  background-color: #4f46e5;
+  background-color: var(--color-indigo-600, #4f46e5);
 }
 
 .blog-post-cta a.border-primary,
 .blog-post-cta a.blog-post-cta-btn-secondary {
-  color: #4f46e5;
+  color: var(--color-indigo-600, #4f46e5);
   background-color: rgb(255 255 255);
-  border: #4f46e5 1px solid;
+  border: var(--color-indigo-600, #4f46e5) 1px solid;
 }
 
 .blog-post-sidebar-card {
@@ -709,7 +709,7 @@ html.dark .blog-post-sidebar-name {
 }
 
 html.dark .blog-post-sidebar-tagline {
-  color: #4f46e5;
+  color: var(--color-indigo-600, #4f46e5);
 }
 
 html.dark .blog-post-sidebar-social a {
@@ -734,7 +734,7 @@ html.dark .blog-post-sidebar-popular-item h4 {
 }
 
 html.dark .blog-post-sidebar-popular-link:is(:hover, :focus-visible) h4 {
-  color: #4f46e5;
+  color: var(--color-indigo-600, #4f46e5);
 }
 
 html.dark .blog-post-sidebar-popular-footer {
@@ -742,7 +742,7 @@ html.dark .blog-post-sidebar-popular-footer {
 }
 
 html.dark .blog-post-sidebar-popular-footer:is(:hover, :focus-visible) {
-  color: #4f46e5;
+  color: var(--color-indigo-600, #4f46e5);
 }
 
 /* stylelint-enable no-descending-specificity */

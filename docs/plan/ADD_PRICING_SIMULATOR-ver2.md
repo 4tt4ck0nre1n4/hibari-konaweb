@@ -48,7 +48,7 @@
 
 ## CSS
 
-CSSのコーディングルールは、CSS_CODING_RULES.mdを参照。
+CSSのコーディングルールは、`.cursor/rules/css-coding-rules.mdc` を参照。
 
 ## 概算見積書
 
