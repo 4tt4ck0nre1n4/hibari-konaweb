@@ -1,4 +1,4 @@
-import { validateEnv } from "../schemas/env.schema";
+import { validateEnv } from "@/schemas/env.schema";
 
 /**
  * Vite は `.env` に無い `PUBLIC_*` を `import.meta.env` に載せないことがある。

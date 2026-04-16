@@ -1,0 +1,65 @@
+---
+interface AboutProps {
+  aboutTitle: string;
+  aboutSubTitle: string;
+  id?: string;
+  /** ページの主見出しは 1。セクション見出しは 2（既定） */
+  headingLevel?: 1 | 2;
+}
+
+const { aboutTitle, aboutSubTitle, id, headingLevel = 2 } = Astro.props as AboutProps;
+---
+
+<hgroup>
+  {
+    headingLevel === 1 ? (
+      <h1 class="about__title" id={id}>
+        {aboutTitle}
+      </h1>
+    ) : (
+      <h2 class="about__title" id={id}>
+        {aboutTitle}
+      </h2>
+    )
+  }
+  <p class="about__subTitle">
+    {aboutSubTitle}
+  </p>
+</hgroup>
+
+<style is:global>
+  .about__title {
+    font-size: 2rem;
+    color: inherit;
+    text-align: center;
+    padding-block-start: 1rem;
+  }
+  .about__subTitle {
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.2em;
+    color: inherit;
+    text-align: center;
+    margin-block-start: 1rem;
+  }
+  @media (width <= 480px) {
+    .about__subTitle {
+      letter-spacing: 0.04em;
+    }
+  }
+
+  /* 印刷時は完全に非表示 */
+  @media print {
+    hgroup,
+    .about__title,
+    .about__subTitle {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+  }
+</style>

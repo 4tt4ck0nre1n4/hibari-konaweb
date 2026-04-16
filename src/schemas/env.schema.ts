@@ -31,6 +31,9 @@ export const envSchema = z.object({
   // Google Analytics Measurement ID（任意）
   PUBLIC_GA_MEASUREMENT_ID: z.string().optional(),
 
+  /** `/blog/category` の meta 用 SEO 専用カテゴリーの slug。未設定時は `SITE.categories.seoOnlyCategorySlug` */
+  PUBLIC_CATEGORY_INDEX_SEO_CATEGORY_SLUG: z.string().optional(),
+
   // Cloudflare Turnstile Site Key（任意）
   PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
 

@@ -1,11 +1,11 @@
 ---
-import Layout from "../../../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import type { GetStaticPaths } from "astro";
 import { Icon } from "astro-icon/components";
 import { generateBreadcrumbs } from "../../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
-import globalText from "../../../data/globalText.json";
-import { CATEGORY_PAGE_API, CATEGORY_SLUG_API, CATEGORY_ID_API } from "../../../api/headlessCms";
+import { SITE as globalText } from "@/config/site";
+import { CATEGORY_PAGE_API, CATEGORY_SLUG_API, CATEGORY_ID_API } from "@/api/headlessCms";
 
 interface CategoryPosts {
   id: number;
@@ -167,7 +167,21 @@ const categoryText = "同じカテゴリーの記事の一覧です。";
 const categoryError = "このカテゴリーには記事がありません。";
 const categoryLink = "カテゴリー記事一覧のページへ";
 const title = category?.name ?? "カテゴリー記事が見つかりません";
-const description = category?.acf?.description ?? "No description";
+
+/** CMS 説明が無いときの meta 用。`no-unsafe-call` 回避のため `.replace` をここに閉じる */
+function formatCategoryMetaFallback(categoryName: string): string {
+  const template: string = globalText.categories.metaDescriptionSlugTemplate;
+  return template.replace("{categoryName}", categoryName);
+}
+
+const cmsDescriptionRaw = category?.acf?.description?.trim() ?? "";
+const hasValidCmsDescription = cmsDescriptionRaw !== "" && cmsDescriptionRaw.toLowerCase() !== "no description";
+
+const description = !category
+  ? globalText.categories.description
+  : hasValidCmsDescription
+    ? cmsDescriptionRaw
+    : formatCategoryMetaFallback(category.name);
 const postAriaLabel = "の記事へ";
 const postAriaTitle = "の記事へ";
 
@@ -178,12 +192,12 @@ const datetime = "投稿日:";
 
 <Layout
   title={title}
-  description={description ?? ""}
+  description={description}
   ogType={globalText.local.type}
   ogTitle={title}
-  ogDescription={description ?? ""}
+  ogDescription={description}
   twitterTitle={title}
-  twitterDescription={description ?? ""}
+  twitterDescription={description}
 >
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />

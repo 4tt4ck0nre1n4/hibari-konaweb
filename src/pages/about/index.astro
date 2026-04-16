@@ -1,15 +1,15 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
-import AboutHeading from "../../components/AboutHeading.astro";
-import AboutMe from "../../components/AboutMe.astro";
-import Sns from "../../components/Sns.astro";
-import SkillsIcon from "../../components/SkillsIcon.astro";
-import Card from "../../components/Card.astro";
-import aboutText from "../../data/aboutText.json";
-import serviceText from "../../data/serviceText.json";
-import globalText from "../../data/globalText.json";
+import AboutHeading from "@/components/about/AboutHeading.astro";
+import AboutMe from "@/components/about/AboutMe.astro";
+import Sns from "@/components/about/Sns.astro";
+import SkillsIcon from "@/components/about/SkillsIcon.astro";
+import Card from "@/components/about/Card.astro";
+import aboutText from "@/data/aboutText.json";
+import serviceText from "@/data/serviceText.json";
+import { SITE as globalText } from "@/config/site";
 
 interface AboutText {
   aboutHeader: string;
@@ -21,8 +21,8 @@ interface AboutText {
   aboutLikeHeader: string;
   aboutLikeText: string;
 }
-import FlowingLinesWrapper from "../../components/FlowingLinesWrapper.astro";
-import { twitter, github_sns, mail, contact } from "../../data/constSns";
+import FlowingLinesWrapper from "@/components/ui/FlowingLinesWrapper.astro";
+import { twitter, github_sns, mail, contact } from "@/config/ui";
 import {
   html,
   css,
@@ -50,7 +50,7 @@ import {
   gemini,
   claude,
   type SkillsProps,
-} from "../../data/constSkills";
+} from "@/config/skills";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 const href = "/service";
@@ -76,23 +76,12 @@ interface ContactType {
 
 const typedContact = contact as ContactType;
 
-const aboutMeTitle = "About Me";
-const aboutMeSubTitle = "私について。";
-const skillsTitle = "Skills";
-const skillsSubTitle = "私の使用しているスキル・ツールをご紹介します。";
-const serviceTitle = "Service";
-const serviceSubTitle = "私の提供するサービスについてご紹介します。";
-
-const aboutImage = {
-  alt: "About Meのイメージ画像",
-  width: 150,
-  height: 300,
-};
-
-const cardSrc1 = "/riv/working-office.riv";
-const cardSrc2 = "/riv/designer-life.riv";
-const cardSrc3 = "/riv/web-developer.riv";
-const cardSrc4 = "/riv/fixing-site.riv";
+const aboutMeTitle = serviceText.about.aboutMeTitle;
+const aboutMeSubTitle = serviceText.about.aboutMeSubTitle;
+const skillsTitle = serviceText.skill.skillTitle;
+const skillsSubTitle = serviceText.skill.skillSubTitle;
+const serviceTitle = serviceText.service.serviceTitle;
+const serviceSubTitle = serviceText.service.serviceSubTitle;
 ---
 
 <Layout
@@ -114,6 +103,7 @@ const cardSrc4 = "/riv/fixing-site.riv";
           id={`${aboutMeTitle} ${aboutMeSubTitle}`}
           aboutTitle={aboutMeTitle}
           aboutSubTitle={aboutMeSubTitle}
+          headingLevel={1}
         />
       </FlowingLinesWrapper>
       <div class="about__inner">
@@ -169,9 +159,9 @@ const cardSrc4 = "/riv/fixing-site.riv";
           <img
             class="about__image"
             src="/favicon.svg"
-            alt={aboutImage.alt}
-            width={aboutImage.width}
-            height={aboutImage.height}
+            alt={serviceText.about.imageMeta.alt}
+            width={serviceText.about.imageMeta.width}
+            height={serviceText.about.imageMeta.height}
             decoding="async"
             loading="lazy"
           />
@@ -236,7 +226,7 @@ const cardSrc4 = "/riv/fixing-site.riv";
             cardBody={serviceText.service.card1.serviceBody}
             cardDetails=""
             serviceMenu={serviceText.service.card1.serviceMenu}
-            src={cardSrc1}
+            src={serviceText.service.cardSrc1}
           />
           <Card
             href={href}
@@ -244,7 +234,7 @@ const cardSrc4 = "/riv/fixing-site.riv";
             cardBody={serviceText.service.card2.serviceBody}
             cardDetails=""
             serviceMenu={serviceText.service.card2.serviceMenu}
-            src={cardSrc2}
+            src={serviceText.service.cardSrc2}
           />
           <Card
             href={href}
@@ -252,7 +242,7 @@ const cardSrc4 = "/riv/fixing-site.riv";
             cardBody={serviceText.service.card3.serviceBody}
             cardDetails=""
             serviceMenu={serviceText.service.card3.serviceMenu}
-            src={cardSrc3}
+            src={serviceText.service.cardSrc3}
           />
           <Card
             href={href}
@@ -260,7 +250,7 @@ const cardSrc4 = "/riv/fixing-site.riv";
             cardBody={serviceText.service.card4.serviceBody}
             cardDetails=""
             serviceMenu={serviceText.service.card4.serviceMenu}
-            src={cardSrc4}
+            src={serviceText.service.cardSrc4}
           />
         </ul>
       </div>
@@ -1084,7 +1074,7 @@ const cardSrc4 = "/riv/fixing-site.riv";
 </style>
 
 <script>
-  import { setupFlowingLinesAnimation } from "../../scripts/flowingLines";
+  import { setupFlowingLinesAnimation } from "@/scripts/flowingLines";
   setupFlowingLinesAnimation();
 
   // タッチデバイスでのスキルアイコンのアニメーション制御

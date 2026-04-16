@@ -137,7 +137,7 @@ if (document.readyState === "loading") {
 
 画像の依存関係ツリーから、以下のコンポーネントが即座に読み込まれています：
 
-- `SwiperMenu.astro` → `swiper-bundle.js` (2,786ms, 22.42 KiB)
+- `layout/side/SwiperMenu.astro` → `swiper-bundle.js` (2,786ms, 22.42 KiB)
 - `SoundToggle` → `SoundToggle.DokelzoC.js` (3,280ms, 1.11 KiB)
 - `ParticlesComponent` → `ParticlesComponent.Bk60KCue.js` (3,267ms, 1.92 KiB)
 - `HamburgerMenu` → `HamburgerMenu.peXHxMzl.js` (2,219ms, 3.66 KiB)

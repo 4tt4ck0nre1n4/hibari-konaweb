@@ -116,7 +116,7 @@
          ▼                         ▼
 ┌──────────────────┐     ┌──────────────────┐
 │ calculatePrice() │     │ LocalStorage     │
-│   (utils)        │     │ (永続化)         │
+│   (pricing)        │     │ (永続化)         │
 └────────┬─────────┘     └──────────────────┘
          │
          ▼
@@ -143,7 +143,7 @@ src/
 ├── config/
 │   ├── pricing.ts                 # 料金・項目設定（69行）
 │   └── companyInfo.ts             # 会社情報・見積設定（27行）
-├── utils/
+├── pricing/
 │   ├── calculatePrice.ts          # 料金計算ロジック（59行）
 │   ├── generateEstimateNumber.ts  # 見積番号生成（36行）
 │   └── storageManager.ts          # LocalStorage管理（46行）
@@ -260,7 +260,7 @@ export const ESTIMATE_CONFIG = {
 } as const;
 ```
 
-#### 8. **utils/calculatePrice.ts** (料金計算)
+#### 8. **pricing/calculatePrice.ts** (料金計算)
 
 ```typescript
 // ページ数に応じた料金計算
@@ -299,7 +299,7 @@ export function calculatePrice(
 }
 ```
 
-#### 9. **utils/generateEstimateNumber.ts** (見積番号生成)
+#### 9. **pricing/generateEstimateNumber.ts** (見積番号生成)
 
 ```typescript
 // 見積書番号: EST-YYYYMMDD-XXXX
@@ -328,7 +328,7 @@ export function calculateExpiryDate(issueDate: Date, validityDays: number): Date
 }
 ```
 
-#### 10. **utils/storageManager.ts** (状態永続化)
+#### 10. **pricing/storageManager.ts** (状態永続化)
 
 ```typescript
 const STORAGE_KEY = 'pricing-simulator-state';
@@ -796,7 +796,7 @@ useEffect(() => {
 
 ### コード実装
 
-**ページ数割増計算**: `utils/calculatePrice.ts` (8-17行目)
+**ページ数割増計算**: `pricing/calculatePrice.ts` (8-17行目)
 
 ```typescript
 export function calculatePagePrice(
@@ -813,7 +813,7 @@ export function calculatePagePrice(
 }
 ```
 
-**全体計算**: `utils/calculatePrice.ts` (22-55行目)
+**全体計算**: `pricing/calculatePrice.ts` (22-55行目)
 
 ```typescript
 export function calculatePrice(
@@ -1465,7 +1465,7 @@ const getPageLabel = () => {
 **解決方法**: より高精度なランダム番号生成、またはカウンター方式に変更
 
 ```typescript
-// utils/generateEstimateNumber.ts
+// pricing/generateEstimateNumber.ts
 export function generateEstimateNumber(): string {
   const now = new Date();
   const year = now.getFullYear();

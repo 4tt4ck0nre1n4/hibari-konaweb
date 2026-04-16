@@ -41,11 +41,9 @@ const targetFile = path.join(__dirname, `src/pages/privacy/${formattedPath}.astr
 if (!fs.existsSync(targetFile)) {
   const content = `
   ---
-  import Layout from "../../layouts/Layout.astro";
-  import Header from "../../components/Header.astro";
-  import Footer from "../../components/Footer.astro";
-  import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
-  import Breadcrumbs from "../../components/Breadcrumbs.astro";
+  import Layout from "@/layouts/Layout.astro";
+  import { generateBreadcrumbs } from "@/util/generateBreadcrumbs";
+  import Breadcrumbs from "@/components/Breadcrumbs.astro";
 
   interface Props {
     privacyTitle: string;
@@ -64,27 +62,21 @@ if (!fs.existsSync(targetFile)) {
     twitterTitle="プライバシーポリシー (改定日 &#0058; ${formattedDate})"
     twitterDescription="当サイトのプライバシーポリシーの改定内容を掲載しています。"
   >
-    <div id="outer-container">
-      <Header />
-      <main id="page-wrap">
-        <div class="breadcrumbs__wrapper">
-          <Breadcrumbs {crumbs} />
-        </div>
-        <div class="privacy__wrapper">
-          <h1 class="privacy__title">
-            プライバシーポリシー (改定日 &#0058;
-            <time datetime=${formattedPath}>
-             ${formattedDate}
-            </time>
-            )
-          </h1>
-          <p class="privacy__text">
-            当サイトのプライバシーポリシー (改定日 &#0058; ${formattedDate})の改定内容は下記の通りです。
-          </p>
-          <p class="privacy__text"></p>
-        </div>
-      </main>
-      <Footer />
+    <div class="breadcrumbs__wrapper">
+      <Breadcrumbs {crumbs} />
+    </div>
+    <div class="privacy__wrapper">
+      <h1 class="privacy__title">
+        プライバシーポリシー (改定日 &#0058;
+        <time datetime="${formattedPath}">
+          ${formattedDate}
+        </time>
+        )
+      </h1>
+      <p class="privacy__text">
+        当サイトのプライバシーポリシー (改定日 &#0058; ${formattedDate})の改定内容は下記の通りです。
+      </p>
+      <p class="privacy__text"></p>
     </div>
   </Layout>`;
 

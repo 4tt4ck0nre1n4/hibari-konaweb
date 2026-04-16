@@ -4,7 +4,7 @@ import {
   pricingItemsSchema,
   plansSchema,
   pageCountOptionsSchema,
-} from "../schemas/data.schema";
+} from "@/schemas/data.schema";
 
 // その他の機能 サブ項目の型定義
 export interface FunctionOption {

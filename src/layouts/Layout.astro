@@ -2,8 +2,8 @@
 import HeadLayout from "./HeadLayout.astro";
 import Header from "./Header.astro";
 import Footer from "./Footer.astro";
-import PageTopButton from "../components/PageTopButton.astro";
-import SkipLink from "../components/SkipLink.astro";
+import PageTopButton from "@/components/ui/PageTopButton.astro";
+import SkipLink from "@/components/seo/SkipLink.astro";
 // クリティカルなフォントのみを読み込む（400のみ）
 import "@fontsource/poppins/400.css";
 
@@ -62,9 +62,6 @@ const shouldLoadGA: boolean =
       <Footer />
     </div>
     <PageTopButton />
-
-    <!-- GSAPとScrollTriggerは必要なページでのみ動的インポートで読み込む -->
-    <!-- js-confettiは必要なページでのみ動的インポートで読み込む -->
 
     {/* Google Analytics: gtag.js の遅延読み込み（実装は public/scripts/deferred-google-analytics.js） */}
     {

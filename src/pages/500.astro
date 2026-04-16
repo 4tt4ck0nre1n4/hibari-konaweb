@@ -1,12 +1,12 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import type { GetStaticPaths } from "astro";
 
 import Breadcrumbs from "../components/Breadcrumbs.astro";
-import globalText from "../data/globalText.json";
-import errorText from "../data/errorText.json";
+import { SITE as globalText } from "@/config/site";
+import errorText from "@/data/errorText.json";
 import { Image } from "astro:assets";
-import serverErrorImage from "../assets/image/500Cat.webp";
+import serverErrorImage from "@/assets/image/500Cat.webp";
 
 interface Props {
   error: unknown;
@@ -21,12 +21,6 @@ export const getStaticPaths: GetStaticPaths = () => {
 export const prerender = true;
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "500 Server Error" }];
-
-const serverErrorImageMeta = {
-  alt: "500 Server Error エラーを案内する猫の画像",
-  width: 200,
-  height: 200,
-};
 ---
 
 <Layout
@@ -60,9 +54,9 @@ const serverErrorImageMeta = {
       <Image
         class="serverError__image"
         src={serverErrorImage}
-        alt={serverErrorImageMeta.alt}
-        width={serverErrorImageMeta.width}
-        height={serverErrorImageMeta.height}
+        alt={errorText.serverError.imageAlt}
+        width={errorText.serverError.imageWidth}
+        height={errorText.serverError.imageHeight}
         loading="lazy"
         decoding="async"
       />

@@ -11,7 +11,7 @@
 - jspdf-autotable v3.8.4
 
 ### 2. PDF生成ユーティリティ
-✅ **完了** - `src/utils/generatePDF.ts`
+✅ **完了** - `src/pricing/generatePDF.ts`
 
 **実装機能**:
 - `generateEstimatePDF()`: 見積データからPDF生成

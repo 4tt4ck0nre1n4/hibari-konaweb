@@ -1,13 +1,13 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import type { GetStaticPaths, PaginateFunction } from "astro";
-import SafeIcon from "../../components/SafeIcon.astro";
+import SafeIcon from "@/components/ui/SafeIcon.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
-import globalText from "../../data/globalText.json";
-import { BLOG_PAGE_API } from "../../api/headlessCms";
-import FlowingLinesWrapper from "../../components/FlowingLinesWrapper.astro";
-import { getWordPressImageUrl } from "../../util/optimizeWordPressImage";
+import { SITE as globalText } from "@/config/site";
+import { BLOG_PAGE_API } from "@/api/headlessCms";
+import FlowingLinesWrapper from "@/components/ui/FlowingLinesWrapper.astro";
+import { getWordPressImageUrl } from "@/util/optimizeWordPressImage";
 
 interface CategoryInfo {
   id: number;
@@ -175,7 +175,6 @@ const blogImages = posts.map((post) => {
 const hasNextPage = page.size < page.total ? true : false;
 const blogTitle = "Blog";
 const blogText = "ブログ記事の一覧です。";
-// const errorBlogText = "ブログ記事が見つかりませんでした。";
 const errorCategoryText = "カテゴリーが見つかりませんでした。";
 const postAriaLabel = "の記事へ";
 const postAriaTitle = "の記事へ";
@@ -592,6 +591,6 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
 </style>
 
 <script>
-  import { setupFlowingLinesAnimation } from "../../scripts/flowingLines";
+  import { setupFlowingLinesAnimation } from "@/scripts/flowingLines";
   setupFlowingLinesAnimation();
 </script>

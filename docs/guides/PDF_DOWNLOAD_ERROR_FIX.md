@@ -79,7 +79,7 @@ npm install jspdf@^2.5.2 jspdf-autotable@^3.8.4
 
 #### 3. コードの修正
 
-##### `src/utils/generatePDF.ts`
+##### `src/pricing/generatePDF.ts`
 
 **修正内容**:
 1. `import autoTable from 'jspdf-autotable'` に変更
@@ -105,7 +105,7 @@ npm install --save-dev @types/html2pdf.js
 - CSSデザインが完全に反映される
 - 実装がシンプル
 
-#### 2. `src/utils/generatePDF.ts` に新関数を追加
+#### 2. `src/pricing/generatePDF.ts` に新関数を追加
 
 ```typescript
 import html2pdf from 'html2pdf.js';
@@ -164,7 +164,7 @@ export function generateEstimatePDFFromHTML(
 
 ```typescript
 import { useRef } from 'react';
-import { generateEstimatePDFFromHTML } from '../utils/generatePDF';
+import { generateEstimatePDFFromHTML } from '../pricing/generatePDF';
 
 export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
   const documentRef = useRef<HTMLDivElement>(null);
@@ -271,7 +271,7 @@ npm run build
 
 ### Linterチェック
 ```bash
-read_lints src/utils/generatePDF.ts
+read_lints src/pricing/generatePDF.ts
 read_lints src/components/EstimateDocument.tsx
 ```
 **結果**: ✅ エラーなし
@@ -316,7 +316,7 @@ read_lints src/components/EstimateDocument.tsx
 
 ### コード
 - ✅ `package.json` - html2pdf.jsと@types/html2pdf.jsを追加
-- ✅ `src/utils/generatePDF.ts` - generateEstimatePDFFromHTML関数を追加
+- ✅ `src/pricing/generatePDF.ts` - generateEstimatePDFFromHTML関数を追加
 - ✅ `src/components/EstimateDocument.tsx` - html2pdf.jsを使用するように変更
 - ✅ `node_modules/` - html2pdf.jsがインストールされた
 
@@ -384,7 +384,7 @@ npm run build
 ファイルサイズが大きすぎる場合、以下のオプションを調整できます:
 
 ```typescript
-// src/utils/generatePDF.ts
+// src/pricing/generatePDF.ts
 const opt = {
   image: { 
     type: 'jpeg', 

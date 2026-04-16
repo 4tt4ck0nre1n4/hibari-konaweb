@@ -1,26 +1,14 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import { Image } from "astro:assets";
-import NotfoundImage from "../assets/image/404.webp";
+import NotfoundImage from "@/assets/image/404.webp";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
-import globalText from "../data/globalText.json";
-import errorText from "../data/errorText.json";
+import { SITE as globalText } from "@/config/site";
+import errorText from "@/data/errorText.json";
 
 export const prerender = true;
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "404 Not Found Error" }];
-
-const notFoundImageMeta = {
-  alt: "404 NotFound エラーを案内する画像",
-  width: 280,
-  height: 280,
-};
-const notFoundLinks = {
-  href: "/",
-  ariaLabel: "トップページへ戻る",
-  ariaTitle: "トップページへ戻る",
-  label: "トップページ",
-};
 ---
 
 <Layout
@@ -47,9 +35,9 @@ const notFoundLinks = {
     <Image
       class="notFound__image"
       src={NotfoundImage}
-      alt={notFoundImageMeta.alt}
-      width={notFoundImageMeta.width}
-      height={notFoundImageMeta.height}
+      alt={errorText.notFound.imageAlt}
+      width={errorText.notFound.imageWidth}
+      height={errorText.notFound.imageHeight}
       loading="lazy"
       decoding="async"
     />
@@ -65,11 +53,11 @@ const notFoundLinks = {
     <p class="notFound__body">
       <a
         class="notFound__link"
-        href={notFoundLinks.href}
-        aria-label={notFoundLinks.ariaLabel}
-        title={notFoundLinks.ariaTitle}
+        href={errorText.notFound.links.href}
+        aria-label={errorText.notFound.links.ariaLabel}
+        title={errorText.notFound.links.ariaTitle}
       >
-        {notFoundLinks.label}
+        {errorText.notFound.links.label}
       </a>
       {errorText.notFound.body.text5}
     </p>

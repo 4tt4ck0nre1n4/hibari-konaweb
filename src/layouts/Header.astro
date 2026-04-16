@@ -3,28 +3,27 @@ import LogoSvg from "/public/favicon.svg";
 import TextSvg from "/public/logo_text.svg";
 import WhiteTextSvg from "/public/logo_whiteText.svg";
 import { Image } from "astro:assets";
-
-import Navigation from "../components/Navigation.astro";
-
-const logo = {
-  href: "/",
-  ariaLabel: "ホームに戻る",
-  ariaTitle: "ホームに戻る",
-};
+import layoutText from "@/data/layoutText.json";
+import Navigation from "@/components/navi/Navigation.astro";
 ---
 
 <header class="header">
   <div class="header__wrapper">
     <div class="header__inner">
-      <h1 class="header__logo">
-        <a class="header__logo_link" href={logo.href} aria-label={logo.ariaLabel} title={logo.ariaTitle}>
+      <p class="header__logo">
+        <a
+          class="header__logo_link"
+          href={layoutText.header.logo.href}
+          aria-label={layoutText.header.logo.ariaLabel}
+          title={layoutText.header.logo.ariaTitle}
+        >
           <span class="header__logo_container">
             <Image
               class="header__logo_image"
               src={LogoSvg}
-              alt="ロゴ画像"
-              width="40"
-              height="40"
+              alt={layoutText.header.logo.logoMeta.alt}
+              width={layoutText.header.logo.logoMeta.width}
+              height={layoutText.header.logo.logoMeta.height}
               decoding="async"
               loading="eager"
               fetchpriority="high"
@@ -44,9 +43,9 @@ const logo = {
           <Image
             class="header__logo_text"
             src={TextSvg}
-            alt="ロゴ画像"
-            width="280"
-            height="50"
+            alt={layoutText.header.logo.textLogoMeta.alt}
+            width={layoutText.header.logo.textLogoMeta.width}
+            height={layoutText.header.logo.textLogoMeta.height}
             decoding="async"
             loading="eager"
             fetchpriority="high"
@@ -54,16 +53,16 @@ const logo = {
           <Image
             class="header__logo_whiteText"
             src={WhiteTextSvg}
-            alt="ロゴ画像"
-            width="280"
-            height="50"
+            alt={layoutText.header.logo.textLogoMeta.alt}
+            width={layoutText.header.logo.textLogoMeta.width}
+            height={layoutText.header.logo.textLogoMeta.height}
             decoding="async"
             loading="eager"
             fetchpriority="high"
           />
         </a>
-      </h1>
-      <nav class="header__nav" aria-label="メインナビゲーション">
+      </p>
+      <nav class="header__nav" aria-label={layoutText.header.nav.ariaLabel}>
         <Navigation />
       </nav>
     </div>

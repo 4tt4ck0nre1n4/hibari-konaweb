@@ -1,12 +1,12 @@
 ---
-import FooterHeader from "../components/FooterHeader.astro";
-import FooterSns from "../components/Sns.astro";
-import FooterIcon from "../components/FooterIcon.astro";
-import FooterSupport from "../components/FooterSupport.astro";
-import FooterLinks from "../components/FooterLinks.astro";
-import FooterCopyright from "../components/FooterCopyright.astro";
-import footerText from "../data/footerText.json";
-import { twitter, github_sns, /* instagram, */ about, contact, mail } from "../data/constSns";
+import FooterHeader from "@/components/layout/footer/FooterHeader.astro";
+import FooterSns from "@/components/about/Sns.astro";
+import FooterIcon from "@/components/layout/footer/FooterIcon.astro";
+import FooterSupport from "@/components/layout/footer/FooterSupport.astro";
+import FooterLinks from "@/components/layout/footer/FooterLinks.astro";
+import FooterCopyright from "@/components/layout/footer/FooterCopyright.astro";
+import layoutText from "@/data/layoutText.json";
+import { twitter, github_sns, /* instagram, */ about, contact, mail } from "@/config/ui";
 
 interface ContactType {
   className: {
@@ -34,13 +34,13 @@ const typedContact = contact as ContactType;
         <FooterHeader footerHeader="About Me" />
         <div class="footer__textInner">
           <p class="footer__text_ja">
-            {footerText.aboutMe.ja}
+            {layoutText.footer.aboutMe.ja}
           </p>
           <p class="footer__text_en">
-            {footerText.aboutMe.en1}
+            {layoutText.footer.aboutMe.en1}
           </p>
           <p class="footer__text_en">
-            {footerText.aboutMe.en2}
+            {layoutText.footer.aboutMe.en2}
           </p>
         </div>
         <ul class="footer__snsMenu">
@@ -98,13 +98,13 @@ const typedContact = contact as ContactType;
         <FooterHeader footerHeader="Contact Me" />
         <div class="footer__textInner">
           <p class="footer__text_ja">
-            {footerText.contactMe.ja1}
+            {layoutText.footer.contactMe.ja1}
           </p>
           <p class="footer__text_ja">
-            {footerText.contactMe.ja2}
+            {layoutText.footer.contactMe.ja2}
           </p>
           <p class="footer__text_en">
-            {footerText.contactMe.en}
+            {layoutText.footer.contactMe.en}
           </p>
         </div>
         <ul class="footer__contactMenu">

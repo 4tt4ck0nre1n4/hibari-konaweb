@@ -20,7 +20,7 @@ PageSpeed Insights診断結果（モバイル）:
 
 #### 改善策
 1. **Swiperライブラリの遅延読み込み**
-   - `SwiperMenu.astro`と`SwiperDisplay.astro`でSwiperを動的インポート
+   - `layout/side/SwiperMenu.astro` と `layout/SwiperDisplay.astro` で Swiper を動的インポート
    - Intersection Observerでビューポートに入った時に読み込む
 
 2. **Reactコンポーネントのハイドレーション最適化**

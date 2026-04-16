@@ -22,7 +22,7 @@
 - WordPress 5.0以降
 - Contact Form 7プラグイン（最新版）
 - PHP 7.4以降
-- 実装済みのPDF生成機能（`src/utils/generatePDF.ts`）
+- 実装済みのPDF生成機能（`src/pricing/generatePDF.ts`）
 
 ---
 
@@ -500,7 +500,7 @@ document.querySelector('input[name="estimate-pdf"]');
 
 2. ファイルサイズ制限を変更:
 ```typescript
-// src/utils/generatePDF.ts
+// src/pricing/generatePDF.ts
 const MAX_PDF_SIZE = 10 * 1024 * 1024; // 10MBに変更
 ```
 

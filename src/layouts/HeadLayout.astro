@@ -1,12 +1,12 @@
 ---
-import Favicon from "../components/Favicon.astro";
-import GoogleAnalytics from "../components/GoogleAnalytics.astro";
-import NonCriticalFonts from "../components/NonCriticalFonts.astro";
-import PersonSchema from "../components/PersonSchema.astro";
-import WebSiteSchema from "../components/WebSiteSchema.astro";
-import "../styles/reset.css";
-import "../styles/global.css";
-import globalText from "../data/globalText.json";
+import Favicon from "@/components/Favicon.astro";
+import GoogleAnalytics from "@/components/seo/GoogleAnalytics.astro";
+import NonCriticalFonts from "@/components/seo/NonCriticalFonts.astro";
+import PersonSchema from "@/components/seo/PersonSchema.astro";
+import WebSiteSchema from "@/components/seo/WebSiteSchema.astro";
+import "@/styles/reset.css";
+import "@/styles/global.css";
+import { SITE as globalText } from "@/config/site";
 import { ClientRouter } from "astro:transitions";
 
 interface Props {
@@ -66,7 +66,6 @@ const cspContent = isDev
   <meta name="description" content={description} />
   <Favicon />
   <meta name="generator" content={Astro.generator} />
-  <meta name="keywords" content={globalText.global.keywords} />
   <meta name="color-scheme" content={globalText.global.colorScheme} />
   <meta name="theme-color" content={globalText.global.themeColor} />
   <meta name="author" content={globalText.global.author} />
@@ -178,20 +177,18 @@ const cspContent = isDev
     html.dark footer {
       background-color: transparent;
     }
-
     body {
       width: 100%;
       max-width: 100%;
       min-height: 100vh;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
-      text-rendering: optimizespeed;
+      text-rendering: optimizeSpeed;
       min-block-size: 100%;
       overflow-x: hidden;
       /* レイアウトシフト防止: 初期サイズを明示的に設定 */
       position: relative;
     }
-
     /* スマホサイズでのbody最適化（レイアウトシフト対策） */
     @media (width <= 768px) {
       body {
@@ -202,7 +199,6 @@ const cspContent = isDev
         height: auto;
       }
     }
-
     /* 超小型スマホサイズでのbody最適化 */
     @media (width <= 480px) {
       body {
@@ -226,7 +222,6 @@ const cspContent = isDev
       color: inherit;
       text-decoration: none;
     }
-
     button {
       text-align: center;
     }
@@ -248,13 +243,11 @@ const cspContent = isDev
       position: relative;
       z-index: 1;
     }
-
     @media (width <= 480px) {
       #page-wrap {
         margin-block-start: 7rem;
       }
     }
-
     /* Header クリティカルCSS */
     .header {
       width: 100%;
@@ -291,25 +284,21 @@ const cspContent = isDev
       padding-block: 0.5rem;
       padding-inline: 0.5rem;
     }
-
     /* タブレットサイズの調整 */
     @media (480px <= width <= 1024px) {
       .header {
         height: 80px;
         width: 100%;
       }
-
       .header__wrapper {
         width: 100%;
         max-width: 100%;
       }
-
       .header__inner {
         flex-wrap: wrap;
         gap: 0.5rem;
         width: 100%;
       }
-
       .header__logo_text,
       .header__logo_whiteText {
         width: auto;
@@ -317,60 +306,49 @@ const cspContent = isDev
         height: 24px;
       }
     }
-
     /* 480px以下でのスマホ最適化 */
     @media (width <= 480px) {
       .header {
         height: 128px;
       }
-
       .header__wrapper {
         max-width: 100%;
         padding-inline: 0;
       }
-
       .header__inner {
         flex-direction: column;
         gap: 0.75rem;
         align-items: center;
       }
-
       .header__logo {
         order: 1;
       }
-
       .header__nav {
         order: 2;
         width: 100%;
       }
-
       .header__logo_image {
         width: 40px;
         height: 40px;
       }
-
       .header__logo_text,
       .header__logo_whiteText {
         height: 24px;
         width: auto;
       }
     }
-
     /* iPhone特有の調整 - ロゴのスペースをAndroidと同じに */
     @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
       .header__logo_container {
         margin-inline: 0.25rem;
       }
-
       .header__logo_image {
         margin-inline: 0.25rem;
       }
-
       .header__logo_text,
       .header__logo_whiteText {
         margin-inline: 0.25rem;
       }
-
       /* スクロール時も並列配置を維持 */
       .header__logo_link {
         display: flex;
@@ -389,7 +367,6 @@ const cspContent = isDev
       display: inline-block;
       vertical-align: middle;
     }
-
     .header__logo_image {
       width: 40px;
       height: auto;
@@ -409,14 +386,12 @@ const cspContent = isDev
         transform 0.3s ease,
         box-shadow 0.4s ease;
     }
-
     /* iPhone特有の調整 - スクロール時も並列配置を維持 */
     @media (width <= 480px) and (-webkit-min-device-pixel-ratio: 2) {
       .header__logo_image.is-scroll {
         margin-inline: 0.25rem;
       }
     }
-
     .header__clock_animation {
       position: absolute;
       top: 50%;
@@ -427,7 +402,6 @@ const cspContent = isDev
       z-index: 1;
       pointer-events: none;
     }
-
     .clock-circle {
       stroke: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
       stroke: #4ecdc4;
@@ -435,15 +409,12 @@ const cspContent = isDev
       transform: rotate(-90deg);
       transition: stroke-dashoffset 1s ease-in-out;
     }
-
     .header.is-scroll .clock-circle {
       stroke: #45b7d1;
     }
-
     html.dark .clock-circle {
       stroke: #ffeaa7;
     }
-
     html.dark .header.is-scroll .clock-circle {
       stroke: #96ceb4;
     }
@@ -578,7 +549,6 @@ const cspContent = isDev
     .header__menu_link svg {
       color: inherit;
     }
-
     .logo__wrapper {
       width: 100vw;
       height: 100vh;
@@ -596,17 +566,14 @@ const cspContent = isDev
         opacity 0.8s ease-in-out,
         visibility 0.8s ease-in-out;
     }
-
     .logo__wrapper.hidden {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
     }
-
     html.dark .logo__wrapper {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     }
-
     .loading-content {
       display: flex;
       flex-direction: column;
@@ -618,14 +585,12 @@ const cspContent = isDev
       min-height: 400px; /* CLSを防ぐために最小高さを設定 */
       padding: 2rem;
     }
-
     .logo-container {
       position: relative;
       overflow: hidden;
       aspect-ratio: 1 / 1;
       margin-bottom: 2rem;
     }
-
     .logo-image {
       width: 120px;
       height: 120px;
@@ -633,7 +598,6 @@ const cspContent = isDev
       will-change: transform;
       object-fit: contain;
     }
-
     .title {
       margin-bottom: 2rem;
       position: relative;
@@ -643,13 +607,11 @@ const cspContent = isDev
       gap: 0.5rem;
       will-change: transform, opacity;
     }
-
     .title-row {
       display: flex;
       align-items: center;
       justify-content: center;
     }
-
     .text-stroke {
       font-family: "Poppins", sans-serif;
       font-size: 3rem;
@@ -663,7 +625,6 @@ const cspContent = isDev
       text-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
       display: inline-block;
     }
-
     html.dark .text-stroke {
       color: var(--color-white);
       background-image: var(--gradient-text);
@@ -673,7 +634,6 @@ const cspContent = isDev
       background-position: 0%;
       animation: flowingGradation 6s ease-in infinite;
     }
-
     .text-gradient {
       display: inline-block;
       font-size: 3rem;
@@ -687,11 +647,9 @@ const cspContent = isDev
       z-index: 3;
       animation: flowingGradation 6s ease-in infinite;
     }
-
     .loading-spinner {
       margin-top: 1rem;
     }
-
     .spinner {
       width: 40px;
       height: 40px;
@@ -701,12 +659,10 @@ const cspContent = isDev
       will-change: transform, opacity;
       /* CSS animation disabled - using GSAP instead */
     }
-
     html.dark .spinner {
       border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
       border-top: var(--color-white) 3px solid;
     }
-
     @keyframes flowingGradation {
       0% {
         background-position: 0% 50%;
@@ -718,7 +674,6 @@ const cspContent = isDev
         background-position: 0% 50%;
       }
     }
-
     @keyframes spin {
       0% {
         transform: rotate(0deg);
@@ -727,47 +682,38 @@ const cspContent = isDev
         transform: rotate(360deg);
       }
     }
-
     /* レスポンシブデザイン */
     @media (width <= 768px) {
       .text-stroke,
       .text-gradient {
         font-size: 2.5rem;
       }
-
       .logo-image {
         width: 100px;
       }
-
       .title {
         gap: 0.3rem;
       }
     }
-
     @media (width <= 480px) {
       .text-stroke,
       .text-gradient {
         font-size: 2rem;
       }
-
       .logo-image {
         width: 80px;
       }
-
       .title {
         gap: 0.2rem;
       }
     }
-
     .fv {
       position: relative;
       pointer-events: none; /* カードへのクリックを通過させる */
     }
-
     .fv > * {
       pointer-events: auto; /* 子要素は通常通りクリック可能 */
     }
-
     .fv__wrapper {
       height: 100%;
       min-height: 100vh; /* CLS防止: 最小高さを設定してレイアウトシフトを防止 */
@@ -780,7 +726,6 @@ const cspContent = isDev
       pointer-events: none; /* カードへのクリックを通過させる */
       z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
     }
-
     /* LCP最適化: 背景画像を<img>タグとして使用し、fetchpriority="high"を適用 */
     .fv__background-image {
       position: absolute;
@@ -795,7 +740,6 @@ const cspContent = isDev
       /* 画像読み込み中の背景色 */
       background-color: #1d1f20;
     }
-
     /* スマホサイズ（768px以下）での背景画像最適化 */
     @media (width <= 768px) {
       .fv__background-image {
@@ -804,7 +748,6 @@ const cspContent = isDev
         object-position: center center;
       }
     }
-
     /* タブレットサイズ（769px-1024px）での背景画像最適化 */
     @media (769px <= width <= 1024px) {
       .fv__background-image {
@@ -813,11 +756,9 @@ const cspContent = isDev
         object-position: center center;
       }
     }
-
     .fv__wrapper > * {
       pointer-events: auto; /* 子要素は通常通りクリック可能 */
     }
-
     .fv__wrapper::after {
       content: "";
       position: absolute;
@@ -828,7 +769,6 @@ const cspContent = isDev
       box-shadow: inset 10px 100px 200px rgb(0 0 0 / 0.6);
       pointer-events: none;
     }
-
     /* 背景画像コンテナ */
     .background-container {
       position: absolute;
@@ -853,7 +793,6 @@ const cspContent = isDev
         transparent 100%
       );
     }
-
     /* スマホサイズでマウス追従の円を小さくする */
     @media (width <= 480px) {
       .background-container {
@@ -872,7 +811,6 @@ const cspContent = isDev
         );
       }
     }
-
     .background-rotated {
       position: absolute;
       top: 0;
@@ -887,12 +825,10 @@ const cspContent = isDev
       pointer-events: none;
       z-index: 0 !important;
     }
-
     .background {
       /* マスク位置を更新するためのダミー要素として保持 */
       display: none;
     }
-
     @keyframes background-scroll-3d {
       from {
         background-position: 0% 50%;
@@ -903,7 +839,6 @@ const cspContent = isDev
         transform: translateX(0);
       }
     }
-
     .glitch-container {
       width: 100%;
       height: 100vh;
@@ -918,14 +853,12 @@ const cspContent = isDev
       /* CLS改善: 初期サイズを明示的に設定してレイアウトシフトを防止 */
       min-height: 500px; /* Glitchコンポーネントの最小高さに合わせる */
     }
-
     /* モバイルサイズでのglitch-container最適化 */
     @media (width <= 480px) {
       .glitch-container {
         min-height: 400px; /* モバイル用Glitchコンポーネントの高さに合わせる */
       }
     }
-
     .glitch-container > * {
       pointer-events: auto; /* 子要素は通常通りクリック可能 */
     }
@@ -934,7 +867,6 @@ const cspContent = isDev
     .glitch-container > *:not(.navi-card__wrapper) {
       z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
     }
-
     @keyframes noise {
       0% {
         background-position: 0 0;
@@ -960,7 +892,6 @@ const cspContent = isDev
       <script is:inline type="application/ld+json" set:html={jsonLd} />
     )
   }
-
   <!-- フォントは@fontsource/poppinsをLayout.astroでインポート済み -->
 
   <!-- 非クリティカルなフォントの遅延読み込み -->

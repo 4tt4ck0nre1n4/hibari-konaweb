@@ -1,15 +1,31 @@
 ---
-import Layout from "../../../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import { generateBreadcrumbs } from "../../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
-import globalText from "../../../data/globalText.json";
-import { CATEGORY_PAGE_API } from "../../../api/headlessCms";
-import SafeIcon from "../../../components/SafeIcon.astro";
+import { SITE as globalText } from "@/config/site";
+import { CATEGORY_PAGE_API } from "@/api/headlessCms";
+import SafeIcon from "@/components/ui/SafeIcon.astro";
+import { stripHtmlForMeta } from "@/util/stripHtml";
+
+/** `strict-boolean-expressions` 対策: 文字列を `||` で繋がない */
+function firstNonEmptyString(primary: string, secondary: string): string {
+  if (primary !== "") {
+    return primary;
+  }
+  return secondary;
+}
 
 interface Category {
   id: number;
   name: string;
   slug: string;
+  /** WordPress コアのカテゴリー説明 */
+  description?: string;
+  acf?: {
+    /** ACF でカテゴリーに追加した一覧ページ用説明（任意） */
+    description?: string;
+    archive_description?: string;
+  };
 }
 
 let categories: Category[] = [];
@@ -25,6 +41,32 @@ try {
     console.error("Error fetching categories:", error);
   }
 }
+
+const envSeoSlug =
+  typeof import.meta.env.PUBLIC_CATEGORY_INDEX_SEO_CATEGORY_SLUG === "string"
+    ? import.meta.env.PUBLIC_CATEGORY_INDEX_SEO_CATEGORY_SLUG.trim()
+    : "";
+const seoOnlyCategorySlugConfigured: string = globalText.categories.seoOnlyCategorySlug;
+const seoOnlySlug = envSeoSlug !== "" ? envSeoSlug : seoOnlyCategorySlugConfigured.trim();
+const seoCategory = seoOnlySlug !== "" ? categories.find((c) => c.slug === seoOnlySlug) : undefined;
+
+const rawWpDescription =
+  typeof seoCategory?.acf?.archive_description === "string" && seoCategory.acf.archive_description.trim() !== ""
+    ? seoCategory.acf.archive_description
+    : typeof seoCategory?.acf?.description === "string" && seoCategory.acf.description.trim() !== ""
+      ? seoCategory.acf.description
+      : typeof seoCategory?.description === "string"
+        ? seoCategory.description
+        : "";
+
+const metaFromWordPress = rawWpDescription !== "" ? stripHtmlForMeta(rawWpDescription) : "";
+
+const layoutDescription =
+  metaFromWordPress !== ""
+    ? metaFromWordPress
+    : firstNonEmptyString(globalText.categories.description, globalText.blog.description);
+
+const categoriesForDisplay = seoOnlySlug !== "" ? categories.filter((c) => c.slug !== seoOnlySlug) : categories;
 
 const categoryTitle = "Category";
 const categoryText = "カテゴリー記事の一覧です。";
@@ -43,12 +85,12 @@ const categoryIcon = {
 
 <Layout
   title={globalText.categories.title}
-  description={globalText.categories.description}
+  description={layoutDescription}
   ogType={globalText.local.type}
   ogTitle={globalText.categories.title}
-  ogDescription={globalText.categories.description}
+  ogDescription={layoutDescription}
   twitterTitle={globalText.categories.title}
-  twitterDescription={globalText.categories.description}
+  twitterDescription={layoutDescription}
 >
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />
@@ -66,8 +108,8 @@ const categoryIcon = {
         </div>
         <ul class="category__menu">
           {
-            categories.length > 0 ? (
-              categories.map((category: Category) => (
+            categoriesForDisplay.length > 0 ? (
+              categoriesForDisplay.map((category: Category) => (
                 <li class="category__menu_item">
                   <a
                     class="category__menu_link"

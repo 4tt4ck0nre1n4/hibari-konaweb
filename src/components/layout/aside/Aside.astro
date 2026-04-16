@@ -1,0 +1,317 @@
+---
+import Search from "./Search.astro";
+import Clock from "./Clock.astro";
+import SoundToggle from "./SoundToggle";
+import ParticlesComponent from "./ParticlesComponent.tsx";
+import ClockIcon from "./ClockIcon.astro";
+import GridSwitch from "./GridSwitch.astro";
+import ConfettiButton from "./ConfettiButton.astro";
+---
+
+<div class="aside__container">
+  <div class="clock-search__container">
+    <div class="clock__wrapper">
+      <Clock />
+    </div>
+    <div class="search__wrapper">
+      <Search />
+    </div>
+  </div>
+  <div class="particles-tools__container">
+    <div class="particles__wrapper">
+      <div class="particles__container">
+        <!-- パフォーマンス最適化: ローディング画面が消えた後に読み込む -->
+        <ParticlesComponent client:idle />
+      </div>
+    </div>
+    <div class="tools__wrapper">
+      <!-- TBT改善: ビューポートに入った時に読み込む（client:idle → client:visible） -->
+      <SoundToggle client:visible />
+      <ClockIcon />
+      <GridSwitch />
+      <ConfettiButton />
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .aside__container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .clock-search__container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .clock__wrapper {
+    background: transparent;
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
+    border-radius: 1rem;
+    padding-block: 1rem;
+    padding-inline: 0.5rem;
+    transition: box-shadow 0.4s ease;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0; /* gridアイテムが適切に縮小できるように */
+  }
+  .clock__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
+  }
+  html.dark .clock__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
+  }
+
+  .search__wrapper {
+    background: transparent;
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
+    border-radius: 1rem;
+    padding-block: 1rem;
+    padding-inline: 0.5rem;
+    transition: box-shadow 0.4s ease;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0; /* gridアイテムが適切に縮小できるように */
+  }
+  .search__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
+  }
+  html.dark .search__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
+  }
+
+  .particles-tools__container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+    min-height: 0; /* flexアイテムが縮小できるように */
+  }
+
+  .particles__wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
+    border-radius: 1rem;
+    position: relative;
+    padding-block: 1rem;
+    padding-inline: 0.5rem;
+    transition: box-shadow 0.4s ease;
+    box-sizing: border-box;
+  }
+  .particles__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
+  }
+  html.dark .particles__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
+  }
+
+  .particles-container {
+    width: 100%;
+    position: relative;
+  }
+
+  .particles__container {
+    /* ラッパー側では中央寄せだけ行い、中身のレイアウトはモジュールCSSに任せる */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .tools__wrapper {
+    height: 100%;
+    min-height: 120px; /* CLS対策: 固定の最小高さを設定 */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    align-items: center;
+    justify-items: center;
+    place-items: center;
+    background: transparent;
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
+    border-radius: 1rem;
+    position: relative;
+    padding-block: 1.25rem;
+    padding-inline: 0.5rem;
+    transition: box-shadow 0.4s ease;
+    aspect-ratio: auto;
+    box-sizing: border-box;
+  }
+  .tools__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
+  }
+  html.dark .tools__wrapper:is(:hover, :focus-visible) {
+    box-shadow: 0 16px 8px rgb(255 255 255 / 0.6);
+  }
+
+  #soundToggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-white);
+    border: transparent 1px solid;
+    border-radius: 1rem;
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.6);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    transition:
+      transform 0.1s ease,
+      background 0.4s ease-in-out,
+      box-shadow 0.4s ease;
+  }
+  #soundToggle:is(:hover, :focus-visible) {
+    background: transparent;
+    box-shadow: 0 16px 8px rgb(0 0 0 / 0.6);
+  }
+  #soundToggle:active {
+    background: transparent;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.4);
+    transform: scale(0.8);
+  }
+  #soundToggle svg {
+    width: 40px !important;
+    height: 40px !important;
+    display: inline-flex;
+    filter: drop-shadow(10px 20px 20px rgb(160 160 160 / 0.7));
+    transition:
+      opacity 1.8s ease,
+      transform 0.35s ease;
+  }
+  #soundToggle svg:is(:hover, :focus-visible) {
+    transform: scale(1.1);
+  }
+
+  @media (width <= 768px) {
+    .clock-search__container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.25rem;
+      margin-block-start: 3rem;
+      align-items: stretch;
+    }
+
+    .clock__wrapper,
+    .search__wrapper {
+      width: 100%;
+      margin-bottom: 0;
+      min-width: 0; /* gridアイテムが適切に縮小できるように */
+      padding-block: 0.5rem;
+      padding-inline: 0.25rem;
+    }
+
+    .particles__container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .particles-tools__container {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      margin-block-start: 1rem;
+      align-items: stretch;
+    }
+
+    .particles__wrapper {
+      flex: 1;
+      height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      min-height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      max-height: 120px;
+      padding-block: 1.25rem; /* tools__wrapperと同じpadding-blockに統一 */
+      padding-inline: 0.25rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tools__wrapper {
+      flex: 1;
+      height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      min-height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      max-height: 120px;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 0.25rem;
+      padding-block: 1.25rem; /* tools__wrapperと同じpadding-blockに統一 */
+      padding-inline: 0.25rem;
+    }
+  }
+
+  @media (width <= 1024px) and (width > 768px) {
+    .clock-search__container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.25rem;
+      margin-block-start: 3rem;
+      align-items: stretch;
+    }
+
+    .clock__wrapper,
+    .search__wrapper {
+      width: 100%;
+      margin-bottom: 0;
+      min-width: 0; /* gridアイテムが適切に縮小できるように */
+      padding-block: 0.5rem;
+      padding-inline: 0.25rem;
+    }
+
+    .particles__container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .particles-tools__container {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      margin-block-start: 1rem;
+      align-items: stretch;
+    }
+
+    .particles__wrapper {
+      flex: 1;
+      height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      min-height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      max-height: 120px;
+      padding-block: 1.25rem; /* tools__wrapperと同じpadding-blockに統一 */
+      padding-inline: 0.25rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tools__wrapper {
+      flex: 1;
+      height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      min-height: 120px; /* tools__wrapperと同じ120pxに統一 */
+      max-height: 120px;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 0.25rem;
+      padding-block: 1.25rem; /* tools__wrapperと同じpadding-blockに統一 */
+      padding-inline: 0.25rem;
+    }
+  }
+</style>

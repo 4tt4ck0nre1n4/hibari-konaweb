@@ -1,0 +1,234 @@
+---
+import RiveComponent from "@/components/layout/aside/RiveComponent.tsx";
+
+interface CardProps {
+  href: string;
+  ariaLabel: string;
+  ariaTitle: string;
+  cardTitle: string;
+  cardBody: string;
+  cardDetails: string;
+  serviceMenu?: Array<{ item: string }>;
+  src: string;
+  stateMachines?: string | string[];
+}
+
+const { href, ariaLabel, ariaTitle, cardTitle, cardBody, cardDetails, serviceMenu, src, stateMachines } =
+  Astro.props as CardProps;
+---
+
+<li class="card__item">
+  <article class="card__article">
+    <div class="card__flip-container">
+      <!-- 表面 -->
+      <div class="card__front">
+        <a class="card__item_link" href={href} aria-label={ariaLabel} title={ariaTitle}>
+          <h2 class="card__item_header">
+            {cardTitle}
+          </h2>
+          <p class="card__item_body">
+            {cardBody}
+          </p>
+          <div class="card__item_image">
+            <RiveComponent src={src} stateMachines={stateMachines} minWidth={300} minHeight={200} client:visible />
+          </div>
+          <button class="card__flip_arrow" type="button" aria-label="詳細を見る" title="詳細を見る">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14"></path>
+              <path d="M12 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </a>
+      </div>
+
+      <!-- 裏面 -->
+      <div class="card__back">
+        <div class="card__back_content">
+          <h2 class="card__back_header">
+            {cardTitle}
+          </h2>
+          <ul class="card__back_details">
+            {
+              Array.isArray(serviceMenu) ? (
+                serviceMenu.map((menuItem: { item: string }) => (
+                  <li class="card__back_details_item">{menuItem.item}</li>
+                ))
+              ) : typeof cardDetails === "string" ? (
+                <li class="card__back_details_item">{cardDetails}</li>
+              ) : null
+            }
+          </ul>
+          <button class="card__flip_back" type="button">&larr;</button>
+        </div>
+        <!-- 裏面全体をクリック可能にするためのオーバーレイ -->
+        <div class="card__back_overlay"></div>
+      </div>
+    </div>
+  </article>
+</li>
+
+<script>
+  // @ts-nocheck
+
+  // GSAPを動的にインポート（メインスレッド処理の最適化）
+  // トップレベルでインポートを開始
+  const gsapPromise = import("gsap");
+
+  // シンプルで確実なカードフリップ機能
+  async function initCardFlip() {
+    const { gsap } = await gsapPromise;
+    const cards = document.querySelectorAll(".card__item");
+
+    // フェーズ1: すべてのDOM要素を一度に読み取る
+    const cardData = Array.from(cards).map((card) => {
+      const flipContainer = card.querySelector(".card__flip-container");
+      const frontLink = card.querySelector(".card__front .card__item_link");
+      const backButton = card.querySelector(".card__flip_back");
+      const backOverlay = card.querySelector(".card__back_overlay");
+      const windowWidth = window.innerWidth;
+
+      return {
+        card,
+        flipContainer,
+        frontLink,
+        backButton,
+        backOverlay,
+        windowWidth,
+        isFlipped: false,
+        isAnimating: false,
+      };
+    });
+
+    // フェーズ2: 各カードにイベントリスナーを設定
+    cardData.forEach((data) => {
+      if (!data.flipContainer) return;
+
+      // フリップ実行関数（読み取りと書き込みを分離）
+      const flipCard = (toFlipped: boolean) => {
+        if (data.isAnimating) return;
+
+        // 既に目的の状態の場合は何もしない
+        if (data.isFlipped === toFlipped) return;
+
+        data.isAnimating = true;
+        data.isFlipped = toFlipped;
+
+        // アニメーション設定（読み取り済みの値を使用）
+        const duration = data.windowWidth <= 768 ? 0.3 : 0.4;
+
+        // フェーズ3: GSAP書き込みを実行
+        gsap.to(data.flipContainer, {
+          rotationY: toFlipped ? 180 : 0,
+          duration: duration,
+          ease: "power2.inOut",
+          force3D: true,
+          onComplete: () => {
+            data.isAnimating = false;
+          },
+        });
+
+        // フェーズ4: クラス状態を更新（書き込み）
+        if (toFlipped) {
+          data.flipContainer.classList.add("flipped");
+        } else {
+          data.flipContainer.classList.remove("flipped");
+        }
+      };
+
+      // 表面クリック処理
+      const handleFrontClick = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        flipCard(!data.isFlipped);
+      };
+
+      // 裏面クリック処理
+      const handleBackClick = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        flipCard(false);
+      };
+
+      // イベントリスナー設定（iPhone対応強化版）
+      if (data.frontLink) {
+        // タッチデバイス用（touchstart + touchend）
+        data.frontLink.addEventListener(
+          "touchstart",
+          (e) => {
+            e.preventDefault();
+          },
+          { passive: false }
+        );
+
+        data.frontLink.addEventListener("touchend", handleFrontClick, { passive: false });
+
+        // マウス用
+        data.frontLink.addEventListener("click", handleFrontClick);
+      }
+
+      if (data.backButton) {
+        data.backButton.addEventListener(
+          "touchstart",
+          (e) => {
+            e.preventDefault();
+          },
+          { passive: false }
+        );
+
+        data.backButton.addEventListener("touchend", handleBackClick, { passive: false });
+        data.backButton.addEventListener("click", handleBackClick);
+      }
+
+      if (data.backOverlay) {
+        data.backOverlay.addEventListener(
+          "touchstart",
+          (e) => {
+            e.preventDefault();
+          },
+          { passive: false }
+        );
+
+        data.backOverlay.addEventListener("touchend", handleBackClick, { passive: false });
+        data.backOverlay.addEventListener("click", handleBackClick);
+      }
+    });
+  }
+
+  // 初期化実行
+  function initializeCardFlip() {
+    const cards = document.querySelectorAll(".card__item");
+    if (cards.length === 0) return;
+
+    // 既に初期化済みの場合はスキップ
+    const uninitializedCards = Array.from(cards).filter((card) => !card.hasAttribute("data-initialized"));
+    if (uninitializedCards.length === 0) return;
+
+    initCardFlip();
+
+    // 初期化済みマークを追加
+    cards.forEach((card) => {
+      card.setAttribute("data-initialized", "true");
+    });
+  }
+
+  // DOM読み込み完了後に初期化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeCardFlip);
+  } else {
+    initializeCardFlip();
+  }
+
+  // Astroコンポーネント用の初期化
+  if (typeof window !== "undefined") {
+    setTimeout(initializeCardFlip, 100);
+  }
+</script>

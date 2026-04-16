@@ -1,12 +1,12 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import globalText from "../../data/globalText.json";
+import Layout from "@/layouts/Layout.astro";
+import { SITE as globalText } from "@/config/site";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
-import AboutHeading from "../../components/AboutHeading.astro";
-import { PricingSimulator } from "../../components/PricingSimulator";
-import IconifyInline from "../../components/IconifyInline";
-// import Subscription from "../../components/Subscription.astro";
+import AboutHeading from "@/components/about/AboutHeading.astro";
+import { PricingSimulator } from "@/components/service/PricingSimulator";
+import IconifyInline from "@/components/ui/IconifyInline";
+// import Subscription from "@/components/Subscription.astro";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
@@ -44,7 +44,7 @@ const leadBenefits = serviceSimulator.simulatorLeadBenefits;
     </div>
     <div class="pricing-simulator-wrapper">
       <div class="service-simulator-page-heading">
-        <AboutHeading aboutTitle="Price" aboutSubTitle="料金シミュレーターについて" />
+        <AboutHeading aboutTitle="Price" aboutSubTitle="料金シミュレーターについて" headingLevel={1} />
       </div>
       <div class="pricePage__wrapper service-simulator-lead">
         <section class="service-simulator-lead-card" aria-labelledby="simulator-lead-title">
@@ -372,6 +372,12 @@ const leadBenefits = serviceSimulator.simulatorLeadBenefits;
       flex-direction: column;
       align-items: center;
       gap: 0.35rem;
+    }
+  }
+
+  @media (width <= 480px) {
+    .service-simulator-lead-footer {
+      text-align: left;
     }
   }
 

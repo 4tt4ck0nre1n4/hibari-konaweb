@@ -1,0 +1,560 @@
+import type { ComponentType } from "react";
+import { useState, useEffect, useRef, useLayoutEffect, useCallback } from "react";
+import hamburgerStyles from "@/styles/hamburgerStyles.module.css";
+import ReactDOM from "react-dom";
+import SnsLink from "@/components/navi/SnsLink";
+import { twitter, github_sns, contact, mail } from "@/config/ui";
+import HamburgerMenuLogo from "./HamburgerMenuLogo";
+import type { IconifyInlineProps } from "@/components/ui/IconifyInline";
+
+const title = "My Portfolio Site";
+
+type MenuItemConfig = {
+  label: string;
+  href: string;
+  ariaLabel: string;
+  ariaTitle: string;
+  icon: string;
+  subLabel: string;
+  sectionBorderTop?: boolean;
+};
+
+const menuItems: MenuItemConfig[] = [
+  {
+    label: "Home",
+    href: "/",
+    ariaLabel: "トップページへ戻る",
+    ariaTitle: "トップページへ戻る",
+    icon: "flat-color-icons:home",
+    subLabel: "トップページへ戻る",
+  },
+  {
+    label: "Blog",
+    href: "/blog",
+    ariaLabel: "ブログページへ",
+    ariaTitle: "ブログページへ",
+    icon: "vscode-icons:file-type-libreoffice-writer",
+    subLabel: "ブログ記事を見る",
+  },
+  {
+    label: "About",
+    href: "/about",
+    ariaLabel: "アバウトページへ",
+    ariaTitle: "アバウトページへ",
+    icon: "streamline-ultimate-color:laptop-user",
+    subLabel: "私について",
+    sectionBorderTop: true,
+  },
+  {
+    label: "Works",
+    href: "/works",
+    ariaLabel: "ワークスページへ",
+    ariaTitle: "ワークスページへ",
+    icon: "emojione-v1:laptop-computer",
+    subLabel: "制作実績を見る",
+  },
+  {
+    label: "Service",
+    href: "/service",
+    ariaLabel: "サービスページへ",
+    ariaTitle: "サービスページへ",
+    icon: "streamline-ultimate-color:cash-payment-sign-2",
+    subLabel: "私の提供するサービス",
+  },
+  {
+    label: "Contact",
+    href: "/contact",
+    ariaLabel: "お問い合わせページへ",
+    ariaTitle: "お問い合わせページへ",
+    icon: "fluent-emoji-flat:envelope",
+    subLabel: "お問い合わせページへ",
+    sectionBorderTop: true,
+  },
+];
+
+const startYear = 2025;
+const currentYear = new Date().getFullYear();
+const displayYear = currentYear > startYear ? `${startYear} - ${currentYear}` : `${startYear}`;
+const copyright = "hibari-konaweb.com All Rights Reserved.";
+
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+const HamburgerMenu = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [IconifyInline, setIconifyInline] = useState<ComponentType<IconifyInlineProps> | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const [currentPath, setCurrentPath] = useState("");
+  const [portalTarget, setPortalTarget] = useState<Element | null>(null);
+  const firstMenuLinkRef = useRef<HTMLAnchorElement | null>(null);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
+  const scrollPositionRef = useRef<number>(0);
+
+  const closeMenu = () => setIsOpen(false);
+  const toggleMenu = () => {
+    if (!isOpen) {
+      previouslyFocusedElementRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+      // ネットワーク依存関係ツリー最適化: メニューを開くタイミングでアイコン描画用のコンポーネントを遅延ロード
+      if (!IconifyInline) {
+        // クリティカルパスをブロックしないように、アイコン読み込みを非同期で実行
+        const loadIconify = () => {
+          import("@/components/ui/IconifyInline")
+            .then((mod) => {
+              setIconifyInline(() => mod.default);
+            })
+            .catch(() => {
+              // 失敗時はアイコン無しで動作（メニュー自体は開ける）
+              setIconifyInline(null);
+            });
+        };
+
+        // requestIdleCallbackで遅延読み込み（クリティカルパスをブロックしない）
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(loadIconify, { timeout: 3000 });
+        } else {
+          // フォールバック: setTimeoutで遅延読み込み
+          setTimeout(loadIconify, 200);
+        }
+      }
+    }
+    setIsOpen((prev) => !prev);
+  };
+
+  // 現在のパスを取得
+  useEffect(() => {
+    setCurrentPath(window.location.pathname);
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    setPortalTarget(document.getElementById("overlay-root"));
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const updateOverlayMetrics = () => {
+      // フェーズ1: すべてのDOM読み取りを一度に実行
+      const menuEl = menuRef.current;
+      const overlayEl = overlayRef.current;
+
+      if (!menuEl || !overlayEl) return;
+
+      const rect = menuEl.getBoundingClientRect();
+      const top = Math.max(rect.top, 0);
+      const left = Math.max(rect.left, 0);
+      const width = Math.max(rect.width, 0);
+      const height = Math.max(rect.height, 0);
+
+      // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+      requestAnimationFrame(() => {
+        overlayEl.style.setProperty("--menu-top", `${top}px`);
+        overlayEl.style.setProperty("--menu-left", `${left}px`);
+        overlayEl.style.setProperty("--menu-width", `${width}px`);
+        overlayEl.style.setProperty("--menu-height", `${height}px`);
+      });
+    };
+
+    // メインスレッド処理の最適化: デバウンスでリサイズ/スクロールイベントの実行頻度を制限
+    const debouncedUpdate = (() => {
+      let timeoutId: ReturnType<typeof setTimeout> | null = null;
+      return () => {
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+          requestAnimationFrame(updateOverlayMetrics);
+        }, 150); // 150msでデバウンス
+      };
+    })();
+
+    // 初期化時もrequestAnimationFrame内で実行（強制リフローを避ける）
+    requestAnimationFrame(updateOverlayMetrics);
+
+    const resizeObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(debouncedUpdate) : null;
+    if (resizeObserver && menuRef.current) {
+      resizeObserver.observe(menuRef.current);
+    }
+
+    window.addEventListener("resize", debouncedUpdate, { passive: true });
+    window.addEventListener("scroll", debouncedUpdate, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", debouncedUpdate);
+      window.removeEventListener("scroll", debouncedUpdate);
+      resizeObserver?.disconnect();
+    };
+  }, [isOpen]);
+
+  // メインスレッド処理の最適化: useCallbackでメモ化（不要な再作成を防止）
+  const getMenuFocusableElements = useCallback(() => {
+    const elements: HTMLElement[] = [];
+    if (menuRef.current) {
+      elements.push(
+        ...Array.from(
+          menuRef.current.querySelectorAll<HTMLElement>("a[href], button, [tabindex]:not([tabindex='-1'])")
+        ).filter((element) => !element.hasAttribute("disabled") && element.getAttribute("aria-hidden") !== "true")
+      );
+    }
+    if (buttonRef.current) {
+      elements.push(buttonRef.current);
+    }
+    return elements;
+  }, []);
+
+  useEffect(() => {
+    // フェーズ1: すべてのDOM読み取りを一度に実行
+    const buttonEl = buttonRef.current;
+    const menuEl = menuRef.current;
+
+    // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+    requestAnimationFrame(() => {
+      if (buttonEl) {
+        buttonEl.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      }
+      if (menuEl) {
+        menuEl.setAttribute("aria-hidden", isOpen ? "false" : "true");
+      }
+    });
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!isOpen) return;
+
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      const menuEl = menuRef.current;
+      if (menuEl && menuEl.contains(target)) return;
+
+      const buttonEl = buttonRef.current;
+      if (buttonEl && buttonEl.contains(target)) return;
+
+      const overlayEl = overlayRef.current;
+      if (overlayEl && overlayEl.contains(target)) {
+        const clickableSegment = target.closest("[data-position]");
+        if (clickableSegment) {
+          closeMenu();
+        }
+        return;
+      }
+
+      closeMenu();
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMenu();
+
+      if (e.key === "Tab" && isOpen) {
+        // フェーズ1: すべてのDOM読み取りを一度に実行
+        const focusable = getMenuFocusableElements();
+
+        if (focusable.length === 0) return;
+
+        const preferredFirst =
+          firstMenuLinkRef.current && focusable.includes(firstMenuLinkRef.current)
+            ? firstMenuLinkRef.current
+            : (focusable.find((element) => element !== buttonRef.current) ?? focusable[0]);
+        const lastElement = focusable[focusable.length - 1];
+        const activeElement = document.activeElement as HTMLElement | null;
+        const menuElement = menuRef.current;
+        const isFocusInMenu = Boolean(
+          activeElement && menuElement && (menuElement.contains(activeElement) || activeElement === buttonRef.current)
+        );
+
+        // フェーズ2: フォーカス操作を実行（リフローを最小化）
+        if (!e.shiftKey && !isFocusInMenu) {
+          e.preventDefault();
+          requestAnimationFrame(() => {
+            preferredFirst?.focus({ preventScroll: true });
+          });
+          return;
+        }
+
+        if (!e.shiftKey && activeElement === buttonRef.current) {
+          e.preventDefault();
+          requestAnimationFrame(() => {
+            preferredFirst?.focus({ preventScroll: true });
+          });
+          return;
+        }
+
+        if (e.shiftKey && activeElement === preferredFirst) {
+          e.preventDefault();
+          requestAnimationFrame(() => {
+            lastElement?.focus();
+          });
+        } else if (!e.shiftKey && activeElement === lastElement) {
+          e.preventDefault();
+          requestAnimationFrame(() => {
+            preferredFirst?.focus();
+          });
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
+    // スクロールロック: メニューが開いている時は背景のスクロールを防ぐ
+    // フェーズ1: すべての読み取りを一度に実行
+    const scrollPosition: number = isOpen
+      ? window.scrollY !== undefined && window.scrollY !== null
+        ? window.scrollY
+        : document.documentElement.scrollTop
+      : 0;
+
+    // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
+    requestAnimationFrame(() => {
+      if (isOpen) {
+        // 現在のスクロール位置を保存
+        scrollPositionRef.current = scrollPosition;
+
+        // htmlとbodyの両方にoverflow: hiddenを設定（確実にスクロールを防ぐ）
+        document.documentElement.style.overflow = "hidden";
+        document.documentElement.style.position = "fixed";
+        document.documentElement.style.top = `-${scrollPositionRef.current}px`;
+        document.documentElement.style.width = "100%";
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+        document.body.style.top = `-${scrollPositionRef.current}px`;
+        document.body.style.width = "100%";
+      } else {
+        // スクロールロックを解除
+        document.documentElement.style.overflow = "";
+        document.documentElement.style.position = "";
+        document.documentElement.style.top = "";
+        document.documentElement.style.width = "";
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+
+        // 保存したスクロール位置に復元
+        window.scrollTo(0, scrollPositionRef.current);
+        scrollPositionRef.current = 0;
+      }
+    });
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+
+      // クリーンアップ: メニューが閉じられた時に確実にスクロールロックを解除
+      if (!isOpen) {
+        document.documentElement.style.overflow = "";
+        document.documentElement.style.position = "";
+        document.documentElement.style.top = "";
+        document.documentElement.style.width = "";
+        document.body.style.overflow = "";
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+      }
+    };
+  }, [isOpen, getMenuFocusableElements]);
+
+  useIsomorphicLayoutEffect(() => {
+    if (isOpen) {
+      const focusMenu = () => {
+        const focusable = getMenuFocusableElements();
+        const preferred = firstMenuLinkRef.current;
+        const firstElement =
+          preferred && focusable.includes(preferred)
+            ? preferred
+            : (focusable.find((element) => element !== buttonRef.current) ?? focusable[0]);
+        firstElement?.focus({ preventScroll: true });
+      };
+      const rAF = requestAnimationFrame(() => {
+        requestAnimationFrame(focusMenu);
+      });
+      return () => cancelAnimationFrame(rAF);
+    }
+
+    const previous = previouslyFocusedElementRef.current;
+    if (previous) {
+      requestAnimationFrame(() => {
+        previous.focus();
+      });
+      previouslyFocusedElementRef.current = null;
+    }
+
+    return undefined;
+  }, [isOpen]);
+
+  const overlayNode = isOpen ? (
+    <div
+      ref={overlayRef}
+      className={`${hamburgerStyles.hamburger__overlay} ${hamburgerStyles.hamburger__overlay_open}`}
+      aria-hidden="true"
+    >
+      <div className={hamburgerStyles.hamburger__overlay_segments}>
+        <div
+          className={hamburgerStyles.hamburger__overlay_segment}
+          data-position="top"
+          onClick={closeMenu}
+          role="presentation"
+        />
+        <div
+          className={hamburgerStyles.hamburger__overlay_segment}
+          data-position="bottom"
+          onClick={closeMenu}
+          role="presentation"
+        />
+        <div
+          className={hamburgerStyles.hamburger__overlay_segment}
+          data-position="left"
+          onClick={closeMenu}
+          role="presentation"
+        />
+        <div
+          className={hamburgerStyles.hamburger__overlay_segment}
+          data-position="right"
+          onClick={closeMenu}
+          role="presentation"
+        />
+      </div>
+    </div>
+  ) : null;
+
+  const menuNode = (
+    <div
+      id="hamburger-menu"
+      ref={menuRef}
+      className={`${hamburgerStyles.hamburger__menu} ${isOpen ? hamburgerStyles.open : ""}`}
+      aria-hidden="true"
+    >
+      <div className={hamburgerStyles.hamburger__logo_wrapper}>
+        <HamburgerMenuLogo />
+      </div>
+      <div className={hamburgerStyles.hamburger__title}>
+        <h2 className={hamburgerStyles.hamburger__title_text}>{title}</h2>
+      </div>
+      <ul>
+        {menuItems.map(({ label, href, icon, ariaLabel, ariaTitle, subLabel, sectionBorderTop }, index: number) => {
+          const isActive = currentPath === href || (href !== "/" && currentPath.startsWith(href));
+          return (
+            <li
+              key={label + subLabel + index.toString()}
+              className={`${hamburgerStyles.hamburger__menu_item} ${sectionBorderTop === true ? hamburgerStyles.hamburger__menu_item_sectionTop : ""}`}
+            >
+              <a
+                className={`${hamburgerStyles.hamburger__menu_link} ${isActive ? hamburgerStyles.active : ""}`}
+                href={href}
+                onClick={closeMenu}
+                aria-label={ariaLabel}
+                aria-current={isActive ? "page" : undefined}
+                title={ariaTitle}
+                ref={index === 0 ? firstMenuLinkRef : undefined}
+              >
+                {typeof icon === "string" && icon?.trim() !== "" && isOpen && IconifyInline ? (
+                  <IconifyInline
+                    icon={icon}
+                    className={hamburgerStyles.hamburger__menu_icon}
+                    width="36"
+                    height="36"
+                    aria-hidden
+                  />
+                ) : null}
+                <span className={hamburgerStyles.hamburger__menu_text}>
+                  <span className={hamburgerStyles.hamburger__menu_label}>{label}</span>
+                  <span className={hamburgerStyles.hamburger__menu_subLabel}>{subLabel}</span>
+                </span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+      <div className={hamburgerStyles.hamburger__sns}>
+        <ul className={hamburgerStyles.hamburger__snsMenu}>
+          <SnsLink
+            itemClassName={hamburgerStyles.hamburger__snsItem}
+            linkClassName={hamburgerStyles.hamburger__snsLink}
+            href={twitter.href}
+            snsIconSvg={twitter.icon}
+            ariaLabel={twitter.ariaLabel}
+            ariaTitle={twitter.ariaTitle}
+            targetBlank={twitter.targetBlank}
+          />
+          <SnsLink
+            itemClassName={hamburgerStyles.hamburger__snsItem}
+            linkClassName={hamburgerStyles.hamburger__snsLink}
+            href={github_sns.href}
+            snsIconSvg={github_sns.icon}
+            ariaLabel={github_sns.ariaLabel}
+            ariaTitle={github_sns.ariaTitle}
+            targetBlank={github_sns.targetBlank}
+          />
+          <SnsLink
+            itemClassName={hamburgerStyles.hamburger__snsItem}
+            linkClassName={hamburgerStyles.hamburger__snsLink}
+            href={contact.href}
+            snsIconSvg={contact.icon}
+            ariaLabel={contact.ariaLabel}
+            ariaTitle={contact.ariaTitle}
+          />
+          <SnsLink
+            itemClassName={hamburgerStyles.hamburger__snsItem}
+            linkClassName={hamburgerStyles.hamburger__snsLink}
+            href={mail.href}
+            snsIconSvg={mail.icon}
+            ariaLabel={mail.ariaLabel}
+            ariaTitle={mail.ariaTitle}
+            targetBlank={mail.targetBlank}
+          />
+        </ul>
+      </div>
+      <div className={hamburgerStyles.hamburger__copyright}>
+        <small className={hamburgerStyles.hamburger__copyright_text}>
+          <span className={hamburgerStyles.hamburger__copyright_year}>Copyright &copy; {displayYear}</span>
+          <span className={hamburgerStyles.hamburger__copyright_text}>{copyright}</span>
+        </small>
+      </div>
+    </div>
+  );
+
+  const menuWithOverlay = portalTarget ? (
+    ReactDOM.createPortal(
+      <>
+        {overlayNode}
+        {menuNode}
+      </>,
+      portalTarget
+    )
+  ) : (
+    <>
+      {overlayNode}
+      {menuNode}
+    </>
+  );
+
+  const buttonNode = (
+    <button
+      ref={buttonRef}
+      className={`${hamburgerStyles.hamburger__button} ${isOpen ? hamburgerStyles.open : ""}`}
+      onClick={toggleMenu}
+      aria-label={isOpen ? "メニューを閉じる" : "メニューを開く"}
+      aria-expanded="false"
+      aria-controls="hamburger-menu"
+      tabIndex={0}
+      type="button"
+    >
+      <span className={hamburgerStyles.hamburger__line} />
+    </button>
+  );
+
+  const buttonWithPortal = portalTarget && isOpen ? ReactDOM.createPortal(buttonNode, portalTarget) : buttonNode;
+
+  return (
+    <>
+      {buttonWithPortal}
+      {menuWithOverlay}
+    </>
+  );
+};
+
+export default HamburgerMenu;

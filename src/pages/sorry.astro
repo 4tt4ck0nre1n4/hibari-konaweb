@@ -1,21 +1,15 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import { Image } from "astro:assets";
 import sorryImage from "/public/assets/sorry.webp";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
-import globalText from "../data/globalText.json";
-import errorText from "../data/errorText.json";
+import { SITE as globalText } from "@/config/site";
+import errorText from "@/data/errorText.json";
 
 // 静的サイト生成でpagefindを使用するため、prerenderをtrueに設定
 export const prerender = true;
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "Sorry..." }];
-
-const sorryImageMeta = {
-  alt: "開発中のため立ち入り禁止を案内する猫の画像",
-  width: 200,
-  height: 200,
-};
 ---
 
 <Layout
@@ -40,9 +34,9 @@ const sorryImageMeta = {
     <Image
       class="sorry__image"
       src={sorryImage}
-      alt={sorryImageMeta.alt}
-      width={sorryImageMeta.width}
-      height={sorryImageMeta.height}
+      alt={errorText.sorry.imageAlt}
+      width={errorText.sorry.imageWidth}
+      height={errorText.sorry.imageHeight}
       loading="lazy"
       decoding="async"
     />

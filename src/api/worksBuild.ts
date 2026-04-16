@@ -1,7 +1,7 @@
 import type { GetStaticPaths } from "astro";
 import { buildSkipWordPress, headlessCmsApiPrefix, headlessCmsUrl } from "./headlessCms";
 import { rethrowIfWordPressUnreachable } from "./blogPostsBuild";
-import { worksSchema, type Works } from "../schemas/api.schema";
+import { worksSchema, type Works } from "@/schemas/api.schema";
 
 const WORKS_LIST_BUILD_QUERY = "works?context=embed&acf_format=standard&per_page=100";
 

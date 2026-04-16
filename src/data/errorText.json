@@ -7,7 +7,16 @@
       "text3": "",
       "text4": "",
       "text5": "へ戻るか、各メニューのリンクから目的のページをお探しください。"
-    }
+    },
+    "links": {
+      "href": "/",
+      "ariaLabel": "トップページへ戻る",
+      "ariaTitle": "トップページへ戻る",
+      "label": "トップページ"
+    },
+    "imageAlt": "404 Not Found Error エラーを案内する画像",
+    "imageWidth": 280,
+    "imageHeight": 280
   },
   "serverError": {
     "title": "500 Page Server error",
@@ -31,7 +40,10 @@
         "text": "お問い合わせ",
         "textAfter": "はこちらから"
       }
-    ]
+    ],
+    "imageAlt": "500 Server Error エラーを案内する猫の画像",
+    "imageWidth": 200,
+    "imageHeight": 200
   },
   "sorry": {
     "title": "すいません。このページは準備中です。",
@@ -44,6 +56,8 @@
       }
     ],
     "imageAlt": "開発中のため立ち入り禁止する猫の画像",
+    "imageWidth": 200,
+    "imageHeight": 200,
     "link": "<a class='sorry__link' href='/'> トップページ</a>に戻る"
   }
 }

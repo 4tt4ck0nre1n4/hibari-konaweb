@@ -35,8 +35,10 @@
 
 **1. client:onlyからclient:visibleへ変更**
 
+（旧 `GridRive.astro` は削除済み。現在は `about/Card.astro` などで `RiveComponent` を利用。）
+
 ```diff
-// src/components/GridRive.astro
+// src/components/about/Card.astro（Rive を表示するカード）
 - <RiveComponent client:only="react" />
 + <RiveComponent client:visible />
 ```
@@ -273,4 +275,5 @@ npm run preview
 
 ## 📅 更新履歴
 
+- **2026-04-16**: 未使用だった `GridRive.astro` 等を削除。Rive のコード例を `about/Card.astro` ベースの説明に更新
 - **2025-10-28**: 初版作成 - Rive、GSAP、Reactコンポーネントの遅延読み込み実装

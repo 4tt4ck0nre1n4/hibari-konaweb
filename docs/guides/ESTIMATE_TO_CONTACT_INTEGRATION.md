@@ -116,7 +116,7 @@ npm install --save-dev @types/html2pdf.js
 
 ### 2. PDF生成関数の実装
 
-**ファイル**: `src/utils/generatePDF.ts`
+**ファイル**: `src/pricing/generatePDF.ts`
 
 ```typescript
 import html2pdf from 'html2pdf.js';
@@ -178,7 +178,7 @@ export function generateEstimatePDFFromHTML(
 
 ```typescript
 import { useRef } from 'react';
-import { generateEstimatePDFFromHTML } from '../utils/generatePDF';
+import { generateEstimatePDFFromHTML } from '../pricing/generatePDF';
 
 export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
   const documentRef = useRef<HTMLDivElement>(null);
@@ -367,7 +367,7 @@ mkdir -p public/fonts
 3. **フォントを登録**
 
 ```typescript
-// src/utils/pdfFont.ts
+// src/pricing/pdfFont.ts
 import { jsPDF } from 'jspdf';
 
 export function addJapaneseFont(doc: jsPDF) {
@@ -382,7 +382,7 @@ export function addJapaneseFont(doc: jsPDF) {
 
 ### 3. PDF生成ユーティリティの作成
 
-**ファイル**: `src/utils/generatePDF.ts`
+**ファイル**: `src/pricing/generatePDF.ts`
 
 ```typescript
 import { jsPDF } from 'jspdf';
@@ -525,7 +525,7 @@ export function getPDFBase64(doc: jsPDF): string {
 **ファイル**: `src/components/EstimateDocument.tsx`
 
 ```typescript
-import { generateEstimatePDF, downloadPDF, getPDFBlob } from '../utils/generatePDF';
+import { generateEstimatePDF, downloadPDF, getPDFBlob } from '../pricing/generatePDF';
 
 export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
   // ... 既存のコード
@@ -859,7 +859,7 @@ function sanitize_uploaded_filename($filename) {
 ### 1. クライアント側のバリデーション
 
 ```typescript
-// src/utils/generatePDF.ts
+// src/pricing/generatePDF.ts
 
 /**
  * 見積データのバリデーション
@@ -899,7 +899,7 @@ const handleContact = async () => {
 ### 2. ファイルサイズの制限
 
 ```typescript
-// src/utils/generatePDF.ts
+// src/pricing/generatePDF.ts
 
 const MAX_PDF_SIZE = 5 * 1024 * 1024; // 5MB
 

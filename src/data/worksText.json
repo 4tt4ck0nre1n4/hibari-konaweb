@@ -6,6 +6,23 @@
     "text": "申し訳ございません。Worksページのデータを読み込むことができませんでした。もう一度お試しください。",
     "noIcon": "No icons available"
   },
+  "links": {
+    "ariaLabel": "のページへ(新しいタブで開きます)",
+    "ariaTitle": "のページへ(新しいタブで開きます)",
+    "targetBlank": "_blank"
+  },
+  "metaItems": {
+    "alt": "の画像",
+    "notFound": "No image available",
+    "width": 320,
+    "height": 160,
+    "quality": 95,
+    "format": "webp",
+    "ariaLabel": "のページへ",
+    "ariaTitle": "のページへ",
+    "ariaLabelNewTab": "のページへ(新しいタブで開きます)",
+    "ariaTitleNewTab": "のページへ(新しいタブで開きます)"
+  },
   "work-1": {
     "left_leadMenu": [
       {
@@ -121,5 +138,12 @@
         "body": "WordPressのAdvanced Custom Fields（ACF）REST APIとAstroのjsonファイルを活用し、WorksページやBlogページなどの情報を動的に管理。効率的な更新作業を可能にして、開発後の運用性にも配慮した設計にしています。"
       }
     ]
+  },
+  "pagination": {
+    "first": "最初のページへ",
+    "prev": "前のページへ",
+    "current": "現在のページ",
+    "next": "次のページへ",
+    "last": "最後のページへ"
   }
 }

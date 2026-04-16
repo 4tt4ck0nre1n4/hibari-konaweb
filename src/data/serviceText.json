@@ -1,5 +1,7 @@
 {
   "about": {
+    "aboutMeTitle": "About Me",
+    "aboutMeSubTitle": "私について。",
     "aboutHeader": "About Me ?",
     "aboutBody": [
       {
@@ -23,10 +25,24 @@
     ],
     "aboutText": "ポートフォリオサイトをご覧いただきありがとうございます。私は千葉県袖ケ浦市を拠点にフリーランスとして活動しているWebエンジニアです。",
     "aboutLikeHeader": "",
-    "aboutLikeText": ""
-
+    "aboutLikeText": "",
+    "imageMeta": {
+      "alt": "About Meのイメージ画像",
+      "width": 150,
+      "height": 300
+    }
+  },
+  "skill": {
+    "skillTitle": "Skills",
+    "skillSubTitle": "私の使用しているスキル・ツールをご紹介します。"
   },
   "service": {
+    "serviceTitle": "Service",
+    "serviceSubTitle": "私の提供するサービスについてご紹介します。",
+    "cardSrc1": "/riv/working-office.riv",
+    "cardSrc2": "/riv/designer-life.riv",
+    "cardSrc3": "/riv/web-developer.riv",
+    "cardSrc4": "/riv/fixing-site.riv",
     "text": "私のご提供しているサービスです。",
     "card1": {
       "serviceHeader": "AIコーディング",

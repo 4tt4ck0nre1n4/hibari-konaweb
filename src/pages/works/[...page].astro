@@ -1,13 +1,13 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import type { GetStaticPaths } from "astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
-import globalText from "../../data/globalText.json";
-import worksText from "../../data/worksText.json";
-import { WORKS_PAGE_API } from "../../api/headlessCms";
+import { SITE as globalText } from "@/config/site";
+import worksText from "@/data/worksText.json";
+import { WORKS_PAGE_API } from "@/api/headlessCms";
 import { Image } from "astro:assets";
-import { getOptimizedWordPressImage, getWordPressImageUrl } from "../../util/optimizeWordPressImage";
+import { getOptimizedWordPressImage, getWordPressImageUrl } from "@/util/optimizeWordPressImage";
 
 interface WorkObject {
   id: string;
@@ -191,26 +191,15 @@ const works = Array.isArray(page.data) ? page.data : [];
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
-const worksItems = {
-  alt: "の画像",
-  notFound: "No image available",
-  width: 320,
-  height: 160,
-  ariaLabel: "のページへ",
-  ariaTitle: "のページへ",
-  ariaLabelNewTab: "のページへ(新しいタブで開く)",
-  ariaTitleNewTab: "のページへ(新しいタブで開く)",
-};
-
 // WordPress画像を最適化（ビルド時に処理）
 // 高品質で最適化（quality: 95で高品質を維持）
 const optimizedWorks = await Promise.all(
   works.map(async (work) => {
     const optimizedImage = await getOptimizedWordPressImage(work.acf?.screenshot_pc, {
-      width: worksItems.width,
-      height: worksItems.height,
-      quality: 95, // 品質を85から95に向上
-      format: "webp",
+      width: worksText.metaItems.width,
+      height: worksText.metaItems.height,
+      quality: worksText.metaItems.quality,
+      format: worksText.metaItems.format as "webp" | "avif" | "png" | "jpg" | undefined,
     });
     const fallbackUrl = getWordPressImageUrl(work.acf?.screenshot_pc) ?? "";
     return {
@@ -229,13 +218,13 @@ const repeatedWorks = Array.from(
   (_, i) => optimizedWorks[i % optimizedWorks.length]
 );
 
-const worksPagination = {
-  first: "最初のページへ",
-  prev: "前のページへ",
-  current: "現在のページ",
-  next: "次のページへ",
-  last: "最後のページへ",
-};
+// const worksPagination = {
+//   first: "最初のページへ",
+//   prev: "前のページへ",
+//   current: "現在のページ",
+//   next: "次のページへ",
+//   last: "最後のページへ",
+// };
 ---
 
 <Layout
@@ -265,10 +254,10 @@ const worksPagination = {
                       {work?.optimizedImage ? (
                         <Image
                           src={work.optimizedImage.src}
-                          alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
+                          alt={`${work?.title?.rendered ?? "No Image Available"}${worksText.metaItems.alt}`}
                           class="scrollImage__image"
-                          width={worksItems.width}
-                          height={worksItems.height}
+                          width={worksText.metaItems.width}
+                          height={worksText.metaItems.height}
                           loading="lazy"
                           decoding="async"
                         />
@@ -276,9 +265,9 @@ const worksPagination = {
                         <img
                           class="scrollImage__image"
                           src={work?.fallbackUrl ?? ""}
-                          alt={`${work?.title?.rendered ?? "No Image Available"}${worksItems.alt}`}
-                          width={worksItems.width}
-                          height={worksItems.height}
+                          alt={`${work?.title?.rendered ?? "No Image Available"}${worksText.metaItems.alt}`}
+                          width={worksText.metaItems.width}
+                          height={worksText.metaItems.height}
                           decoding="async"
                           loading="lazy"
                         />
@@ -287,8 +276,8 @@ const worksPagination = {
                     <a
                       class="scrollImage__link"
                       href={work?.acf?.left_link ?? ""}
-                      aria-label={`${work?.acf?.left_link}${worksItems.ariaLabel}`}
-                      title={`${work?.acf?.left_link}${worksItems.ariaTitle}`}
+                      aria-label={`${work?.acf?.left_link}${worksText.metaItems.ariaLabel}`}
+                      title={`${work?.acf?.left_link}${worksText.metaItems.ariaTitle}`}
                       set:html={work?.acf?.left_link ?? ""}
                     />
                     <p class="scrollImage__text">{work?.acf?.right_access ?? "No additional information"}</p>
@@ -319,23 +308,23 @@ const worksPagination = {
                     <a
                       class="worksCard__slug"
                       href={`/works/${work.slug}`}
-                      aria-label={`${work?.title?.rendered}${worksItems.ariaLabel}`}
-                      title={`${work?.title?.rendered}${worksItems.ariaTitle}`}
+                      aria-label={`${work?.title?.rendered}${worksText.metaItems.ariaLabel}`}
+                      title={`${work?.title?.rendered}${worksText.metaItems.ariaTitle}`}
                       set:html={work?.title?.rendered}
                     />
                   </h2>
                   <a
                     class="worksCard__slug"
                     href={`/works/${work.slug}`}
-                    aria-label={`${work.slug}(${work?.title?.rendered})${worksItems.ariaLabel}`}
-                    title={`${work.slug}(${work?.title?.rendered})${worksItems.ariaTitle}`}
+                    aria-label={`${work.slug}(${work?.title?.rendered})${worksText.metaItems.ariaLabel}`}
+                    title={`${work.slug}(${work?.title?.rendered})${worksText.metaItems.ariaTitle}`}
                   >
                     <img
                       class="worksCard__image"
                       src={work?.fallbackUrl ?? ""}
-                      alt={`${work?.title?.rendered ?? "No image available"}${worksItems.alt}`}
-                      width={worksItems.width}
-                      height={worksItems.height}
+                      alt={`${work?.title?.rendered ?? "No image available"}${worksText.metaItems.alt}`}
+                      width={worksText.metaItems.width}
+                      height={worksText.metaItems.height}
                       loading="lazy"
                       decoding="async"
                     />
@@ -343,8 +332,8 @@ const worksPagination = {
                   <a
                     class="worksCard__link"
                     href={work?.acf?.left_link ?? ""}
-                    aria-label={`${work?.title?.rendered}${worksItems.ariaLabelNewTab}`}
-                    title={`${work?.title?.rendered}${worksItems.ariaTitleNewTab}`}
+                    aria-label={`${work?.title?.rendered}${worksText.metaItems.ariaLabelNewTab}`}
+                    title={`${work?.title?.rendered}${worksText.metaItems.ariaTitleNewTab}`}
                     target="_blank"
                     set:html={work?.acf?.left_link ?? ""}
                   />
@@ -369,8 +358,8 @@ const worksPagination = {
                   <a
                     class="pagination__link_current"
                     href={page.url.first}
-                    aria-label={worksPagination.first}
-                    title={worksPagination.first}
+                    aria-label={worksText.pagination.first}
+                    title={worksText.pagination.first}
                   >
                     1
                   </a>
@@ -385,8 +374,8 @@ const worksPagination = {
                   <a
                     class="pagination__link"
                     href={page.url.prev}
-                    aria-label={`${worksPagination.prev}(${page.currentPage - 1})`}
-                    title={worksPagination.prev}
+                    aria-label={`${worksText.pagination.prev}(${page.currentPage - 1})`}
+                    title={worksText.pagination.prev}
                   >
                     &larr;
                   </a>
@@ -400,8 +389,8 @@ const worksPagination = {
                 <a
                   class="pagination__link_current"
                   href={page.url.current}
-                  aria-label={`${worksPagination.current}(${page.currentPage})`}
-                  title={`${worksPagination.current}(${page.currentPage})`}
+                  aria-label={`${worksText.pagination.current}(${page.currentPage})`}
+                  title={`${worksText.pagination.current}(${page.currentPage})`}
                 >
                   {typeof page.currentPage === "number" && page.currentPage > 0 ? page.currentPage : "1"}
                 </a>
@@ -411,8 +400,8 @@ const worksPagination = {
                   <a
                     class="pagination__link"
                     href={page.url.next}
-                    aria-label={`${worksPagination.next}(${page.currentPage + 1})`}
-                    title={worksPagination.next}
+                    aria-label={`${worksText.pagination.next}(${page.currentPage + 1})`}
+                    title={worksText.pagination.next}
                   >
                     &rarr;
                   </a>
@@ -427,8 +416,8 @@ const worksPagination = {
                   <a
                     class="pagination__link_current"
                     href={page.url.last}
-                    aria-label={`${worksPagination.last}(${page.lastPage})`}
-                    title={`${worksPagination.last}(${page.lastPage})`}
+                    aria-label={`${worksText.pagination.last}(${page.lastPage})`}
+                    title={`${worksText.pagination.last}(${page.lastPage})`}
                   >
                     {page.lastPage}
                   </a>

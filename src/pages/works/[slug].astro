@@ -1,14 +1,14 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
-import worksText from "../../data/worksText.json";
-import globalText from "../../data/globalText.json";
-import { WORKS_SLUG_API } from "../../api/headlessCms";
+import worksText from "@/data/worksText.json";
+import { SITE as globalText } from "@/config/site";
+import { WORKS_SLUG_API } from "@/api/headlessCms";
 
-export { getWorksSlugStaticPaths as getStaticPaths } from "../../api/worksBuild";
-import { getWordPressImageUrl, type WordPressImageFieldInput } from "../../util/optimizeWordPressImage";
-import { worksResponseSchema, type Works } from "../../schemas/api.schema";
-import { validateApiResponse } from "../../schemas/api.schema";
+export { getWorksSlugStaticPaths as getStaticPaths } from "@/api/worksBuild";
+import { getWordPressImageUrl, type WordPressImageFieldInput } from "@/util/optimizeWordPressImage";
+import { worksResponseSchema, type Works } from "@/schemas/api.schema";
+import { validateApiResponse } from "@/schemas/api.schema";
 
 interface WorksTextData {
   worksTitle: string;
@@ -149,9 +149,9 @@ const jsonLd = JSON.stringify({
 
 const worksSlugLinks = {
   slug: { rendered: work?.slug },
-  ariaLabel: "のページへ(新しいタブで開きます)",
-  ariaTitle: "のページへ(新しいタブで開きます)",
-  targetBlank: "_blank",
+  ariaLabel: worksText.links.ariaLabel,
+  ariaTitle: worksText.links.ariaTitle,
+  targetBlank: worksText.links.targetBlank,
 };
 
 const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, { name: worksSlugTitle }];
@@ -187,7 +187,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
               </div>
               <div class="left__inner">
                 {/* サイトタイトル */}
-                <h2 class="left__title" set:html={worksSlugTitle ?? "No title available"} />
+                <h1 class="left__title" set:html={worksSlugTitle ?? "No title available"} />
                 <a
                   class="left__link"
                   href={worksSlugLeftLink}
@@ -234,7 +234,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                 />
               </div>
               {/* サイトタイトル */}
-              <h1 class="right__header" set:html={worksRightHeader ?? "No title available"} />
+              <h2 class="right__header" set:html={worksRightHeader ?? "No title available"} />
               {/* ロゴアイコン */}
               {iconImageUrl !== "" && (
                 <img

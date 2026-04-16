@@ -1,19 +1,19 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Logo from "../components/Logo.astro";
+import Layout from "@/layouts/Layout.astro";
+import Logo from "@/components/Logo.astro";
 import Breadcrumbs from "../components/Breadcrumbs.astro";
-import Aside from "../components/Aside.astro";
-import SwiperMenu from "../components/SwiperMenu.astro";
-import globalText from "../data/globalText.json";
-import SwiperDisplay from "../components/SwiperDisplay.astro";
-import gridBackgroundImageSrc from "../assets/gridBackground.webp";
+import Aside from "@/components/layout/aside/Aside.astro";
+import SwiperMenu from "@/components/layout/side/SwiperMenu.astro";
+import { SITE as globalText } from "@/config/site";
+import SwiperDisplay from "@/components/layout/SwiperDisplay.astro";
+import gridBackgroundImageSrc from "@/assets/gridBackground.webp";
 import { getImage } from "astro:assets";
-import FirstView from "../components/FirstView.astro";
-import GridMenu from "../components/GridMenu.astro";
-import ControlMenu from "../components/ControlMenu.astro";
-import fvBackgroundImageSrc from "../assets/fvBackgroundImage.webp";
-import spFvBackgroundImageSrc from "../assets/sp__fvBackgroundImage.webp";
-import fvAnimeImageSrc from "../assets/fvAnimeImage.webp";
+import FirstView from "@/components/layout/firstView/FirstView.astro";
+import GridMenu from "@/components/layout/grid/GridMenu.astro";
+import ControlMenu from "@/components/layout/grid/ControlMenu.astro";
+import fvBackgroundImageSrc from "@/assets/fvBackgroundImage.webp";
+import spFvBackgroundImageSrc from "@/assets/sp__fvBackgroundImage.webp";
+import fvAnimeImageSrc from "@/assets/fvAnimeImage.webp";
 
 const gridBackgroundImage = await getImage({ src: gridBackgroundImageSrc });
 // LCP最適化: FirstViewの背景画像を最優先でプリロード
@@ -369,7 +369,7 @@ const fvAnimeImage = await getImage({
         async () => {
           // GSAPを先に読み込む
           await loadGSAP();
-          const { initGridControlAnimationsDeferred } = await import("../scripts/gridControlAnimations");
+          const { initGridControlAnimationsDeferred } = await import("@/scripts/gridControlAnimations");
           initGridControlAnimationsDeferred();
         },
         { timeout: 10000 } // タイムアウトを10秒に延長してクリティカルパスへの影響を最小化
@@ -379,7 +379,7 @@ const fvAnimeImage = await getImage({
       setTimeout(async () => {
         // GSAPを先に読み込む
         await loadGSAP();
-        const { initGridControlAnimationsDeferred } = await import("../scripts/gridControlAnimations");
+        const { initGridControlAnimationsDeferred } = await import("@/scripts/gridControlAnimations");
         initGridControlAnimationsDeferred();
       }, 10000); // 10秒に延長して初期読み込みをブロックしない
     }
@@ -460,7 +460,7 @@ const fvAnimeImage = await getImage({
     if ("requestIdleCallback" in window) {
       requestIdleCallback(
         async () => {
-          const { initConfettiDeferred } = await import("../scripts/confetti");
+          const { initConfettiDeferred } = await import("@/scripts/confetti");
           initConfettiDeferred();
         },
         { timeout: 10000 } // タイムアウトを10秒に延長してクリティカルパスへの影響を最小化
@@ -468,7 +468,7 @@ const fvAnimeImage = await getImage({
     } else {
       // フォールバック: より長い遅延でクリティカルパスをブロックしない
       setTimeout(async () => {
-        const { initConfettiDeferred } = await import("../scripts/confetti");
+        const { initConfettiDeferred } = await import("@/scripts/confetti");
         initConfettiDeferred();
       }, 10000); // 10秒に延長して初期読み込みをブロックしない
     }

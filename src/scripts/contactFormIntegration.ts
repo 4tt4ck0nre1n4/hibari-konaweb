@@ -2,7 +2,7 @@
  * Contact Form 7にPDFファイルを動的に添付
  * お問い合わせページで実行されるスクリプト
  */
-import { getFromStorageSafely, estimatePdfDataSchema, clearFromStorageSafely } from "../schemas/storage.schema";
+import { getFromStorageSafely, estimatePdfDataSchema, clearFromStorageSafely } from "@/schemas/storage.schema";
 
 export function attachPDFToContactForm(): void {
   const pdfData = getFromStorageSafely(estimatePdfDataSchema, ["estimatePDF", "estimateNumber"], "sessionStorage");

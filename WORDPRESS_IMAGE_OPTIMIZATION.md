@@ -83,7 +83,7 @@ const fallbackUrl = getWordPressImageUrl(imageData) ?? "";
 )}
 ```
 
-### 実装例: SwiperDisplay.astro
+### 実装例: `src/components/layout/SwiperDisplay.astro`
 
 ```astro
 ---

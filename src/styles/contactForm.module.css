@@ -62,6 +62,7 @@
 .input__name:is(:hover, :focus-within) {
   background-color: transparent;
   box-shadow: 0 10px 10px rgb(0 255 255 / 0.6);
+  color: var(--color-white, #f1f5f9);
 }
 
 .input__company {
@@ -81,6 +82,7 @@
 .input__company:is(:hover, :focus-within) {
   background-color: transparent;
   box-shadow: 0 10px 10px rgb(0 255 255 / 0.6);
+  color: var(--color-white, #f1f5f9);
 }
 
 .label__email {
@@ -107,6 +109,7 @@
 .input__email:is(:hover, :focus-within) {
   background-color: transparent;
   box-shadow: 0 10px 10px rgb(0 255 255 / 0.6);
+  color: var(--color-white, #f1f5f9);
 }
 
 .label__message {
@@ -170,6 +173,7 @@
 .textarea__message:is(:hover, :focus-within) {
   background-color: transparent;
   box-shadow: 0 10px 10px rgb(0 255 255 / 0.6);
+  color: var(--color-white, #f1f5f9);
 }
 
 .label__checkbox {
