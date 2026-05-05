@@ -1,11 +1,19 @@
 import { validateConfigData, companyInfoSchema, estimateConfigSchema } from "@/schemas/data.schema";
 
+const DEFAULT_SITE_URL = "https://hibari-konaweb.netlify.app";
+const SITE_URL =
+  typeof import.meta.env.PUBLIC_SITE_URL === "string" && import.meta.env.PUBLIC_SITE_URL.trim() !== ""
+    ? import.meta.env.PUBLIC_SITE_URL.trim().replace(/\/$/, "")
+    : DEFAULT_SITE_URL;
+const DEFAULT_SHARE_IMAGE_PATH = "/logo_outline.svg";
+const DEFAULT_SHARE_IMAGE_URL = `${SITE_URL}${DEFAULT_SHARE_IMAGE_PATH}`;
+
 // ============================================================
 // サイト全体の設定（旧: data/globalText.json）
 // SEO・OGP・各ページのタイトル・説明文など
 // ============================================================
 export const SITE = {
-  url: "https://hibari-konaweb.netlify.app",
+  url: SITE_URL,
   global: {
     themeColor: "",
     colorScheme: "light dark",
@@ -15,8 +23,8 @@ export const SITE = {
   },
   link: {
     sitemap: "/sitemap-index.xml",
-    author: "https://hibari-konaweb.netlify.app",
-    canonical: "https://hibari-konaweb.netlify.app",
+    author: SITE_URL,
+    canonical: SITE_URL,
   },
   og: {
     local: "ja_JP",
@@ -24,8 +32,11 @@ export const SITE = {
     description:
       "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
     type: "website",
-    url: "https://hibari-konaweb.netlify.app",
-    image: "https://hibari-konaweb.netlify.app/assets/screenshot.webp",
+    url: SITE_URL,
+    image: DEFAULT_SHARE_IMAGE_URL,
+    imageWidth: "512",
+    imageHeight: "512",
+    imageAlt: "hibari-konaweb.comのサイトロゴ",
     site_name: "My Portfolio Site",
   },
   twitter: {
@@ -33,8 +44,9 @@ export const SITE = {
     title: "My Portfolio Site",
     description:
       "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
-    site: "https://hibari-konaweb.netlify.app",
-    image: "https://hibari-konaweb.netlify.app/assets/screenshot.webp",
+    site: SITE_URL,
+    image: DEFAULT_SHARE_IMAGE_URL,
+    imageAlt: "hibari-konaweb.comのサイトロゴ",
   },
   local: {
     type: "article",

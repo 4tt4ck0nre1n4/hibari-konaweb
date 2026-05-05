@@ -17,11 +17,12 @@ const footerList = contactText.thanks.footer.list as Array<{ item: string }>;
 <Layout
   title={globalText.thanks.title}
   description={globalText.thanks.description}
-  ogType={globalText.local.type}
+  ogType={globalText.og.type}
   ogTitle={globalText.thanks.title}
   ogDescription={globalText.thanks.description}
   twitterTitle={globalText.thanks.title}
   twitterDescription={globalText.thanks.description}
+  robots="noindex, follow"
 >
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />

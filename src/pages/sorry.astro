@@ -15,11 +15,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Sorry..." }];
 <Layout
   title={globalText.sorry.title}
   description={globalText.sorry.description}
-  ogType={globalText.local.type}
+  ogType={globalText.og.type}
   ogTitle={globalText.sorry.title}
   ogDescription={globalText.sorry.description}
   twitterTitle={globalText.sorry.title}
   twitterDescription={globalText.sorry.description}
+  robots="noindex, follow"
 >
   <link slot="head" rel="preload" href={sorryImage.src} as="image" fetchpriority="low" />
 

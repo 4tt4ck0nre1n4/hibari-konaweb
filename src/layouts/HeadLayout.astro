@@ -21,15 +21,66 @@ interface Props {
   jsonLd?: string | undefined;
   /** 指定時は og:image / twitter:image に使用（例: ブログ記事のアイキャッチ）。未指定は globalText の既定画像 */
   socialImage?: string | undefined;
+  socialImageAlt?: string | undefined;
+  socialImageWidth?: string | number | undefined;
+  socialImageHeight?: string | number | undefined;
+  robots?: string | undefined;
 }
 
-const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitterDescription, jsonLd, socialImage } =
-  Astro.props;
+const {
+  title,
+  description,
+  ogType,
+  ogTitle,
+  ogDescription,
+  twitterTitle,
+  twitterDescription,
+  jsonLd,
+  socialImage,
+  socialImageAlt,
+  socialImageWidth,
+  socialImageHeight,
+  robots,
+} = Astro.props;
 
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+
+function resolveAbsoluteUrl(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed === "") {
+    return siteBaseHref;
+  }
+  return new URL(trimmed, `${siteBaseHref}/`).href;
+}
+
+function nonEmptyString(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() !== "" ? value.trim() : undefined;
+}
+
+function metaDimension(value: unknown): string | undefined {
+  if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+    return String(value);
+  }
+  return nonEmptyString(value);
+}
+
+const hasCustomSocialImage = typeof socialImage === "string" && socialImage.trim() !== "";
 const ogImageResolved =
-  typeof socialImage === "string" && socialImage.trim() !== "" ? socialImage.trim() : globalText.og.image;
+  hasCustomSocialImage && typeof socialImage === "string"
+    ? resolveAbsoluteUrl(socialImage)
+    : resolveAbsoluteUrl(globalText.og.image);
 const twitterImageResolved =
-  typeof socialImage === "string" && socialImage.trim() !== "" ? socialImage.trim() : globalText.twitter.image;
+  hasCustomSocialImage && typeof socialImage === "string"
+    ? resolveAbsoluteUrl(socialImage)
+    : resolveAbsoluteUrl(globalText.twitter.image);
+const imageAltResolved = nonEmptyString(socialImageAlt) ?? (hasCustomSocialImage ? ogTitle : globalText.og.imageAlt);
+const ogImageWidthResolved = hasCustomSocialImage ? metaDimension(socialImageWidth) : globalText.og.imageWidth;
+const ogImageHeightResolved = hasCustomSocialImage ? metaDimension(socialImageHeight) : globalText.og.imageHeight;
+const robotsContent = nonEmptyString(robots) ?? nonEmptyString(globalText.global.robots);
+const twitterSiteContent =
+  typeof globalText.twitter.site === "string" && globalText.twitter.site.trim().startsWith("@")
+    ? globalText.twitter.site.trim()
+    : undefined;
 
 const canonicalHref = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : globalText.link.canonical;
 
@@ -45,21 +96,11 @@ const cspContent = isDev
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, viewport-fit=cover" />
-
-  <!-- LCP最適化: 背景画像のプリロードを最優先で配置（リソース読み込みの遅延を削減） -->
-  <!-- preloadはmeta charsetの直後に配置して、できるだけ早く読み込みを開始 -->
   <slot name="lcp-preload" />
-
   <GoogleAnalytics />
   <meta http-equiv="Content-Security-Policy" content={cspContent} />
-
-  <!-- ネットワーク依存関係ツリー最適化: 外部オリジンへの事前接続 -->
-  <!-- 優先度1: クリティカルな外部リソース（最大4つまで推奨） -->
-  <!-- IconifyはローカルJSONのみ使用するため、外部APIへのpreconnectは不要 -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-
-  <!-- 優先度2: 非クリティカルだが早期接続が有効なリソース -->
   <link rel="dns-prefetch" href="https://www.google-analytics.com" />
   <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
   <title>{title}</title>
@@ -70,26 +111,28 @@ const cspContent = isDev
   <meta name="theme-color" content={globalText.global.themeColor} />
   <meta name="author" content={globalText.global.author} />
   <meta name="format-detection" content={globalText.global.formatDetection} />
+  {typeof robotsContent === "string" && <meta name="robots" content={robotsContent} />}
   <link rel="canonical" href={canonicalHref} />
   <link rel="author" href={globalText.link.author} />
-  <meta property="og:local" content={globalText.og.local} />
+  <meta property="og:locale" content={globalText.og.local} />
   <meta property="og:title" content={ogTitle} />
   <meta property="og:description" content={ogDescription} />
   <meta property="og:type" content={ogType} />
   <meta property="og:url" content={canonicalHref} />
   <meta property="og:image" content={ogImageResolved} />
+  {typeof ogImageWidthResolved === "string" && <meta property="og:image:width" content={ogImageWidthResolved} />}
+  {typeof ogImageHeightResolved === "string" && <meta property="og:image:height" content={ogImageHeightResolved} />}
+  <meta property="og:image:alt" content={imageAltResolved} />
   <meta property="og:site_name" content={globalText.og.site_name} />
   <meta name="twitter:card" content={globalText.twitter.card} />
   <meta name="twitter:title" content={twitterTitle} />
   <meta name="twitter:description" content={twitterDescription} />
-  <meta name="twitter:site" content={globalText.twitter.site} />
+  {typeof twitterSiteContent === "string" && <meta name="twitter:site" content={twitterSiteContent} />}
   <meta name="twitter:image" content={twitterImageResolved} />
+  <meta name="twitter:image:alt" content={imageAltResolved} />
 
-  <!-- ページ固有の追加head要素（LCP最適化など）- 早期読み込みのため、metaタグの直後に配置 -->
   <slot name="head" />
-
   <ClientRouter />
-
   <!-- Critical CSS インライン化 -->
   <style is:global>
     /* CSS変数の定義（初期レンダリングに必須） */

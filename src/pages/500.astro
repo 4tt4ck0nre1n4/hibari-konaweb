@@ -26,11 +26,12 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "500 Server Error" }];
 <Layout
   title={globalText.serverError500.title}
   description={globalText.serverError500.description}
-  ogType={globalText.local.type}
+  ogType={globalText.og.type}
   ogTitle={globalText.serverError500.title}
   ogDescription={globalText.serverError500.description}
   twitterTitle={globalText.serverError500.title}
   twitterDescription={globalText.serverError500.description}
+  robots="noindex, follow"
 >
   <link slot="head" rel="preload" href={serverErrorImage.src} as="image" fetchpriority="high" />
 

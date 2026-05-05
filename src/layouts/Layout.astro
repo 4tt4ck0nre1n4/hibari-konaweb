@@ -18,10 +18,27 @@ interface Props {
   jsonLd?: string;
   /** 記事ページなど: BlogPosting の image と同じ絶対 URL を渡すと og:image / twitter:image に反映 */
   socialImage?: string;
+  socialImageAlt?: string;
+  socialImageWidth?: string | number;
+  socialImageHeight?: string | number;
+  robots?: string;
 }
 
-const { title, description, ogType, ogTitle, ogDescription, twitterTitle, twitterDescription, jsonLd, socialImage } =
-  Astro.props;
+const {
+  title,
+  description,
+  ogType,
+  ogTitle,
+  ogDescription,
+  twitterTitle,
+  twitterDescription,
+  jsonLd,
+  socialImage,
+  socialImageAlt,
+  socialImageWidth,
+  socialImageHeight,
+  robots,
+} = Astro.props;
 
 // Google Analytics設定
 const GA_MEASUREMENT_ID: string | undefined =
@@ -45,6 +62,10 @@ const shouldLoadGA: boolean =
     twitterDescription={twitterDescription}
     jsonLd={jsonLd}
     socialImage={socialImage}
+    socialImageAlt={socialImageAlt}
+    socialImageWidth={socialImageWidth}
+    socialImageHeight={socialImageHeight}
+    robots={robots}
   >
     <slot name="head" slot="head" />
   </HeadLayout>
