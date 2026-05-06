@@ -2,45 +2,38 @@
 /**
  * WebSite構造化データ（JSON-LD）
  *
- * サイト全体の情報とサイト内検索機能を検索エンジンに提供
+ * サイト全体の情報を検索エンジンに提供
  * Schema.org WebSite型を使用
  *
  * 用途:
- * - Googleのサイトリンク検索ボックス表示
  * - サイト全体の情報提供
  * - SEO強化
  */
 import { SITE as globalText } from "@/config/site";
 
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": `${siteBaseHref}/#website`,
   name: globalText.og.site_name,
   description: globalText.og.description,
-  url: globalText.url,
+  url: siteBaseHref,
   inLanguage: "ja-JP",
-
-  // サイト内検索機能（Pagefind使用）
-  potentialAction: {
-    "@type": "SearchAction",
-    target: {
-      "@type": "EntryPoint",
-      urlTemplate: `${globalText.url}/blog?search={search_term_string}`,
-    },
-    "query-input": "required name=search_term_string",
-  },
 
   // 運営者情報（Person）
   publisher: {
     "@type": "Person",
+    "@id": `${siteBaseHref}/#person`,
     name: globalText.global.author,
-    url: globalText.url,
+    url: siteBaseHref,
   },
 
   // サイトのロゴ
   logo: {
     "@type": "ImageObject",
-    url: `${globalText.url}/logo_outline.svg`,
+    url: `${siteBaseHref}/logo.svg`,
     width: "512",
     height: "512",
   },

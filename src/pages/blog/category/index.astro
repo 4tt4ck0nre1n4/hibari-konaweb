@@ -60,13 +60,17 @@ const rawWpDescription =
         : "";
 
 const metaFromWordPress = rawWpDescription !== "" ? stripHtmlForMeta(rawWpDescription) : "";
+const categoriesForDisplay = seoOnlySlug !== "" ? categories.filter((c) => c.slug !== seoOnlySlug) : categories;
 
 const layoutDescription =
   metaFromWordPress !== ""
     ? metaFromWordPress
-    : firstNonEmptyString(globalText.categories.description, globalText.blog.description);
-
-const categoriesForDisplay = seoOnlySlug !== "" ? categories.filter((c) => c.slug !== seoOnlySlug) : categories;
+    : categoriesForDisplay.length > 0
+      ? `ブログカテゴリー一覧です。${categoriesForDisplay
+          .map((category) => category.name)
+          .slice(0, 6)
+          .join("、")}など、テーマ別に記事を探せます。`
+      : firstNonEmptyString(globalText.categories.description, globalText.blog.description);
 
 const categoryTitle = "Category";
 const categoryText = "カテゴリー記事の一覧です。";

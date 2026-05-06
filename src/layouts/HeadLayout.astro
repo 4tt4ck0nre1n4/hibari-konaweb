@@ -229,16 +229,12 @@ const cspContent = isDev
       text-rendering: optimizeSpeed;
       min-block-size: 100%;
       overflow-x: hidden;
-      /* レイアウトシフト防止: 初期サイズを明示的に設定 */
       position: relative;
     }
-    /* スマホサイズでのbody最適化（レイアウトシフト対策） */
     @media (width <= 768px) {
       body {
         min-height: 100vh;
-        /* スマホのアドレスバー表示/非表示に対応 */
         min-height: -webkit-fill-available;
-        /* レイアウトシフト防止: 高さを固定 */
         height: auto;
       }
     }
@@ -246,9 +242,7 @@ const cspContent = isDev
     @media (width <= 480px) {
       body {
         min-height: 100vh;
-        /* スマホのアドレスバー表示/非表示に対応 */
         min-height: -webkit-fill-available;
-        /* レイアウトシフト防止: 高さを固定 */
         height: auto;
       }
     }
@@ -416,7 +410,6 @@ const cspContent = isDev
       display: block;
       position: relative;
       z-index: 2;
-      /* transition: transform 0.3s ease; */
     }
     .header__logo_image.is-scroll {
       border: transparent 1px solid;
@@ -625,7 +618,7 @@ const cspContent = isDev
       text-align: center;
       width: 100%;
       max-width: 500px;
-      min-height: 400px; /* CLSを防ぐために最小高さを設定 */
+      min-height: 400px;
       padding: 2rem;
     }
     .logo-container {
@@ -700,7 +693,6 @@ const cspContent = isDev
       border-top: var(--color-white) 3px solid;
       border-radius: 50%;
       will-change: transform, opacity;
-      /* CSS animation disabled - using GSAP instead */
     }
     html.dark .spinner {
       border: 3px solid color-mix(in srgb, var(--color-white) 30%, transparent);
@@ -752,24 +744,23 @@ const cspContent = isDev
     }
     .fv {
       position: relative;
-      pointer-events: none; /* カードへのクリックを通過させる */
+      pointer-events: none;
     }
     .fv > * {
-      pointer-events: auto; /* 子要素は通常通りクリック可能 */
+      pointer-events: auto;
     }
     .fv__wrapper {
       height: 100%;
-      min-height: 100vh; /* CLS防止: 最小高さを設定してレイアウトシフトを防止 */
+      min-height: 100vh;
       background: #1d1f20;
       perspective: 1200px;
       overflow: hidden;
       position: relative;
       margin-block: 0;
       margin-inline: auto;
-      pointer-events: none; /* カードへのクリックを通過させる */
-      z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+      pointer-events: none;
+      z-index: 0 !important;
     }
-    /* LCP最適化: 背景画像を<img>タグとして使用し、fetchpriority="high"を適用 */
     .fv__background-image {
       position: absolute;
       top: 0;
@@ -779,14 +770,12 @@ const cspContent = isDev
       object-fit: cover;
       object-position: center;
       z-index: 0;
-      pointer-events: none; /* カードへのクリックを通過させる */
-      /* 画像読み込み中の背景色 */
+      pointer-events: none;
       background-color: #1d1f20;
     }
     /* スマホサイズ（768px以下）での背景画像最適化 */
     @media (width <= 768px) {
       .fv__background-image {
-        /* スマホ用画像のアスペクト比を維持しながら表示 */
         object-fit: cover;
         object-position: center center;
       }
@@ -794,13 +783,12 @@ const cspContent = isDev
     /* タブレットサイズ（769px-1024px）での背景画像最適化 */
     @media (769px <= width <= 1024px) {
       .fv__background-image {
-        /* タブレット用：デスクトップ画像を使用するため、適切にフィット */
         object-fit: cover;
         object-position: center center;
       }
     }
     .fv__wrapper > * {
-      pointer-events: auto; /* 子要素は通常通りクリック可能 */
+      pointer-events: auto;
     }
     .fv__wrapper::after {
       content: "";
@@ -808,7 +796,7 @@ const cspContent = isDev
       top: 0;
       width: 100%;
       height: 100%;
-      z-index: 0 !important; /* カードより後ろに配置（カードは100001） */
+      z-index: 0 !important;
       box-shadow: inset 10px 100px 200px rgb(0 0 0 / 0.6);
       pointer-events: none;
     }
@@ -817,10 +805,10 @@ const cspContent = isDev
       position: absolute;
       width: 100%;
       height: 100%;
-      z-index: 0 !important; /* カードより後ろに配置 */
+      z-index: 0 !important;
       overflow: hidden;
       transform-style: preserve-3d;
-      pointer-events: none; /* カードへのクリックを通過させる */
+      pointer-events: none;
       /* CSS変数の初期値を明示的に設定 */
       --mouse-x: 50%;
       --mouse-y: 50%;
@@ -938,11 +926,6 @@ const cspContent = isDev
   <!-- フォントは@fontsource/poppinsをLayout.astroでインポート済み -->
 
   <!-- 非クリティカルなフォントの遅延読み込み -->
-  <!--
-      非クリティカルなフォント（Poppins 700、Cinzel Decorative、Playfair Display、Marcellus）を
-      <link rel="preload"> で遅延読み込みします。
-      ビルド時に async-css-optimizer.js が自動的に最適化します。
-    -->
   <NonCriticalFonts />
 
   <!-- NOTE:

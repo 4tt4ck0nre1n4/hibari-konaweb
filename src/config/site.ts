@@ -5,7 +5,7 @@ const SITE_URL =
   typeof import.meta.env.PUBLIC_SITE_URL === "string" && import.meta.env.PUBLIC_SITE_URL.trim() !== ""
     ? import.meta.env.PUBLIC_SITE_URL.trim().replace(/\/$/, "")
     : DEFAULT_SITE_URL;
-const DEFAULT_SHARE_IMAGE_PATH = "/logo_outline.svg";
+const DEFAULT_SHARE_IMAGE_PATH = "/assets/screenshot.webp";
 const DEFAULT_SHARE_IMAGE_URL = `${SITE_URL}${DEFAULT_SHARE_IMAGE_PATH}`;
 
 // ============================================================
@@ -34,9 +34,9 @@ export const SITE = {
     type: "website",
     url: SITE_URL,
     image: DEFAULT_SHARE_IMAGE_URL,
-    imageWidth: "512",
-    imageHeight: "512",
-    imageAlt: "hibari-konaweb.comのサイトロゴ",
+    imageWidth: "1200",
+    imageHeight: "630",
+    imageAlt: "hibari-konaweb.comのトップページスクリーンショット",
     site_name: "My Portfolio Site",
   },
   twitter: {
@@ -46,7 +46,7 @@ export const SITE = {
       "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
     site: SITE_URL,
     image: DEFAULT_SHARE_IMAGE_URL,
-    imageAlt: "hibari-konaweb.comのサイトロゴ",
+    imageAlt: "hibari-konaweb.comのトップページスクリーンショット",
   },
   local: {
     type: "article",
@@ -99,7 +99,7 @@ export const SITE = {
   contact: {
     title: "Contact | My Portfolio Site",
     description:
-      "Web制作などのお仕事に関するご相談、お見積りやポートフォリオの感想など、お問い合わせはこちらのフォームからお願いします。メール受付後、1～3営業日以内にメールで返答させていただきます。",
+      "Web制作などのお仕事に関するご相談、お見積りやポートフォリオの感想など、お問い合わせはこちらのフォームからお願いします。メール受付後、原則24時間以内にメールで返答させていただきます。",
   },
   service: {
     title: "Service | My Portfolio Site",

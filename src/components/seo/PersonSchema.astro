@@ -12,11 +12,14 @@
  */
 import { SITE as globalText } from "@/config/site";
 
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+
 const personSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
+  "@id": `${siteBaseHref}/#person`,
   name: globalText.global.author,
-  url: globalText.url,
+  url: siteBaseHref,
   jobTitle: "Web Developer / Freelance Coder",
   description: globalText.og.description,
 
@@ -39,7 +42,7 @@ const personSchema = {
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "customer support",
-    url: `${globalText.url}/contact`,
+    url: `${siteBaseHref}/contact`,
     availableLanguage: "Japanese",
   },
 

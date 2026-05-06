@@ -39,7 +39,12 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
       <div class="background-rotated" style={`background-image: url(${fvAnimeImageSrc})`}></div>
       <div class="background"></div>
     </div>
-    <h1 class="site-title">My Portfolio Site</h1>
+    <h1 class="site-title">
+      My Portfolio Site
+      <span class="screenReader-only">
+        - Web制作、フロントエンド開発、AstroとWordPressを活用したサイト改善のポートフォリオ</span
+      >
+    </h1>
     <div class="glitch-container">
       <NaviCard />
       <Glitch />

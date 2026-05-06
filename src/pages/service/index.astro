@@ -45,15 +45,18 @@ const leadBenefits = serviceSimulator.simulatorLeadBenefits;
     <div class="pricing-simulator-wrapper">
       <div class="service-simulator-page-heading">
         <AboutHeading aboutTitle="Price" aboutSubTitle="料金シミュレーターについて" headingLevel={1} />
+        <p class="service-simulator-page-heading__lead">
+          Web制作・サイト改善を検討している方向けに、必要な項目を選ぶだけで概算費用と相談の流れを確認できます。
+        </p>
       </div>
       <div class="pricePage__wrapper service-simulator-lead">
         <section class="service-simulator-lead-card" aria-labelledby="simulator-lead-title">
-          <h3 id="simulator-lead-title" class="service-simulator-lead-card__title">
+          <h2 id="simulator-lead-title" class="service-simulator-lead-card__title">
             <span class="service-simulator-lead-card__title-icon" aria-hidden="true">
               <IconifyInline client:load icon="emojione:light-bulb" width="1.25em" height="1.25em" />
             </span>
             {serviceSimulator.simulatorLeadCardTitle}
-          </h3>
+          </h2>
           <p class="service-simulator-lead-card__subtitle">{serviceSimulator.simulatorLeadCardSubtitle}</p>
           <ol class="service-simulator-lead-card__steps">
             {
@@ -113,6 +116,15 @@ const leadBenefits = serviceSimulator.simulatorLeadBenefits;
   .pricePage__wrapper {
     width: 100%;
     max-width: 700px;
+    margin-inline: auto;
+  }
+  .service-simulator-page-heading__lead {
+    width: min(90%, 700px);
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.06em;
+    text-align: center;
+    margin-block-start: 1rem;
     margin-inline: auto;
   }
   @media (width <= 768px) {

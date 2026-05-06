@@ -1,13 +1,15 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import type { GetStaticPaths, PaginateFunction } from "astro";
+import { Image } from "astro:assets";
 import SafeIcon from "@/components/ui/SafeIcon.astro";
 import { generateBreadcrumbs } from "../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { SITE as globalText } from "@/config/site";
 import { BLOG_PAGE_API } from "@/api/headlessCms";
 import FlowingLinesWrapper from "@/components/ui/FlowingLinesWrapper.astro";
-import { getWordPressImageUrl } from "@/util/optimizeWordPressImage";
+import { getOptimizedWordPressImage, getWordPressImageUrl } from "@/util/optimizeWordPressImage";
+import { compactJsonLd, stripHtml } from "@/util/jsonLd";
 
 interface CategoryInfo {
   id: number;
@@ -33,6 +35,9 @@ interface PostDataObject {
   };
   cat_info?: CategoryInfo[];
 }
+
+const BLOG_CARD_IMAGE_WIDTH = 640;
+const BLOG_CARD_IMAGE_HEIGHT = 360;
 
 interface PageDataObject {
   url: {
@@ -162,19 +167,35 @@ if (import.meta.env.DEV) {
 }
 
 const posts = Array.isArray(page.data) ? page.data : [];
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
 
-// WordPress画像は外部配信のため、通常のimgタグを使用
-const blogImages = posts.map((post) => {
-  const imageUrl = getWordPressImageUrl(post.acf?.blog_image) ?? "";
-  return {
-    ...post,
-    imageUrl,
-  };
-});
+function absoluteUrlForPath(path: string | undefined): string | undefined {
+  if (typeof path !== "string" || path.trim() === "") {
+    return undefined;
+  }
+  return new URL(path, `${siteBaseHref}/`).href;
+}
+
+const blogImages = await Promise.all(
+  posts.map(async (post) => {
+    const imageUrl = getWordPressImageUrl(post.acf?.blog_image) ?? "";
+    const optimizedImage = await getOptimizedWordPressImage(post.acf?.blog_image, {
+      width: BLOG_CARD_IMAGE_WIDTH,
+      height: BLOG_CARD_IMAGE_HEIGHT,
+      quality: 85,
+      format: "webp",
+    });
+    return {
+      ...post,
+      imageUrl,
+      optimizedImage,
+    };
+  })
+);
 
 const hasNextPage = page.size < page.total ? true : false;
 const blogTitle = "Blog";
-const blogText = "ブログ記事の一覧です。";
+const blogText = "Web制作・フロントエンド・WordPress・AI活用に関するブログ記事の一覧です。";
 const errorCategoryText = "カテゴリーが見つかりませんでした。";
 const postAriaLabel = "の記事へ";
 const postAriaTitle = "の記事へ";
@@ -204,6 +225,30 @@ const postPagination = {
 };
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
+const currentPageHref = absoluteUrlForPath(page.url.current) ?? new URL(Astro.url.pathname, `${siteBaseHref}/`).href;
+const prevPageHref = absoluteUrlForPath(page.url.prev);
+const nextPageHref = absoluteUrlForPath(page.url.next);
+const collectionJsonLd = JSON.stringify(
+  compactJsonLd({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${currentPageHref}#collection`,
+    url: currentPageHref,
+    name: globalText.blog.title,
+    description: globalText.blog.description,
+    inLanguage: "ja-JP",
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": `${siteBaseHref}/#website`,
+    },
+    hasPart: blogImages.map((postData, index) => ({
+      "@type": "BlogPosting",
+      position: page.start + index,
+      headline: stripHtml(postData.acf?.blog_title ?? postData.title.rendered),
+      url: `${siteBaseHref}/blog/${postData.slug}`,
+    })),
+  })
+);
 ---
 
 <Layout
@@ -214,7 +259,10 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
   ogDescription={globalText.blog.description}
   twitterTitle={globalText.blog.title}
   twitterDescription={globalText.blog.description}
+  jsonLd={collectionJsonLd}
 >
+  {typeof prevPageHref === "string" && <link slot="head" rel="prev" href={prevPageHref} />}
+  {typeof nextPageHref === "string" && <link slot="head" rel="next" href={nextPageHref} />}
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />
   </div>
@@ -253,15 +301,28 @@ const crumbs = generateBreadcrumbs(Astro.url.pathname);
                       </h2>
                     </div>
                     <div class="blog__thumbnail">
-                      {postData.imageUrl !== "" && (
-                        <img
-                          class="blog__menu_image"
-                          src={postData.imageUrl}
-                          alt={postData.title.rendered}
-                          decoding="async"
-                          loading="lazy"
-                        />
-                      )}
+                      {postData.imageUrl !== "" &&
+                        (postData.optimizedImage !== null ? (
+                          <Image
+                            class="blog__menu_image"
+                            src={postData.optimizedImage.src}
+                            alt={postData.title.rendered}
+                            width={BLOG_CARD_IMAGE_WIDTH}
+                            height={BLOG_CARD_IMAGE_HEIGHT}
+                            decoding="async"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <img
+                            class="blog__menu_image"
+                            src={postData.imageUrl}
+                            alt={postData.title.rendered}
+                            width={BLOG_CARD_IMAGE_WIDTH}
+                            height={BLOG_CARD_IMAGE_HEIGHT}
+                            decoding="async"
+                            loading="lazy"
+                          />
+                        ))}
                     </div>
                   </a>
                   <div class="blog__footer">

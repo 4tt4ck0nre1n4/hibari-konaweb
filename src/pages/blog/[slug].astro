@@ -13,17 +13,13 @@ import {
   type BlogPostSidebarItem,
 } from "@/schemas/api.schema";
 import { validateApiResponse } from "@/schemas/api.schema";
-import { getWordPressImageUrl } from "@/util/optimizeWordPressImage";
+import { getOptimizedWordPressImage, getWordPressImageUrl } from "@/util/optimizeWordPressImage";
 import { getCategoryBadgeClasses } from "@/util/categoryBadgeStyle";
+import { compactJsonLd, stripHtml, toAbsoluteUrl, toIsoDate, uniqueNonEmptyStrings } from "@/util/jsonLd";
 import "@/styles/blog-article.css";
 
-function stripHtml(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+const BLOG_HERO_IMAGE_WIDTH = 1200;
+const BLOG_HERO_IMAGE_HEIGHT = 630;
 
 const dateIcon = {
   icon: "emojione-v1:alarm-clock",
@@ -126,7 +122,7 @@ const postId = post?.id ?? 0;
 const postSlugTitle = post?.title?.rendered;
 const title = post?.title?.rendered ?? "記事が見つかりません";
 const plainTitle = stripHtml(title);
-const publishedDate = typeof post?.date === "string" && post.date !== "" ? new Date(post.date).toISOString() : "";
+const publishedDate = toIsoDate(post?.date) ?? "";
 const postDate = post?.date ?? "";
 const content = post?.content?.rendered ?? "この記事の内容は表示できません";
 
@@ -142,13 +138,20 @@ const datetime = "投稿日:";
 const categoryLabel = "カテゴリー:";
 const categoryAriaLabel = "のカテゴリー記事へ";
 const categoryAriaTitle = "のカテゴリー記事へ";
+const currentCategory = Array.isArray(post?.cat_info) && post.cat_info.length > 0 ? post.cat_info[0] : undefined;
+const currentCategoryName = stripHtml(currentCategory?.name);
+const currentCategoryPath =
+  typeof currentCategory?.slug === "string" && currentCategory.slug.trim() !== ""
+    ? `/blog/category/${decodeURIComponent(currentCategory.slug)}`
+    : undefined;
 export const prerender = true;
 
 const acfDescription: string = typeof post?.acf?.description === "string" ? post.acf.description : "";
 const postMetaDescription = acfDescription.trim();
-const jsonLdDescription = acfDescription.replace(/(<([^>]+)>)/gi, "").trim();
+const jsonLdDescription = stripHtml(acfDescription);
 
 const siteBase = globalText.url.replace(/\/$/, "");
+const siteBaseHref = Astro.site?.href.replace(/\/$/, "") ?? siteBase;
 const contactUrl = `${siteBase}/contact`;
 const worksUrl = `${siteBase}/works`;
 const serviceUrl = `${siteBase}/service`;
@@ -166,46 +169,64 @@ const layoutTitle = plainTitle !== "" ? plainTitle : "Blog Title Not Found";
 const jsonLdHeadline = plainTitle !== "" ? plainTitle : "Blog post";
 
 const postFeaturedImageUrl = getWordPressImageUrl(post?.acf?.blog_image);
+const optimizedFeaturedImage = await getOptimizedWordPressImage(post?.acf?.blog_image, {
+  width: BLOG_HERO_IMAGE_WIDTH,
+  height: BLOG_HERO_IMAGE_HEIGHT,
+  quality: 90,
+  format: "webp",
+});
 const postSocialImage =
-  typeof postFeaturedImageUrl === "string" && postFeaturedImageUrl.trim() !== ""
-    ? postFeaturedImageUrl.trim()
-    : undefined;
+  optimizedFeaturedImage !== null
+    ? optimizedFeaturedImage.src
+    : typeof postFeaturedImageUrl === "string" && postFeaturedImageUrl.trim() !== ""
+      ? postFeaturedImageUrl.trim()
+      : undefined;
 
 /** アイキャッチが無いときは og:image 既定（空文字はスキーマ上避ける） */
 const blogPostingImageUrl =
-  typeof postFeaturedImageUrl === "string" && postFeaturedImageUrl.trim() !== ""
-    ? postFeaturedImageUrl.trim()
-    : globalText.og.image;
+  typeof postSocialImage === "string" && postSocialImage.trim() !== "" ? postSocialImage.trim() : globalText.og.image;
 
-const modifiedRaw = typeof post?.modified === "string" ? post.modified.trim() : "";
-const dateModifiedIso =
-  modifiedRaw !== ""
-    ? (() => {
-        const t = Date.parse(modifiedRaw);
-        return Number.isNaN(t) ? "" : new Date(t).toISOString();
-      })()
-    : "";
+const dateModifiedIso = toIsoDate(post?.modified);
+const articleSections = uniqueNonEmptyStrings(
+  Array.isArray(post?.cat_info) ? post.cat_info.map((cat) => cat.name) : []
+);
+const blogPostingImageHref = toAbsoluteUrl(blogPostingImageUrl, siteBaseHref);
+const publisherLd = {
+  "@type": "Person",
+  "@id": `${siteBaseHref}/#person`,
+  name: globalText.global.author,
+  url: siteBaseHref,
+};
 
-const blogPostingLd: Record<string, unknown> = {
+const blogPostingLd = compactJsonLd({
   "@context": "https://schema.org",
   "@type": "BlogPosting",
+  "@id": `${articleCanonicalHref}#blogposting`,
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": articleCanonicalHref,
+  },
   headline: jsonLdHeadline,
   description: jsonLdDescription,
   datePublished: publishedDate,
+  dateModified: dateModifiedIso,
   url: articleCanonicalHref,
   author: {
     "@type": "Person",
-    name: `${globalText.blog.authorName}`,
+    name: globalText.blog.authorName,
+    url: siteBaseHref,
   },
-  image: blogPostingImageUrl,
-};
-if (dateModifiedIso !== "") {
-  blogPostingLd.dateModified = dateModifiedIso;
-}
+  publisher: publisherLd,
+  image: blogPostingImageHref,
+  thumbnailUrl: blogPostingImageHref,
+  articleSection: articleSections,
+  keywords: articleSections,
+  isAccessibleForFree: true,
+});
 
 const jsonLd = JSON.stringify(blogPostingLd);
 
-const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { name: postSlugTitle }];
+const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { name: stripHtml(postSlugTitle) }];
 ---
 
 <Layout
@@ -218,7 +239,15 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   twitterDescription={postMetaDescription}
   jsonLd={jsonLd}
   socialImage={postSocialImage}
+  socialImageAlt={layoutTitle}
+  socialImageWidth={BLOG_HERO_IMAGE_WIDTH}
+  socialImageHeight={BLOG_HERO_IMAGE_HEIGHT}
 >
+  {
+    typeof postSocialImage === "string" && (
+      <link slot="head" rel="preload" href={postSocialImage} as="image" fetchpriority="high" />
+    )
+  }
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />
   </div>
@@ -276,9 +305,62 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
           </div>
         </header>
 
+        {
+          typeof postSocialImage === "string" && (
+            <figure class="blog-post-featured-image my-8 overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
+              {optimizedFeaturedImage !== null ? (
+                <Image
+                  src={optimizedFeaturedImage.src}
+                  alt={layoutTitle}
+                  width={BLOG_HERO_IMAGE_WIDTH}
+                  height={BLOG_HERO_IMAGE_HEIGHT}
+                  class="h-auto w-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                  fetchpriority="high"
+                />
+              ) : (
+                <img
+                  src={postSocialImage}
+                  alt={layoutTitle}
+                  width={BLOG_HERO_IMAGE_WIDTH}
+                  height={BLOG_HERO_IMAGE_HEIGHT}
+                  class="h-auto w-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                  fetchpriority="high"
+                />
+              )}
+            </figure>
+          )
+        }
+
         <div class="blog-article-body w-full max-w-[700px] mx-auto">
           <div class="blog-article-content" set:html={content} />
         </div>
+
+        {
+          currentCategoryPath !== undefined && currentCategoryName !== "" && (
+            <nav
+              class="blog-post-category-guide rounded-xl border border-slate-100 bg-slate-50 p-5"
+              aria-label="この記事と同じテーマの記事"
+            >
+              <p class="text-sm font-bold text-slate-800">この記事は「{currentCategoryName}」カテゴリーの記事です。</p>
+              <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                関連するノウハウや制作メモをまとめて読みたい場合は、同じカテゴリーの記事一覧もご覧ください。
+              </p>
+              <a
+                href={currentCategoryPath}
+                class="mt-3 inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
+                aria-label={`${currentCategoryName}${categoryAriaLabel}`}
+                title={`${currentCategoryName}${categoryAriaTitle}`}
+              >
+                「{currentCategoryName}」の記事一覧へ
+                <span aria-hidden="true">→</span>
+              </a>
+            </nav>
+          )
+        }
 
         <div class="blog-post-share flex items-center justify-between py-6 border-t border-b border-slate-100">
           <span class="text-sm font-bold text-slate-400">記事をシェアする</span>
@@ -327,7 +409,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
               {globalText.blog.postCtaDescription}
             </p>
 
-            <div class="blog-post-cta-actions flex flex-col sm:flex-row justify-center gap-4 w-full max-w-xl mx-auto">
+            <div class="blog-post-cta-actions flex flex-col sm:flex-row justify-center gap-4 w-full max-w-2xl mx-auto">
               <a
                 href={contactUrl}
                 class="blog-post-cta-btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 w-full bg-primary text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
@@ -347,6 +429,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
                   ariaHidden={true}
                 />
                 {globalText.blog.postCtaWorksButton}
+              </a>
+              <a
+                href={serviceUrl}
+                class="blog-post-cta-btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3 w-full bg-white text-primary font-bold rounded-lg border border-primary hover:bg-slate-50 transition-colors"
+              >
+                <SafeIcon name="fa6-solid:desktop" width={20} height={20} class="shrink-0" ariaHidden={true} />
+                サービス内容を見る
               </a>
             </div>
           </div>
@@ -448,7 +537,7 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
           class="blog-post-sidebar-popular-title text-sm font-normal text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2"
         >
           <SafeIcon name="emojione-v1:star" width={18} height={18} class="text-violet-500 shrink-0" ariaHidden={true} />
-          読まれている記事
+          {currentCategoryName !== "" ? `「${currentCategoryName}」とあわせて読みたい記事` : "あわせて読みたい記事"}
         </h3>
         <ul class="blog-post-sidebar-popular-list list-none pl-0">
           {

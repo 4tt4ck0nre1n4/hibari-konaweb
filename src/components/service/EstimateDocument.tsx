@@ -268,7 +268,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
             {!HIDE_LOGO_FOR_FIREFOX_TEST ? (
               <>
                 <img
-                  src="/logo_myPortfolioSite-name.svg"
+                  src="/logo.svg"
                   alt={COMPANY_INFO.name}
                   className="estimate-document__logo-icon"
                   width={32}

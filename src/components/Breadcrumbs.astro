@@ -1,16 +1,21 @@
 ---
 import { SITE as globalText } from "../config/site";
+import { stripHtml } from "@/util/jsonLd";
 
 interface CrumbProps {
-  name: string;
+  name: unknown;
   path?: string;
 }
 
 const { crumbs } = Astro.props as { crumbs: CrumbProps[] };
 
 const isValidPath = (path: unknown): path is string => typeof path === "string" && path.trim() !== "";
+const normalizedCrumbs = crumbs.map((crumb) => ({
+  ...crumb,
+  name: stripHtml(crumb.name),
+}));
 
-const hasMultipleCrumbs = crumbs.length > 1;
+const hasMultipleCrumbs = normalizedCrumbs.length > 1;
 
 /** canonical と同じく Astro.site を優先、未設定時は globalText.url */
 const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
@@ -26,7 +31,7 @@ if (hasMultipleCrumbs) {
   const jsonLdObject = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: crumbs.map((crumb, index) => {
+    itemListElement: normalizedCrumbs.map((crumb, index) => {
       const base = {
         "@type": "ListItem",
         position: index + 1,
@@ -54,7 +59,7 @@ if (hasMultipleCrumbs) {
 
       <div class="breadcrumbs" aria-label="Breadcrumb">
         <ol>
-          {crumbs.map((crumb) => (
+          {normalizedCrumbs.map((crumb) => (
             <li>
               {isValidPath(crumb.path) ? (
                 <a href={crumb.path} aria-label={`${crumb.name}ページへ`}>

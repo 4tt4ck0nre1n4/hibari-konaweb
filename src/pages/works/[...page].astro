@@ -8,6 +8,7 @@ import worksText from "@/data/worksText.json";
 import { WORKS_PAGE_API } from "@/api/headlessCms";
 import { Image } from "astro:assets";
 import { getOptimizedWordPressImage, getWordPressImageUrl } from "@/util/optimizeWordPressImage";
+import { compactJsonLd, stripHtml } from "@/util/jsonLd";
 
 interface WorkObject {
   id: string;
@@ -188,6 +189,14 @@ if (import.meta.env.DEV) {
 const isShowPagination = page.lastPage > 1;
 
 const works = Array.isArray(page.data) ? page.data : [];
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+
+function absoluteUrlForPath(path: string | undefined): string | undefined {
+  if (typeof path !== "string" || path.trim() === "") {
+    return undefined;
+  }
+  return new URL(path, `${siteBaseHref}/`).href;
+}
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
@@ -218,6 +227,31 @@ const repeatedWorks = Array.from(
   (_, i) => optimizedWorks[i % optimizedWorks.length]
 );
 
+const currentPageHref = absoluteUrlForPath(page.url.current) ?? new URL(Astro.url.pathname, `${siteBaseHref}/`).href;
+const prevPageHref = absoluteUrlForPath(page.url.prev);
+const nextPageHref = absoluteUrlForPath(page.url.next);
+const collectionJsonLd = JSON.stringify(
+  compactJsonLd({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${currentPageHref}#collection`,
+    url: currentPageHref,
+    name: globalText.works.title,
+    description: globalText.works.description,
+    inLanguage: "ja-JP",
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": `${siteBaseHref}/#website`,
+    },
+    hasPart: optimizedWorks.map((work, index) => ({
+      "@type": "CreativeWork",
+      position: (page.currentPage - 1) * 4 + index + 1,
+      name: stripHtml(work?.title?.rendered),
+      url: `${siteBaseHref}/works/${work?.slug}`,
+    })),
+  })
+);
+
 // const worksPagination = {
 //   first: "最初のページへ",
 //   prev: "前のページへ",
@@ -235,7 +269,10 @@ const repeatedWorks = Array.from(
   ogDescription={globalText.works.description}
   twitterTitle={globalText.works.title}
   twitterDescription={globalText.works.description}
+  jsonLd={collectionJsonLd}
 >
+  {typeof prevPageHref === "string" && <link slot="head" rel="prev" href={prevPageHref} />}
+  {typeof nextPageHref === "string" && <link slot="head" rel="next" href={nextPageHref} />}
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />
   </div>
@@ -319,15 +356,27 @@ const repeatedWorks = Array.from(
                     aria-label={`${work.slug}(${work?.title?.rendered})${worksText.metaItems.ariaLabel}`}
                     title={`${work.slug}(${work?.title?.rendered})${worksText.metaItems.ariaTitle}`}
                   >
-                    <img
-                      class="worksCard__image"
-                      src={work?.fallbackUrl ?? ""}
-                      alt={`${work?.title?.rendered ?? "No image available"}${worksText.metaItems.alt}`}
-                      width={worksText.metaItems.width}
-                      height={worksText.metaItems.height}
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    {work.optimizedImage ? (
+                      <Image
+                        class="worksCard__image"
+                        src={work.optimizedImage.src}
+                        alt={`${work?.title?.rendered ?? "No image available"}${worksText.metaItems.alt}`}
+                        width={worksText.metaItems.width}
+                        height={worksText.metaItems.height}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <img
+                        class="worksCard__image"
+                        src={work?.fallbackUrl ?? ""}
+                        alt={`${work?.title?.rendered ?? "No image available"}${worksText.metaItems.alt}`}
+                        width={worksText.metaItems.width}
+                        height={worksText.metaItems.height}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
                   </a>
                   <a
                     class="worksCard__link"

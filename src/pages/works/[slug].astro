@@ -4,11 +4,17 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import worksText from "@/data/worksText.json";
 import { SITE as globalText } from "@/config/site";
 import { WORKS_SLUG_API } from "@/api/headlessCms";
+import { Image } from "astro:assets";
 
 export { getWorksSlugStaticPaths as getStaticPaths } from "@/api/worksBuild";
-import { getWordPressImageUrl, type WordPressImageFieldInput } from "@/util/optimizeWordPressImage";
+import {
+  getOptimizedWordPressImage,
+  getWordPressImageUrl,
+  type WordPressImageFieldInput,
+} from "@/util/optimizeWordPressImage";
 import { worksResponseSchema, type Works } from "@/schemas/api.schema";
 import { validateApiResponse } from "@/schemas/api.schema";
+import { compactJsonLd, stripHtml, toAbsoluteUrl, toIsoDate, uniqueNonEmptyStrings } from "@/util/jsonLd";
 
 interface WorksTextData {
   worksTitle: string;
@@ -24,6 +30,12 @@ interface WorksTextData {
 }
 
 const typedWorksText: WorksTextData = worksText as unknown as WorksTextData;
+
+const WORK_MAIN_IMAGE_WIDTH = 1200;
+const WORK_MAIN_IMAGE_HEIGHT = 675;
+const WORK_SP_IMAGE_WIDTH = 420;
+const WORK_SP_IMAGE_HEIGHT = 840;
+const WORK_ICON_IMAGE_SIZE = 96;
 
 const { slug } = Astro.params as { slug: string };
 // getStaticPaths()で取得したデータを優先的に使用
@@ -118,8 +130,9 @@ const icons = work?.acf
   : [];
 
 const worksSlugTitle = work?.title?.rendered;
+const worksPlainTitle = stripHtml(worksSlugTitle);
 const worksSlugDescription = acfStr(work?.acf?.description);
-const worksScreenshotPc = getWordPressImageUrl(asWpImage(work?.acf?.screenshot_pc)) ?? "";
+const worksPlainDescription = stripHtml(worksSlugDescription);
 const worksSlugLeftLink = optionalAcfStr(work?.acf?.left_link);
 const worksSlugRightLink = optionalAcfStr(work?.acf?.right_link);
 const worksRightHeader = optionalAcfStr(work?.acf?.right_header);
@@ -130,22 +143,77 @@ const screenshotPcUrl = getWordPressImageUrl(asWpImage(work?.acf?.screenshot_pc)
 const pcImageUrl = getWordPressImageUrl(asWpImage(work?.acf?.pc_image)) ?? "";
 const spImageUrl = getWordPressImageUrl(asWpImage(work?.acf?.sp_image)) ?? "";
 const iconImageUrl = getWordPressImageUrl(asWpImage(work?.acf?.icon_image)) ?? "";
+const optimizedScreenshotPc = await getOptimizedWordPressImage(asWpImage(work?.acf?.screenshot_pc), {
+  width: WORK_MAIN_IMAGE_WIDTH,
+  height: WORK_MAIN_IMAGE_HEIGHT,
+  quality: 90,
+  format: "webp",
+});
+const optimizedPcImage = await getOptimizedWordPressImage(asWpImage(work?.acf?.pc_image), {
+  width: WORK_MAIN_IMAGE_WIDTH,
+  height: WORK_MAIN_IMAGE_HEIGHT,
+  quality: 90,
+  format: "webp",
+});
+const optimizedSpImage = await getOptimizedWordPressImage(asWpImage(work?.acf?.sp_image), {
+  width: WORK_SP_IMAGE_WIDTH,
+  height: WORK_SP_IMAGE_HEIGHT,
+  quality: 88,
+  format: "webp",
+});
+const optimizedIconImage = await getOptimizedWordPressImage(asWpImage(work?.acf?.icon_image), {
+  width: WORK_ICON_IMAGE_SIZE,
+  height: WORK_ICON_IMAGE_SIZE,
+  quality: 90,
+  format: "webp",
+});
 
 const siteOrigin = Astro.site?.origin ?? globalText.url.replace(/\/$/, "");
+const siteBaseHref = Astro.site?.href.replace(/\/$/, "") ?? globalText.url.replace(/\/$/, "");
+const workCanonicalHref = `${siteOrigin}/works/${work.slug}`;
+const mainScreenshotSrc = optimizedScreenshotPc?.src ?? screenshotPcUrl;
+const workImageHref = toAbsoluteUrl(mainScreenshotSrc, siteBaseHref);
+const workExternalUrl =
+  typeof worksSlugLeftLink === "string" && /^https?:\/\//.test(worksSlugLeftLink) ? worksSlugLeftLink : undefined;
+const workLeadMenu = Array.isArray(workTextData?.left_leadMenu) ? workTextData.left_leadMenu : [];
+const workTopicNames = uniqueNonEmptyStrings([
+  worksRightHeader,
+  ...workLeadMenu.map(({ header }) => header),
+  ...icons.map((icon) => icon.name),
+]);
+const creatorLd = {
+  "@type": "Person",
+  "@id": `${siteBaseHref}/#person`,
+  name: globalText.global.author,
+  url: siteBaseHref,
+};
 
-const jsonLd = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "CreativeWork",
-  name: worksSlugTitle,
-  description: worksSlugDescription.replace(/(<([^>]+)>)/gi, "").trim(),
-  url: `${siteOrigin}/works/${work.slug}`,
-  ...(work.date !== "" ? { datePublished: work.date } : {}),
-  author: {
-    "@type": "Person",
-    name: "hibari-konaweb.com",
-  },
-  image: worksScreenshotPc,
-});
+const jsonLd = JSON.stringify(
+  compactJsonLd({
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "@id": `${workCanonicalHref}#creativework`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": workCanonicalHref,
+    },
+    name: worksPlainTitle,
+    description: worksPlainDescription,
+    url: workCanonicalHref,
+    sameAs: workExternalUrl,
+    datePublished: toIsoDate(work.date),
+    author: creatorLd,
+    creator: creatorLd,
+    provider: creatorLd,
+    image: workImageHref,
+    thumbnailUrl: workImageHref,
+    about: workTopicNames.map((name) => ({
+      "@type": "Thing",
+      name,
+    })),
+    keywords: workTopicNames,
+  })
+);
 
 const worksSlugLinks = {
   slug: { rendered: work?.slug },
@@ -154,7 +222,7 @@ const worksSlugLinks = {
   targetBlank: worksText.links.targetBlank,
 };
 
-const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, { name: worksSlugTitle }];
+const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, { name: worksPlainTitle }];
 ---
 
 <Layout
@@ -167,6 +235,11 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
   twitterDescription={worksSlugDescription}
   jsonLd={jsonLd}
 >
+  {
+    mainScreenshotSrc !== "" && (
+      <link slot="head" rel="preload" href={mainScreenshotSrc} as="image" fetchpriority="high" />
+    )
+  }
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />
   </div>
@@ -177,13 +250,29 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
           <div class="split__container">
             <div class="split left left1">
               <div class="left__imageInner">
-                <img
-                  class="left__image"
-                  src={screenshotPcUrl}
-                  alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
-                  decoding="async"
-                  loading="lazy"
-                />
+                {optimizedScreenshotPc !== null ? (
+                  <Image
+                    class="left__image"
+                    src={optimizedScreenshotPc.src}
+                    alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
+                    width={WORK_MAIN_IMAGE_WIDTH}
+                    height={WORK_MAIN_IMAGE_HEIGHT}
+                    decoding="async"
+                    loading="eager"
+                    fetchpriority="high"
+                  />
+                ) : (
+                  <img
+                    class="left__image"
+                    src={screenshotPcUrl}
+                    alt={worksSlugTitle?.trim() !== "" ? worksSlugTitle : "No image available"}
+                    width={WORK_MAIN_IMAGE_WIDTH}
+                    height={WORK_MAIN_IMAGE_HEIGHT}
+                    decoding="async"
+                    loading="eager"
+                    fetchpriority="high"
+                  />
+                )}
               </div>
               <div class="left__inner">
                 {/* サイトタイトル */}
@@ -225,38 +314,78 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
             <div class="split right site1">
               {/* サイト pc画像 */}
               <div class="right__pcImageInner">
-                <img
-                  class="right__pcImage"
-                  src={pcImageUrl}
-                  alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                  decoding="async"
-                  loading="lazy"
-                />
+                {optimizedPcImage !== null ? (
+                  <Image
+                    class="right__pcImage"
+                    src={optimizedPcImage.src}
+                    alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                    width={WORK_MAIN_IMAGE_WIDTH}
+                    height={WORK_MAIN_IMAGE_HEIGHT}
+                    decoding="async"
+                    loading="lazy"
+                  />
+                ) : (
+                  <img
+                    class="right__pcImage"
+                    src={pcImageUrl}
+                    alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                    width={WORK_MAIN_IMAGE_WIDTH}
+                    height={WORK_MAIN_IMAGE_HEIGHT}
+                    decoding="async"
+                    loading="lazy"
+                  />
+                )}
               </div>
               {/* サイトタイトル */}
               <h2 class="right__header" set:html={worksRightHeader ?? "No title available"} />
               {/* ロゴアイコン */}
-              {iconImageUrl !== "" && (
-                <img
-                  class="right__logoIcon"
-                  src={iconImageUrl}
-                  alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
-                  decoding="async"
-                  loading="lazy"
-                />
-              )}
+              {iconImageUrl !== "" &&
+                (optimizedIconImage !== null ? (
+                  <Image
+                    class="right__logoIcon"
+                    src={optimizedIconImage.src}
+                    alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                    width={WORK_ICON_IMAGE_SIZE}
+                    height={WORK_ICON_IMAGE_SIZE}
+                    decoding="async"
+                    loading="lazy"
+                  />
+                ) : (
+                  <img
+                    class="right__logoIcon"
+                    src={iconImageUrl}
+                    alt={worksSlugTitle.trim() !== "" ? worksSlugTitle : "No image available"}
+                    width={WORK_ICON_IMAGE_SIZE}
+                    height={WORK_ICON_IMAGE_SIZE}
+                    decoding="async"
+                    loading="lazy"
+                  />
+                ))}
               {/* Basic認証テキスト */}
               <p class="right__text" set:html={worksRightAccess ?? ""} />
               {/* サイト sp画像 */}
-              {spImageUrl !== "" && (
-                <img
-                  class="right__spImage"
-                  src={spImageUrl}
-                  alt={worksSlugTitle ?? "No image"}
-                  loading="lazy"
-                  decoding="async"
-                />
-              )}
+              {spImageUrl !== "" &&
+                (optimizedSpImage !== null ? (
+                  <Image
+                    class="right__spImage"
+                    src={optimizedSpImage.src}
+                    alt={worksSlugTitle ?? "No image"}
+                    width={WORK_SP_IMAGE_WIDTH}
+                    height={WORK_SP_IMAGE_HEIGHT}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <img
+                    class="right__spImage"
+                    src={spImageUrl}
+                    alt={worksSlugTitle ?? "No image"}
+                    width={WORK_SP_IMAGE_WIDTH}
+                    height={WORK_SP_IMAGE_HEIGHT}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ))}
               {/* サイトリンク URL */}
               <a
                 class="right__link"
@@ -275,6 +404,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                         class="right__iconMenu_image"
                         src={url}
                         alt={`${name} icon`}
+                        width={WORK_ICON_IMAGE_SIZE}
+                        height={WORK_ICON_IMAGE_SIZE}
                         loading="lazy"
                         decoding="async"
                       />
