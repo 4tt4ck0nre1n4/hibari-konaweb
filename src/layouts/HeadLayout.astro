@@ -923,17 +923,8 @@ const cspContent = isDev
       <script is:inline type="application/ld+json" set:html={jsonLd} />
     )
   }
-  <!-- フォントは@fontsource/poppinsをLayout.astroでインポート済み -->
-
   <!-- 非クリティカルなフォントの遅延読み込み -->
   <NonCriticalFonts />
-
-  <!-- NOTE:
-      以前はFOUC防止のために html を visibility:hidden にしていましたが、
-      DevTools Lighthouse 実行時に show 処理が走らないケースがあり NO_FCP の原因になりました。
-      Critical CSS をインライン化している前提では、ここで html を隠すメリットが薄いため、
-      常に描画可能にして Lighthouse を含む計測ツールで確実にFCPが発生するようにします。
-    -->
   <script is:inline>
     // 念のため、常に可視化（View Transitionsの遷移後も含む）
     document.documentElement.style.visibility = "visible";

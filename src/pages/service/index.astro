@@ -10,17 +10,7 @@ import IconifyInline from "@/components/ui/IconifyInline";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
-type ServiceSimulatorCopy = typeof globalText.service & {
-  simulatorLeadCardTitle: string;
-  simulatorLeadCardSubtitle: string;
-  simulatorLeadStepLabels: string[];
-  simulatorLeadBenefits: string[];
-  simulatorContactNote: string;
-  simulatorContactHref?: string;
-  simulatorContactLinkLabel: string;
-};
-
-const serviceSimulator = globalText.service as ServiceSimulatorCopy;
+const serviceSimulator = globalText.service;
 const stepLabels = serviceSimulator.simulatorLeadStepLabels;
 const leadBenefits = serviceSimulator.simulatorLeadBenefits;
 ---
@@ -45,9 +35,7 @@ const leadBenefits = serviceSimulator.simulatorLeadBenefits;
     <div class="pricing-simulator-wrapper">
       <div class="service-simulator-page-heading">
         <AboutHeading aboutTitle="Price" aboutSubTitle="料金シミュレーターについて" headingLevel={1} />
-        <p class="service-simulator-page-heading__lead">
-          Web制作・サイト改善を検討している方向けに、必要な項目を選ぶだけで概算費用と相談の流れを確認できます。
-        </p>
+        <p class="service-simulator-page-heading__lead">{serviceSimulator.simulatorPageLead}</p>
       </div>
       <div class="pricePage__wrapper service-simulator-lead">
         <section class="service-simulator-lead-card" aria-labelledby="simulator-lead-title">
@@ -57,7 +45,12 @@ const leadBenefits = serviceSimulator.simulatorLeadBenefits;
             </span>
             {serviceSimulator.simulatorLeadCardTitle}
           </h2>
-          <p class="service-simulator-lead-card__subtitle">{serviceSimulator.simulatorLeadCardSubtitle}</p>
+          <p class="service-simulator-lead-card__subtitle">
+            <span class="service-simulator-lead-card__subtitle-bold">
+              {serviceSimulator.simulatorLeadCardSubtitleBold}
+            </span>
+            {serviceSimulator.simulatorLeadCardSubtitle}
+          </p>
           <ol class="service-simulator-lead-card__steps">
             {
               stepLabels.map((label, index) => (
@@ -119,11 +112,11 @@ const leadBenefits = serviceSimulator.simulatorLeadBenefits;
     margin-inline: auto;
   }
   .service-simulator-page-heading__lead {
-    width: min(90%, 700px);
+    width: min(90%, 580px);
     font-size: 1rem;
     line-height: 1.8;
     letter-spacing: 0.06em;
-    text-align: center;
+    text-align: left;
     margin-block-start: 1rem;
     margin-inline: auto;
   }
@@ -252,7 +245,10 @@ const leadBenefits = serviceSimulator.simulatorLeadBenefits;
     align-items: center;
     flex-shrink: 0;
   }
-
+  .service-simulator-lead-card__subtitle-bold {
+    font-weight: 700;
+    color: #166534;
+  }
   .service-simulator-lead-card__subtitle {
     max-width: 36rem;
     font-size: 1rem;

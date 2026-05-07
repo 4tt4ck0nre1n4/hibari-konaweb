@@ -13,13 +13,19 @@ import {
   type BlogPostSidebarItem,
 } from "@/schemas/api.schema";
 import { validateApiResponse } from "@/schemas/api.schema";
-import { getOptimizedWordPressImage, getWordPressImageUrl } from "@/util/optimizeWordPressImage";
+import {
+  getOptimizedWordPressImage,
+  getWordPressImageUrl,
+  type WordPressImageFieldInput,
+} from "@/util/optimizeWordPressImage";
 import { getCategoryBadgeClasses } from "@/util/categoryBadgeStyle";
 import { compactJsonLd, stripHtml, toAbsoluteUrl, toIsoDate, uniqueNonEmptyStrings } from "@/util/jsonLd";
 import "@/styles/blog-article.css";
 
-const BLOG_HERO_IMAGE_WIDTH = 1200;
-const BLOG_HERO_IMAGE_HEIGHT = 630;
+/** アイキャッチは最大幅のみ指定し縦横比を保持（OGP 寸法は出力画像に合わせる） */
+const BLOG_HERO_IMAGE_MAX_WIDTH = 1200;
+const BLOG_SOCIAL_IMAGE_FALLBACK_WIDTH = 1200;
+const BLOG_SOCIAL_IMAGE_FALLBACK_HEIGHT = 630;
 
 const dateIcon = {
   icon: "emojione-v1:alarm-clock",
@@ -168,13 +174,30 @@ const showServiceSidebarBanner = false;
 const layoutTitle = plainTitle !== "" ? plainTitle : "Blog Title Not Found";
 const jsonLdHeadline = plainTitle !== "" ? plainTitle : "Blog post";
 
-const postFeaturedImageUrl = getWordPressImageUrl(post?.acf?.blog_image);
-const optimizedFeaturedImage = await getOptimizedWordPressImage(post?.acf?.blog_image, {
-  width: BLOG_HERO_IMAGE_WIDTH,
-  height: BLOG_HERO_IMAGE_HEIGHT,
+const acfBlogImage = post?.acf?.blog_image as WordPressImageFieldInput | undefined;
+const postFeaturedImageUrl = getWordPressImageUrl(acfBlogImage);
+const acfFeaturedNumericDims =
+  acfBlogImage !== null &&
+  typeof acfBlogImage === "object" &&
+  typeof acfBlogImage.width === "number" &&
+  typeof acfBlogImage.height === "number"
+    ? { width: acfBlogImage.width, height: acfBlogImage.height }
+    : null;
+
+const optimizedFeaturedImage = await getOptimizedWordPressImage(acfBlogImage, {
+  width: BLOG_HERO_IMAGE_MAX_WIDTH,
   quality: 90,
   format: "webp",
 });
+
+const featuredSocialWidth =
+  optimizedFeaturedImage !== null
+    ? Number(optimizedFeaturedImage.attributes.width)
+    : (acfFeaturedNumericDims?.width ?? BLOG_SOCIAL_IMAGE_FALLBACK_WIDTH);
+const featuredSocialHeight =
+  optimizedFeaturedImage !== null
+    ? Number(optimizedFeaturedImage.attributes.height)
+    : (acfFeaturedNumericDims?.height ?? BLOG_SOCIAL_IMAGE_FALLBACK_HEIGHT);
 const postSocialImage =
   optimizedFeaturedImage !== null
     ? optimizedFeaturedImage.src
@@ -240,8 +263,8 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   jsonLd={jsonLd}
   socialImage={postSocialImage}
   socialImageAlt={layoutTitle}
-  socialImageWidth={BLOG_HERO_IMAGE_WIDTH}
-  socialImageHeight={BLOG_HERO_IMAGE_HEIGHT}
+  socialImageWidth={featuredSocialWidth}
+  socialImageHeight={featuredSocialHeight}
 >
   {
     typeof postSocialImage === "string" && (
@@ -312,9 +335,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
                 <Image
                   src={optimizedFeaturedImage.src}
                   alt={layoutTitle}
-                  width={BLOG_HERO_IMAGE_WIDTH}
-                  height={BLOG_HERO_IMAGE_HEIGHT}
-                  class="h-auto w-full object-cover"
+                  width={featuredSocialWidth}
+                  height={featuredSocialHeight}
+                  class="h-auto w-full max-w-full"
                   loading="eager"
                   decoding="async"
                   fetchpriority="high"
@@ -323,9 +346,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
                 <img
                   src={postSocialImage}
                   alt={layoutTitle}
-                  width={BLOG_HERO_IMAGE_WIDTH}
-                  height={BLOG_HERO_IMAGE_HEIGHT}
-                  class="h-auto w-full object-cover"
+                  width={featuredSocialWidth}
+                  height={featuredSocialHeight}
+                  class="h-auto w-full max-w-full"
                   loading="eager"
                   decoding="async"
                   fetchpriority="high"
@@ -419,16 +442,20 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
               </a>
               <a
                 href={worksUrl}
-                class="blog-post-cta-btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3 w-full bg-white text-primary font-bold rounded-lg border border-primary hover:bg-slate-50 transition-colors"
+                class="blog-post-cta-btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3 w-full bg-white text-primary font-bold rounded-lg border border-primary hover:bg-slate-50 transition-colors text-center"
+                aria-label={`${globalText.blog.postCtaWorksButtonLine1}${globalText.blog.postCtaWorksButtonLine2}`}
               >
                 <SafeIcon
                   name="emojione-v1:laptop-computer"
                   width={20}
                   height={20}
-                  class="shrink-0"
+                  class="shrink-0 self-center"
                   ariaHidden={true}
                 />
-                {globalText.blog.postCtaWorksButton}
+                <span class="flex flex-col items-center leading-tight">
+                  <span class="block">{globalText.blog.postCtaWorksButtonLine1}</span>
+                  <span class="block">{globalText.blog.postCtaWorksButtonLine2}</span>
+                </span>
               </a>
               <a
                 href={serviceUrl}

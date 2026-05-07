@@ -194,8 +194,6 @@ const blogImages = await Promise.all(
 );
 
 const hasNextPage = page.size < page.total ? true : false;
-const blogTitle = "Blog";
-const blogText = "Web制作・フロントエンド・WordPress・AI活用に関するブログ記事の一覧です。";
 const errorCategoryText = "カテゴリーが見つかりませんでした。";
 const postAriaLabel = "の記事へ";
 const postAriaTitle = "の記事へ";
@@ -269,12 +267,8 @@ const collectionJsonLd = JSON.stringify(
   <div id="main-container">
     <div class="blog__wrapper">
       <FlowingLinesWrapper>
-        <h1 class="blog__title">
-          {blogTitle}
-        </h1>
-        <p class="blog__text">
-          {blogText}
-        </p>
+        <h1 class="blog__title">{globalText.blog.indexHeading}</h1>
+        <p class="blog__text">{globalText.blog.description}</p>
       </FlowingLinesWrapper>
       <!-- <ul class="blog__menu"> -->
       <ul class:list={["blog__menu", blogImages.length === 0 && "blog__menu--empty"]}>

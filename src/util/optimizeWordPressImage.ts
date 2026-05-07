@@ -117,9 +117,19 @@ export async function getOptimizedWordPressImage(
   const width =
     options?.width ??
     (imageData !== null && typeof imageData === "object" && "width" in imageData ? imageData.width : undefined);
-  const height =
-    options?.height ??
-    (imageData !== null && typeof imageData === "object" && "height" in imageData ? imageData.height : undefined);
+  /**
+   * options に width のみ指定したときは縦横比を保つため height を付けない（ACF の height をマージしない）。
+   * width・height の両方が指定されている一覧サムネ等は従来どおり。
+   */
+  let height: number | undefined;
+  if (options !== undefined && "height" in options) {
+    height = options.height;
+  } else if (options?.width !== undefined) {
+    height = undefined;
+  } else {
+    height =
+      imageData !== null && typeof imageData === "object" && "height" in imageData ? imageData.height : undefined;
+  }
 
   return optimizeWordPressImage(imageUrl, {
     ...options,

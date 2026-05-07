@@ -66,14 +66,18 @@ export const SITE = {
   },
   blog: {
     title: "Blog | My Portfolio Site",
-    description: "ブログの記事一覧です。",
+    /** `/blog` 一覧の H1 文言 */
+    indexHeading: "Blog",
+    description: "Web制作・フロントエンド・WordPress・AI活用に関するブログ記事の一覧です。",
     error: "申し訳ございません。ブログの記事一覧のデータを読み込むことができませんでした。もう一度お試しください。",
     postCtaHeading: "あなたのビジネス課題をWebで解決しませんか？",
     postCtaDescription:
       "この記事で紹介した技術を用いたサイト構築や、現状のWebサイトの改善提案を行っています。まずは無料でお気軽にご相談ください。",
     postCtaBadge: "Web制作・システム開発のご相談",
     postCtaContactButton: "無料相談・お問い合わせ",
-    postCtaWorksButton: "制作実績を見る →",
+    /** CTA の Works ボタンは狭い幅での折り返し位置用に 2 行に分割 */
+    postCtaWorksButtonLine1: "制作実績を",
+    postCtaWorksButtonLine2: "見る →",
     authorName: "hibari-konaweb.com",
     profileName: "",
     profileTagline: "フロントエンドエンジニア",
@@ -104,9 +108,12 @@ export const SITE = {
   service: {
     title: "Service | My Portfolio Site",
     description: "Web制作などのお仕事に関する私のサービス内容と料金表を紹介しています。",
-    simulatorLeadCardTitle: "プランを選んで、タップするだけ。",
-    simulatorLeadCardSubtitle:
-      "その場でわかる料金シミュレーター。概算金額がすぐに確認でき、そのまま見積書の作成まで進められます。",
+    /** 料金シミュレーター見出し直下のリード文（`/service`） */
+    simulatorPageLead:
+      "Web制作・サイト改善を検討している方向けに、必要な項目を選ぶだけで概算費用と相談の流れを確認できます。",
+    simulatorLeadCardTitle: "プランを選んでタップするだけ。",
+    simulatorLeadCardSubtitleBold: "その場でわかる料金シミュレーター。",
+    simulatorLeadCardSubtitle: "概算金額がすぐに確認でき、そのまま見積書の作成まで進められます。",
     simulatorLeadStepLabels: ["プランを選ぶ", "項目をタップ", "見積書を作成"],
     simulatorLeadBenefits: ["最短30秒", "ステップが視覚的", "簡単に見積書を作成"],
     simulatorContactNote: "正式なお見積りや仕様のすり合わせは、",
