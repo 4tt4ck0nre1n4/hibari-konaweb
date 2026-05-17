@@ -77,9 +77,7 @@ export const SITE = {
       "この記事で紹介した技術を用いたサイト構築や、現状のWebサイトの改善提案を行っています。まずは無料でお気軽にご相談ください。",
     postCtaBadge: "Web制作・システム開発のご相談",
     postCtaContactButton: "無料相談・お問い合わせ",
-    /** CTA の Works ボタンは狭い幅での折り返し位置用に 2 行に分割 */
-    postCtaWorksButtonLine1: "制作実績を",
-    postCtaWorksButtonLine2: "見る →",
+    postCtaWorksButton: "制作実績を見る →",
     authorName: "hibari-konaweb.com",
     profileName: "",
     profileTagline: "フロントエンドエンジニア",

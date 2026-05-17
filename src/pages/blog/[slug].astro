@@ -467,19 +467,10 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
               <a
                 href={worksUrl}
                 class="blog-post-cta-btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3 w-full bg-white text-primary font-bold rounded-lg border border-primary hover:bg-slate-50 transition-colors text-center"
-                aria-label={`${globalText.blog.postCtaWorksButtonLine1}${globalText.blog.postCtaWorksButtonLine2}`}
+                aria-label={globalText.blog.postCtaWorksButton}
               >
-                <SafeIcon
-                  name="emojione-v1:laptop-computer"
-                  width={20}
-                  height={20}
-                  class="shrink-0 self-center"
-                  ariaHidden={true}
-                />
-                <span class="flex flex-col items-center leading-tight">
-                  <span class="block">{globalText.blog.postCtaWorksButtonLine1}</span>
-                  <span class="block">{globalText.blog.postCtaWorksButtonLine2}</span>
-                </span>
+                <SafeIcon name="fa6-solid:desktop" width={20} height={20} class="shrink-0" ariaHidden={true} />
+                {globalText.blog.postCtaWorksButton}
               </a>
               <a
                 href={serviceUrl}
@@ -614,9 +605,9 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
                           <Image
                             src={thumb}
                             alt=""
-                            width={640}
+                            width={840}
                             height={360}
-                            class="h-full w-full object-cover"
+                            class="h-full w-full object-contain"
                             loading="lazy"
                           />
                         ) : null}

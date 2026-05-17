@@ -114,6 +114,14 @@
   margin-block-start: 1rem;
 }
 
+/* アイキャッチ：アスペクト比を保持し、レイアウト用の箱で潰れないようにする */
+.blog-post-featured-image img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
 .blog-article-body {
   width: 100%;
   max-width: 700px;
@@ -583,17 +591,18 @@
 
 .blog-post-sidebar-popular-thumb {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 21 / 9;
   overflow: hidden;
   border-radius: 0.5rem;
   background-color: rgb(241 245 249);
-  border: 1px solid rgb(226 232 240);
+  border: rgb(226 232 240) 1px solid;
 }
 
 .blog-post-sidebar-popular-thumb img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   transition: transform 200ms ease-out;
 }
 
