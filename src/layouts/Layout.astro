@@ -70,13 +70,12 @@ const shouldLoadGA: boolean =
     <slot name="head" slot="head" />
   </HeadLayout>
   <body>
-    <!-- アクセシビリティ: スキップリンク（キーボード操作ユーザー向け） -->
     <SkipLink />
 
     <div id="overlay-root"></div>
     <div id="outer-container">
       <Header />
-      <!-- WCAG 2.1準拠: main要素にaria-labelでアクセシビリティ対応 -->
+      <!-- WCAG 2.1準拠: アクセシビリティ対応 -->
       <main id="page-wrap" aria-label="メインコンテンツ">
         <slot />
       </main>

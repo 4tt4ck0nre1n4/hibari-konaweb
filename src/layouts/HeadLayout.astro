@@ -135,7 +135,6 @@ const cspContent = isDev
 
   <slot name="head" />
   <ClientRouter />
-  <!-- Critical CSS インライン化 -->
   <style is:global>
     /* CSS変数の定義（初期レンダリングに必須） */
     :root {
@@ -915,27 +914,23 @@ const cspContent = isDev
     }
   </style>
 
-  <!-- サイト全体の構造化データ（Person + WebSite） -->
   <PersonSchema />
   <WebSiteSchema />
 
-  <!-- ページ固有の構造化データ -->
   {
     typeof jsonLd === "string" && jsonLd.trim() !== "" && (
       <script is:inline type="application/ld+json" set:html={jsonLd} />
     )
   }
-  <!-- 非クリティカルなフォントの遅延読み込み -->
+
   <NonCriticalFonts />
   <script is:inline>
-    // 念のため、常に可視化（View Transitionsの遷移後も含む）
     document.documentElement.style.visibility = "visible";
     document.addEventListener("astro:after-swap", () => {
       document.documentElement.style.visibility = "visible";
     });
   </script>
 
-  <!-- CSS非同期読み込みのフォールバックスクリプト -->
   <script is:inline>
     // preload + onload パターンと media="print" hack のフォールバック
     (function () {
@@ -985,8 +980,6 @@ const cspContent = isDev
     })();
   </script>
 
-  <!-- グローバルエラーハンドラー: 動的インポートのエラーを適切に処理 -->
-  <!-- is:inlineで即座に実行し、他のスクリプトより先にエラーハンドラーを設定 -->
   <script is:inline>
     // @ts-nocheck
     // IIFEでスコープを分離（重複宣言エラーを防ぐ）
