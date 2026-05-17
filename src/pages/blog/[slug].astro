@@ -26,6 +26,7 @@ import "@/styles/blog-article.css";
 const BLOG_HERO_IMAGE_MAX_WIDTH = 1200;
 const BLOG_SOCIAL_IMAGE_FALLBACK_WIDTH = 1200;
 const BLOG_SOCIAL_IMAGE_FALLBACK_HEIGHT = 630;
+const BLOG_META_DESCRIPTION_MAX_LENGTH = 120;
 
 const dateIcon = {
   icon: "emojione-v1:alarm-clock",
@@ -42,6 +43,22 @@ const categoryIcon = {
 const shareIconSize = 18;
 
 const isDevBlogSlug = import.meta.env.DEV;
+
+function buildMetaDescription(...sources: unknown[]): string {
+  for (const source of sources) {
+    const text = stripHtml(source);
+    if (text === "") {
+      continue;
+    }
+
+    const chars = Array.from(text);
+    return chars.length > BLOG_META_DESCRIPTION_MAX_LENGTH
+      ? `${chars.slice(0, BLOG_META_DESCRIPTION_MAX_LENGTH).join("")}...`
+      : text;
+  }
+
+  return globalText.blog.description;
+}
 
 export { getBlogSlugStaticPaths as getStaticPaths } from "@/api/blogPostsBuild";
 
@@ -150,11 +167,22 @@ const currentCategoryPath =
   typeof currentCategory?.slug === "string" && currentCategory.slug.trim() !== ""
     ? `/blog/category/${decodeURIComponent(currentCategory.slug)}`
     : undefined;
+const sameCategorySidebarPosts =
+  currentCategory === undefined
+    ? []
+    : sidebarPosts.filter((sidebarPost) =>
+        Array.isArray(sidebarPost.cat_info)
+          ? sidebarPost.cat_info.some(
+              (category) => category.id === currentCategory.id || category.slug === currentCategory.slug
+            )
+          : false
+      );
+const relatedSidebarPosts = sameCategorySidebarPosts.length > 0 ? sameCategorySidebarPosts : sidebarPosts;
 export const prerender = true;
 
 const acfDescription: string = typeof post?.acf?.description === "string" ? post.acf.description : "";
-const postMetaDescription = acfDescription.trim();
-const jsonLdDescription = stripHtml(acfDescription);
+const postMetaDescription = buildMetaDescription(acfDescription, post?.excerpt?.rendered, content);
+const jsonLdDescription = postMetaDescription;
 
 const siteBase = globalText.url.replace(/\/$/, "");
 const siteBaseHref = Astro.site?.href.replace(/\/$/, "") ?? siteBase;
@@ -234,11 +262,7 @@ const blogPostingLd = compactJsonLd({
   datePublished: publishedDate,
   dateModified: dateModifiedIso,
   url: articleCanonicalHref,
-  author: {
-    "@type": "Person",
-    name: globalText.blog.authorName,
-    url: siteBaseHref,
-  },
+  author: publisherLd,
   publisher: publisherLd,
   image: blogPostingImageHref,
   thumbnailUrl: blogPostingImageHref,
@@ -568,14 +592,14 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
         </h3>
         <ul class="blog-post-sidebar-popular-list list-none pl-0">
           {
-            sidebarPosts.length === 0 ? (
+            relatedSidebarPosts.length === 0 ? (
               <li class="text-xs text-slate-500">
                 {sidebarListFetchFailed
                   ? "記事一覧を読み込めませんでした。時間をおいて再度お試しください。"
                   : "他に表示できる記事はまだありません。"}
               </li>
             ) : (
-              sidebarPosts.map((p) => {
+              relatedSidebarPosts.map((p) => {
                 const thumb = getWordPressImageUrl(p.acf?.blog_image);
                 const itemTitle = p.title?.rendered ?? "";
                 const firstCat = Array.isArray(p.cat_info) && p.cat_info.length > 0 ? p.cat_info[0] : undefined;
@@ -612,6 +636,17 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
           }
         </ul>
         <div class="blog-post-sidebar-popular-footer-wrap">
+          {
+            currentCategoryPath !== undefined && currentCategoryName !== "" && (
+              <a
+                href={currentCategoryPath}
+                class="blog-post-sidebar-popular-footer text-sm font-normal text-slate-600 transition-colors duration-200 hover:text-primary hover:underline"
+              >
+                「{currentCategoryName}」の記事をもっと見る
+                <span aria-hidden="true">→</span>
+              </a>
+            )
+          }
           <a
             href="/blog"
             class="blog-post-sidebar-popular-footer text-sm font-normal text-slate-600 transition-colors duration-200 hover:text-primary hover:underline"

@@ -202,9 +202,8 @@ const jsonLd = JSON.stringify(
     url: workCanonicalHref,
     sameAs: workExternalUrl,
     datePublished: toIsoDate(work.date),
-    author: creatorLd,
     creator: creatorLd,
-    provider: creatorLd,
+    author: creatorLd,
     image: workImageHref,
     thumbnailUrl: workImageHref,
     about: workTopicNames.map((name) => ({
@@ -308,6 +307,19 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
                     </li>
                   )}
                 </ul>
+                <nav class="left__workCta" aria-label="実績に関連する相談導線">
+                  <p class="left__workCta_text">
+                    この実績のようなWeb制作・サイト改善をご検討中の方は、目的に合わせた設計から実装までご相談いただけます。
+                  </p>
+                  <div class="left__workCta_links">
+                    <a class="left__workCta_link" href="/service">
+                      サービス内容を見る
+                    </a>
+                    <a class="left__workCta_link" href="/contact">
+                      制作について相談する
+                    </a>
+                  </div>
+                </nav>
               </div>
             </div>
 
@@ -600,6 +612,33 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Works", path: "/works" }, 
     letter-spacing: 0.16em;
     text-align: justify;
     margin-block-start: 0.5rem;
+  }
+  .left__workCta {
+    background-color: rgb(255 255 255 / 0.64);
+    border: 1px solid rgb(102 51 153 / 0.24);
+    border-radius: 0.75rem;
+    margin-block-start: 2rem;
+    padding-block: 1rem;
+    padding-inline: 1rem;
+  }
+  .left__workCta_text {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    letter-spacing: 0.08em;
+    text-align: justify;
+  }
+  .left__workCta_links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 1rem;
+  }
+  .left__workCta_link {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-purple);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
   /* 左サイド サイトリンク URL */
   .left__link {

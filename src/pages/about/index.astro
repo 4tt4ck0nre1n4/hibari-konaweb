@@ -10,6 +10,7 @@ import Card from "@/components/about/Card.astro";
 import aboutText from "@/data/aboutText.json";
 import serviceText from "@/data/serviceText.json";
 import { SITE as globalText } from "@/config/site";
+import { compactJsonLd, stripHtml } from "@/util/jsonLd";
 
 interface AboutText {
   aboutHeader: string;
@@ -82,16 +83,43 @@ const skillsTitle = serviceText.skill.skillTitle;
 const skillsSubTitle = serviceText.skill.skillSubTitle;
 const serviceTitle = serviceText.service.serviceTitle;
 const serviceSubTitle = serviceText.service.serviceSubTitle;
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+const pageHref = Astro.site != null ? new URL(Astro.url.pathname, Astro.site).href : `${siteBaseHref}/about`;
+const jsonLd = JSON.stringify(
+  compactJsonLd({
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": `${pageHref}#profile`,
+    url: pageHref,
+    name: globalText.about.title,
+    description: globalText.about.description,
+    inLanguage: "ja-JP",
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": `${siteBaseHref}/#website`,
+    },
+    mainEntity: {
+      "@type": "Person",
+      "@id": `${siteBaseHref}/#person`,
+      name: globalText.global.author,
+      url: siteBaseHref,
+      description: stripHtml(typedAboutText.aboutText),
+      jobTitle: "Web Developer / Freelance Coder",
+      sameAs: [github_sns.href],
+    },
+  })
+);
 ---
 
 <Layout
   title={globalText.about.title}
   description={globalText.about.description}
-  ogType={globalText.local.type}
+  ogType={globalText.og.type}
   ogTitle={globalText.about.title}
   ogDescription={globalText.about.description}
   twitterTitle={globalText.about.title}
   twitterDescription={globalText.about.description}
+  jsonLd={jsonLd}
 >
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />

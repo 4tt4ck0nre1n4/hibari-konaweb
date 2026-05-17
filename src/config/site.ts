@@ -1,6 +1,8 @@
 import { validateConfigData, companyInfoSchema, estimateConfigSchema } from "@/schemas/data.schema";
 
 const DEFAULT_SITE_URL = "https://hibari-konaweb.netlify.app";
+const SITE_NAME = "hibari-konaweb.com";
+const SITE_TITLE = `${SITE_NAME} | Web制作・フロントエンド開発`;
 const SITE_URL =
   typeof import.meta.env.PUBLIC_SITE_URL === "string" && import.meta.env.PUBLIC_SITE_URL.trim() !== ""
     ? import.meta.env.PUBLIC_SITE_URL.trim().replace(/\/$/, "")
@@ -17,7 +19,7 @@ export const SITE = {
   global: {
     themeColor: "",
     colorScheme: "light dark",
-    author: "hibari-konaweb.com",
+    author: SITE_NAME,
     robots: "",
     formatDetection: "telephone=no, address=no",
   },
@@ -28,7 +30,7 @@ export const SITE = {
   },
   og: {
     local: "ja_JP",
-    title: "My Portfolio Site",
+    title: SITE_TITLE,
     description:
       "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
     type: "website",
@@ -37,14 +39,14 @@ export const SITE = {
     imageWidth: "1200",
     imageHeight: "630",
     imageAlt: "hibari-konaweb.comのトップページスクリーンショット",
-    site_name: "My Portfolio Site",
+    site_name: SITE_NAME,
   },
   twitter: {
     card: "summary_large_image",
-    title: "My Portfolio Site",
+    title: SITE_TITLE,
     description:
       "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
-    site: SITE_URL,
+    site: "",
     image: DEFAULT_SHARE_IMAGE_URL,
     imageAlt: "hibari-konaweb.comのトップページスクリーンショット",
   },
@@ -52,20 +54,20 @@ export const SITE = {
     type: "article",
   },
   top: {
-    title: "My Portfolio Site",
+    title: SITE_TITLE,
     description:
       "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
   },
   about: {
-    title: "About | My Portfolio Site",
+    title: `About | ${SITE_NAME}`,
     description: "私について、スキル、サービスを紹介しています。",
   },
   works: {
-    title: "Works | My Portfolio Site",
+    title: `Works | ${SITE_NAME}`,
     description: "私の活動の履歴、実績、作品を紹介しています。",
   },
   blog: {
-    title: "Blog | My Portfolio Site",
+    title: `Blog | ${SITE_NAME}`,
     /** `/blog` 一覧の H1 文言 */
     indexHeading: "Blog",
     description: "Web制作・フロントエンド・WordPress・AI活用に関するブログ記事の一覧です。",
@@ -85,7 +87,7 @@ export const SITE = {
       "クリエイティビティ × AI × ビジネス。成果に直結するWebサイトやアプリケーションを制作しています。Astro / React 等が得意です。",
   },
   categories: {
-    title: "Categories | My Portfolio Site",
+    title: `Categories | ${SITE_NAME}`,
     description: "ブログのカテゴリー記事一覧です。",
     /**
      * Headless CMS のカテゴリーに個別の説明（ACF 等）がないとき、`/blog/category/[slug]` の meta description に使う。
@@ -101,12 +103,12 @@ export const SITE = {
     seoOnlyCategorySlug: "" as string,
   },
   contact: {
-    title: "Contact | My Portfolio Site",
+    title: `Contact | ${SITE_NAME}`,
     description:
       "Web制作などのお仕事に関するご相談、お見積りやポートフォリオの感想など、お問い合わせはこちらのフォームからお願いします。メール受付後、原則24時間以内にメールで返答させていただきます。",
   },
   service: {
-    title: "Service | My Portfolio Site",
+    title: `Service | ${SITE_NAME}`,
     description: "Web制作などのお仕事に関する私のサービス内容と料金表を紹介しています。",
     /** 料金シミュレーター見出し直下のリード文（`/service`） */
     simulatorPageLead:
@@ -121,27 +123,27 @@ export const SITE = {
     simulatorContactLinkLabel: "お問い合わせフォームからご相談ください。",
   },
   thanks: {
-    title: "Thanks | My Portfolio Site",
+    title: `Thanks | ${SITE_NAME}`,
     description:
       "お問い合わせありがとうございます。ご記入していただいた情報は無事に送信されました。確認のため、お客様に自動返信メールをお送りしております。",
   },
   privacy: {
-    title: "Privacy Policy | My Portfolio Site",
+    title: `Privacy Policy | ${SITE_NAME}`,
     description:
       "プライバシーポリシー（以下、「本ポリシー」といいます。）は、当サイトがどのような個人情報を取得し、どのように利用するか、どのように個人情報を管理するのかをユーザーにご説明するものです。当サイトは本ポリシーに従い、個人情報の安全管理のために必要かつ適切な取り扱いと保護に努めます。",
   },
   sorry: {
-    title: "Sorry... | My Portfolio Site",
+    title: `Sorry... | ${SITE_NAME}`,
     description:
       "申し訳ございません。このページは準備中です。当サイトをご覧いただきありがとうございます。各ページは随時更新しております。しばらくお待ちください。",
   },
   notFound404: {
-    title: "404 Not Found | My Portfolio Site",
+    title: `404 Not Found | ${SITE_NAME}`,
     description:
       "お探しのページが見つかりませんでした。アクセスしようとしたページは削除、変更されたか、現在利用できない可能性があります。直接アドレスを入力された場合は、アドレスが正しく入力されているかもう一度ご確認ください。",
   },
   serverError500: {
-    title: "500 Server Error | My Portfolio Site",
+    title: `500 Server Error | ${SITE_NAME}`,
     description: "サーバー側で何らかの予期しないエラーが発生しました。",
   },
 } as const;

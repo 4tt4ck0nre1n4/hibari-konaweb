@@ -7,6 +7,7 @@ import { SITE as globalText } from "@/config/site";
 import contactText from "@/data/contactText.json";
 import contactBackgroundImageSrc from "@/assets/gridBackground.webp";
 import { getImage } from "astro:assets";
+import { compactJsonLd } from "@/util/jsonLd";
 
 const contactBackgroundImage = await getImage({ src: contactBackgroundImageSrc });
 interface Props {
@@ -14,14 +15,36 @@ interface Props {
 }
 
 const pageTitle = "Contact";
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+const pageHref = Astro.site != null ? new URL(Astro.url.pathname, Astro.site).href : `${siteBaseHref}/contact`;
 
-const jsonLd = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "ContactPage",
-  name: pageTitle,
-  description: `${globalText.contact.description}`,
-  url: `${globalText.url}/contact`,
-});
+const jsonLd = JSON.stringify(
+  compactJsonLd({
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "@id": `${pageHref}#contact`,
+    name: pageTitle,
+    description: globalText.contact.description,
+    url: pageHref,
+    inLanguage: "ja-JP",
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": `${siteBaseHref}/#website`,
+    },
+    about: {
+      "@type": "Person",
+      "@id": `${siteBaseHref}/#person`,
+      name: globalText.global.author,
+      url: siteBaseHref,
+    },
+    mainEntity: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      url: pageHref,
+      availableLanguage: "Japanese",
+    },
+  })
+);
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
@@ -32,7 +55,7 @@ export const prerender = true;
 <Layout
   title={globalText.contact.title}
   description={globalText.contact.description}
-  ogType={globalText.local.type}
+  ogType={globalText.og.type}
   ogTitle={globalText.contact.title}
   ogDescription={globalText.contact.description}
   twitterTitle={globalText.contact.title}

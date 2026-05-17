@@ -243,12 +243,18 @@ const collectionJsonLd = JSON.stringify(
       "@type": "WebSite",
       "@id": `${siteBaseHref}/#website`,
     },
-    hasPart: optimizedWorks.map((work, index) => ({
-      "@type": "CreativeWork",
-      position: (page.currentPage - 1) * 4 + index + 1,
-      name: stripHtml(work?.title?.rendered),
-      url: `${siteBaseHref}/works/${work?.slug}`,
-    })),
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: optimizedWorks.map((work, index) => ({
+        "@type": "ListItem",
+        position: (page.currentPage - 1) * 4 + index + 1,
+        item: {
+          "@type": "CreativeWork",
+          name: stripHtml(work?.title?.rendered),
+          url: `${siteBaseHref}/works/${work?.slug}`,
+        },
+      })),
+    },
   })
 );
 
@@ -264,7 +270,7 @@ const collectionJsonLd = JSON.stringify(
 <Layout
   title={globalText.works.title}
   description={globalText.works.description}
-  ogType={globalText.local.type}
+  ogType={globalText.og.type}
   ogTitle={globalText.works.title}
   ogDescription={globalText.works.description}
   twitterTitle={globalText.works.title}
@@ -331,6 +337,13 @@ const collectionJsonLd = JSON.stringify(
       </h1>
       <p class="works__text">
         {worksText.worksText}
+      </p>
+      <p class="works__text works__text--support">
+        制作実績のようなサイト制作・改善をご検討中の方は、
+        <a class="works__text_link" href="/service">サービス内容</a>
+        と
+        <a class="works__text_link" href="/contact">お問い合わせ</a>
+        もあわせてご覧ください。
       </p>
       <ul class:list={["worksCard__menu", optimizedWorks.length === 0 && "worksCard__menu--empty"]}>
         {
@@ -600,6 +613,18 @@ const collectionJsonLd = JSON.stringify(
     letter-spacing: 0.2em;
     color: inherit;
     padding-inline: 1rem;
+  }
+  .works__text--support {
+    max-width: 760px;
+    letter-spacing: 0.08em;
+    margin-inline: auto;
+    margin-block-start: 1rem;
+  }
+  .works__text_link {
+    color: var(--color-purple);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
   /* Worksページ カード */
   .worksCard__menu {

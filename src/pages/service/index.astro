@@ -6,23 +6,102 @@ import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import AboutHeading from "@/components/about/AboutHeading.astro";
 import { PricingSimulator } from "@/components/service/PricingSimulator";
 import IconifyInline from "@/components/ui/IconifyInline";
+import serviceText from "@/data/serviceText.json";
+import { compactJsonLd, stripHtml } from "@/util/jsonLd";
 // import Subscription from "@/components/Subscription.astro";
+
+interface ServiceCard {
+  serviceHeader: string;
+  serviceBody: string;
+}
+
+interface ServiceTextData {
+  service: {
+    card1: ServiceCard;
+    card2: ServiceCard;
+    card3: ServiceCard;
+    card4: ServiceCard;
+  };
+}
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
 
 const serviceSimulator = globalText.service;
 const stepLabels = serviceSimulator.simulatorLeadStepLabels;
 const leadBenefits = serviceSimulator.simulatorLeadBenefits;
+const serviceData = serviceText as ServiceTextData;
+const serviceCards = [
+  serviceData.service.card1,
+  serviceData.service.card2,
+  serviceData.service.card3,
+  serviceData.service.card4,
+];
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+const pageHref = Astro.site != null ? new URL(Astro.url.pathname, Astro.site).href : `${siteBaseHref}/service`;
+const jsonLd = JSON.stringify(
+  compactJsonLd({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${pageHref}#webpage`,
+        url: pageHref,
+        name: globalText.service.title,
+        description: globalText.service.description,
+        inLanguage: "ja-JP",
+        isPartOf: {
+          "@type": "WebSite",
+          "@id": `${siteBaseHref}/#website`,
+        },
+        mainEntity: {
+          "@id": `${pageHref}#service`,
+        },
+      },
+      {
+        "@type": "Service",
+        "@id": `${pageHref}#service`,
+        name: "Web制作・サイト改善サービス",
+        description: globalText.service.description,
+        url: pageHref,
+        provider: {
+          "@type": "Person",
+          "@id": `${siteBaseHref}/#person`,
+          name: globalText.global.author,
+          url: siteBaseHref,
+        },
+        areaServed: {
+          "@type": "Country",
+          name: "Japan",
+        },
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          "@id": `${pageHref}#offer-catalog`,
+          name: "Web制作サービス一覧",
+          itemListElement: serviceCards.map((card, index) => ({
+            "@type": "Offer",
+            position: index + 1,
+            itemOffered: {
+              "@type": "Service",
+              name: stripHtml(card.serviceHeader),
+              description: stripHtml(card.serviceBody),
+            },
+          })),
+        },
+      },
+    ],
+  })
+);
 ---
 
 <Layout
   title={globalText.service.title}
   description={globalText.service.description}
-  ogType={globalText.local.type}
+  ogType={globalText.og.type}
   ogTitle={globalText.service.title}
   ogDescription={globalText.service.description}
   twitterTitle={globalText.service.title}
   twitterDescription={globalText.service.description}
+  jsonLd={jsonLd}
 >
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />

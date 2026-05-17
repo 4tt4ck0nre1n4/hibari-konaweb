@@ -100,6 +100,7 @@ export const blogPostSchema = z.object({
     if (!Array.isArray(v)) return [];
     return v.filter((x): x is number => typeof x === "number" && Number.isFinite(x));
   }),
+  excerpt: wpRenderedLenientSchema.optional(),
   content: wpRenderedLenientSchema,
   cat_info: z.array(catInfoSchema).optional(),
   _embedded: wpEmbeddedLenientSchema,

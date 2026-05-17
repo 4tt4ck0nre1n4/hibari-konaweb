@@ -32,11 +32,8 @@ const personSchema = {
     name: globalText.global.author,
   },
 
-  // SNSリンク（実在証明・権威性向上）
-  sameAs: [
-    "https://github.com/4tt4ck0nre1n4",
-    "https://twitter.com/your-account", // 実際のTwitterアカウントに置き換えてください
-  ],
+  // SNSリンク（実在する公開プロフィールのみを出力）
+  sameAs: ["https://github.com/4tt4ck0nre1n4"],
 
   // 連絡先情報
   contactPoint: {
@@ -64,44 +61,9 @@ const personSchema = {
     "SEO Optimization",
   ],
 
-  // 提供サービス
+  // サービス詳細は /service の OfferCatalog を正とする
   hasOfferCatalog: {
-    "@type": "OfferCatalog",
-    name: "Web制作サービス",
-    itemListElement: [
-      {
-        "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: "ホームページ制作",
-          description: "アクセシビリティ対応のWebサイト制作",
-        },
-      },
-      {
-        "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: "WordPress開発",
-          description: "WordPressを使用したCMS構築",
-        },
-      },
-      {
-        "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: "Webサイトリニューアル",
-          description: "既存サイトの改善・最適化",
-        },
-      },
-      {
-        "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: "コーディング代行",
-          description: "デザインからの高品質なコーディング実装",
-        },
-      },
-    ],
+    "@id": `${siteBaseHref}/service#offer-catalog`,
   },
 };
 ---

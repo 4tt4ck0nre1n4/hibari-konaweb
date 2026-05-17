@@ -11,6 +11,9 @@ interface FeedPost {
   modified?: string;
 }
 
+const WORDPRESS_TOTAL_PAGES_HEADER = "x-wp-totalpages";
+const RSS_MAX_WORDPRESS_PAGES = 20;
+
 function getSiteBase(site: URL | undefined): string {
   return (site?.href ?? SITE.url).replace(/\/$/, "");
 }
@@ -50,6 +53,41 @@ function toRssDate(value: string): string {
   return Number.isNaN(timestamp) ? new Date().toUTCString() : new Date(timestamp).toUTCString();
 }
 
+function getFeedPostDateSource(post: FeedPost): string {
+  if (typeof post.modified === "string" && post.modified !== "") {
+    return post.modified;
+  }
+  if (post.date !== "") {
+    return post.date;
+  }
+  return new Date().toISOString();
+}
+
+function getFeedPostTimestamp(post: FeedPost): number {
+  const timestamp = Date.parse(getFeedPostDateSource(post));
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function buildFeedPageUrl(page: number): string {
+  const url = new URL(BLOG_PAGE_API);
+  url.searchParams.set("page", String(page));
+  return url.href;
+}
+
+function parseTotalPages(response: Response): number {
+  const raw = response.headers.get(WORDPRESS_TOTAL_PAGES_HEADER);
+  if (raw === null) {
+    return 1;
+  }
+
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return 1;
+  }
+
+  return Math.min(parsed, RSS_MAX_WORDPRESS_PAGES);
+}
+
 function parseFeedPosts(value: unknown): FeedPost[] {
   if (!Array.isArray(value)) {
     return [];
@@ -87,16 +125,32 @@ function parseFeedPosts(value: unknown): FeedPost[] {
 
 async function fetchFeedPosts(): Promise<FeedPost[]> {
   try {
-    const response = await fetch(BLOG_PAGE_API);
-    if (!response.ok) {
+    const firstResponse = await fetch(buildFeedPageUrl(1));
+    if (!firstResponse.ok) {
       if (buildSkipWordPress) {
         return [];
       }
-      throw new Error(`Failed to fetch RSS posts: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch RSS posts: ${firstResponse.status} ${firstResponse.statusText}`);
     }
 
-    const json: unknown = await response.json();
-    return parseFeedPosts(json);
+    const firstJson: unknown = await firstResponse.json();
+    const posts = parseFeedPosts(firstJson);
+    const totalPages = parseTotalPages(firstResponse);
+
+    for (let page = 2; page <= totalPages; page++) {
+      const response = await fetch(buildFeedPageUrl(page));
+      if (!response.ok) {
+        if (buildSkipWordPress) {
+          break;
+        }
+        throw new Error(`Failed to fetch RSS posts page ${page}: ${response.status} ${response.statusText}`);
+      }
+
+      const json: unknown = await response.json();
+      posts.push(...parseFeedPosts(json));
+    }
+
+    return posts;
   } catch (error) {
     if (buildSkipWordPress) {
       return [];
@@ -108,19 +162,14 @@ async function fetchFeedPosts(): Promise<FeedPost[]> {
 function buildRssXml(siteBase: string, posts: FeedPost[]): string {
   const feedUrl = `${siteBase}/rss.xml`;
   const blogUrl = `${siteBase}/blog`;
-  const latestDate = posts[0]?.modified ?? posts[0]?.date ?? new Date().toISOString();
+  const sortedPosts = [...posts].sort((a, b) => getFeedPostTimestamp(b) - getFeedPostTimestamp(a));
+  const latestDate = sortedPosts[0] !== undefined ? getFeedPostDateSource(sortedPosts[0]) : new Date().toISOString();
 
-  const items = posts
+  const items = sortedPosts
     .map((post) => {
       const postUrl = `${siteBase}/blog/${encodeURIComponent(post.slug)}`;
       const description = post.description !== "" ? post.description : SITE.blog.description;
-      const dateSource =
-        post.date !== ""
-          ? post.date
-          : typeof post.modified === "string" && post.modified !== ""
-            ? post.modified
-            : new Date().toISOString();
-      const pubDate = toRssDate(dateSource);
+      const pubDate = toRssDate(getFeedPostDateSource(post));
 
       return `    <item>
       <title>${escapeXml(post.title)}</title>
@@ -133,7 +182,7 @@ function buildRssXml(siteBase: string, posts: FeedPost[]): string {
     .join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>${escapeXml(SITE.blog.title)}</title>
     <link>${escapeXml(blogUrl)}</link>
@@ -141,7 +190,7 @@ function buildRssXml(siteBase: string, posts: FeedPost[]): string {
     <language>ja-JP</language>
     <lastBuildDate>${escapeXml(toRssDate(latestDate))}</lastBuildDate>
     <ttl>60</ttl>
-    <atom:link xmlns:atom="http://www.w3.org/2005/Atom" href="${escapeXml(feedUrl)}" rel="self" type="application/rss+xml" />
+    <atom:link href="${escapeXml(feedUrl)}" rel="self" type="application/rss+xml" />
 ${items}
   </channel>
 </rss>

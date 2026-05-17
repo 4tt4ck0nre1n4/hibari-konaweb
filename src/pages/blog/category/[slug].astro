@@ -6,6 +6,7 @@ import { generateBreadcrumbs } from "../../../util/generateBreadcrumbs";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import { SITE as globalText } from "@/config/site";
 import { CATEGORY_PAGE_API, CATEGORY_SLUG_API, CATEGORY_ID_API } from "@/api/headlessCms";
+import { compactJsonLd, stripHtml } from "@/util/jsonLd";
 
 interface CategoryPosts {
   id: number;
@@ -163,7 +164,7 @@ try {
 }
 
 const categoryTitle = "カテゴリー：";
-const categoryText = "同じカテゴリーの記事の一覧です。";
+const categoryText = "同じテーマの記事をまとめています。関連するノウハウや制作メモを続けて確認できます。";
 const categoryError = "このカテゴリーには記事がありません。";
 const categoryLink = "カテゴリー記事一覧のページへ";
 const title = category?.name ?? "カテゴリー記事が見つかりません";
@@ -194,6 +195,44 @@ const postAriaLabel = "の記事へ";
 const postAriaTitle = "の記事へ";
 
 const crumbs = generateBreadcrumbs(Astro.url.pathname);
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+const pageHref =
+  Astro.site != null ? new URL(Astro.url.pathname, Astro.site).href : `${siteBaseHref}/blog/category/${slug}`;
+const jsonLd = JSON.stringify(
+  compactJsonLd({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${pageHref}#collection`,
+    url: pageHref,
+    name: title,
+    description,
+    inLanguage: "ja-JP",
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": `${siteBaseHref}/#website`,
+    },
+    about:
+      category === null
+        ? undefined
+        : {
+            "@type": "Thing",
+            name: category.name,
+          },
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: posts.map((post, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        item: {
+          "@type": "BlogPosting",
+          headline: stripHtml(post.acf?.blog_title ?? post.title.rendered),
+          url: new URL(`blog/${post.slug}`, `${siteBaseHref}/`).href,
+          datePublished: post.date,
+        },
+      })),
+    },
+  })
+);
 const dateIcon = "emojione-v1:alarm-clock";
 const datetime = "投稿日:";
 ---
@@ -201,11 +240,12 @@ const datetime = "投稿日:";
 <Layout
   title={title}
   description={description}
-  ogType={globalText.local.type}
+  ogType={globalText.og.type}
   ogTitle={title}
   ogDescription={description}
   twitterTitle={title}
   twitterDescription={description}
+  jsonLd={jsonLd}
 >
   <div class="breadcrumbs__wrapper">
     <Breadcrumbs {crumbs} />

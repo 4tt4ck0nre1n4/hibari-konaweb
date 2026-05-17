@@ -239,12 +239,18 @@ const collectionJsonLd = JSON.stringify(
       "@type": "WebSite",
       "@id": `${siteBaseHref}/#website`,
     },
-    hasPart: blogImages.map((postData, index) => ({
-      "@type": "BlogPosting",
-      position: page.start + index,
-      headline: stripHtml(postData.acf?.blog_title ?? postData.title.rendered),
-      url: `${siteBaseHref}/blog/${postData.slug}`,
-    })),
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: blogImages.map((postData, index) => ({
+        "@type": "ListItem",
+        position: page.start + index,
+        item: {
+          "@type": "BlogPosting",
+          headline: stripHtml(postData.acf?.blog_title ?? postData.title.rendered),
+          url: `${siteBaseHref}/blog/${postData.slug}`,
+        },
+      })),
+    },
   })
 );
 ---
@@ -252,7 +258,7 @@ const collectionJsonLd = JSON.stringify(
 <Layout
   title={globalText.blog.title}
   description={globalText.blog.description}
-  ogType={globalText.local.type}
+  ogType={globalText.og.type}
   ogTitle={globalText.blog.title}
   ogDescription={globalText.blog.description}
   twitterTitle={globalText.blog.title}

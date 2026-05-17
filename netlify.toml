@@ -217,6 +217,11 @@
     Cache-Control = "public, max-age=86400, must-revalidate"
 
 [[headers]]
+  for = "/rss.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, must-revalidate"
+
+[[headers]]
   for = "/sitemap.xml"
   [headers.values]
     Cache-Control = "public, max-age=86400, must-revalidate"
