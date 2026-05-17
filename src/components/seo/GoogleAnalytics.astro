@@ -28,29 +28,15 @@ const shouldLoadGA: boolean =
 
 function buildGaHeadScript(measurementId: string): string {
   return `
-    // headタグ内: 最小限の初期化のみ
-    // dataLayerとgtag関数の定義（スクリプト読み込み前でも動作するように）
+    // headタグ内: 最小限の初期化のみ（gtag.js は body 直前の遅延ローダーで読み込み）
+    // Consent default は config / event より前に必ず実行する（Consent Mode v2）
     try {
       window.dataLayer = window.dataLayer || [];
       function gtag() {
-        dataLayer.push(arguments);
+        window.dataLayer.push(arguments);
       }
       window.gtag = gtag;
-      gtag("js", new Date());
 
-      // GA4 設定（スクリプト読み込みは遅延するため、ここでは設定のみ）
-      // 実際のスクリプト読み込みは</body>の直前でスクロール検知後に実行される
-      gtag("config", ${JSON.stringify(measurementId)}, {
-        // ページビューの自動送信
-        send_page_view: true,
-        // IPアドレスの匿名化（プライバシー保護）
-        anonymize_ip: true,
-        // デバッグモードの無効化
-        debug_mode: false,
-      });
-
-      // Consent Mode v2: GDPR対応のため、ユーザーの同意前はデフォルトで拒否設定
-      // 必要に応じて Cookie 同意バナーと連携してください
       gtag("consent", "default", {
         ad_storage: "denied",
         ad_user_data: "denied",
@@ -58,7 +44,7 @@ function buildGaHeadScript(measurementId: string): string {
         analytics_storage: "denied",
         functionality_storage: "denied",
         personalization_storage: "denied",
-        security_storage: "granted", // セキュリティは常に許可
+        security_storage: "granted",
         wait_for_update: 500,
       });
 
@@ -66,6 +52,14 @@ function buildGaHeadScript(measurementId: string): string {
       // プライバシーポリシーに応じて調整してください
       gtag("consent", "update", {
         analytics_storage: "granted",
+      });
+
+      gtag("js", new Date());
+
+      // GA4 設定（実送信は gtag.js 読み込み後）。IP は GA4 で既定により扱われるため anonymize_ip は付けない
+      gtag("config", ${JSON.stringify(measurementId)}, {
+        send_page_view: true,
+        debug_mode: false,
       });
     } catch (error) {
       console.warn("[Google Analytics] 初期化エラー:", error);
