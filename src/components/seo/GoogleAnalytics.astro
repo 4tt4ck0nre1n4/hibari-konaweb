@@ -14,8 +14,8 @@
  * - headタグには最小限のコードのみ配置（dataLayerとgtag関数の初期化）
  * - 実際のスクリプト読み込みは</body>の直前でスクロール検知後に実行
  *
- * 注: <script is:inline> 内にそのまま `{` を書くと Astro / Prettier が
- * テンプレート式と誤解するため、本文はフロントマターで文字列化して渡す。
+ * 注: <script is:inline> 内では Astro テンプレート式 `{}` は評価されないため、
+ * 本文はフロントマターで文字列化して set:html ディレクティブ経由で渡す。
  */
 
 const GA_MEASUREMENT_ID: string | undefined =
@@ -106,8 +106,8 @@ const gaMissingIdWarnScript: string | null =
   typeof isDev === "boolean" && !isDev && !shouldLoadGA ? buildGaMissingIdWarnScript() : null;
 ---
 
-{gaHeadScript !== null && <script is:inline>{gaHeadScript}</script>}
+{gaHeadScript !== null && <script is:inline set:html={gaHeadScript}></script>}
 
-{gaDevMockScript !== null && <script is:inline>{gaDevMockScript}</script>}
+{gaDevMockScript !== null && <script is:inline set:html={gaDevMockScript}></script>}
 
-{gaMissingIdWarnScript !== null && <script is:inline>{gaMissingIdWarnScript}</script>}
+{gaMissingIdWarnScript !== null && <script is:inline set:html={gaMissingIdWarnScript}></script>}

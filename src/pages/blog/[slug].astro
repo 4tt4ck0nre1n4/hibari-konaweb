@@ -466,11 +466,14 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
               </a>
               <a
                 href={worksUrl}
-                class="blog-post-cta-btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3 w-full bg-white text-primary font-bold rounded-lg border border-primary hover:bg-slate-50 transition-colors text-center"
-                aria-label={globalText.blog.postCtaWorksButton}
+                class="blog-post-cta-btn-secondary blog-post-cta-btn-works inline-flex items-center justify-center gap-2 px-6 py-3 w-full bg-white text-primary font-bold rounded-lg border border-primary hover:bg-slate-50 transition-colors text-center"
+                aria-label={`${globalText.blog.postCtaWorksButtonLine1}${globalText.blog.postCtaWorksButtonLine2}`}
               >
                 <SafeIcon name="fa6-solid:desktop" width={20} height={20} class="shrink-0" ariaHidden={true} />
-                {globalText.blog.postCtaWorksButton}
+                <span class="blog-post-cta-works-lines">
+                  <span class="blog-post-cta-works-line">{globalText.blog.postCtaWorksButtonLine1}</span>
+                  <span class="blog-post-cta-works-line">{globalText.blog.postCtaWorksButtonLine2}</span>
+                </span>
               </a>
               <a
                 href={serviceUrl}

@@ -525,6 +525,24 @@
   border: var(--color-indigo-600, #4f46e5) 1px solid;
 }
 
+.blog-post-cta .blog-post-cta-btn-works {
+  gap: 0.5rem;
+}
+
+.blog-post-cta .blog-post-cta-works-lines {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.25;
+  min-inline-size: 0;
+}
+
+.blog-post-cta .blog-post-cta-works-line {
+  display: block;
+  white-space: nowrap;
+}
+
 .blog-post-sidebar-card {
   background-color: rgb(255 255 255);
   border: 1px solid rgb(241 245 249);
