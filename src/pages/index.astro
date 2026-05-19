@@ -5,6 +5,7 @@ import Breadcrumbs from "../components/Breadcrumbs.astro";
 import Aside from "@/components/layout/aside/Aside.astro";
 import SwiperMenu from "@/components/layout/side/SwiperMenu.astro";
 import { SITE as globalText } from "@/config/site";
+import { compactJsonLd } from "@/util/jsonLd";
 import SwiperDisplay from "@/components/layout/SwiperDisplay.astro";
 import gridBackgroundImageSrc from "@/assets/gridBackground.webp";
 import { getImage } from "astro:assets";
@@ -42,6 +43,30 @@ const fvAnimeImage = await getImage({
   quality: 80,
   format: "webp",
 });
+
+const siteBaseHref = (Astro.site?.href ?? globalText.url).replace(/\/$/, "");
+const homeJsonLd = JSON.stringify(
+  compactJsonLd({
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ProfilePage",
+        "@id": `${siteBaseHref}/#profilepage`,
+        url: siteBaseHref,
+        name: globalText.og.site_name,
+        description: globalText.og.description,
+        inLanguage: "ja-JP",
+        isPartOf: {
+          "@type": "WebSite",
+          "@id": `${siteBaseHref}/#website`,
+        },
+        mainEntity: {
+          "@id": `${siteBaseHref}/#person`,
+        },
+      },
+    ],
+  })
+);
 ---
 
 <Layout
@@ -52,6 +77,7 @@ const fvAnimeImage = await getImage({
   ogDescription={globalText.top.description}
   twitterTitle={globalText.top.title}
   twitterDescription={globalText.top.description}
+  jsonLd={homeJsonLd}
 >
   <!-- LCP背景画像のプリロード（HeadLayoutのheadの最初に配置） -->
   <!-- デスクトップ用画像のプリロード（769px以上・タブレット＋デスクトップ） -->

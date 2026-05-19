@@ -22,6 +22,11 @@ interface Props {
   socialImageWidth?: string | number;
   socialImageHeight?: string | number;
   robots?: string;
+  articlePublishedTime?: string;
+  articleModifiedTime?: string;
+  articleAuthor?: string;
+  articleSection?: string;
+  articleTags?: string[];
 }
 
 const {
@@ -38,6 +43,11 @@ const {
   socialImageWidth,
   socialImageHeight,
   robots,
+  articlePublishedTime,
+  articleModifiedTime,
+  articleAuthor,
+  articleSection,
+  articleTags,
 } = Astro.props;
 
 // Google Analytics設定
@@ -66,6 +76,11 @@ const shouldLoadGA: boolean =
     socialImageWidth={socialImageWidth}
     socialImageHeight={socialImageHeight}
     robots={robots}
+    articlePublishedTime={articlePublishedTime}
+    articleModifiedTime={articleModifiedTime}
+    articleAuthor={articleAuthor}
+    articleSection={articleSection}
+    articleTags={articleTags}
   >
     <slot name="head" slot="head" />
   </HeadLayout>

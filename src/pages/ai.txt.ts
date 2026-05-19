@@ -12,6 +12,7 @@ Site: ${SITE.og.site_name}
 Canonical origin: ${siteBase}
 Language: ja-JP
 Publisher: ${SITE.global.author}
+Last-Updated: 2026-05-19
 
 Policy:
 - AI crawlers and AI-powered search agents are allowed to crawl public pages on this site.

@@ -414,9 +414,6 @@ const { fvBackgroundImageSrc, spFvBackgroundImageSrc, fvAnimeImageSrc } = Astro.
             width: rect.width,
             height: rect.height,
           },
-          // デバッグ情報は別のrequestAnimationFrameで取得して強制リフローを避ける
-          finalMouseXVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-x"),
-          finalMouseYVar: window.getComputedStyle(backgroundContainer).getPropertyValue("--mouse-y"),
         });
       });
 

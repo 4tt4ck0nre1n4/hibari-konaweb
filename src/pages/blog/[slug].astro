@@ -249,6 +249,9 @@ const publisherLd = {
   url: siteBaseHref,
 };
 
+const contentPlainText = stripHtml(post?.content?.rendered ?? "");
+const wordCount = contentPlainText.length > 0 ? Math.round(contentPlainText.length / 2) : undefined;
+
 const blogPostingLd = compactJsonLd({
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -262,6 +265,7 @@ const blogPostingLd = compactJsonLd({
   datePublished: publishedDate,
   dateModified: dateModifiedIso,
   url: articleCanonicalHref,
+  inLanguage: "ja-JP",
   author: publisherLd,
   publisher: publisherLd,
   image: blogPostingImageHref,
@@ -269,6 +273,11 @@ const blogPostingLd = compactJsonLd({
   articleSection: articleSections,
   keywords: articleSections,
   isAccessibleForFree: true,
+  wordCount,
+  speakable: {
+    "@type": "SpeakableSpecification",
+    cssSelector: ["h1", "h2", ".blog-post-article"],
+  },
 });
 
 const jsonLd = JSON.stringify(blogPostingLd);
@@ -289,6 +298,11 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
   socialImageAlt={layoutTitle}
   socialImageWidth={featuredSocialWidth}
   socialImageHeight={featuredSocialHeight}
+  articlePublishedTime={publishedDate}
+  articleModifiedTime={dateModifiedIso}
+  articleAuthor={siteBaseHref}
+  articleSection={articleSections[0]}
+  articleTags={articleSections}
 >
   {
     typeof postSocialImage === "string" && (

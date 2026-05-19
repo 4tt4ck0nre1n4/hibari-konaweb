@@ -38,6 +38,12 @@ function buildLlmsTxt(siteBase: string): string {
 - AI crawler policy: ${siteBase}/ai.txt
 - Robots policy: ${siteBase}/robots.txt
 
+## Content Freshness
+
+- Blog is updated regularly. For the latest articles, see: ${siteBase}/rss.xml
+- ブログは定期的に更新されています。最新記事は ${siteBase}/rss.xml または ${siteBase}/blog を参照してください。
+- Last policy review: 2026-05-19
+
 ## Expertise And Services
 
 - Web site production for business, portfolio, landing page, blog, and WordPress/headless CMS use cases.

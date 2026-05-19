@@ -119,26 +119,29 @@ import Navigation from "@/components/navi/Navigation.astro";
     setInterval(updateClock, 1000);
   }
 
+  // DOM要素をキャッシュ（スクロールのたびに検索しない）
+  let cachedHeader: HTMLElement | null = null;
+  let cachedLogoImage: HTMLElement | null = null;
+  let cachedMenuItems: NodeListOf<HTMLElement> | null = null;
+
+  function cacheScrollElements() {
+    cachedHeader = document.querySelector<HTMLElement>(".header");
+    cachedLogoImage = document.querySelector<HTMLElement>(".header__logo_image");
+    cachedMenuItems = document.querySelectorAll<HTMLElement>(".header__menu_item");
+  }
+
   // スクロールイベントハンドラー
   function handleScroll() {
-    const header = document.querySelector<HTMLElement>(".header");
-    const logoImage = document.querySelector<HTMLElement>(".header__logo_image");
-    const headerMenuItems = document.querySelectorAll<HTMLElement>(".header__menu_item");
-
-    if (!header || !logoImage || !headerMenuItems) return;
+    if (!cachedHeader || !cachedLogoImage || !cachedMenuItems) return;
 
     if (window.scrollY > 50) {
-      header.classList.add("is-scroll");
-      logoImage.classList.add("is-scroll");
-      headerMenuItems.forEach((headerMenuItem) => {
-        headerMenuItem.classList.add("is-scroll");
-      });
+      cachedHeader.classList.add("is-scroll");
+      cachedLogoImage.classList.add("is-scroll");
+      cachedMenuItems.forEach((item) => item.classList.add("is-scroll"));
     } else {
-      header.classList.remove("is-scroll");
-      logoImage.classList.remove("is-scroll");
-      headerMenuItems.forEach((headerMenuItem) => {
-        headerMenuItem.classList.remove("is-scroll");
-      });
+      cachedHeader.classList.remove("is-scroll");
+      cachedLogoImage.classList.remove("is-scroll");
+      cachedMenuItems.forEach((item) => item.classList.remove("is-scroll"));
     }
   }
 
@@ -156,8 +159,13 @@ import Navigation from "@/components/navi/Navigation.astro";
     };
   })();
 
-  // イベントリスナーの設定
+  cacheScrollElements();
   window.addEventListener("scroll", throttledScroll, { passive: true });
+
+  // View Transitions でページ遷移した後にキャッシュを更新
+  document.addEventListener("astro:after-swap", () => {
+    cacheScrollElements();
+  });
 
   // DOMが読み込まれた後に時計アニメーションを初期化
   document.addEventListener("DOMContentLoaded", initClockAnimation);

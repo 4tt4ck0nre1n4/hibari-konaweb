@@ -175,20 +175,20 @@ export default defineConfig({
       // チャンクサイズの最適化
       chunkSizeWarningLimit: 500,
       rollupOptions: {
-        output: {
-          // Tree shakingを強化: 未使用のコードを削除
-          treeshake: {
-            moduleSideEffects: (id) => {
-              // CSSファイルとAstroファイルは副作用ありとして扱う
-              if (id.endsWith(".css") || id.endsWith(".scss") || id.endsWith(".astro")) {
-                return true;
-              }
-              // その他のモジュールはTree shakingを適用
-              return false;
-            },
-            propertyReadSideEffects: false,
-            tryCatchDeoptimization: false,
+        // Tree shakingを強化: 未使用のコードを削除（output直下ではなくrollupOptions直下に配置）
+        treeshake: {
+          moduleSideEffects: (id) => {
+            // CSSファイルとAstroファイルは副作用ありとして扱う
+            if (id.endsWith(".css") || id.endsWith(".scss") || id.endsWith(".astro")) {
+              return true;
+            }
+            // その他のモジュールはTree shakingを適用
+            return false;
           },
+          propertyReadSideEffects: false,
+          tryCatchDeoptimization: false,
+        },
+        output: {
           // GSAPなどのライブラリを適切にバンドル
           manualChunks: (id) => {
             // GSAPライブラリ（動的インポートで読み込まれるため、使用されないページではバンドルされない）

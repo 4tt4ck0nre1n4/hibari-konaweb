@@ -106,8 +106,8 @@ const gaMissingIdWarnScript: string | null =
   typeof isDev === "boolean" && !isDev && !shouldLoadGA ? buildGaMissingIdWarnScript() : null;
 ---
 
-{gaHeadScript !== null && <script is:inline set:html={gaHeadScript}></script>}
+{gaHeadScript !== null && <script is:inline set:html={gaHeadScript} />}
 
-{gaDevMockScript !== null && <script is:inline set:html={gaDevMockScript}></script>}
+{gaDevMockScript !== null && <script is:inline set:html={gaDevMockScript} />}
 
-{gaMissingIdWarnScript !== null && <script is:inline set:html={gaMissingIdWarnScript}></script>}
+{gaMissingIdWarnScript !== null && <script is:inline set:html={gaMissingIdWarnScript} />}
