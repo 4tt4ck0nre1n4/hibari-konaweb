@@ -130,13 +130,17 @@ const gradientTitle = "My Portfolio";
       return;
     }
 
+    // repeat:-1 の無限スピナーなどアクティブなトゥイーンをすべて停止
+    gsap.killTweensOf(loadingScreen.querySelectorAll("*"));
+    gsap.killTweensOf(loadingScreen);
+
     // フェーズ2: すべての書き込みを一度に実行（リフローを最小化）
     // GSAPのautoAlphaを使用（opacityとvisibilityを同時に制御、レイアウトをトリガーしない）
     // displayプロパティは変更せず、pointer-eventsでクリックを無効化
     gsap.set(loadingScreen, {
       autoAlpha: 0,
       pointerEvents: "none",
-      immediateRender: true, // 即座に適用
+      immediateRender: true,
     });
 
     // overflowの変更もGSAPで行う（強制リフローを避ける）

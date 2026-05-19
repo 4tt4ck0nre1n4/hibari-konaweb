@@ -234,13 +234,12 @@ function initializeApp(): void {
     );
   };
 
-  // 時刻アニメーション（requestAnimationFrameで最適化）
+  // 時刻アニメーション（1秒ごとのチェックで十分なためsetIntervalを使用）
   const rotateRestartButtonTimeInterval = (): void => {
     let lastSecond = -1;
 
     const checkTime = (): void => {
-      const now = new Date();
-      const seconds = now.getSeconds();
+      const seconds = new Date().getSeconds();
 
       if ((seconds === 0 || seconds === 30) && seconds !== lastSecond) {
         rotateRestartButton();
@@ -248,11 +247,9 @@ function initializeApp(): void {
       } else if (seconds !== 0 && seconds !== 30) {
         lastSecond = -1;
       }
-
-      requestAnimationFrame(checkTime);
     };
 
-    requestAnimationFrame(checkTime);
+    setInterval(checkTime, 1000);
   };
 
   rotateRestartButtonTimeInterval();
