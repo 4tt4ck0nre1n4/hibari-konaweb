@@ -35,6 +35,7 @@ function buildLlmsTxt(siteBase: string): string {
 
 - Sitemap index: ${siteBase}/sitemap-index.xml
 - RSS feed: ${siteBase}/rss.xml
+- Full article index: ${siteBase}/llms-full.txt
 - AI crawler policy: ${siteBase}/ai.txt
 - Robots policy: ${siteBase}/robots.txt
 

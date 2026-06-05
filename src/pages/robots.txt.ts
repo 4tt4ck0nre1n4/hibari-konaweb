@@ -22,6 +22,7 @@ ${AI_USER_AGENTS.map((agent) => `User-agent: ${agent}\nAllow: /`).join("\n\n")}
 
 # AI and machine-readable discovery
 LLMS: ${new URL("llms.txt", site).href}
+LLMS-FULL: ${new URL("llms-full.txt", site).href}
 AI-Policy: ${new URL("ai.txt", site).href}
 RSS: ${new URL("rss.xml", site).href}
 Sitemap: ${sitemapURL.href}
