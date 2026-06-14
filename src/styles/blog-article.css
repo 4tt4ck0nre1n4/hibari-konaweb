@@ -53,6 +53,12 @@
   }
 }
 
+@media (width < 1024px) {
+  .blog-post-sidebar {
+    margin-block-start: 2.5rem;
+  }
+}
+
 .blog-post-article {
   background-color: rgb(255 255 255);
   border-radius: 0.75rem;
@@ -344,13 +350,17 @@
 /* stylelint-disable no-descending-specificity -- ページ下部のフォールバックをまとめる */
 
 /* Tailwind 未適用時のフォールバック（記事ページのシェア・CTA・サイドバー） */
+.blog-post-category-guide {
+  margin-block-start: 2.5rem;
+}
+
 .blog-post-share {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-block-start: 3rem;
+  margin-block-start: 2.5rem;
   margin-bottom: 0;
   padding-block: 1.5rem;
   border-top-width: 1px;
@@ -573,6 +583,12 @@
   background-color: transparent;
   border: none;
   box-shadow: none;
+}
+
+@media (width < 1024px) {
+  .blog-post-sidebar-banner--empty {
+    min-height: 2.5rem;
+  }
 }
 
 .blog-post-sidebar .blog-post-sidebar-banner .text-secondary {

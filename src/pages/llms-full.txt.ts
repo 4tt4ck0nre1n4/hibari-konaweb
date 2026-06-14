@@ -44,11 +44,9 @@ function getCategories(value: unknown): string[] {
   const embedded = getRecord(record?._embedded);
   const terms = embedded?.["wp:term"];
   if (!Array.isArray(terms) || terms.length === 0) return [];
-  const taxTerms = terms[0];
+  const taxTerms: unknown = terms[0];
   if (!Array.isArray(taxTerms)) return [];
-  return taxTerms
-    .map((term) => getString(getRecord(term)?.name))
-    .filter((name) => name !== "");
+  return taxTerms.map((term) => getString(getRecord(term)?.name)).filter((name) => name !== "");
 }
 
 function buildFeedPageUrl(page: number): string {
