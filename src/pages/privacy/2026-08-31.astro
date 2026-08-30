@@ -1,0 +1,185 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { generateBreadcrumbs } from "@/util/generateBreadcrumbs";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+
+interface Props {
+  privacyTitle: string;
+}
+
+const privacyTitle = "プライバシーポリシー";
+const crumbs = generateBreadcrumbs(Astro.url.pathname);
+
+const cloudflareTurnstileLinksJa = {
+  href: "https://www.cloudflare.com/ja-jp/turnstile-privacy-policy/",
+  ariaLabel: "Turnstileプライバシー補遺条項のページへ（新しいタブで開く）",
+  ariaTitle: "Turnstileプライバシー補遺条項のページへ（新しいタブで開く）",
+  targetBlank: "_blank",
+};
+const cloudflareTurnstileLinksEn = {
+  href: "https://www.cloudflare.com/turnstile-privacy-policy/",
+  ariaLabel: "Turnstile Privacy Addendumのページへ（新しいタブで開く）",
+  ariaTitle: "Turnstile Privacy Addendumのページへ（新しいタブで開く）",
+  targetBlank: "_blank",
+};
+---
+
+<Layout
+  title={`${privacyTitle} (改定日 : 2026年08月31日)`}
+  description="当サイトのプライバシーポリシーの改定内容を掲載しています。"
+  ogType="article"
+  ogTitle="プライバシーポリシー (改定日 : 2026年08月31日)"
+  ogDescription="当サイトのプライバシーポリシーの改定内容を掲載しています。"
+  twitterTitle="プライバシーポリシー (改定日 : 2026年08月31日)"
+  twitterDescription="当サイトのプライバシーポリシーの改定内容を掲載しています。"
+>
+  <div class="breadcrumbs__wrapper">
+    <Breadcrumbs {crumbs} />
+  </div>
+  <div class="privacy__wrapper">
+    <h1 class="privacy__title">
+      プライバシーポリシー (改定日 &#0058;
+      <time datetime="2026-08-31">2026年08月31日</time>
+      )
+    </h1>
+    <p class="privacy__text">
+      当サイトのプライバシーポリシー (改定日 &#0058; 2026年08月31日)の改定内容は下記の通りです。
+    </p>
+
+    <section>
+      <h2 class="privacy__header">Cloudflare Turnstileについて</h2>
+      <p class="privacy__body">
+        当サイトでは、お問い合わせフォームへのスパム送信や不正アクセスを防止するため、Cloudflare,
+        Inc.が提供する「Cloudflare
+        Turnstile」（以下、Turnstile）を利用しています。Turnstileでは、ボット判定およびセキュリティ保護のため、IPアドレス、User-Agent等の技術情報が処理されます。なお、Turnstileが当サイトのお問い合わせフォームに入力された内容を取得・保存するものではありません。詳細については、下記のリンクをご確認ください。
+      </p>
+      <ul class="privacy__menu">
+        <li class="privacy__menu_item">
+          <a
+            class="privacy__body_link"
+            href={cloudflareTurnstileLinksJa.href}
+            aria-label={cloudflareTurnstileLinksJa.ariaLabel}
+            title={cloudflareTurnstileLinksJa.ariaTitle}
+            target={cloudflareTurnstileLinksJa.targetBlank}
+          >
+            Turnstileプライバシー補遺条項（日本語版）
+          </a>
+        </li>
+        <li class="privacy__menu_item">
+          <a
+            class="privacy__body_link privacy__menu_link_gap"
+            href={cloudflareTurnstileLinksEn.href}
+            aria-label={cloudflareTurnstileLinksEn.ariaLabel}
+            title={cloudflareTurnstileLinksEn.ariaTitle}
+            target={cloudflareTurnstileLinksEn.targetBlank}
+          >
+            Turnstile Privacy Addendum（英語原文）
+          </a>
+        </li>
+      </ul>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .privacy__wrapper {
+    width: 100%;
+    max-width: 700px;
+    margin-inline: auto;
+    padding-block: 3rem;
+  }
+  @media (width <= 480px) {
+    .privacy__wrapper {
+      width: 88%;
+      padding-block: 2rem;
+    }
+  }
+
+  .privacy__title {
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+    color: inherit;
+    text-align: center;
+    margin-block-start: 3rem;
+  }
+
+  .privacy__text {
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.2em;
+    color: inherit;
+    text-align: justify;
+    margin-block-start: 2rem;
+  }
+
+  .privacy__header {
+    font-size: 1.25rem;
+    letter-spacing: 0.1em;
+    color: inherit;
+    text-align: center;
+    border: var(--color-purple) 1px solid;
+    margin-block-start: 4rem;
+    padding-block: 0.5rem;
+  }
+  @media (width <= 480px) {
+    .privacy__header {
+      padding-inline-start: 1rem;
+    }
+  }
+
+  .privacy__body {
+    font-size: 1rem;
+    line-height: 2;
+    letter-spacing: 0.2em;
+    color: inherit;
+    text-align: justify;
+    margin-block-start: 2rem;
+  }
+
+  .privacy__menu {
+    width: fit-content;
+    list-style: disc;
+    margin-block-start: 2rem;
+    margin-inline: auto;
+    padding-inline-start: 1.5rem;
+  }
+
+  .privacy__menu_text {
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.2em;
+    color: inherit;
+    margin-block-start: 1rem;
+  }
+
+  .privacy__menu_link_gap {
+    display: inline-block;
+    margin-block-start: 1rem;
+  }
+
+  .privacy__body_link {
+    font-size: 1rem;
+    color: var(--color-purple);
+    text-decoration: underline;
+    transform: all 0.5s ease;
+  }
+
+  .privacy__body_link:is(:hover, :focus-visible) {
+    color: rgba(0, 19, 172, 1);
+    text-decoration: none;
+  }
+  @media (width <= 480px) {
+    .privacy__header {
+      text-align: left;
+    }
+    .privacy__menu {
+      padding-inline-start: 1.5rem;
+    }
+    .privacy__text {
+      font-size: 0.9375rem;
+    }
+    .privacy__body {
+      font-size: 0.9375rem;
+    }
+  }
+</style>

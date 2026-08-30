@@ -73,6 +73,18 @@ const googlePrivacypolicyLinks = {
   ariaTitle: "Googleプライバシーポリシーへ（新しいタブで開く）",
   targetBlank: "_blank",
 };
+const cloudflareTurnstileLinksJa = {
+  href: "https://www.cloudflare.com/ja-jp/turnstile-privacy-policy/",
+  ariaLabel: "Turnstileプライバシー補遺条項のページへ（新しいタブで開く）",
+  ariaTitle: "Turnstileプライバシー補遺条項のページへ（新しいタブで開く）",
+  targetBlank: "_blank",
+};
+const cloudflareTurnstileLinksEn = {
+  href: "https://www.cloudflare.com/turnstile-privacy-policy/",
+  ariaLabel: "Turnstile Privacy Addendumのページへ（新しいタブで開く）",
+  ariaTitle: "Turnstile Privacy Addendumのページへ（新しいタブで開く）",
+  targetBlank: "_blank",
+};
 ---
 
 <Layout
@@ -285,7 +297,6 @@ const googlePrivacypolicyLinks = {
       </p>
       <ul class="privacy__menu">
         <li class="privacy__menu_item">
-          <p class="privacy__menu_text">Googleアナリティクスの利用規約</p>
           <a
             class="privacy__body_link"
             href={googleAnalyticsTermsLinks.href}
@@ -297,15 +308,47 @@ const googlePrivacypolicyLinks = {
           </a>
         </li>
         <li class="privacy__menu_item">
-          <p class="privacy__menu_text">Googleプライバシーポリシー</p>
           <a
-            class="privacy__body_link"
+            class="privacy__body_link privacy__menu_link_gap"
             href={googlePrivacypolicyLinks.href}
             aria-label={googlePrivacypolicyLinks.ariaLabel}
             title={googlePrivacypolicyLinks.ariaTitle}
             target={googlePrivacypolicyLinks.targetBlank}
           >
             Googleプライバシーポリシー
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="privacy__header">Cloudflare Turnstileについて</h2>
+      <p class="privacy__body">
+        当サイトでは、お問い合わせフォームへのスパム送信や不正アクセスを防止するため、Cloudflare,
+        Inc.が提供する「Cloudflare
+        Turnstile」（以下、Turnstile）を利用しています。Turnstileでは、ボット判定およびセキュリティ保護のため、IPアドレス、User-Agent等の技術情報が処理されます。なお、Turnstileが当サイトのお問い合わせフォームに入力された内容を取得・保存するものではありません。詳細については、下記のリンクをご確認ください。
+      </p>
+      <ul class="privacy__menu">
+        <li class="privacy__menu_item">
+          <a
+            class="privacy__body_link"
+            href={cloudflareTurnstileLinksJa.href}
+            aria-label={cloudflareTurnstileLinksJa.ariaLabel}
+            title={cloudflareTurnstileLinksJa.ariaTitle}
+            target={cloudflareTurnstileLinksJa.targetBlank}
+          >
+            Turnstileプライバシー補遺条項（日本語版）
+          </a>
+        </li>
+        <li class="privacy__menu_item">
+          <a
+            class="privacy__body_link privacy__menu_link_gap"
+            href={cloudflareTurnstileLinksEn.href}
+            aria-label={cloudflareTurnstileLinksEn.ariaLabel}
+            title={cloudflareTurnstileLinksEn.ariaTitle}
+            target={cloudflareTurnstileLinksEn.targetBlank}
+          >
+            Turnstile Privacy Addendum（英語原文）
           </a>
         </li>
       </ul>
@@ -484,6 +527,11 @@ const googlePrivacypolicyLinks = {
     line-height: 1.8;
     letter-spacing: 0.2em;
     color: inherit;
+    margin-block-start: 1rem;
+  }
+
+  .privacy__menu_link_gap {
+    display: inline-block;
     margin-block-start: 1rem;
   }
 
