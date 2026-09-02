@@ -35,7 +35,13 @@ const ariaTitleThemeButton = "テーマを切り替える";
         </path>
       </symbol>
     </defs>
-    <use width="360" height="360" href="#meteoconsClearDay0" transform="translate(68.5 68.5)" aria-hidden="true"> </use>
+    <use
+      class="theme-icon theme-icon--sun"
+      width="360"
+      height="360"
+      href="#meteoconsClearDay0"
+      transform="translate(68.5 68.5)"
+      aria-hidden="true"></use>
 
     <defs>
       <symbol id="meteoconsClearNight0" class="moon" viewBox="0 0 279 279" aria-hidden="true" role="presentation">
@@ -60,8 +66,13 @@ const ariaTitleThemeButton = "テーマを切り替える";
         </path>
       </symbol>
     </defs>
-    <use width="279" height="279" href="#meteoconsClearNight0" transform="translate(116.5 116.5)" aria-hidden="true">
-    </use>
+    <use
+      class="theme-icon theme-icon--moon"
+      width="279"
+      height="279"
+      href="#meteoconsClearNight0"
+      transform="translate(116.5 116.5)"
+      aria-hidden="true"></use>
   </svg>
 </button>
 
@@ -83,101 +94,71 @@ const ariaTitleThemeButton = "テーマを切り替える";
     transform: scale(0.95);
   }
 
+  .theme-icon--sun {
+    display: inline;
+  }
+  .theme-icon--moon {
+    display: none;
+  }
+  html.dark .theme-icon--sun {
+    display: none;
+  }
+  html.dark .theme-icon--moon {
+    display: inline;
+  }
+
   .sun {
-    display: block;
     fill: transparent;
   }
   .moon {
-    display: none;
     fill: var(--color-white);
   }
-
-  /* JavaScriptで制御されるため、メディアクエリは削除 */
-  /* localStorageに保存されたテーマ設定を優先する */
 </style>
 
 <script is:inline>
-  // テーマの初期化とイベントリスナーの設定を行う関数
+  const THEME_STORAGE_KEY = "theme";
+
+  function getTheme() {
+    if (typeof localStorage !== "undefined" && localStorage.getItem(THEME_STORAGE_KEY)) {
+      return localStorage.getItem(THEME_STORAGE_KEY);
+    }
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
+    }
+    return "light";
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }
+
   function initTheme() {
-    const sun = document.querySelectorAll(".sun");
-    const moon = document.querySelectorAll(".moon");
-
-    // テーマの取得（localStorageを優先、なければシステム設定）
-    const getTheme = () => {
-      if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-        return localStorage.getItem("theme");
-      }
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        return "dark";
-      } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
-        return "light";
-      }
-      // デフォルトはlight
-      return "light";
-    };
-
     const theme = getTheme();
+    applyTheme(theme);
 
-    // アイコンの表示を切り替える関数
-    const toggleIcons = (currentTheme) => {
-      if (currentTheme === "light") {
-        sun.forEach((icon) => (icon.style.display = "block"));
-        moon.forEach((icon) => (icon.style.display = "none"));
-      } else {
-        sun.forEach((icon) => (icon.style.display = "none"));
-        moon.forEach((icon) => (icon.style.display = "block"));
-      }
-    };
-
-    // HTML要素にクラスを適用
-    if (theme === "light") {
-      document.documentElement.classList.remove("dark");
-    } else {
-      document.documentElement.classList.add("dark");
-    }
-
-    // アイコンの表示を更新
-    toggleIcons(theme);
-
-    // localStorageに保存（初回のみ、既に保存されている場合は更新しない）
-    if (typeof localStorage !== "undefined" && !localStorage.getItem("theme")) {
-      localStorage.setItem("theme", theme);
-    }
-
-    // トグルボタンのクリックハンドラー
-    const handleToggleClick = () => {
-      const element = document.documentElement;
-      element.classList.toggle("dark");
-
-      const isDark = element.classList.contains("dark");
-      const newTheme = isDark ? "dark" : "light";
-      localStorage.setItem("theme", newTheme);
-
-      toggleIcons(newTheme);
-
-      console.log(newTheme);
-    };
-
-    // 既存のイベントリスナーを削除してから新しいリスナーを追加
-    const themeToggle = document.getElementById("themeToggle");
-    if (themeToggle) {
-      // 既存のリスナーを削除するために、クローンして置き換える
-      const newToggle = themeToggle.cloneNode(true);
-      themeToggle.parentNode?.replaceChild(newToggle, themeToggle);
-      // 新しいリスナーを追加
-      document.getElementById("themeToggle").addEventListener("click", handleToggleClick);
+    if (typeof localStorage !== "undefined" && !localStorage.getItem(THEME_STORAGE_KEY)) {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
     }
   }
 
-  // 初回実行
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initTheme);
-  } else {
-    initTheme();
-  }
+  initTheme();
 
-  // View Transitions対応: ページ遷移時にテーマを再初期化
-  document.addEventListener("astro:after-swap", () => {
-    initTheme();
-  });
+  if (!window.__themeToggleInitialized) {
+    window.__themeToggleInitialized = true;
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const button = target.closest("#themeToggle");
+      if (!button) return;
+
+      const nextTheme = document.documentElement.classList.contains("dark") ? "light" : "dark";
+      applyTheme(nextTheme);
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    });
+
+    document.addEventListener("astro:after-swap", () => {
+      initTheme();
+    });
+  }
 </script>
