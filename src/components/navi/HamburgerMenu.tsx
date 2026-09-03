@@ -75,7 +75,7 @@ const menuItems: MenuItemConfig[] = [
 const startYear = 2025;
 const currentYear = new Date().getFullYear();
 const displayYear = currentYear > startYear ? `${startYear} - ${currentYear}` : `${startYear}`;
-const copyright = "hibari-konaweb.com All Rights Reserved.";
+const copyright = "hibari-codeweb.com All Rights Reserved.";
 
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 

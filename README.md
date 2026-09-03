@@ -1,4 +1,4 @@
-# hibari-konaweb.com | Web制作・フロントエンド開発
+# hibari-codeweb.com | Web制作・フロントエンド開発
 
 Web制作・フロントエンド開発のポートフォリオサイトです。Astro + React + TypeScript で構築し、WordPress をヘッドレスCMSとして使用しています。Tailwind CSS v4 によるスタイリングに加え、構造化データ（JSON-LD）・`llms.txt` / `ai.txt` などによる **SEO・AI検索最適化** を施しています。
 

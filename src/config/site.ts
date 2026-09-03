@@ -1,7 +1,7 @@
 import { validateConfigData, companyInfoSchema, estimateConfigSchema } from "@/schemas/data.schema";
 
 const DEFAULT_SITE_URL = "https://hibari-konaweb.netlify.app";
-const SITE_NAME = "hibari-konaweb.com";
+const SITE_NAME = "hibari-codeweb.com";
 const SITE_TITLE = `${SITE_NAME} | Web制作・フロントエンド開発`;
 const SITE_URL =
   typeof import.meta.env.PUBLIC_SITE_URL === "string" && import.meta.env.PUBLIC_SITE_URL.trim() !== ""
@@ -38,7 +38,7 @@ export const SITE = {
     image: DEFAULT_SHARE_IMAGE_URL,
     imageWidth: "1200",
     imageHeight: "630",
-    imageAlt: "hibari-konaweb.comのトップページスクリーンショット",
+    imageAlt: "hibari-codeweb.comのトップページスクリーンショット",
     site_name: SITE_NAME,
   },
   twitter: {
@@ -48,7 +48,7 @@ export const SITE = {
       "ポートフォリオサイトをご覧いただきありがとうございます。Web制作などお仕事に関するご相談、お見積りはお気軽にお問い合わせください。",
     site: "",
     image: DEFAULT_SHARE_IMAGE_URL,
-    imageAlt: "hibari-konaweb.comのトップページスクリーンショット",
+    imageAlt: "hibari-codeweb.comのトップページスクリーンショット",
   },
   local: {
     type: "article",
@@ -80,7 +80,7 @@ export const SITE = {
     /** CTA の Works ボタン表示（2 行 + blog-article.css の nowrap で意図した位置に折り返す） */
     postCtaWorksButtonLine1: "制作実績を",
     postCtaWorksButtonLine2: "見る →",
-    authorName: "hibari-konaweb.com",
+    authorName: "hibari-codeweb.com",
     profileName: "",
     profileTagline: "フロントエンドエンジニア",
     profileBio:

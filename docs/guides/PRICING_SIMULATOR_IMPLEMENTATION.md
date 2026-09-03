@@ -243,7 +243,7 @@ export const PAGE_COUNT_OPTIONS: PageCountOption[] = [
 
 ```typescript
 export const COMPANY_INFO = {
-  name: 'hibari-konaweb.com',
+  name: 'hibari-codeweb.com',
   website: 'https://hibari-konaweb.netlify.app',
   registrationNumber: '',  // インボイス登録番号（空欄の場合は非表示）
 } as const;
