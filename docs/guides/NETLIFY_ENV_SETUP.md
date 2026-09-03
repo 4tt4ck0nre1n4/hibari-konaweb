@@ -36,14 +36,14 @@ PUBLIC_WPCF7_POST_ID=456
 **重要**: `PUBLIC_API_URL`は、Contact Form 7のAPIエンドポイントとしても使用されます。  
 フォーム送信時に`https://hibari-konaweb.com`に接続できない場合は、`PUBLIC_API_URL`の設定を確認してください。
 
-reCAPTCHAを使用している場合：
+Cloudflare Turnstileを使用している場合：
 
 ```
-PUBLIC_RECAPTCHA_SITE_KEY=your_recaptcha_site_key_here
+PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key_here
 ```
 
-**重要**: reCAPTCHAのサイトキーは公開されても問題ありませんが、シークレットキーは**絶対に**環境変数に設定しないでください。  
-シークレットキーはWordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」で設定してください。
+**重要**: Turnstileのサイトキーは公開されても問題ありませんが、シークレットキーは**絶対に**環境変数に設定しないでください。  
+シークレットキーはWordPress管理画面の「お問い合わせ」→「統合」→「Turnstile」で設定してください。
 
 ### 4. 再デプロイ
 
@@ -97,23 +97,23 @@ netlify deploy --prod --dir=dist
 1. **Netlifyの環境変数を確認**
    - `Site settings` → `Environment variables`で以下を確認：
      - `PUBLIC_API_URL`が正しく設定されているか
-     - `PUBLIC_RECAPTCHA_SITE_KEY`が設定されているか
+     - `PUBLIC_TURNSTILE_SITE_KEY`が設定されているか
 
-2. **WordPress側のreCAPTCHA設定を確認**
-   - WordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」で：
-     - サイトキーが`PUBLIC_RECAPTCHA_SITE_KEY`と一致しているか
+2. **WordPress側のTurnstile設定を確認**
+   - WordPress管理画面の「お問い合わせ」→「統合」→「Turnstile」で：
+     - サイトキーが`PUBLIC_TURNSTILE_SITE_KEY`と一致しているか
      - シークレットキーが正しく設定されているか
 
-3. **Google reCAPTCHA管理画面でドメインを確認**
-   - https://www.google.com/recaptcha/admin にアクセス
-   - 使用しているreCAPTCHAサイトを選択
-   - 「ドメイン」セクションで、`hibari-konaweb.netlify.app`が登録されているか確認
+3. **Cloudflare Turnstile管理画面でドメインを確認**
+   - [Cloudflare ダッシュボード](https://dash.cloudflare.com/?to=/:account/turnstile) にアクセス
+   - 使用しているTurnstileサイトを選択
+   - 「Hostname Management（ホスト名管理）」で、`hibari-konaweb.netlify.app`および`hibari-konaweb.com`が登録されているか確認（未登録の場合は 401 エラーになります）
 
 4. **ブラウザのコンソールで確認**
    - 開発者ツール（F12）のコンソールタブを開く
-   - フォーム送信時に以下のログを確認：
-     - `✅ [Contact Form] reCAPTCHA token obtained`が表示されているか
-     - `📋 [Contact Form] FormData keys:`に`g-recaptcha-response`が含まれているか
+   - フォーム送信時に以下を確認：
+     - `challenges.cloudflare.com`へのリクエストが成功しているか
+     - `📋 [Contact Form] FormData keys:`に`_wpcf7_turnstile_response`が含まれているか
      - `📤 [Contact Form] Sending POST request to:`で送信先URLを確認
 
 ### ネットワークエラー（ERR_INTERNET_DISCONNECTED）が発生する場合

@@ -5,7 +5,7 @@
 ## 目次
 
 1. [SSL化（HTTPS）](#ssl化https)
-2. [reCAPTCHA設定](#recaptcha設定)
+2. [Turnstile設定](#turnstile設定)
 3. [その他のセキュリティ対策](#その他のセキュリティ対策)
 
 ## SSL化（HTTPS）
@@ -29,55 +29,51 @@ Netlifyは自動的にSSL証明書を提供します。カスタムドメイン�
 - ブラウザのアドレスバーで「🔒」アイコンが表示されていることを確認
 - `https://`で始まるURLであることを確認
 
-## reCAPTCHA設定
+## Turnstile設定
 
 ### 概要
 
-reCAPTCHAは、Googleが提供するボット対策サービスです。Contact Form 7では、reCAPTCHA v3（ユーザーに気づかれない形で動作）を推奨します。
+Cloudflare Turnstileは、Cloudflareが提供するボット対策（CAPTCHA代替）サービスです。ユーザーにパズルを課さずにボットを判定でき、プライバシーにも配慮されています。当サイトでは Google reCAPTCHA から Turnstile へ移行済みです。
 
 ### WordPress側の設定
 
-#### 1. Contact Form 7にreCAPTCHA統合プラグインをインストール
+#### 1. Contact Form 7のTurnstile統合を有効化
 
-Contact Form 7 v5.1以降では、reCAPTCHA機能が標準で含まれています。追加のプラグインは不要です。
+Contact Form 7 v6.0以降では、Turnstile機能が標準で含まれています。追加のプラグインは不要です（バージョンが古い場合は Contact Form 7 を更新してください）。
 
-#### 2. Google reCAPTCHAのサイトキーとシークレットキーを取得
+#### 2. Cloudflare Turnstileのサイトキーとシークレットキーを取得
 
-1. [Google reCAPTCHA管理画面](https://www.google.com/recaptcha/admin)にアクセス
-2. 「+」ボタンをクリックして新しいサイトを登録
+1. [Cloudflare ダッシュボード](https://dash.cloudflare.com/?to=/:account/turnstile)にアクセス
+2. 「Turnstile」→「Add Site（サイトを追加）」をクリック
 3. 以下の設定を行います：
-   - **ラベル**: サイト名（例: Hibari Konaweb Contact Form）
-   - **reCAPTCHAタイプ**: reCAPTCHA v3（推奨）または reCAPTCHA v2
-   - **ドメイン**: **両方のドメインを登録する必要があります**
-     - フロントエンド側: `hibari-konaweb.netlify.app`（reCAPTCHAトークンを生成する側）
-     - WordPress側: `hibari-konaweb.com`（reCAPTCHAトークンを検証する側）
-     - **重要**: WordPress側のドメイン（`hibari-konaweb.com`）が登録されていないと、WordPressからGoogleへの検証リクエストが拒否され、spamとして判定されます
-4. 「送信」をクリック
+   - **サイト名**: 任意（例: Hibari Konaweb Contact Form）
+   - **ドメイン**: **フォームを埋め込む・検証するドメインを登録する必要があります**
+     - フロントエンド側: `hibari-konaweb.netlify.app`（Turnstileウィジェットを表示する側）
+     - 本番ドメイン: `hibari-konaweb.com`
+     - **重要**: 表示するドメインが「許可するドメイン」に登録されていないと、ウィジェットが 401 エラーになり送信できません
+   - **ウィジェットのタイプ**: Managed（推奨）
+4. 「作成」をクリック
 5. **サイトキー**と**シークレットキー**をコピー（後で使用します）
 
-**注意**: 既にサイトを登録している場合でも、後からドメインを追加できます：
-1. サイトを選択
-2. 「設定」を開く
-3. 「ドメイン」セクションで「+ ドメインを追加します」をクリック
-4. `hibari-konaweb.com`を入力して追加
+**注意**: 後からドメインを追加する場合は、対象サイトの「Settings（設定）」→「Hostname Management（ホスト名管理）」からドメインを追加できます。
 
-#### 3. WordPress管理画面でreCAPTCHAを設定
+#### 3. WordPress管理画面でTurnstileを設定
 
 1. WordPress管理画面にログイン
 2. 「お問い合わせ」→「統合」に移動
-3. 「reCAPTCHA」セクションで以下を設定：
+3. 「Turnstile（Cloudflare）」セクションで以下を設定：
    - **サイトキー**: 上記で取得したサイトキーを入力
    - **シークレットキー**: 上記で取得したシークレットキーを入力
 4. 「変更を保存」をクリック
 
-#### 4. Contact Form 7のフォームにreCAPTCHAを追加
+#### 4. Contact Form 7のフォームにTurnstileを追加
 
-**重要**: reCAPTCHA v3を使用している場合でも、REST API経由でフォームを送信する場合は、フォームテンプレートに`[recaptcha]`タグを追加する必要があります。
+**重要**: REST API経由でフォームを送信する場合は、フォームテンプレートに`[turnstile]`タグを追加する必要があります。
 
 Contact Form 7のフォーム編集画面で、フォームタグに以下を追加：
 
 ```
-[recaptcha]
+[turnstile]
 ```
 
 このタグは、送信ボタンの前（通常は最後）に配置してください：
@@ -89,11 +85,9 @@ Contact Form 7のフォーム編集画面で、フォームタグに以下を追
 [email* your-email autocomplete:email] </label>
 <label> メッセージ本文(任意)
 [textarea your-message] </label>
-[recaptcha]
+[turnstile]
 [submit "送信"]
 ```
-
-**注意**: 通常のWordPressフォーム（REST APIを使用しない場合）では、reCAPTCHA v3は自動的に動作するため`[recaptcha]`タグは不要ですが、REST API経由で送信する場合は必要です。
 
 ### Astro側の設定
 
@@ -102,15 +96,15 @@ Contact Form 7のフォーム編集画面で、フォームタグに以下を追
 `.env`ファイルまたはNetlifyの環境変数に以下を追加：
 
 ```env
-# reCAPTCHA設定
-PUBLIC_RECAPTCHA_SITE_KEY=your_site_key_here
+# Turnstile設定
+PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key_here
 ```
 
-**重要**: `PUBLIC_RECAPTCHA_SITE_KEY`は公開されても問題ないサイトキーです。シークレットキーは**絶対に**環境変数に設定しないでください。
+**重要**: `PUBLIC_TURNSTILE_SITE_KEY`は公開されても問題ないサイトキーです。シークレットキーは**絶対に**環境変数に設定しないでください（WordPress側の統合設定でのみ使用します）。
 
 #### 2. 実装の確認
 
-Astro側の実装は既に完了しています。`ContactForm.tsx`コンポーネントが自動的にreCAPTCHAトークンを取得して送信します。
+Astro側の実装は既に完了しています。`ContactForm.tsx`コンポーネントが`@marsidev/react-turnstile`でウィジェットを表示し、取得したトークンを`_wpcf7_turnstile_response`フィールドとして送信します。`PUBLIC_TURNSTILE_SITE_KEY`が未設定の場合はウィジェットを非表示にして検証をスキップします。
 
 ## その他のセキュリティ対策
 
@@ -136,58 +130,54 @@ Contact Form 7は自動的に入力値をサニタイズ（無害化）します
 
 ## トラブルシューティング
 
-### reCAPTCHAが動作しない場合
+### Turnstileが動作しない場合
 
 1. **サイトキーが正しく設定されているか確認**
 
-   - `.env`ファイルの`PUBLIC_RECAPTCHA_SITE_KEY`を確認
+   - `.env`ファイルの`PUBLIC_TURNSTILE_SITE_KEY`を確認
    - Netlifyの環境変数が正しく設定されているか確認
-   - WordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」でサイトキーが一致しているか確認
+   - WordPress管理画面の「お問い合わせ」→「統合」→「Turnstile」でサイトキーが一致しているか確認
 
 2. **シークレットキーを再設定（重要）**
 
-   - Google reCAPTCHA管理画面（https://www.google.com/recaptcha/admin）でシークレットキーを再取得
-   - **重要**: サイトキーとシークレットキーは同じreCAPTCHAサイトのペアである必要があります
-   - WordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」で：
-     - シークレットキーを一度削除（「キーを削除」ボタンをクリック）
-     - 再度シークレットキーを入力
+   - [Cloudflare ダッシュボード](https://dash.cloudflare.com/?to=/:account/turnstile)でシークレットキーを再取得
+   - **重要**: サイトキーとシークレットキーは同じTurnstileサイトのペアである必要があります
+   - WordPress管理画面の「お問い合わせ」→「統合」→「Turnstile」で：
+     - シークレットキーを再入力
      - 「変更を保存」をクリック
    - 設定後、数分待ってから再度フォーム送信を試す
 
 3. **ドメインが正しく登録されているか確認**
 
-   - Google reCAPTCHA管理画面で、使用しているドメインが登録されているか確認
+   - Cloudflare Turnstileの対象サイトの「Hostname Management（ホスト名管理）」で、使用しているドメインが登録されているか確認
    - 本番環境の場合：`hibari-konaweb.com`が登録されているか確認
-   - 必要に応じてドメインを追加
+   - **未登録の場合**: ウィジェットが 401 エラーになり、トークンが取得できず送信に失敗します。必要に応じてドメインを追加してください
 
 4. **ブラウザのコンソールでエラーを確認**
    - ブラウザの開発者ツール（F12）でコンソールエラーを確認
-   - ネットワークタブでreCAPTCHA APIへのリクエストが成功しているか確認
-   - `g-recaptcha-response`がFormDataに含まれているか確認
+   - ネットワークタブで`challenges.cloudflare.com`へのリクエストが成功しているか確認
+   - `_wpcf7_turnstile_response`がFormDataに含まれているか確認
 
-5. **WordPress側のデバッグログを確認**
+5. **CSP（Content Security Policy）でブロックされていないか確認**
+   - `challenges.cloudflare.com`が`script-src` / `frame-src` / `connect-src`で許可されているか確認（`netlify.toml`および`src/layouts/HeadLayout.astro`）
+   - CSPエラーが出ている場合、ウィジェットが表示されません
+
+6. **WordPress側のデバッグログを確認**
    - `wp-content/debug.log`を確認（エラーがあれば生成されます）
-   - reCAPTCHA関連のエラーメッセージがないか確認
+   - Turnstile関連のエラーメッセージがないか確認
    - `wp-config.php`で`WP_DEBUG_LOG`が`true`に設定されているか確認
 
-6. **Contact Form 7のフォームテンプレートを確認**
-   - フォームテンプレートに`[recaptcha]`タグが含まれているか確認
-   - REST API経由で送信する場合は、`[recaptcha]`タグが必要です
+7. **Contact Form 7のフォームテンプレートを確認**
+   - フォームテンプレートに`[turnstile]`タグが含まれているか確認
+   - REST API経由で送信する場合は、`[turnstile]`タグが必要です
 
-7. **一時的にreCAPTCHAを無効化してテスト（原因特定用）**
-   - WordPress管理画面の「お問い合わせ」→「統合」→「reCAPTCHA」で「キーを削除」をクリック
-   - フォームテンプレートから`[recaptcha]`タグを削除
+8. **一時的にTurnstileを無効化してテスト（原因特定用）**
+   - フロント側で`PUBLIC_TURNSTILE_SITE_KEY`を未設定にすると、ウィジェットが非表示になり検証がスキップされます
+   - WordPress管理画面の「お問い合わせ」→「統合」→「Turnstile」でキーを削除し、フォームテンプレートから`[turnstile]`タグを削除
    - フォーム送信が成功するか確認
-   - **成功する場合**: reCAPTCHA設定に問題があることが確定
-   - **成功しない場合**: reCAPTCHA以外の問題（SMTP設定など）の可能性
-   - **注意**: テスト後は必ずreCAPTCHAを再有効化してください
-
-8. **Contact Form 7のREST API経由での送信でreCAPTCHAが検証されない問題**
-   - Contact Form 7のREST API経由での送信では、reCAPTCHAの検証方法が通常のフォーム送信と異なる可能性があります
-   - この場合、以下のいずれかの対応が必要です：
-     - **オプションA**: reCAPTCHAを無効化して、他のセキュリティ対策（レート制限など）で対応
-     - **オプションB**: Contact Form 7の通常のフォーム送信方式に変更（REST APIを使用しない）
-     - **オプションC**: Contact Form 7のプラグインを更新して、REST API経由でのreCAPTCHA検証に対応しているか確認
+   - **成功する場合**: Turnstile設定に問題があることが確定
+   - **成功しない場合**: Turnstile以外の問題（SMTP設定など）の可能性
+   - **注意**: テスト後は必ずTurnstileを再有効化してください
 
 ### SSL証明書の問題
 
@@ -205,14 +195,14 @@ Contact Form 7は自動的に入力値をサニタイズ（無害化）します
 実装後、以下の項目を確認してください：
 
 - [ ] SSL証明書が有効（HTTPSでアクセス可能）
-- [ ] reCAPTCHAサイトキーが環境変数に設定されている
-- [ ] WordPress側でreCAPTCHAのシークレットキーが設定されている
-- [ ] フォーム送信時にreCAPTCHAトークンが送信されている（ブラウザの開発者ツールで確認）
+- [ ] Turnstileサイトキーが環境変数（`PUBLIC_TURNSTILE_SITE_KEY`）に設定されている
+- [ ] WordPress側でTurnstileのシークレットキーが設定されている
+- [ ] フォーム送信時にTurnstileトークン（`_wpcf7_turnstile_response`）が送信されている（ブラウザの開発者ツールで確認）
 - [ ] レート制限が正常に動作している
 - [ ] バリデーションが正常に動作している
 
 ## 参考リンク
 
 - [Contact Form 7公式ドキュメント](https://contactform7.com/)
-- [Google reCAPTCHA公式ドキュメント](https://developers.google.com/recaptcha)
+- [Cloudflare Turnstile公式ドキュメント](https://developers.cloudflare.com/turnstile/)
 - [Netlify SSL/TLS設定](https://docs.netlify.com/domains-https/https-ssl/)

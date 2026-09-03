@@ -70,6 +70,9 @@ import Navigation from "@/components/navi/Navigation.astro";
 </header>
 
 <script>
+  // 時計アニメーションの更新用インターバルID（遷移時の多重生成を防ぐため保持）
+  let clockIntervalId: ReturnType<typeof setInterval> | null = null;
+
   // 時計アニメーションの初期化と管理
   function initClockAnimation() {
     const clockCircle = document.querySelector<SVGCircleElement>(".clock-circle");
@@ -115,8 +118,10 @@ import Navigation from "@/components/navi/Navigation.astro";
     // 初回実行
     updateClock();
 
+    // 既存インターバルをクリア（遷移時の多重生成を防止）
+    if (clockIntervalId !== null) clearInterval(clockIntervalId);
     // 1秒ごとに更新
-    setInterval(updateClock, 1000);
+    clockIntervalId = setInterval(updateClock, 1000);
   }
 
   // DOM要素をキャッシュ（スクロールのたびに検索しない）
@@ -165,6 +170,8 @@ import Navigation from "@/components/navi/Navigation.astro";
   // View Transitions でページ遷移した後にキャッシュを更新
   document.addEventListener("astro:after-swap", () => {
     cacheScrollElements();
+    // 遷移で差し替わった新しい .clock-circle に時計アニメーションを再バインド
+    initClockAnimation();
   });
 
   // DOMが読み込まれた後に時計アニメーションを初期化
