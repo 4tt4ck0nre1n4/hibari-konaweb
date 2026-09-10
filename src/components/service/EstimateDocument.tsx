@@ -4,6 +4,7 @@ import { COMPANY_INFO } from "@/config/site";
 import { generateEstimatePDFFromHTML } from "@/pricing/generatePDF";
 import "@/styles/pricing/EstimateDocument.css";
 import IconifyInline from "@/components/ui/IconifyInline";
+import logoText from "@/assets/logo_text.svg";
 
 const pdfIcon = "vscode-icons:file-type-pdf2";
 const contactIcon = "ic:baseline-contact-mail";
@@ -275,7 +276,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
                   height={32}
                 />
                 <img
-                  src="/logo_text.svg"
+                  src={logoText.src}
                   alt={COMPANY_INFO.name}
                   className="estimate-document__logo-text"
                   width={200}

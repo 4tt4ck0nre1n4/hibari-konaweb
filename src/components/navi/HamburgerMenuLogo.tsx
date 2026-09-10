@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import hamburgerStyles from "@/styles/hamburgerStyles.module.css";
+import logoText from "@/assets/logo_text.svg";
 
 const HamburgerMenuLogo = () => {
   const clockCircleRef = useRef<SVGCircleElement>(null);
@@ -91,7 +92,7 @@ const HamburgerMenuLogo = () => {
       </span>
       <img
         className={hamburgerStyles.hamburger__logo_text}
-        src="/logo_text.svg"
+        src={logoText.src}
         alt="ロゴテキスト"
         width="280"
         height="50"
