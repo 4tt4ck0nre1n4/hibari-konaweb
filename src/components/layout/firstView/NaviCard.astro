@@ -448,7 +448,9 @@ const menuItems: MenuItem[] = [
   }
 
   /* レスポンシブ対応 */
-  @media (width <= 1024px) {
+  /* ノートPC/タブレット帯（769〜1024px）はデフォルトの左上配置を継承。
+     中央寄せはスマホ（≤768px）のみに限定する */
+  @media (width <= 768px) {
     .navi-card__button {
       top: 88px;
       left: 50%;
