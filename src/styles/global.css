@@ -408,6 +408,22 @@ html.dark .sns-icon__img--dark {
   display: block;
 }
 
+/* ラスター画像の公式ロゴ（LINE / YouTube）: 縦横比を保ったまま 28px の枠に収める */
+.sns-icon__img--brand {
+  width: 28px;
+  height: 28px;
+}
+
+/*
+ * YouTube 公式アイコンは配布PNGに広い余白（クリアスペース）を含み、
+ * ロゴ本体が画像幅の約66%（28px枠で約18px）しかないため、他のアイコンと幅を揃えるよう拡大する。
+ * 拡大分の余白は透明。ファイル自体は加工しない。
+ */
+.sns-icon__item--youtube .sns-icon__img--brand {
+  transform: scale(1.5);
+  pointer-events: none;
+}
+
 /* 印刷時のグローバルスタイル */
 @media print {
   header,

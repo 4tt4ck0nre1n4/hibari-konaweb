@@ -2,6 +2,8 @@ import xLogoBlack from "@/assets/icons/x-logo-black.svg";
 import xLogoWhite from "@/assets/icons/x-logo-white.svg";
 import githubLogoBlack from "@/assets/icons/GitHub_Invertocat_Black.svg";
 import githubLogoWhite from "@/assets/icons/GitHub_Invertocat_White.svg";
+import lineLogo from "@/assets/icons/LINE_Brand_icon.png";
+import youtubeLogo from "@/assets/icons/yt_icon_red_digital.png";
 
 // ============================================================
 // ボタンアイコン定数（旧: data/constButton.ts）
@@ -72,6 +74,36 @@ export const notion = {
   item: "Notion",
   ariaLabel: "Notionページへ(新しいタブで開く)",
   ariaTitle: "Notionページへ(新しいタブで開く)",
+  targetBlank: "_blank",
+};
+/**
+ * 公式ブランドロゴ（LINE / YouTube）
+ * - LINE: https://www.line.me/ja/logo （Brand Icon。SVG配布なしのためPNG）
+ * - YouTube: https://brand.youtube/youtube-icon/ （Core / red digital）
+ * フルカラーのためライト・ダーク共通。astro:assets で表示サイズに合わせて最適化する。
+ * ガイドラインで拡大・回転などの演出が禁止されているため、押下時の縮小演出も行わない。
+ * TODO: YouTube はチャンネル開設後に href を変更する
+ */
+export const line = {
+  className: "sns-icon__link",
+  // LINE STORE: 自作LINEスタンプのクリエイターページ
+  href: "https://store.line.me/stickershop/author/6659913/ja",
+  icon: "",
+  image: lineLogo,
+  item: "LINE",
+  ariaLabel: "LINEスタンプ(LINE STORE)ページへ(新しいタブで開く)",
+  ariaTitle: "LINEスタンプ(LINE STORE)ページへ(新しいタブで開く)",
+  targetBlank: "_blank",
+};
+export const youtube = {
+  className: "sns-icon__link",
+  href: "/sorry",
+  icon: "",
+  image: youtubeLogo,
+  brand: "youtube",
+  item: "YouTube",
+  ariaLabel: "YouTubeページへ(新しいタブで開く)",
+  ariaTitle: "YouTubeページへ(新しいタブで開く)",
   targetBlank: "_blank",
 };
 export const instagram = {

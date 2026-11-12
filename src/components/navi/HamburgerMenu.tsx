@@ -3,7 +3,8 @@ import { useState, useEffect, useRef, useLayoutEffect, useCallback } from "react
 import hamburgerStyles from "@/styles/hamburgerStyles.module.css";
 import ReactDOM from "react-dom";
 import SnsLink from "@/components/navi/SnsLink";
-import { twitter, github_sns, contact, mail } from "@/config/ui";
+import type { SnsIconImage } from "@/components/navi/SnsLink";
+import { twitter, github_sns, contact, line, youtube } from "@/config/ui";
 import HamburgerMenuLogo from "./HamburgerMenuLogo";
 import type { IconifyInlineProps } from "@/components/ui/IconifyInline";
 
@@ -79,7 +80,17 @@ const copyright = "hibari-codeweb.com All Rights Reserved.";
 
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-const HamburgerMenu = () => {
+/** Astro 側（Navigation.astro）で最適化した LINE / YouTube 公式ロゴ画像 */
+export interface HamburgerBrandIcons {
+  line: SnsIconImage;
+  youtube: SnsIconImage;
+}
+
+interface HamburgerMenuProps {
+  brandIcons?: HamburgerBrandIcons;
+}
+
+const HamburgerMenu = ({ brandIcons }: HamburgerMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [IconifyInline, setIconifyInline] = useState<ComponentType<IconifyInlineProps> | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -502,11 +513,21 @@ const HamburgerMenu = () => {
           <SnsLink
             itemClassName={hamburgerStyles.hamburger__snsItem}
             linkClassName={hamburgerStyles.hamburger__snsLink}
-            href={mail.href}
-            snsIconSvg={mail.icon}
-            ariaLabel={mail.ariaLabel}
-            ariaTitle={mail.ariaTitle}
-            targetBlank={mail.targetBlank}
+            href={line.href}
+            snsIconImage={brandIcons?.line}
+            ariaLabel={line.ariaLabel}
+            ariaTitle={line.ariaTitle}
+            targetBlank={line.targetBlank}
+          />
+          <SnsLink
+            itemClassName={hamburgerStyles.hamburger__snsItem}
+            linkClassName={hamburgerStyles.hamburger__snsLink}
+            href={youtube.href}
+            snsIconImage={brandIcons?.youtube}
+            snsBrand={youtube.brand}
+            ariaLabel={youtube.ariaLabel}
+            ariaTitle={youtube.ariaTitle}
+            targetBlank={youtube.targetBlank}
           />
         </ul>
       </div>

@@ -1,4 +1,6 @@
 ---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
 import SafeIcon from "@/components/ui/SafeIcon.astro";
 
 interface SnsProps {
@@ -7,14 +9,28 @@ interface SnsProps {
   snsIconSvg?: string;
   /** ダークモード時に差し替えるSVGアセット（公式ロゴの白版など） */
   snsIconDarkSvg?: string;
+  /** ラスター画像の公式ロゴ（LINE / YouTube など）。指定時は最適化して表示し、押下時の演出を無効化する */
+  snsIconImage?: ImageMetadata;
+  /** ブランド名（例: "youtube"）。li に sns-icon__item--{brand} クラスを付与し、ロゴ個別の調整に使う */
+  snsBrand?: string;
   snsIconName?: string;
   ariaLabel: string;
   ariaTitle: string;
   targetBlank?: string;
 }
 
-const { className, href, snsIconSvg, snsIconDarkSvg, snsIconName, ariaLabel, ariaTitle, targetBlank } =
-  Astro.props as SnsProps;
+const {
+  className,
+  href,
+  snsIconSvg,
+  snsIconDarkSvg,
+  snsIconImage,
+  snsBrand,
+  snsIconName,
+  ariaLabel,
+  ariaTitle,
+  targetBlank,
+} = Astro.props as SnsProps;
 
 const snsIconWidth: number = 28;
 const snsIconHeight: number = 28;
@@ -25,7 +41,13 @@ const isSvgAsset =
 const hasDarkVariant = isSvgAsset && typeof snsIconDarkSvg === "string" && snsIconDarkSvg.trim() !== "";
 ---
 
-<li class="sns-icon__item">
+<li
+  class:list={[
+    "sns-icon__item",
+    { "sns-icon__item--static": snsIconImage != null },
+    snsBrand != null && `sns-icon__item--${snsBrand}`,
+  ]}
+>
   <a
     class={className}
     href={href}
@@ -34,7 +56,22 @@ const hasDarkVariant = isSvgAsset && typeof snsIconDarkSvg === "string" && snsIc
     {...targetBlank === "_blank" ? { target: "_blank" as const } : {}}
   >
     {
-      isSvgAsset ? (
+      snsIconImage != null ? (
+        <Image
+          src={snsIconImage}
+          width={snsIconWidth}
+          densities={[1, 2, 3]}
+          format="png"
+          alt=""
+          loading="lazy"
+          decoding="async"
+          aria-hidden="true"
+          class="sns-icon__img sns-icon__img--brand"
+        />
+      ) : null
+    }
+    {
+      snsIconImage == null && isSvgAsset ? (
         <img
           src={snsIconSvg}
           width={snsIconWidth}
@@ -64,7 +101,11 @@ const hasDarkVariant = isSvgAsset && typeof snsIconDarkSvg === "string" && snsIc
         />
       ) : null
     }
-    {isSvgAsset ? null : <SafeIcon name={snsIconSvg} width={snsIconWidth} height={snsIconHeight} />}
+    {
+      snsIconImage != null || isSvgAsset ? null : (
+        <SafeIcon name={snsIconSvg} width={snsIconWidth} height={snsIconHeight} />
+      )
+    }
     {snsIconName != null && snsIconName.trim() !== "" && <span class="sns-icon__name">{snsIconName}</span>}
   </a>
 </li>

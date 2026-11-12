@@ -1,5 +1,8 @@
 ---
+import { getImage } from "astro:assets";
 import HamburgerMenu from "./HamburgerMenu";
+import type { HamburgerBrandIcons } from "./HamburgerMenu";
+import { line, youtube } from "@/config/ui";
 import MenuIcon from "./MenuIcon.astro";
 import BackgroundImage from "./BackgroundImage.astro";
 import ThemeColor from "./ThemeColor.astro";
@@ -17,6 +20,18 @@ const contact = {
   icon: "fluent-emoji-flat:envelope",
   ariaLabel: "お問い合わせページへ",
   ariaTitle: "お問い合わせページへ",
+};
+
+// LINE / YouTube 公式ロゴ（PNG）を表示サイズに合わせて最適化し、ハンバーガーメニュー（React）へ渡す。
+// 色の変化を避けるため PNG のまま出力する。
+const brandImageOptions = { width: 28, densities: [1, 2, 3], format: "png" as const };
+const [lineImage, youtubeImage] = await Promise.all([
+  getImage({ src: line.image, ...brandImageOptions }),
+  getImage({ src: youtube.image, ...brandImageOptions }),
+]);
+const brandIcons: HamburgerBrandIcons = {
+  line: { src: lineImage.src, srcSet: lineImage.srcSet.attribute },
+  youtube: { src: youtubeImage.src, srcSet: youtubeImage.srcSet.attribute },
 };
 ---
 
@@ -46,7 +61,7 @@ const contact = {
     <BackgroundImage />
   </li>
   <li class="header__menu_item header__menu_item--hamburger">
-    <HamburgerMenu client:visible />
+    <HamburgerMenu client:visible brandIcons={brandIcons} />
   </li>
 </ul>
 

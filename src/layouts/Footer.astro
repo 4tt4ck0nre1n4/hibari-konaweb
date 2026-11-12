@@ -6,7 +6,7 @@ import FooterSupport from "@/components/layout/footer/FooterSupport.astro";
 import FooterLinks from "@/components/layout/footer/FooterLinks.astro";
 import FooterCopyright from "@/components/layout/footer/FooterCopyright.astro";
 import layoutText from "@/data/layoutText.json";
-import { twitter, github_sns, /* instagram, */ about, contact, mail } from "@/config/ui";
+import { twitter, github_sns, line, youtube, /* instagram, */ about, contact, mail } from "@/config/ui";
 
 interface ContactType {
   className: {
@@ -62,6 +62,25 @@ const typedContact = contact as ContactType;
             ariaLabel={github_sns.ariaLabel}
             ariaTitle={github_sns.ariaTitle}
             targetBlank={github_sns.targetBlank}
+            source="Sns Components"
+          />
+          <FooterSns
+            className={line.className}
+            href={line.href}
+            snsIconImage={line.image}
+            ariaLabel={line.ariaLabel}
+            ariaTitle={line.ariaTitle}
+            targetBlank={line.targetBlank}
+            source="Sns Components"
+          />
+          <FooterSns
+            className={youtube.className}
+            href={youtube.href}
+            snsIconImage={youtube.image}
+            snsBrand={youtube.brand}
+            ariaLabel={youtube.ariaLabel}
+            ariaTitle={youtube.ariaTitle}
+            targetBlank={youtube.targetBlank}
             source="Sns Components"
           />
           <!-- Instagram: 運用再開時は import の instagram を有効化し、このブロックのコメントを外す -->
@@ -230,6 +249,11 @@ const typedContact = contact as ContactType;
     transform: scale(0.8);
     box-shadow: 0 8px 8px rgb(255 255 255 / 0.6);
   }
+  /* LINE / YouTube: ガイドラインに配慮し、押下時の縮小演出を行わない（影の変化のみ） */
+  .footer__snsMenu .sns-icon__item--static:active,
+  html.dark .footer__snsMenu .sns-icon__item--static:active {
+    transform: none;
+  }
   .footer__snsMenu .sns-icon__link {
     display: flex;
     align-items: center;
@@ -301,8 +325,8 @@ const typedContact = contact as ContactType;
   }
   .footer .footer__snsMenu {
     display: grid;
-    /* Instagram 再表示時は repeat(4, 48px) に戻す */
-    grid-template-columns: repeat(3, 48px);
+    /* X, GitHub, LINE, YouTube, About（Instagram 再表示時は repeat(6, 48px)） */
+    grid-template-columns: repeat(5, 48px);
     gap: 0.5rem;
     margin-block-start: 0.5rem;
   }

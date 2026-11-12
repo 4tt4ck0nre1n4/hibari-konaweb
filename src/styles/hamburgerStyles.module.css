@@ -708,7 +708,9 @@
 .hamburger__sns .hamburger__snsMenu {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 48px);
+
+  /* X, GitHub, Contact, LINE, YouTube */
+  grid-template-columns: repeat(5, 48px);
   gap: 0.75rem;
   justify-content: center;
   border-top: 2px solid rgb(102 126 234 / 0.4);
@@ -782,6 +784,23 @@
 
 .hamburger__menu.open .hamburger__snsItem:nth-child(4) {
   transition-delay: 1.32s, 0s, 1.32s;
+}
+
+.hamburger__menu.open .hamburger__snsItem:nth-child(5) {
+  transition-delay: 1.44s, 0s, 1.44s;
+}
+
+/* LINE / YouTube: ガイドラインに配慮し、押下時の縮小演出を行わない（影の変化のみ） */
+.hamburger__menu.open .hamburger__snsItem:global(.sns-icon__item--static):active,
+:global(html.dark) .hamburger__menu.open .hamburger__snsItem:global(.sns-icon__item--static):active {
+  transform: translateY(0);
+}
+
+/* 5アイコンが狭い画面でも1行に収まるよう間隔を詰める */
+@media (width <= 400px) {
+  .hamburger__sns .hamburger__snsMenu {
+    gap: 0.5rem;
+  }
 }
 
 .hamburger__snsLink {

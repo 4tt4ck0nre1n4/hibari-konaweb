@@ -2,6 +2,12 @@ import type { ComponentType } from "react";
 import { useEffect, useState, useMemo, memo } from "react";
 import type { IconifyInlineProps } from "@/components/ui/IconifyInline";
 
+/** 最適化済みのラスター画像ロゴ（LINE / YouTube など） */
+export interface SnsIconImage {
+  src: string;
+  srcSet?: string;
+}
+
 export interface SnsLinkProps {
   itemClassName?: string;
   linkClassName?: string;
@@ -9,6 +15,10 @@ export interface SnsLinkProps {
   snsIconSvg?: string;
   /** ダークモード時に差し替えるSVGアセット（公式ロゴの白版など） */
   snsIconDarkSvg?: string;
+  /** ラスター画像の公式ロゴ。指定時は押下時の縮小演出を無効化する */
+  snsIconImage?: SnsIconImage;
+  /** ブランド名（例: "youtube"）。li に sns-icon__item--{brand} クラスを付与する */
+  snsBrand?: string;
   snsIconName?: string;
   ariaLabel: string;
   ariaTitle: string;
@@ -21,6 +31,8 @@ const SnsLink = ({
   href,
   snsIconSvg,
   snsIconDarkSvg,
+  snsIconImage,
+  snsBrand,
   snsIconName,
   ariaLabel,
   ariaTitle,
@@ -72,7 +84,15 @@ const SnsLink = ({
   }, [IconifyInline, isSvgAsset, snsIconSvg]);
 
   return (
-    <li className={itemClassName}>
+    <li
+      className={[
+        itemClassName,
+        snsIconImage !== undefined ? "sns-icon__item--static" : "",
+        snsBrand !== undefined ? `sns-icon__item--${snsBrand}` : "",
+      ]
+        .filter((name) => name !== "")
+        .join(" ")}
+    >
       <a
         className={linkClassName}
         href={href}
@@ -80,7 +100,19 @@ const SnsLink = ({
         aria-label={ariaLabel}
         title={ariaTitle}
       >
-        {isSvgAsset ? (
+        {snsIconImage !== undefined ? (
+          <img
+            src={snsIconImage.src}
+            srcSet={snsIconImage.srcSet}
+            width={snsIconWidth}
+            height={snsIconHeight}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+            className="sns-icon__img sns-icon__img--brand"
+          />
+        ) : isSvgAsset ? (
           hasIconName ? (
             <img
               src={snsIconSvg}

@@ -23,7 +23,7 @@ interface AboutText {
   aboutLikeText: string;
 }
 import FlowingLinesWrapper from "@/components/ui/FlowingLinesWrapper.astro";
-import { twitter, github_sns, mail, contact } from "@/config/ui";
+import { twitter, github_sns, line, youtube, contact } from "@/config/ui";
 import {
   html,
   css,
@@ -175,12 +175,21 @@ const jsonLd = JSON.stringify(
                 snsIconSvg={typedContact.icon}
               />
               <Sns
-                className={mail.className.about}
-                href={mail.href}
-                snsIconSvg={mail.icon}
-                ariaLabel={mail.ariaLabel}
-                ariaTitle={mail.ariaTitle}
-                targetBlank={mail.targetBlank}
+                className={line.className}
+                href={line.href}
+                ariaLabel={line.ariaLabel}
+                ariaTitle={line.ariaTitle}
+                targetBlank={line.targetBlank}
+                snsIconImage={line.image}
+              />
+              <Sns
+                className={youtube.className}
+                href={youtube.href}
+                ariaLabel={youtube.ariaLabel}
+                ariaTitle={youtube.ariaTitle}
+                targetBlank={youtube.targetBlank}
+                snsIconImage={youtube.image}
+                snsBrand={youtube.brand}
               />
             </ul>
           </div>
@@ -384,7 +393,8 @@ const jsonLd = JSON.stringify(
   }
   .about__snsMenu {
     display: grid;
-    grid-template-columns: repeat(4, 48px);
+    /* X, GitHub, Contact, LINE, YouTube */
+    grid-template-columns: repeat(5, 48px);
     gap: 0.75rem;
     padding-block-start: 1.5rem;
     padding-block-end: 0.5rem;
@@ -435,6 +445,16 @@ const jsonLd = JSON.stringify(
   html.dark .about__snsMenu .sns-icon__item:active {
     transform: scale(0.8);
     box-shadow: 0 8px 8px rgb(255 255 255 / 0.6);
+  }
+  /* LINE / YouTube: ガイドラインに配慮し、押下時の縮小演出を行わない（影の変化のみ） */
+  .about__snsMenu .sns-icon__item--static:active,
+  html.dark .about__snsMenu .sns-icon__item--static:active {
+    transform: none;
+  }
+  @media (width <= 480px) {
+    .about__snsMenu {
+      gap: 0.5rem;
+    }
   }
   html.dark .about__snsMenu .sns-icon__link svg {
     stroke: var(--color-white);

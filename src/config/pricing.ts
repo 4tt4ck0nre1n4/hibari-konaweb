@@ -6,6 +6,9 @@ import {
   pageCountOptionsSchema,
 } from "@/schemas/data.schema";
 
+/** ノーブレークスペース（改行させたくない空白） */
+const NBSP = String.fromCharCode(0xa0);
+
 // その他の機能 サブ項目の型定義
 export interface FunctionOption {
   id: string;
@@ -347,10 +350,13 @@ export const HOMEPAGE_PRICING_ITEMS: PricingItem[] = [
   },
   {
     id: "line",
-    name: "公式LINE設置・連携",
+    // 「/」が行頭に来ないよう、前の空白はノーブレークスペース（NBSP）
+    name: `公式LINE設置・連携${NBSP}/ スタンプ作成`,
     basePrice: 15000,
     isQuantifiable: false,
-    icon: "streamline-ultimate-color:line-app-logo",
+    // LINEブランドロゴは使用せず汎用アイコンを使用（ガイドラインで色・形の改変が禁止のため）。真ん中の列に合わせ緑系に
+    icon: "streamline-ultimate-color:phone-type",
+    iconColorOverride: "green",
   },
   {
     id: "banner",
