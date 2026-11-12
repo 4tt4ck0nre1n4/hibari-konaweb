@@ -5,13 +5,16 @@ interface SnsProps {
   className: string;
   href: string;
   snsIconSvg?: string;
+  /** ダークモード時に差し替えるSVGアセット（公式ロゴの白版など） */
+  snsIconDarkSvg?: string;
   snsIconName?: string;
   ariaLabel: string;
   ariaTitle: string;
   targetBlank?: string;
 }
 
-const { className, href, snsIconSvg, snsIconName, ariaLabel, ariaTitle, targetBlank } = Astro.props as SnsProps;
+const { className, href, snsIconSvg, snsIconDarkSvg, snsIconName, ariaLabel, ariaTitle, targetBlank } =
+  Astro.props as SnsProps;
 
 const snsIconWidth: number = 28;
 const snsIconHeight: number = 28;
@@ -19,6 +22,7 @@ const isSvgAsset =
   typeof snsIconSvg === "string" &&
   snsIconSvg.trim() !== "" &&
   (snsIconSvg.endsWith(".svg") || snsIconSvg.startsWith("/") || snsIconSvg.startsWith("."));
+const hasDarkVariant = isSvgAsset && typeof snsIconDarkSvg === "string" && snsIconDarkSvg.trim() !== "";
 ---
 
 <li class="sns-icon__item">
@@ -41,11 +45,26 @@ const isSvgAsset =
           fetchpriority="low"
           aria-hidden={snsIconName == null}
           data-sns-icon={snsIconSvg}
+          class={hasDarkVariant ? "sns-icon__img sns-icon__img--light" : "sns-icon__img"}
         />
-      ) : (
-        <SafeIcon name={snsIconSvg} width={snsIconWidth} height={snsIconHeight} />
-      )
+      ) : null
     }
+    {
+      hasDarkVariant ? (
+        <img
+          src={snsIconDarkSvg}
+          width={snsIconWidth}
+          height={snsIconHeight}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          fetchpriority="low"
+          aria-hidden="true"
+          class="sns-icon__img sns-icon__img--dark"
+        />
+      ) : null
+    }
+    {isSvgAsset ? null : <SafeIcon name={snsIconSvg} width={snsIconWidth} height={snsIconHeight} />}
     {snsIconName != null && snsIconName.trim() !== "" && <span class="sns-icon__name">{snsIconName}</span>}
   </a>
 </li>

@@ -759,13 +759,8 @@ html.dark .blog-post-sidebar-social a {
   color: rgb(148 163 184);
 }
 
-html.dark .blog-post-sidebar-social a:nth-child(1):is(:hover, :focus-visible),
-html.dark .blog-post-sidebar-social a:nth-child(3):is(:hover, :focus-visible) {
+html.dark .blog-post-sidebar-social a:is(:hover, :focus-visible) {
   color: rgb(71 85 105);
-}
-
-html.dark .blog-post-sidebar-social a:nth-child(2):is(:hover, :focus-visible) {
-  color: #1da1f2;
 }
 
 html.dark .blog-post-sidebar-popular-title {

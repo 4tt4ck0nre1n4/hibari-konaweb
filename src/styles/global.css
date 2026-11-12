@@ -387,6 +387,27 @@ html.dark select:focus-visible {
   text-decoration: none;
 }
 
+/*
+ * 公式ブランドロゴ（X / GitHub）のライト・ダーク切り替え（SNSリンク・スキル一覧で共用）
+ * ブランドガイドラインに従い、ロゴ自体の色は変えず、黒版と白版の画像を切り替える。
+ */
+.sns-icon__img {
+  display: block;
+  object-fit: contain;
+}
+
+.sns-icon__img--dark {
+  display: none;
+}
+
+html.dark .sns-icon__img--light {
+  display: none;
+}
+
+html.dark .sns-icon__img--dark {
+  display: block;
+}
+
 /* 印刷時のグローバルスタイル */
 @media print {
   header,

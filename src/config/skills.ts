@@ -1,6 +1,19 @@
+import githubLogoBlack from "@/assets/icons/GitHub_Invertocat_Black.svg";
+import githubLogoWhite from "@/assets/icons/GitHub_Invertocat_White.svg";
+import cursorLogoLight from "@/assets/icons/Cursor_CUBE_2D_LIGHT.svg";
+import cursorLogoDark from "@/assets/icons/Cursor_CUBE_2D_DARK.svg";
+import geminiLogo from "@/assets/icons/Google_Gemini_icon_2025.svg";
+import openaiLogoBlack from "@/assets/icons/OAI_OpenAI-Blossom_Black.svg";
+import openaiLogoWhite from "@/assets/icons/OAI_OpenAI-Blossom_White.svg";
+import cssLogo from "@/assets/icons/Official_CSS_Logo.svg";
+
 export interface SkillsProps {
   className: string;
   icon: string;
+  /** 公式ロゴのSVGアセット（ライトモード用） */
+  iconSrc?: string;
+  /** 公式ロゴのSVGアセット（ダークモード用） */
+  iconDarkSrc?: string;
   item: string;
 }
 export const html = {
@@ -10,7 +23,9 @@ export const html = {
 };
 export const css = {
   className: "css",
-  icon: "devicon:css3",
+  icon: "",
+  // 公式ロゴ（CSS Logo）。カラーロゴのためライト・ダーク共通
+  iconSrc: cssLogo.src,
   item: "CSS",
 };
 export const sass = {
@@ -95,13 +110,19 @@ export const netlify = {
 };
 export const github = {
   className: "github",
-  icon: "devicon:github",
+  icon: "",
+  // 公式ロゴ（https://github.com/logos）。ライト=黒版 / ダーク=白版
+  iconSrc: githubLogoBlack.src,
+  iconDarkSrc: githubLogoWhite.src,
   item: "Github",
   link: "/sorry",
 };
 export const cursor = {
   className: "cursor",
-  icon: "vscode-icons:file-type-cursorrules",
+  icon: "",
+  // 公式ロゴ（Cursor ブランドアセット CUBE 2D）。ライト=LIGHT版（濃色） / ダーク=DARK版（淡色）
+  iconSrc: cursorLogoLight.src,
+  iconDarkSrc: cursorLogoDark.src,
   item: "Cursor",
 };
 export const vercel = {
@@ -116,12 +137,17 @@ export const filezilla = {
 };
 export const chatgpt = {
   className: "chatgpt",
-  icon: "logos:openai-icon",
+  icon: "",
+  // 公式ロゴ（OpenAI Blossom）。ライト=黒版 / ダーク=白版
+  iconSrc: openaiLogoBlack.src,
+  iconDarkSrc: openaiLogoWhite.src,
   item: "ChatGPT",
 };
 export const gemini = {
   className: "gemini",
-  icon: "material-icon-theme:gemini-ai",
+  icon: "",
+  // 公式ロゴ（Google Gemini icon 2025）。カラーロゴのためライト・ダーク共通
+  iconSrc: geminiLogo.src,
   item: "Gemini",
 };
 export const claude = {

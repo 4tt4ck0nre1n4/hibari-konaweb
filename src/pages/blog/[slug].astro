@@ -4,6 +4,8 @@ import Layout from "@/layouts/Layout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { SITE as globalText } from "@/config/site";
 import { github_sns, twitter } from "@/config/ui";
+import xLogoBlack from "@/assets/icons/x-logo-black.svg";
+import githubLogoBlack from "@/assets/icons/GitHub_Invertocat_Black.svg";
 import { BLOG_PAGE_API, BLOG_SLUG_API } from "@/api/headlessCms";
 import SafeIcon from "@/components/ui/SafeIcon.astro";
 import {
@@ -430,10 +432,17 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
               href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(plainTitle)}`}
               target="_blank"
               rel="noopener noreferrer"
-              class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-[#1DA1F2] hover:text-white transition-colors duration-200"
+              class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors duration-200"
               aria-label="X (Twitter)でシェア"
             >
-              <SafeIcon name="fa6-brands:x-twitter" width={shareIconSize} height={shareIconSize} ariaHidden={true} />
+              <img
+                src={xLogoBlack.src}
+                width={shareIconSize}
+                height={shareIconSize}
+                alt=""
+                aria-hidden="true"
+                class="object-contain"
+              />
             </a>
             <a
               href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`}
@@ -537,16 +546,16 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
             class="text-slate-400 hover:text-slate-600"
             aria-label={github_sns.ariaLabel}
           >
-            <SafeIcon name="bi:github" width={22} height={22} ariaHidden={true} />
+            <img src={githubLogoBlack.src} width={22} height={22} alt="" aria-hidden="true" class="object-contain" />
           </a>
           <a
             href={twitter.href}
             target={twitter.targetBlank}
             rel="noopener noreferrer"
-            class="text-slate-400 hover:text-[#1DA1F2]"
+            class="text-slate-400 hover:text-slate-600"
             aria-label={twitter.ariaLabel}
           >
-            <SafeIcon name="devicon:twitter" width={22} height={22} ariaHidden={true} />
+            <img src={xLogoBlack.src} width={22} height={22} alt="" aria-hidden="true" class="object-contain" />
           </a>
           <a href={aboutUrl} class="text-slate-400 hover:text-slate-600" aria-label="サイトについて">
             <SafeIcon name="fa6-solid:link" width={22} height={22} ariaHidden={true} />

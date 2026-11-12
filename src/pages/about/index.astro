@@ -156,6 +156,7 @@ const jsonLd = JSON.stringify(
                 ariaTitle={twitter.ariaTitle}
                 targetBlank={twitter.targetBlank}
                 snsIconSvg={twitter.icon}
+                snsIconDarkSvg={twitter.iconDark}
               />
               <Sns
                 className={github_sns.className}
@@ -164,6 +165,7 @@ const jsonLd = JSON.stringify(
                 ariaTitle={github_sns.ariaTitle}
                 targetBlank={github_sns.targetBlank}
                 snsIconSvg={github_sns.icon}
+                snsIconDarkSvg={github_sns.iconDark}
               />
               <Sns
                 className={typedContact.className.about}
@@ -205,7 +207,7 @@ const jsonLd = JSON.stringify(
       <div class="skills__inner">
         <ul class="skills__menu">
           <SkillsIcon className={html.className} iconSvg={html.icon} iconName={html.item} />
-          <SkillsIcon className={css.className} iconSvg={css.icon} iconName={css.item} />
+          <SkillsIcon className={css.className} iconSvg={css.icon} iconSrc={css.iconSrc} iconName={css.item} />
           <SkillsIcon className={sass.className} iconSvg={sass.icon} iconName={sass.item} />
           <SkillsIcon className={javascript.className} iconSvg={javascript.icon} iconName={javascript.item} />
           <SkillsIcon className={typescript.className} iconSvg={typescript.icon} iconName={typescript.item} />
@@ -221,17 +223,40 @@ const jsonLd = JSON.stringify(
           <SkillsIcon className={vite.className} iconSvg={vite.icon} iconName={vite.item} />
           <SkillsIcon className={astro.className} iconSvg={astro.icon} iconName={astro.item} />
           <SkillsIcon className={vscode.className} iconSvg={vscode.icon} iconName={vscode.item} />
-          <SkillsIcon className={cursor.className} iconSvg={cursor.icon} iconName={cursor.item} />
+          <SkillsIcon
+            className={cursor.className}
+            iconSvg={cursor.icon}
+            iconSrc={cursor.iconSrc}
+            iconDarkSrc={cursor.iconDarkSrc}
+            iconName={cursor.item}
+          />
           <SkillsIcon className={netlify.className} iconSvg={netlify.icon} iconName={netlify.item} />
           <SkillsIcon className={vercel.className} iconSvg={vercel.icon} iconName={vercel.item} />
-          <SkillsIcon className={typedGithub.className} iconSvg={typedGithub.icon} iconName={typedGithub.item} />
+          <SkillsIcon
+            className={typedGithub.className}
+            iconSvg={typedGithub.icon}
+            iconSrc={typedGithub.iconSrc}
+            iconDarkSrc={typedGithub.iconDarkSrc}
+            iconName={typedGithub.item}
+          />
           <SkillsIcon
             className={typedFilezilla.className}
             iconSvg={typedFilezilla.icon}
             iconName={typedFilezilla.item}
           />
-          <SkillsIcon className={chatgpt.className} iconSvg={chatgpt.icon} iconName={chatgpt.item} />
-          <SkillsIcon className={gemini.className} iconSvg={gemini.icon} iconName={gemini.item} />
+          <SkillsIcon
+            className={chatgpt.className}
+            iconSvg={chatgpt.icon}
+            iconSrc={chatgpt.iconSrc}
+            iconDarkSrc={chatgpt.iconDarkSrc}
+            iconName={chatgpt.item}
+          />
+          <SkillsIcon
+            className={gemini.className}
+            iconSvg={gemini.icon}
+            iconSrc={gemini.iconSrc}
+            iconName={gemini.item}
+          />
           <SkillsIcon className={claude.className} iconSvg={claude.icon} iconName={claude.item} />
         </ul>
       </div>
@@ -531,10 +556,51 @@ const jsonLd = JSON.stringify(
     }
   }
   .skills-icon {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     color: inherit;
+  }
+  /*
+   * ホバー時の接地影（アイコンが浮き上がる演出）
+   * ブランドガイドラインに配慮し、ロゴ自体には影・回転などの加工をせず、アイコンの下に影を置く
+   */
+  .skills-icon::before {
+    content: "";
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    width: 36px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 0.35);
+    filter: blur(3px);
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5);
+    transition:
+      opacity 0.3s ease-out,
+      transform 0.3s ease-out;
+    pointer-events: none;
+  }
+  html.dark .skills-icon::before {
+    background: rgb(255 255 255 / 0.35);
+  }
+  .skills-icon__image--asset {
+    display: inline-block;
+  }
+  .skills-icon__image--asset img {
+    width: 100%;
+    height: 100%;
+  }
+  /*
+   * OpenAI 公式ロゴ（Blossom）は配布ファイルに広い余白（クリアスペース）を含み、
+   * ロゴ本体が枠の約51%しかないため、他のアイコンと見た目の大きさを揃えるよう拡大表示する。
+   * 拡大分の余白は透明。隣のアイコンのホバー判定を妨げないよう pointer-events を無効化する。
+   */
+  .skills-icon.chatgpt .skills-icon__image--asset img {
+    transform: scale(1.85);
+    pointer-events: none;
   }
   .skills-icon__image[data-icon] {
     width: 40px;
@@ -556,16 +622,25 @@ const jsonLd = JSON.stringify(
   }
   /* ホバー可能なデバイス（主にPC）でのみホバー効果を適用 */
   @media (any-hover: hover) {
-    .skills-icon .skills-icon__image:is(:hover, :focus-visible) {
-      transform: translateZ(20px) scale(1.6) rotate(720deg);
+    .skills-icon:is(:hover, :focus-within) .skills-icon__image {
+      transform: translateZ(20px) translateY(-6px) scale(1.3);
+      transition: transform 0.3s ease-out;
+    }
+    .skills-icon:is(:hover, :focus-within)::before {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
     }
   }
 
   /* タッチデバイス用の一時的なフィードバック */
   @media (any-hover: none) {
     .skills-icon .skills-icon__image.touch-animate {
-      transform: translateZ(20px) scale(1.6) rotate(720deg);
+      transform: translateZ(20px) translateY(-6px) scale(1.3);
       transition: transform 0.3s ease-out;
+    }
+    .skills-icon.touch-active::before {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
     }
 
     /* タッチ時にスキル名を表示 */

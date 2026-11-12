@@ -63,11 +63,8 @@ export default defineConfig({
     icon({
       include: {
         devicon: [
-          "twitter",
-          "github",
           "notion",
           "html5",
-          "css3",
           "sass",
           "javascript",
           "typescript",
@@ -83,9 +80,9 @@ export default defineConfig({
           "vercel",
           "filezilla",
         ],
-        logos: ["wordpress-icon", "greensock-icon", "netlify-icon", "gulp", "openai-icon", "claude-icon"],
+        logos: ["wordpress-icon", "greensock-icon", "netlify-icon", "gulp", "claude-icon"],
         "fa6-solid": ["cat", "envelope", "rocket", "crown", "arrow-right", "desktop", "link"],
-        "fa6-brands": ["instagram", "x-twitter", "facebook-f"],
+        "fa6-brands": ["instagram", "facebook-f"],
         ic: ["baseline-contact-mail"],
         "fluent-emoji": [
           "red-heart",
@@ -106,14 +103,12 @@ export default defineConfig({
         ],
         "fluent-emoji-high-contrast": ["party-popper", "mobile-phone", "mobile-phone-with-arrow"],
         "emojione-v1": ["alarm-clock", "bookmark", "star", "laptop-computer"],
-        bi: ["alarm-fill", "github"],
+        bi: ["alarm-fill"],
         octicon: ["play-24"],
         carbon: ["pause-outline"],
         ion: ["play-back-circle-outline"],
         solar: ["restart-circle-outline"],
         "flat-color-icons": ["home"],
-        "material-icon-theme": ["gemini-ai"],
-        "vscode-icons": ["file-type-cursorrules"],
       },
       iconDir: "src/assets/icons",
 

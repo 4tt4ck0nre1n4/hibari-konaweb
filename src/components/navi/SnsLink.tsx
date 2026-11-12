@@ -7,6 +7,8 @@ export interface SnsLinkProps {
   linkClassName?: string;
   href: string;
   snsIconSvg?: string;
+  /** ダークモード時に差し替えるSVGアセット（公式ロゴの白版など） */
+  snsIconDarkSvg?: string;
   snsIconName?: string;
   ariaLabel: string;
   ariaTitle: string;
@@ -18,6 +20,7 @@ const SnsLink = ({
   linkClassName = "sns-icon__link",
   href,
   snsIconSvg,
+  snsIconDarkSvg,
   snsIconName,
   ariaLabel,
   ariaTitle,
@@ -35,6 +38,9 @@ const SnsLink = ({
       (snsIconSvg.endsWith(".svg") || snsIconSvg.startsWith("/") || snsIconSvg.startsWith(".")),
     [snsIconSvg]
   );
+
+  const hasDarkVariant = isSvgAsset && typeof snsIconDarkSvg === "string" && snsIconDarkSvg.trim() !== "";
+  const imgClassName = hasDarkVariant ? "sns-icon__img sns-icon__img--light" : "sns-icon__img";
 
   const hasIconName = useMemo(() => snsIconName != null && snsIconName.trim() !== "", [snsIconName]);
 
@@ -84,6 +90,7 @@ const SnsLink = ({
               loading="lazy"
               decoding="async"
               data-sns-icon={snsIconSvg}
+              className={imgClassName}
             />
           ) : (
             <img
@@ -95,10 +102,23 @@ const SnsLink = ({
               decoding="async"
               aria-hidden="true"
               data-sns-icon={snsIconSvg}
+              className={imgClassName}
             />
           )
         ) : IconifyInline ? (
           <IconifyInline icon={snsIconSvg ?? ""} width={snsIconWidth} height={snsIconHeight} aria-hidden />
+        ) : null}
+        {hasDarkVariant ? (
+          <img
+            src={snsIconDarkSvg}
+            width={snsIconWidth}
+            height={snsIconHeight}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            aria-hidden="true"
+            className="sns-icon__img sns-icon__img--dark"
+          />
         ) : null}
         {hasIconName ? <span className="sns-icon__name">{snsIconName}</span> : null}
       </a>

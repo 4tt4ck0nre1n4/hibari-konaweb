@@ -817,6 +817,18 @@
   stroke: var(--color-white);
 }
 
+/*
+ * メニューパネルはダークモードでも白背景のため、公式ロゴ（X / GitHub）は常に黒版を表示する。
+ * global.css の html.dark による白版への切り替えを、メニュー内でのみ打ち消す。
+ */
+:global(html.dark) .hamburger__snsLink :global(.sns-icon__img--light) {
+  display: block;
+}
+
+:global(html.dark) .hamburger__snsLink :global(.sns-icon__img--dark) {
+  display: none;
+}
+
 .hamburger__snsLink :global(.sns-icon__name) {
   display: none;
 }

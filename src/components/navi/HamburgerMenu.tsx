@@ -476,6 +476,7 @@ const HamburgerMenu = () => {
             linkClassName={hamburgerStyles.hamburger__snsLink}
             href={twitter.href}
             snsIconSvg={twitter.icon}
+            snsIconDarkSvg={twitter.iconDark}
             ariaLabel={twitter.ariaLabel}
             ariaTitle={twitter.ariaTitle}
             targetBlank={twitter.targetBlank}
@@ -485,6 +486,7 @@ const HamburgerMenu = () => {
             linkClassName={hamburgerStyles.hamburger__snsLink}
             href={github_sns.href}
             snsIconSvg={github_sns.icon}
+            snsIconDarkSvg={github_sns.iconDark}
             ariaLabel={github_sns.ariaLabel}
             ariaTitle={github_sns.ariaTitle}
             targetBlank={github_sns.targetBlank}

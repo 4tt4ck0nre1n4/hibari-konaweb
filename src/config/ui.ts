@@ -1,3 +1,8 @@
+import xLogoBlack from "@/assets/icons/x-logo-black.svg";
+import xLogoWhite from "@/assets/icons/x-logo-white.svg";
+import githubLogoBlack from "@/assets/icons/GitHub_Invertocat_Black.svg";
+import githubLogoWhite from "@/assets/icons/GitHub_Invertocat_White.svg";
+
 // ============================================================
 // ボタンアイコン定数（旧: data/constButton.ts）
 // ============================================================
@@ -32,10 +37,19 @@ export interface SnsProps {
 }
 
 const logoSvg = "/favicon.svg";
+
+/**
+ * 公式ブランドロゴ（X / GitHub）
+ * - X: https://about.x.com/ja/who-we-are/brand-toolkit （配布は白版のみ。黒版は fill のみ black に変更）
+ * - GitHub: https://github.com/logos （Invertocat 黒版・白版）
+ * ブランドガイドラインにより、ロゴは黒または白の単色で使用し、形状・色を加工しない。
+ * ライトモードでは黒版（icon）、ダークモードでは白版（iconDark）を表示する。
+ */
 export const twitter = {
   className: "sns-icon__link",
   href: "/sorry",
-  icon: "devicon:twitter",
+  icon: xLogoBlack.src,
+  iconDark: xLogoWhite.src,
   item: "X(Twitter)",
   ariaLabel: "X(Twitter)ページへ(新しいタブで開く)",
   ariaTitle: "X(Twitter)ページへ(新しいタブで開く)",
@@ -44,7 +58,8 @@ export const twitter = {
 export const github_sns = {
   className: "sns-icon__link",
   href: "https://github.com/4tt4ck0nre1n4",
-  icon: "bi:github",
+  icon: githubLogoBlack.src,
+  iconDark: githubLogoWhite.src,
   item: "Github",
   ariaLabel: "Githubページへ(新しいタブで開く)",
   ariaTitle: "Githubページへ(新しいタブで開く)",

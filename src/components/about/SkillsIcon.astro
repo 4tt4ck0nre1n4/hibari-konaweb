@@ -4,17 +4,50 @@ import SafeIcon from "@/components/ui/SafeIcon.astro";
 interface SkillsIconProps {
   className: string;
   iconSvg: string;
+  /** 公式ロゴのSVGアセット（ライトモード用・黒版など）。指定時は iconSvg より優先 */
+  iconSrc?: string;
+  /** 公式ロゴのSVGアセット（ダークモード用・白版など） */
+  iconDarkSrc?: string;
   iconName: string;
 }
 
-const { className, iconSvg, iconName } = Astro.props as SkillsIconProps;
+const { className, iconSvg, iconSrc, iconDarkSrc, iconName } = Astro.props as SkillsIconProps;
+const hasAsset = typeof iconSrc === "string" && iconSrc.trim() !== "";
+const hasDarkVariant = hasAsset && typeof iconDarkSrc === "string" && iconDarkSrc.trim() !== "";
 
 const skillIconWidth: number = 32;
 const skillIconHeight: number = 32;
 ---
 
 <li class={`skills-icon ${className}`}>
-  <SafeIcon name={iconSvg} class="skills-icon__image" width={skillIconWidth} height={skillIconHeight} />
+  {
+    hasAsset ? (
+      <span class="skills-icon__image skills-icon__image--asset" data-icon={className} aria-hidden="true">
+        <img
+          src={iconSrc}
+          width={skillIconWidth}
+          height={skillIconHeight}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          class={hasDarkVariant ? "sns-icon__img sns-icon__img--light" : "sns-icon__img"}
+        />
+        {hasDarkVariant && (
+          <img
+            src={iconDarkSrc}
+            width={skillIconWidth}
+            height={skillIconHeight}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            class="sns-icon__img sns-icon__img--dark"
+          />
+        )}
+      </span>
+    ) : (
+      <SafeIcon name={iconSvg} class="skills-icon__image" width={skillIconWidth} height={skillIconHeight} />
+    )
+  }
   <span class="skills-icon__name">
     {iconName}
   </span>
