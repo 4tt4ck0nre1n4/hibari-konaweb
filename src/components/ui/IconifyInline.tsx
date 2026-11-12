@@ -15,110 +15,35 @@ type IconifyIconsJSON = {
   width?: number;
   height?: number;
   icons: Record<string, IconifyIcon>;
-  // aliases 等は必要になったら対応（現状利用アイコンは icons の直指定想定）
+  // エイリアスはサブセット生成時に実体へ解決済み
 };
 
-// アイコンセットのキャッシュ（一度読み込んだら再利用）
-const iconSetCache = new Map<string, IconifyIconsJSON>();
+// 使用中のアイコンだけを収録したサブセット（scripts/generate-icon-subset.mjs が生成）
+// 以前はアイコンセット全体（fluent-emoji だけで 100MB 超）を読み込んでいたため、
+// バンドルサイズとビルド時のメモリ使用量が過大になっていた。
+type IconifySubset = Record<string, IconifyIconsJSON>;
 
-// アイコンセットを動的に読み込む関数
+let subsetPromise: Promise<IconifySubset | null> | null = null;
+
+// アイコンサブセットを動的に読み込む関数（初回のみ読み込み、以降は再利用）
 const loadIconSet = async (prefix: string): Promise<IconifyIconsJSON | null> => {
-  // キャッシュをチェック
-  if (iconSetCache.has(prefix)) {
-    return iconSetCache.get(prefix) ?? null;
-  }
-
-  try {
-    let iconSet: IconifyIconsJSON | null = null;
-
-    // 必要なアイコンセットのみを動的インポート
-    switch (prefix) {
-      case "bi":
-        iconSet = (await import("@iconify-json/bi/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "devicon":
-        iconSet = (await import("@iconify-json/devicon/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "emojione":
-        iconSet = (await import("@iconify-json/emojione/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "emojione-v1":
-        iconSet = (await import("@iconify-json/emojione-v1/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "fa6-solid":
-        iconSet = (await import("@iconify-json/fa6-solid/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "fxemoji":
-        iconSet = (await import("@iconify-json/fxemoji/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "flat-color-icons":
-        iconSet = (await import("@iconify-json/flat-color-icons/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "fluent-emoji":
-        iconSet = (await import("@iconify-json/fluent-emoji/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "fluent-emoji-flat":
-        iconSet = (await import("@iconify-json/fluent-emoji-flat/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "fluent-emoji-high-contrast":
-        iconSet = (await import("@iconify-json/fluent-emoji-high-contrast/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "ic":
-        iconSet = (await import("@iconify-json/ic/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "icon-park":
-        iconSet = (await import("@iconify-json/icon-park/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "marketeq":
-        iconSet = (await import("@iconify-json/marketeq/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "mdi":
-        iconSet = (await import("@iconify-json/mdi/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "material-icon-theme":
-        iconSet = (await import("@iconify-json/material-icon-theme/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "noto-v1":
-        iconSet = (await import("@iconify-json/noto-v1/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "streamline-color":
-        iconSet = (await import("@iconify-json/streamline-color/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "streamline-kameleon-color":
-        iconSet = (await import("@iconify-json/streamline-kameleon-color/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "streamline-ultimate":
-        iconSet = (await import("@iconify-json/streamline-ultimate/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "streamline-ultimate-color":
-        iconSet = (await import("@iconify-json/streamline-ultimate-color/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "twemoji":
-        iconSet = (await import("@iconify-json/twemoji/icons.json")).default as IconifyIconsJSON;
-        break;
-      case "vscode-icons":
-        iconSet = (await import("@iconify-json/vscode-icons/icons.json")).default as IconifyIconsJSON;
-        break;
-      default:
-        return null;
-    }
-
-    if (iconSet !== null) {
-      iconSetCache.set(prefix, iconSet);
-    }
-
-    return iconSet;
-  } catch (error) {
-    // 本番環境ではエラーログを抑制（PageSpeed Insightsのエラーを防ぐ）
-    // 開発環境でのみログを出力
-    if (typeof window !== "undefined") {
-      const isDev = (window as Window & { __DEV__?: boolean }).__DEV__;
-      if (isDev === true) {
-        console.warn(`Failed to load icon set: ${prefix}`, error);
+  subsetPromise ??= import("@/generated/iconify-subset.json")
+    .then((mod) => mod.default as IconifySubset)
+    .catch((error: unknown) => {
+      // 本番環境ではエラーログを抑制（PageSpeed Insightsのエラーを防ぐ）
+      // 開発環境でのみログを出力
+      if (typeof window !== "undefined") {
+        const isDev = (window as Window & { __DEV__?: boolean }).__DEV__;
+        if (isDev === true) {
+          console.warn("Failed to load icon subset", error);
+        }
       }
-    }
-    return null;
-  }
+      subsetPromise = null;
+      return null;
+    });
+
+  const subset = await subsetPromise;
+  return subset?.[prefix] ?? null;
 };
 
 // メインスレッド処理の最適化: parseIconNameをメモ化（同じアイコン名の再計算を避ける）

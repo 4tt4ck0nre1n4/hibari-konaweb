@@ -11,6 +11,36 @@ import netlify from "@astrojs/netlify";
 import { asyncSwiperCssPlugin } from "./async-css-optimizer.js";
 
 import tailwindcss from "@tailwindcss/vite";
+import { existsSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+
+/**
+ * astro-icon の include を「実際に使っているアイコンだけ」に絞る。
+ *
+ * astro-icon は include に記載のないインストール済みアイコンセットを丸ごと読み込むため、
+ * mdi / twemoji / noto-v1 などが数万アイコン分サーバーバンドルに入り、
+ * Netlify のビルドがメモリ不足（exit 137）で強制終了していた。
+ * scripts/generate-icon-subset.mjs が src から収集した使用アイコン一覧を手動指定にマージし、
+ * 一覧にないセットは空配列（アイコンなし）にする。
+ */
+function buildIconInclude(manualInclude) {
+  const subsetPath = new URL("./src/generated/iconify-subset.json", import.meta.url);
+  if (!existsSync(subsetPath)) {
+    execFileSync(process.execPath, ["scripts/generate-icon-subset.mjs"], { stdio: "inherit" });
+  }
+  const subset = JSON.parse(readFileSync(subsetPath, "utf8"));
+  const pkg = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
+  const installedSets = Object.keys({ ...pkg.dependencies, ...pkg.devDependencies })
+    .filter((name) => name.startsWith("@iconify-json/"))
+    .map((name) => name.replace("@iconify-json/", ""));
+
+  const include = {};
+  for (const set of installedSets) {
+    const names = new Set([...(manualInclude[set] ?? []), ...Object.keys(subset[set]?.icons ?? {})]);
+    include[set] = [...names];
+  }
+  return include;
+}
 
 // WordPressドメインを環境変数から取得（リモート画像最適化用）
 function getWordPressDomain() {
@@ -61,7 +91,7 @@ export default defineConfig({
       xslURL: "/sitemap.xsl",
     }),
     icon({
-      include: {
+      include: buildIconInclude({
         devicon: [
           "notion",
           "html5",
@@ -109,7 +139,7 @@ export default defineConfig({
         ion: ["play-back-circle-outline"],
         solar: ["restart-circle-outline"],
         "flat-color-icons": ["home"],
-      },
+      }),
       iconDir: "src/assets/icons",
 
       svgoOptions: {
