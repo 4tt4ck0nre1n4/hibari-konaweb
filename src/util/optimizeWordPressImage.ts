@@ -48,6 +48,12 @@ export function getWordPressImageUrl(imageData: WordPressImageFieldInput): strin
   return null;
 }
 
+/** URL のパス部分が .svg で終わるか（クエリ・ハッシュは無視） */
+function isSvgUrl(url: string): boolean {
+  const path = url.split(/[?#]/, 1)[0] ?? "";
+  return path.toLowerCase().endsWith(".svg");
+}
+
 /**
  * WordPress画像を最適化する
  *
@@ -71,13 +77,27 @@ export async function optimizeWordPressImage(
     return null;
   }
 
+  /*
+   * SVG は最適化（ラスター変換）の対象外にする。
+   * Astro 6 は既定で SVG 処理が無効のため、getImage() に渡すと画像生成フェーズで
+   * ビルド全体が失敗する（UnsupportedImageFormat）。SVG はベクターで劣化しないため、
+   * null を返して呼び出し側のフォールバック（元URLの <img>）で表示する。
+   */
+  if (isSvgUrl(imageUrl)) {
+    return null;
+  }
+
   try {
     // リモート画像URLをgetImage()で処理
     // Astroはビルド時に画像をダウンロードして最適化します
+    const hasWidth = options?.width !== undefined;
+    const hasHeight = options?.height !== undefined;
     const optimizedImage = await getImage({
       src: imageUrl,
       width: options?.width,
       height: options?.height,
+      // リモート画像は幅・高さの両方が必要。片方しか分からない場合は元画像から縦横比を取得する
+      inferSize: !(hasWidth && hasHeight),
       quality: options?.quality ?? 95,
       format: options?.format,
     });
