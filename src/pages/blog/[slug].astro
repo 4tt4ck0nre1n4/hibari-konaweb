@@ -485,7 +485,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
                 class="blog-post-cta-btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 w-full bg-primary text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
               >
                 <SafeIcon name="fluent-emoji-flat:envelope" width={20} height={20} class="shrink-0" ariaHidden={true} />
-                {globalText.blog.postCtaContactButton}
+                <span class="blog-post-cta-contact-label">
+                  {globalText.blog.postCtaContactButton
+                    .split(/(?<=・)/)
+                    .map((part) => (
+                      <span class="blog-post-cta-contact-part">{part}</span>
+                    ))}
+                </span>
               </a>
               <a
                 href={worksUrl}
