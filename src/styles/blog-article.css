@@ -354,6 +354,32 @@
   margin-block-start: 2.5rem;
 }
 
+/*
+ * カテゴリー案内ボックス: 背景は明るい色のままなので、文字色はライト／ダーク／端末に関わらず固定する。
+ * （iPhone で文字が薄く見える問題への対処。Tailwind utilities レイヤーに負けないよう @layer 外で指定）
+ */
+.blog-post-category-guide,
+html.dark .blog-post-category-guide {
+  background-color: rgb(248 250 252);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.blog-post-category-guide .blog-post-category-guide__title,
+html.dark .blog-post-category-guide .blog-post-category-guide__title {
+  color: rgb(15 23 42);
+}
+
+.blog-post-category-guide .blog-post-category-guide__text,
+html.dark .blog-post-category-guide .blog-post-category-guide__text {
+  color: rgb(51 65 85);
+}
+
+.blog-post-category-guide .blog-post-category-guide__link,
+html.dark .blog-post-category-guide .blog-post-category-guide__link {
+  color: var(--color-indigo-600, #4f46e5);
+}
+
 .blog-post-share {
   display: flex;
   align-items: center;

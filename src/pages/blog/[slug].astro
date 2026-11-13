@@ -408,13 +408,13 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
               class="blog-post-category-guide mt-10 rounded-xl border border-slate-100 bg-slate-50 p-5"
               aria-label="この記事と同じテーマの記事"
             >
-              <p class="text-sm font-bold text-slate-800">この記事は「{currentCategoryName}」カテゴリーの記事です。</p>
-              <p class="mt-2 text-sm leading-relaxed text-slate-600">
+              <p class="blog-post-category-guide__title text-sm font-bold text-slate-800">この記事は「{currentCategoryName}」カテゴリーの記事です。</p>
+              <p class="blog-post-category-guide__text mt-2 text-sm leading-relaxed text-slate-600">
                 関連するノウハウや制作メモをまとめて読みたい場合は、同じカテゴリーの記事一覧もご覧ください。
               </p>
               <a
                 href={currentCategoryPath}
-                class="mt-4 inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
+                class="blog-post-category-guide__link mt-4 inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
                 aria-label={`${currentCategoryName}${categoryAriaLabel}`}
                 title={`${currentCategoryName}${categoryAriaTitle}`}
               >
