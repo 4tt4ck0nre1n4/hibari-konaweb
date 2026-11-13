@@ -40,7 +40,7 @@ const wpEmbeddedLenientSchema = z
   .object({
     author: z.array(wpAuthorLenientSchema).optional(),
     /** タームのフィールドが文脈で欠ける場合があるため緩く受ける */
-    "wp:term": z.array(z.array(z.record(z.unknown()))).optional(),
+    "wp:term": z.array(z.array(z.record(z.string(), z.unknown()))).optional(),
   })
   .passthrough()
   .optional();
@@ -84,7 +84,7 @@ const blogAcfSchema = z
  * Works の ACF は REST で文字列 / メディア ID / `{ url }` / `null` など揺れる。
  * ビルド時の静的パス生成で落とさないよう広く受け、表示は `getWordPressImageUrl` 等で正規化する。
  */
-const worksAcfRestSchema = z.record(z.unknown()).nullish();
+const worksAcfRestSchema = z.record(z.string(), z.unknown()).nullish();
 
 /**
  * Blog投稿スキーマ
