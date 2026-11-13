@@ -3,7 +3,7 @@ import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { SITE as globalText } from "@/config/site";
-import { github_sns, twitter } from "@/config/ui";
+import { github_sns, twitter, line, youtube } from "@/config/ui";
 import xLogoBlack from "@/assets/icons/x-logo-black.svg";
 import githubLogoBlack from "@/assets/icons/GitHub_Invertocat_Black.svg";
 import { BLOG_PAGE_API, BLOG_SLUG_API } from "@/api/headlessCms";
@@ -556,6 +556,24 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
             aria-label={twitter.ariaLabel}
           >
             <img src={xLogoBlack.src} width={22} height={22} alt="" aria-hidden="true" class="object-contain" />
+          </a>
+          <a
+            href={line.href}
+            target={line.targetBlank}
+            rel="noopener noreferrer"
+            class="hover:opacity-80 transition-opacity"
+            aria-label={line.ariaLabel}
+          >
+            <img src={line.image.src} width={22} height={22} alt="" aria-hidden="true" class="object-contain" />
+          </a>
+          <a
+            href={youtube.href}
+            target={youtube.targetBlank}
+            rel="noopener noreferrer"
+            class="hover:opacity-80 transition-opacity"
+            aria-label={youtube.ariaLabel}
+          >
+            <img src={youtube.image.src} width={22} height={22} alt="" aria-hidden="true" class="object-contain" />
           </a>
           <a href={aboutUrl} class="text-slate-400 hover:text-slate-600" aria-label="サイトについて">
             <SafeIcon name="fa6-solid:link" width={22} height={22} ariaHidden={true} />
