@@ -573,7 +573,14 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }, { 
             class="hover:opacity-80 transition-opacity"
             aria-label={youtube.ariaLabel}
           >
-            <img src={youtube.image.src} width={22} height={22} alt="" aria-hidden="true" class="object-contain" />
+            <img
+              src={youtube.image.src}
+              width={22}
+              height={22}
+              alt=""
+              aria-hidden="true"
+              class="blog-post-sidebar-youtube-icon object-contain"
+            />
           </a>
           <a href={aboutUrl} class="text-slate-400 hover:text-slate-600" aria-label="サイトについて">
             <SafeIcon name="fa6-solid:link" width={22} height={22} ariaHidden={true} />

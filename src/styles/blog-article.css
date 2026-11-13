@@ -769,6 +769,12 @@ html.dark .blog-post-category-guide .blog-post-category-guide__link {
   border-top-color: rgb(241 245 249);
 }
 
+/* YouTube 公式ロゴは画像に透明余白があり他より小さく見えるため、フッターと同じく 1.5 倍に拡大（余白は透明） */
+.blog-post-sidebar-social .blog-post-sidebar-youtube-icon {
+  transform: scale(1.5);
+  pointer-events: none;
+}
+
 /*
  * 白いカード上のテキスト: html.dark の継承色や非レイヤーの a { color: inherit } より、
  * ライトモードと同じ色を明示（Tailwind utilities レイヤーより優先させるためこのファイルは @layer 外）。
