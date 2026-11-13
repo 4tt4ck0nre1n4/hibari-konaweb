@@ -334,6 +334,9 @@ export async function generateEstimatePDFFromHTML(element: HTMLElement, _estimat
       const head = clonedDoc.head ?? clonedDoc.documentElement;
       head.appendChild(style);
       clonedElement.classList.add("estimate-document--pdf-export");
+      // PDF は常にライト表示。ダークモード用ルール（html.dark ...）は PDF 用 CSS より詳細度が高く、
+      // 白文字・暗い背景が PDF に混ざってしまうため、クローン側の dark クラスを外す
+      clonedDoc.documentElement.classList.remove("dark");
       // data-html2canvas-ignore は描画をスキップするだけでレイアウト上の高さは残るため、
       // 空白分でキャンバスが伸びて余分なページができる。クローン側で領域ごと消す
       clonedElement.querySelectorAll<HTMLElement>("[data-html2canvas-ignore]").forEach((el) => {
