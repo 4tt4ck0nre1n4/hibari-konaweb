@@ -188,6 +188,11 @@ export default defineConfig({
       dedupe: ["react", "react-dom"],
     },
     cacheDir: ".vite-cache", // node_modules外にキャッシュを配置
+    optimizeDeps: {
+      // Astro 7 + @astrojs/react 7 の dev で react-dom/client が事前バンドルされず、
+      // CJS のまま配信されて「createRoot が export されていない」ハイドレーションエラーになるため明示する
+      include: ["react-dom/client"],
+    },
     server: {
       watch: {
         // プロジェクト外（例: C:\DumpStack.log.tmp などのロックされたシステムファイル）を監視すると
@@ -222,7 +227,6 @@ export default defineConfig({
             return false;
           },
           propertyReadSideEffects: false,
-          tryCatchDeoptimization: false,
         },
         output: {
           // GSAPなどのライブラリを適切にバンドル
