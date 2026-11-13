@@ -306,7 +306,22 @@ export async function generateEstimatePDFFromHTML(element: HTMLElement, _estimat
   let canvasSplitY = 0;
 
   // キャンバスにフル描画（onclone でスタイル注入・クラス付与・details margin リセット・分割位置計測）
+  // html2canvas はキャンバスの高さを「元の要素」の寸法から決める（クローン側の変更は反映されない）。
+  // data-html2canvas-ignore の領域は描画されないだけで高さが残り、末尾に空白ページができるため、
+  // 除外領域を一瞬だけ非表示にして撮影対象の高さを測り、height として渡す。
+  // 同一タスク内で測定と復元を行うので、画面に再描画（ちらつき）は発生しない。
+  const ignoredEls = Array.from(element.querySelectorAll<HTMLElement>("[data-html2canvas-ignore]"));
+  const savedDisplay = ignoredEls.map((el) => el.style.display);
+  ignoredEls.forEach((el) => {
+    el.style.display = "none";
+  });
+  const captureHeight = Math.ceil(element.getBoundingClientRect().height);
+  ignoredEls.forEach((el, i) => {
+    el.style.display = savedDisplay[i] ?? "";
+  });
+
   const canvas = await html2canvas(element, {
+    height: captureHeight,
     scale: 2,
     useCORS: true,
     logging: false,
@@ -319,6 +334,11 @@ export async function generateEstimatePDFFromHTML(element: HTMLElement, _estimat
       const head = clonedDoc.head ?? clonedDoc.documentElement;
       head.appendChild(style);
       clonedElement.classList.add("estimate-document--pdf-export");
+      // data-html2canvas-ignore は描画をスキップするだけでレイアウト上の高さは残るため、
+      // 空白分でキャンバスが伸びて余分なページができる。クローン側で領域ごと消す
+      clonedElement.querySelectorAll<HTMLElement>("[data-html2canvas-ignore]").forEach((el) => {
+        el.style.display = "none";
+      });
       // インラインスタイルで margin-block-start: 0 を直接適用し、CSS読み込み順に依存しないようにする
       const detailsEl = clonedElement.querySelector<HTMLElement>(".estimate-document__details");
       if (detailsEl) detailsEl.style.marginBlockStart = "0";

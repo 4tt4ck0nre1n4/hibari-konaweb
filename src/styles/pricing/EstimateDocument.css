@@ -627,6 +627,36 @@ html.dark .estimate-document__notes-footer {
   background-color: var(--color-purple-dark, #7c3aed);
 }
 
+/* 処理中（PDF生成中）の表示 */
+.estimate-document__button:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.estimate-document__spinner {
+  flex-shrink: 0;
+  width: 1.25em;
+  height: 1.25em;
+  border: 2px solid currentcolor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: estimate-document-spin 0.8s linear infinite;
+}
+
+@keyframes estimate-document-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.estimate-document__status {
+  min-block-size: 1.5em;
+  margin: 0;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--color-purple, #8b5cf6);
+}
+
 /* ダークモード対応 */
 html.dark .estimate-document__expiry-badge {
   background-color: #2d2400;

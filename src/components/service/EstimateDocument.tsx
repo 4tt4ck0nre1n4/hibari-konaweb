@@ -39,6 +39,8 @@ interface EstimateDocumentProps {
 
 export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
   const documentRef = useRef<HTMLDivElement>(null);
+  /** PDF生成中の操作。null=待機中。ボタンの無効化と「作成中」表示に使う */
+  const [busyAction, setBusyAction] = useState<"pdf" | "contact" | null>(null);
   type AccordionKey = "extraCosts" | "aboutEstimate" | "payment";
   const [openAccordions, setOpenAccordions] = useState<Record<AccordionKey, boolean>>({
     extraCosts: false,
@@ -134,7 +136,19 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
     restoreAccordions();
   };
 
+  /**
+   * 処理中表示を実際に描画させてから重い処理（html2canvas）を始めるための待機。
+   * これがないと、メインスレッドが塞がれて「作成中」の表示が出る前に固まって見える。
+   */
+  const waitForPaint = () =>
+    new Promise<void>((resolve) => {
+      requestAnimationFrame(() => setTimeout(resolve, 0));
+    });
+
   const handleDownloadPDF = async () => {
+    if (busyAction !== null) return;
+    setBusyAction("pdf");
+    await waitForPaint();
     const { restoreAccordions } = expandAccordionsForCapture();
     try {
       if (!documentRef.current) {
@@ -147,19 +161,8 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
         await Promise.race([document.fonts.ready, new Promise((resolve) => setTimeout(resolve, 2000))]);
       }
 
-      // ボタンを一時的に非表示
-      const buttons = documentRef.current.querySelector(".estimate-document__actions");
-      if (buttons) {
-        (buttons as HTMLElement).style.display = "none";
-      }
-
-      // PDF生成
+      // PDF生成（アクション領域は data-html2canvas-ignore によりキャプチャから除外される）
       const blob = await generateEstimatePDFFromHTML(documentRef.current, estimateData.estimateNumber);
-
-      // ボタンを再表示
-      if (buttons) {
-        (buttons as HTMLElement).style.display = "";
-      }
 
       // ダウンロード
       const url = URL.createObjectURL(blob);
@@ -174,11 +177,17 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
       alert(`PDFの生成に失敗しました。\n\n詳細: ${errorMessage}`);
     } finally {
       restoreAccordions();
+      setBusyAction(null);
     }
   };
 
   const handleContact = async () => {
+    if (busyAction !== null) return;
+    setBusyAction("contact");
+    await waitForPaint();
     const { restoreAccordions } = expandAccordionsForCapture();
+    // 遷移に成功する場合は、ページが切り替わるまで「準備中」表示を残す
+    let navigating = false;
     try {
       if (!documentRef.current) {
         alert("見積書要素が見つかりません。");
@@ -190,19 +199,8 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
         await Promise.race([document.fonts.ready, new Promise((resolve) => setTimeout(resolve, 2000))]);
       }
 
-      // ボタンを一時的に非表示
-      const buttons = documentRef.current.querySelector(".estimate-document__actions");
-      if (buttons) {
-        (buttons as HTMLElement).style.display = "none";
-      }
-
-      // PDF生成
+      // PDF生成（アクション領域は data-html2canvas-ignore によりキャプチャから除外される）
       const blob = await generateEstimatePDFFromHTML(documentRef.current, estimateData.estimateNumber);
-
-      // ボタンを再表示
-      if (buttons) {
-        (buttons as HTMLElement).style.display = "";
-      }
 
       // BlobをBase64に変換してSessionStorageに保存
       const reader = new FileReader();
@@ -214,6 +212,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
         // お問い合わせページへ遷移
         window.location.href = "/contact";
       };
+      navigating = true;
       reader.readAsDataURL(blob);
     } catch (error) {
       console.error("PDF生成エラー:", error);
@@ -221,6 +220,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
       alert(`PDFの生成に失敗しました。\n\n詳細: ${errorMessage}`);
     } finally {
       restoreAccordions();
+      if (!navigating) setBusyAction(null);
     }
   };
 
@@ -551,7 +551,11 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
         </p>
       </div>
 
-      <div className="estimate-document__actions no-print">
+      <div
+        className="estimate-document__actions no-print"
+        data-html2canvas-ignore="true"
+        aria-busy={busyAction !== null}
+      >
         {/* 有効期限バッジ */}
         <div className="estimate-document__expiry-badge">
           {renderIcon(alarmClockIcon, "estimate-document__icon--expiry", "20")}
@@ -577,9 +581,14 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
             type="button"
             className="estimate-document__button estimate-document__button--contact"
             onClick={() => void handleContact()}
+            disabled={busyAction !== null}
           >
-            {renderIcon(contactIcon, "estimate-document__icon--contact")}
-            お問い合わせ・正式見積りを依頼する →
+            {busyAction === "contact" ? (
+              <span className="estimate-document__spinner" aria-hidden="true" />
+            ) : (
+              renderIcon(contactIcon, "estimate-document__icon--contact")
+            )}
+            {busyAction === "contact" ? "お問い合わせの準備中…" : "お問い合わせ・正式見積りを依頼する →"}
           </button>
           <p className="estimate-document__cta-assurance">
             <span>✓ 返信は通常24時間以内</span>
@@ -593,6 +602,7 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
             type="button"
             className="estimate-document__button estimate-document__button--print"
             onClick={handlePrint}
+            disabled={busyAction !== null}
           >
             {renderIcon(printerIcon, "estimate-document__icon--print")}
             印刷する
@@ -601,11 +611,21 @@ export function EstimateDocument({ estimateData }: EstimateDocumentProps) {
             type="button"
             className="estimate-document__button estimate-document__button--pdf"
             onClick={() => void handleDownloadPDF()}
+            disabled={busyAction !== null}
           >
-            {renderIcon(pdfIcon, "estimate-document__icon--pdf")}
-            PDFを保存
+            {busyAction === "pdf" ? (
+              <span className="estimate-document__spinner" aria-hidden="true" />
+            ) : (
+              renderIcon(pdfIcon, "estimate-document__icon--pdf")
+            )}
+            {busyAction === "pdf" ? "PDFを作成中…" : "PDFを保存"}
           </button>
         </div>
+        {/* 処理中メッセージ（スクリーンリーダーにも通知）。領域は常に存在させ、中身だけ切り替える */}
+        <p className="estimate-document__status" role="status" aria-live="polite">
+          {busyAction === "pdf" && "見積書を作成しています。数秒お待ちください。"}
+          {busyAction === "contact" && "見積書を添付してお問い合わせページへ移動します。数秒お待ちください。"}
+        </p>
       </div>
     </div>
   );
