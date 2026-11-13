@@ -15,43 +15,48 @@ interface Slider {
 }
 
 let sliders: Slider[] = [];
-
 const isDevSlider = import.meta.env.DEV;
 
-try {
-  const resSlider = await fetch(SLIDER_PATH_API, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
-    // タイムアウトを設定
-    signal: AbortSignal.timeout(5000),
-  });
+/**
+ * ビルド時に WordPress からスライダー一覧を取得する。
+ * 一度の失敗（タイムアウト・一時的な接続エラー）で「スライド 0 件のページ」が本番にデプロイされないよう、
+ * 再試行する。失敗は本番ビルドのログにも残す（以前は開発時のみ出力していたため気づけなかった）。
+ */
+const SLIDER_FETCH_ATTEMPTS = 3;
+const SLIDER_FETCH_TIMEOUT_MS = 15000;
 
-  if (resSlider.ok) {
-    const data = (await resSlider.json()) as unknown as Slider[];
+for (let attempt = 1; attempt <= SLIDER_FETCH_ATTEMPTS; attempt++) {
+  try {
+    const resSlider = await fetch(SLIDER_PATH_API, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      signal: AbortSignal.timeout(SLIDER_FETCH_TIMEOUT_MS),
+    });
 
-    if (!Array.isArray(data)) {
-      if (isDevSlider) {
-        console.warn("Expected an array of posts, but received:", data);
-      }
+    if (!resSlider.ok) {
+      console.warn(`[SwiperMenu] Failed to fetch slider data (attempt ${attempt}/${SLIDER_FETCH_ATTEMPTS}):`, resSlider.status);
     } else {
-      sliders = data;
-    }
-  } else if (isDevSlider) {
-    console.warn("Failed to fetch slider data:", resSlider.status);
-  }
-} catch (error) {
-  if (error instanceof Error) {
-    if (error.name === "AbortError") {
-      if (isDevSlider) {
-        console.warn("Slider data fetch timed out");
+      const data = (await resSlider.json()) as unknown;
+      if (Array.isArray(data)) {
+        sliders = data as Slider[];
+        break;
       }
-    } else if (isDevSlider) {
-      console.warn("Error fetching slider data:", error.message);
+      console.warn(`[SwiperMenu] Expected an array of sliders (attempt ${attempt}/${SLIDER_FETCH_ATTEMPTS}), received:`, data);
     }
+  } catch (error) {
+    const message = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    console.warn(`[SwiperMenu] Error fetching slider data (attempt ${attempt}/${SLIDER_FETCH_ATTEMPTS}):`, message);
   }
-  // Continue with empty array
+
+  if (attempt < SLIDER_FETCH_ATTEMPTS) {
+    await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+  }
+}
+
+if (sliders.length === 0 && !isDevSlider) {
+  console.warn("[SwiperMenu] No slider data was loaded. The slider will be empty in this build.");
 }
 
 // WordPress画像をAstroで最適化してキャッシュ可能にする
