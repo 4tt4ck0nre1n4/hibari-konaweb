@@ -92,8 +92,11 @@ const crumbs = [{ name: "Home", path: "/" }, { name: "Sorry..." }];
   }
   .sorry__image {
     display: block;
-    width: 200px;
-    height: 200px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    aspect-ratio: 743 / 500;
     border-radius: 20%;
     object-fit: contain;
     margin-block-start: 1rem;
