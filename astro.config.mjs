@@ -188,6 +188,17 @@ export default defineConfig({
       dedupe: ["react", "react-dom"],
     },
     cacheDir: ".vite-cache", // node_modules外にキャッシュを配置
+    server: {
+      watch: {
+        // プロジェクト外（例: C:\DumpStack.log.tmp などのロックされたシステムファイル）を監視すると
+        // EBUSY で開発サーバーが落ちるため、プロジェクト外のパスは監視対象から除外する
+        ignored: (p) => {
+          const target = String(p).replace(/\\/g, "/").toLowerCase();
+          const root = process.cwd().replace(/\\/g, "/").toLowerCase();
+          return !target.startsWith(root);
+        },
+      },
+    },
     build: {
       emptyOutDir: false, // Windowsのファイルロック問題を回避
       commonjsOptions: {
